@@ -1,0 +1,58 @@
+<div class="main-container" [ngClass]="{'ios-main': isIosDevice()}">
+  <div class="header">
+    <div class="left-container">
+      <img class="logo" src="assets/main-menu/shiba_logo.png" />
+      <div class="left-container-text">Reability Online</div>
+    </div>
+    <div class="right-container">
+      <div class="user-name">
+        {{currentUser.username}}
+      </div>
+      <div class="logout-container" (click)="logout()">
+        <img class="log-out-image" src="assets/main-menu/svg-cards/log_out.svg" />
+        Log out
+      </div>
+    </div>
+  </div>
+  <div class="mid-container" [ngClass]="{'hide': fullScreenVideoSessionDisplay}">
+    <div class="outer-border">
+      <div class="content-background">
+        <div class="header-container">
+          <div class="header-title">Video Call</div>
+          <svg viewBox="0 0 36 36" class="loader">
+            <path class="circle" stroke-dasharray="100, 100" d="M18 2.0845
+                a 15.9155 15.9155 0 0 1 0 31.831
+                a 15.9155 15.9155 0 0 1 0 -31.831" />
+          </svg>
+        </div>
+      </div>
+      <div class="connection-message-container">
+        <div class="connection-image"></div>
+        <div class="message-header">{{message_header}}</div>
+        <div class="message-content">{{message_content}}</div>
+      </div>
+      <div class="waiting-for-call-spinner-container">
+        <div class="spinner-icon"></div>
+        <div class="waiting-text">{{spinner_text}}</div>
+        <div class="waiting-text-mobile">{{spinner_text_mobile}}</div>
+        <div class="spinner">
+          <div class="bounce1"></div>
+          <div class="bounce2"></div>
+          <div class="bounce3"></div>
+        </div>
+      </div>
+      <div class="video-wrapper" cdkDrag cdkDragBoundary=".backdrop">
+        <video id="patient-video" class="patient-video" playsinline autoplay muted></video>
+      </div>
+      <div *ngIf="!localStream" class="no-camera-message">{{no_camera_connection}}</div>
+    </div>
+  </div>
+</div>
+<app-full-screen-video-session-component *ngIf="fullScreenVideoSessionDisplay" [localStream]="localStream"
+  [remoteStream]="getRemoteStream()" (leaveFullScreenVideo)="toggleVideoSessionView()" [isTherapist]="false"
+  [isVideoPaitentSession]="true" [remotePeerUserName]="getTherapistUser()" [isTherapistScreenShared]="isShareScreen">
+</app-full-screen-video-session-component>
+<audio id="call-audio">
+  <source src="assets/audio/skype_call.mp3" type="audio/mpeg">
+</audio>
+<div id="web-rtc-wrapper" class="web-rtc-wrapper"></div>

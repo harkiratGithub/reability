@@ -1,0 +1,22 @@
+.container {
+  display: flex;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  overflow: auto;
+  .content {
+    background-color: #fefefe;
+    margin: auto;
+    min-width: fit-content;
+    height: fit-content;
+    border: 1px solid #888;
+    border-radius: 20px;
+    box-shadow: 0 24px 48px -8px rgba(17, 50, 102, 0.3);
+  }
+}
+.backdrop {
+  background-color: rgba($color: black, $alpha: 0.7);
+}

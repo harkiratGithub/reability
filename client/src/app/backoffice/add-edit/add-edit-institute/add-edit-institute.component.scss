@@ -1,0 +1,141 @@
+$FORM-WIDTH: 280px;
+
+form {
+  width: $FORM-WIDTH;
+  padding: 30px;
+}
+
+.field-container {
+  display: block;
+  margin-bottom: 24px;
+  position: relative;
+
+  :last-child {
+    margin-bottom: 0;
+  }
+
+  .description {
+    display: block;
+    color: #b6c5cf;
+    font-family: 'Roboto bold';
+    font-size: 16px;
+    margin-bottom: 10px;
+
+    .secondary {
+      font-family: 'Roboto';
+    }
+  }
+
+  input {
+    background: inherit;
+    height: 40px;
+    width: 280px;
+    padding-left: 8px;
+    padding-right: 8px;
+    font-size: 16px;
+    font-family: 'Roboto';
+    color: #6d7278;
+    border: 1px solid #b6c5cf;
+    border-radius: 10px;
+    outline: none;
+
+    &[type='file'] {
+      height: 0;
+      width: 0;
+      padding: 0;
+      border: 0;
+      overflow: hidden;
+      display: none;
+    }
+  }
+
+  input::placeholder {
+    color: #d2d2d2;
+    font-family: Roboto;
+    font-size: 16px;
+  }
+
+  &.group {
+    .input-container {
+      margin-bottom: 20px;
+    }
+  }
+
+  .input-container {
+    position: relative;
+    --paddingRight: 28px;
+
+    input {
+      padding-right: var(--paddingRight);
+    }
+
+    .delete-container {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: calc(#{$FORM-WIDTH} - var(--paddingRight));
+      right: 0;
+      cursor: default;
+
+      .delete-image-container {
+        display: flex;
+        height: 100%;
+        width: 100%;
+        cursor: pointer;
+
+        img {
+          margin: auto;
+        }
+      }
+    }
+  }
+
+  .upload-container {
+    display: flex;
+    margin-top: 16px;
+
+    .upload {
+      display: inline-block;
+      justify-content: center;
+      margin-left: auto;
+      align-items: center;
+      height: 42px;
+      padding: 12px 10px;
+      font-family: Roboto;
+      font-size: 16px;
+      border: 1px solid #0091ff;
+      border-radius: 10px;
+      color: #0091ff;
+      cursor: pointer;
+
+      &:hover {
+        background-color: #0091ff;
+        border: none;
+        color: #ffffff;
+      }
+    }
+  }
+
+  .add-new-department {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    border: 1px solid #44d7b6;
+    border-radius: 10px;
+    color: #44d7b6;
+    font-family: 'Roboto bold';
+    cursor: pointer;
+
+    &:hover {
+      background-color: #44d7b6;
+      border: none;
+      color: #ffffff;
+    }
+  }
+}
+
+.disabled {
+  pointer-events: none;
+  opacity: 0.4;
+}

@@ -1,0 +1,251 @@
+/* You can add global styles to this file, and also import other style files */
+@import './fonts';
+@import '~@angular/material/prebuilt-themes/indigo-pink.css';
+@import './normalize.scss';
+
+body {
+  padding: 0;
+  margin: 0;
+  font-family: Roboto;
+  height: 100vh;
+  width: 100vw;
+}
+
+* {
+  user-select: none;
+  box-sizing: border-box;
+}
+
+.mat-tab-body-wrapper {
+  height: 100%;
+}
+
+.shifts-dropbox {
+  .mat-menu-content {
+    max-height: 350px !important;
+  }
+  /* width */
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  /* Track */
+  &::-webkit-scrollbar-track {
+    box-shadow: 0;
+    border-radius: 0;
+  }
+
+  /* Handle */
+  &::-webkit-scrollbar-thumb {
+    background: #0091ff;
+    border-radius: 4px;
+  }
+}
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  box-shadow: 0;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #dfeaed;
+  border-radius: 4px;
+}
+
+// Remove padding from the dialog popup
+.mat-dialog-container {
+  padding: 0 !important;
+  overflow: visible !important;
+}
+
+.custom-therapist-dialog {
+  .mat-dialog-container {
+    border-radius: 0 !important;
+  }
+}
+
+.split-screen-panel-popup {
+  transform: scale(0.55);
+  transform-origin: center bottom;
+}
+
+.split-screen-swapped-panel-popup {
+  transform: scale(0.15);
+  transform-origin: center;
+}
+
+.mobile-view {
+  transform: scale(0.5);
+  transform-origin: center center;
+  max-width: 100vw !important;
+  .main-section {
+    font-size: 1.5rem !important;
+    padding: 50px 50px 50px 30px !important;
+  }
+}
+
+.screen-panel-popup-mobile {
+  transform: scale(0.35);
+  transform-origin: center center;
+  max-width: 100vw !important;
+  margin-left: 0 !important;
+  margin-top: 0 !important;
+  .main-section {
+    font-size: 1.5rem !important;
+    padding: 50px 50px 50px 30px !important;
+  }
+}
+
+.hide-modal {
+  visibility: hidden;
+}
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.selectable {
+  user-select: text;
+}
+.pointer {
+  cursor: pointer;
+}
+.init-pointer {
+  cursor: initial;
+}
+.shiba-logo{
+  height: 40px;
+  width: 25px;
+  margin-right: 10px;
+  mix-blend-mode: difference;
+}
+
+@font-face {
+  font-family: 'Fredoka One';
+  src: url('/../assets/fonts/FredokaOne-Regular.ttf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Roboto medium';
+  src: url('/../assets/fonts/Roboto-Medium.ttf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Roboto bold';
+  src: url('/../assets/fonts/Roboto-Bold.ttf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Roboto black';
+  src: url('/../assets/fonts/Roboto-Black.ttf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('/../assets/fonts/Roboto-Regular.ttf') format('opentype');
+}
+
+// start - bottom tooltip - https://stackblitz.com/edit/angular-tooltip-directive?file=app%2Fapp.component.ts
+.ng-tooltip {
+  position: absolute;
+  max-width: 150px;
+  font-size: 14px;
+  text-align: center;
+  color: #f8f8f2;
+  padding: 3px 8px;
+  background: #282a36;
+  border-radius: 4px;
+  z-index: 1000;
+  opacity: 0;
+}
+.ng-tooltip:after {
+  content: '';
+  position: absolute;
+  border-style: solid;
+}
+
+.ng-tooltip-bottom:after {
+  bottom: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-color: transparent transparent black transparent;
+}
+
+.ng-tooltip-show {
+  opacity: 1;
+}
+.mat-menu-panel {
+  border-radius: 8px !important;
+  background-color: white !important;
+  box-shadow: 0 2px 8px 0 rgba(25, 148, 192, 0.3) !important;
+  min-height: auto !important;
+}
+@media only screen and (min-width: 280px) and (max-width: 640px) and (orientation: portrait) {
+  body {
+    overflow: hidden !important;
+    height: 100%;
+  }
+  html {
+    height: 100%;
+  }
+}
+@media only screen and (min-height: 260px) and (max-height: 640px) and (orientation: landscape) {
+  body {
+    overflow: hidden !important;
+    height: 100%;
+  }
+  html {
+    height: 100%;
+  }
+}
+// end
+input {
+  -webkit-user-select: text; /* Chrome, Opera, Safari */
+  -moz-user-select: text; /* Firefox 2+ */
+  -ms-user-select: text; /* IE 10+ */
+  user-select: text; /* Standard syntax */
+}
+@media screen and (min-width: 300px) and (max-width: 640px) and (orientation: portrait) {
+  .mobile-view {
+    display: block;
+    /* Rotate the content container */
+    transform: rotate(90deg) scale(0.5);
+    /* Set content width to viewport height */
+    /* Set content height to viewport width */
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+  }
+  .screen-panel-popup-mobile {
+    display: block;
+    /* Rotate the content container */
+    transform: rotate(90deg) scale(0.35);
+    /* Set content width to viewport height */
+    /* Set content height to viewport width */
+    position: absolute !important;
+    bottom: 40%;
+    left: 0;
+  }
+  .mat-dialog-container {
+    padding: 26px !important;
+    padding-bottom: 38px !important;
+    overflow: auto !important;
+    border-radius: 4px !important;
+    width: 90vh !important;
+    height: 100% !important;
+    box-shadow: unset !important;
+    background: transparent !important;
+  }
+}
+
+.grecaptcha-badge {
+  visibility: hidden;
+}
+
+// remove underline from mat input
+::ng-deep .mat-form-field-appearance-legacy .mat-form-field-underline {
+  display: none !important;
+}

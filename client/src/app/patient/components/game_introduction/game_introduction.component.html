@@ -1,0 +1,68 @@
+<div *ngIf="!isMobile" id="game-introduction" class="game-introduction">
+  <div class="intro-title">
+    <div>
+      <p class="intro-game-name">{{ currentGameName }}</p>
+    </div>
+    <div *ngIf="!isTherapistMode" class="header" (click)="hideGameIntro()">
+      <div class="header-right-container">
+        <img class="log-out-image" src="assets/main-menu/svg-cards/back_home.svg" />
+        <p class="log-out-text">Home</p>
+      </div>
+    </div>
+  </div>
+  <div class="faded-section">
+    <div class="game-data">
+      <div class="game-data-title">{{ currentGameDescription }}</div>
+      <div class="intro-types-wrapper">
+        <div class="grey-border" *ngFor="let introType of introTypes; let i = index">
+          <div class="intro-type-box">
+            <p class="intro-type-title">{{ introType.type | camelcasepipe }}</p>
+            <p class="intro-type-value">{{ introType.value }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="msg-border" *ngIf="!introTypes.length && isShowMsg">
+        <div class="loading-msg">{{ message }}</div>
+      </div>
+      <div class="loading-bar-handle">
+        <div id="introLoadingBarWrapper" class="skeleton-loading-bar">
+          <div *ngIf="gotGameSettings" id="introLoadingBar" class="loading-fill"></div>
+        </div>
+        <div class="skeleton-loading-percentage">
+          <p class="skeleton-loading-title">Loading Progress</p>
+          <p class="skeleton-loading-text">{{ loadingBarPercentage }}%</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div *ngIf="isMobile" id="game-introduction" class="game-introduction-mobile">
+  <div class="intro-title-mobile">
+    <!-- <div *ngIf="!isTherapistMode" class="header-mobile" (click)="hideGameIntro()">
+      <div class="header-right-container-mobile">
+        <img class="log-out-image-mobile" src="assets/main-menu/svg-cards/back_home.svg" />
+        <p class="log-out-text-mobile">Home</p>
+      </div>
+    </div> -->
+    <div>
+      <p class="intro-game-name-mobile">{{ currentGameName }}</p>
+    </div>
+  </div>
+  <div class="faded-section-mobile">
+    <div class="game-data-mobile">
+      <div class="game-data-title-mobile">{{ currentGameDescription }}</div>
+      <div class="msg-border-mobile" *ngIf="!introTypes.length && isShowMsg">
+        <div class="loading-msg-mobile">{{ message }}</div>
+      </div>
+      <div class="loading-bar-handle-mobile">
+        <div id="introLoadingBarWrapper" class="skeleton-loading-bar-mobile">
+          <div *ngIf="gotGameSettings" id="introLoadingBar" class="loading-fill-mobile"></div>
+        </div>
+        <div class="skeleton-loading-percentage-mobile">
+          <p class="skeleton-loading-title-mobile">Loading Progress</p>
+          <p class="skeleton-loading-text-mobile">{{ loadingBarPercentage }}%</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

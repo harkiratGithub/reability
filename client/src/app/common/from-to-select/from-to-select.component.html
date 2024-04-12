@@ -1,0 +1,40 @@
+<div class="hour-range">
+  <div
+    *ngIf="localStartTime"
+    class="shift-time"
+    [matMenuTriggerFor]="startTimeMenu"
+    (click)="focusOnMenuItem(localStartTime)"
+  >
+    {{ localStartTime }}
+  </div>
+  <mat-menu class="shifts-dropbox" #startTimeMenu="matMenu">
+    <button
+      #menuItem
+      mat-menu-item
+      *ngFor="let time of possibleShiftTimings; trackBy: trackByIndex"
+      (click)="setLocalStartTime(time)"
+    >
+      {{ time }}
+    </button>
+  </mat-menu>
+  <img src="/assets/backoffice/arrow_right_with_line.svg" alt="" />
+  <div
+    *ngIf="localEndTime"
+    [ngClass]="{ disabled: endTimeAutoAdjusted }"
+    class="shift-time"
+    [matMenuTriggerFor]="endTimeMenu"
+    (click)="focusOnMenuItem(localEndTime)"
+  >
+    {{ localEndTime }}
+  </div>
+  <mat-menu class="shifts-dropbox" #endTimeMenu="matMenu">
+    <button
+      #menuItem
+      mat-menu-item
+      *ngFor="let time of possibleShiftTimings; trackBy: trackByIndex"
+      (click)="setLocalEndTime(time)"
+    >
+      {{ time }}
+    </button>
+  </mat-menu>
+</div>

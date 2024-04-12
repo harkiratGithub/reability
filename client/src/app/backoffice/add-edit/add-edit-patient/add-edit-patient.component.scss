@@ -1,0 +1,139 @@
+.field-container {
+  margin-bottom: 24px;
+  margin-left: 34px;
+
+  :last-child {
+    margin-bottom: 0;
+  }
+
+  .description {
+    display: block;
+    color: #b6c5cf;
+    font-family: 'Roboto bold';
+    font-size: 16px;
+    margin-bottom: 10px;
+
+    .secondary {
+      font-family: 'Roboto';
+    }
+  }
+
+  input {
+    background: inherit;
+    height: 40px;
+    width: 280px;
+    padding-left: 8px;
+    padding-right: 8px;
+    font-size: 16px;
+    font-family: 'Roboto';
+    color: #6d7278;
+    border: 1px solid #b6c5cf;
+    border-radius: 10px;
+    outline: none;
+
+    &.disabled {
+      opacity: 0.4;
+    }
+  }
+}
+
+form {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 30px;
+  .column {
+    flex: 1;
+    display: flex;
+    flex-flow: column nowrap;
+  }
+  :last-child {
+    flex: 2;
+  }
+}
+.checkbox-container {
+  margin-bottom: 24px;
+  display: block;
+
+  .description {
+    color: #b6c5cf;
+    font-family: 'Roboto bold';
+    font-size: 16px;
+    margin-bottom: 10px;
+
+    .secondary {
+      font-family: 'Roboto';
+    }
+  }
+
+  input {
+    background: inherit;
+    margin-right: 10px;
+  }
+}
+
+.patient-log {
+  margin: 30px;
+  width: fit-content;
+  .log-entry {
+    margin-bottom: 30px;
+  }
+}
+
+.reset-password {
+  margin: 30px;
+  color: blue;
+  cursor: pointer;
+}
+
+.add-remark {
+  margin: 30px;
+  width: fit-content;
+
+  .remark-input-container {
+    display: flex;
+    align-items: flex-end;
+  }
+}
+
+.inputTextArea {
+  width: 800px;
+  padding-left: 8px;
+  color: #6d7278;
+  border: 1px solid #b6c5cf;
+  border-radius: 10px;
+  min-height: 130px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  overflow: hidden;
+  outline: none;
+}
+
+.inputTextArea::placeholder {
+  color: #d2d2d2;
+  font-family: Roboto;
+  font-size: 16px;
+}
+
+.save {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  width: 80px;
+  color: #ffffff;
+  border: 1px solid #44d7b6;
+  border-radius: 20px;
+  background-color: #44d7b6;
+  margin-left: 10px;
+  cursor: pointer;
+
+  .save-text {
+    font-size: 14px;
+    font-family: 'Roboto bold';
+    margin: 0 auto;
+  }
+
+  &.disabled {
+    opacity: 0.2;
+    pointer-events: none;
+  }
+}

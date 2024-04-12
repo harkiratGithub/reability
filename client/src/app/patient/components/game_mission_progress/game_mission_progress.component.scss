@@ -1,0 +1,62 @@
+.game-percentage-wrapper {
+    width: auto;
+    border-radius: 8px;
+    background-color: #0E191F;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 12px;
+    margin-bottom: 10px;
+    max-height: 16vh;
+}
+.percentage {
+    position: relative;
+    height: 100px;
+    display: flex;
+    flex: 1 1 auto;
+    justify-content: center;
+}
+.game-percentage-loader {
+    visibility: visible;
+    width: 100px;
+    .game-percentage-loader-bg {
+      fill: none;
+      stroke: rgba(195, 195, 195, 0.4);
+      stroke-width: 3;
+    }
+    .game-percentage-circle {
+      fill: none;
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-dashoffset: 100;
+      stroke: #FF52A0;
+    }
+}
+.percentage-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
+    color: #FFFFFF;
+    font-family: "Open Sans";
+    font-size: 27px;
+    font-weight: 300;
+    letter-spacing: 0;
+    line-height: 76px;
+    text-align: right;
+}
+.percentage-title-wrapper {
+    display: flex;
+    flex: 1 1 auto;
+    justify-content: center;
+}
+.percentage-title {
+    color: #ECECED;
+    font-family: "Open Sans";
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0;
+    line-height: 24px;
+    margin: 0;
+}

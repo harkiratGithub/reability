@@ -1,0 +1,44 @@
+<form [formGroup]="customForm">
+  <label class="field-container">
+    <span class="description">Name</span>
+    <input type="text" formControlName="name" required />
+  </label>
+  <label class="field-container">
+    <span class="description">Logo<span class="secondary"> (JPG, PNG, PDF)</span></span>
+    <div class="input-container">
+      <input type="text" class="disabled" formControlName="logo" />
+    </div>
+    <input type="file" id="file" (change)="onFileChange($event)" />
+    <div class="upload-container">
+      <label for="file" class="upload">Choose a file</label>
+    </div>
+  </label>
+  <div class="field-container group" formArrayName="expertises">
+    <span class="description">Expertises</span>
+    <div
+      class="input-container"
+      *ngFor="let input of expertises.controls; let i = index"
+      [class.disabled]="isExpertiseFieldDisabled(i)"
+    >
+      <div class="expertise-container" [formGroupName]="i">
+        <div>
+          <input formControlName="name" type="text" [placeholder]="addExpertisePlaceHolder" />
+          <div class="delete-container" *ngIf="!isExpertiseFieldDisabled(i)">
+            <div class="delete-image-container" (click)="deleteExpertiseField(i)">
+              <img src="/assets/backoffice/icon_close_search.svg" />
+            </div>
+          </div>
+        </div>
+        <div class="max-patients-container">
+          <div><span class="max-patients-title">Max Patients: </span></div>
+          <app-select formControlName="max_patients" [items]="maxPatientsOptions"> </app-select>
+        </div>
+        <div class="duration-container">
+          <div><span class="duration-title">Duration: </span></div>
+          <app-select formControlName="duration" [items]="durationOptions"> </app-select>
+        </div>
+      </div>
+    </div>
+    <div class="add-new-expertise" (click)="addNewExpertise()">+ Add Expertise</div>
+  </div>
+</form>

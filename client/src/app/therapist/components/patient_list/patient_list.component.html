@@ -1,0 +1,174 @@
+<div class="patient-list-container">
+  <div class="head-container">
+    <div class="logged">
+      <div class="logged-in">
+        <div class="peer-title">
+          <div class="circle" [style.background]="getPeerStatusColor(peersStatusConst.AVAILABLE)"></div>
+          <div class="peer-text">{{ peersStatusConst.AVAILABLE }}</div>
+        </div>
+        <div class="peer-amount" [style.margin-left.px]="10">
+          {{
+            patientListGrouped[peersStatusConst.AVAILABLE] ? patientListGrouped[peersStatusConst.AVAILABLE].length : 0
+          }}
+        </div>
+      </div>
+      <div class="logged-in">
+        <div class="peer-title">
+          <div class="circle" [style.background]="getPeerStatusColor(peersStatusConst.CONNECTED)"></div>
+          <div class="peer-text">{{ peersStatusConst.CONNECTED }}</div>
+        </div>
+        <div class="peer-amount" [style.margin-left.px]="10">
+          {{
+            patientListGrouped[peersStatusConst.CONNECTED] ? patientListGrouped[peersStatusConst.CONNECTED].length : 0
+          }}
+        </div>
+      </div>
+      <div class="logged-in">
+        <div class="peer-title">
+          <div class="circle" [style.background]="getPeerStatusColor(peersStatusConst.BUSY)"></div>
+          <div class="peer-text">{{ peersStatusConst.BUSY }}</div>
+        </div>
+        <div class="peer-amount" [style.margin-left.px]="10">
+          {{ patientListGrouped[peersStatusConst.BUSY] ? patientListGrouped[peersStatusConst.BUSY].length : 0 }}
+        </div>
+      </div>
+      <div class="logged-in">
+        <div class="peer-title">
+          <div class="circle" [style.background]="getPeerStatusColor(peersStatusConst.LOGGED_OUT)"></div>
+          <div class="peer-text">{{ peersStatusConst.LOGGED_OUT }}</div>
+        </div>
+        <div class="peer-amount" [style.margin-left.px]="10">
+          {{
+            patientListGrouped[peersStatusConst.LOGGED_OUT] ? patientListGrouped[peersStatusConst.LOGGED_OUT].length : 0
+          }}
+        </div>
+      </div>
+      <div class="logged-in">
+        <div class="peer-title">
+          <div class="circle" [style.background]="getPeerStatusColor(peersStatusConst.DISABLED)"></div>
+          <div class="peer-text">{{ peersStatusConst.DISABLED }}</div>
+        </div>
+        <div class="peer-amount" [style.margin-left.px]="10">
+          {{ patientListGrouped[peersStatusConst.DISABLED] ? patientListGrouped[peersStatusConst.DISABLED].length : 0 }}
+        </div>
+      </div>
+    </div>
+    <div class="search-container">
+      <app-backoffice-search
+        [data]="patientList"
+        [disabled]="patientList && patientList.length === 0"
+        [filterFunc]="filterFunc"
+      ></app-backoffice-search>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <div class="table-header">
+      <div class="status-header">Status</div>
+      <div class="full-name-header">User Name</div>
+      <div class="phone-header">Phone</div>
+      <div class="left-button" (click)="onWeeklyActivityClicked('left')">
+        <img class="arrow" src="/assets/backoffice/arrow_left.svg" />
+      </div>
+      <div class="last-week-activity-header">
+        <div class="last-week-activity-title-header">Weekly activity</div>
+        <div class="date-container">
+          <div *ngFor="let date of lastWeekActivityArray" class="date-header">
+            {{ date | date : 'dd MMM' }}
+          </div>
+        </div>
+      </div>
+      <div class="right-button" (click)="onWeeklyActivityClicked('right')">
+        <img class="arrow" src="/assets/backoffice/arrow_right.svg" />
+      </div>
+      <div class="last-login-header">
+        <div class="last-login-text">Last login</div>
+      </div>
+    </div>
+    <div class="table-body">
+      <div
+        *ngFor="let patient of patientListFiltered"
+        [ngClass]="{ opened: patient.settingMenuOpen }"
+        class="table-row"
+      >
+        <div class="status">
+          <div class="circle" [style.background]="getPeerStatusColor(patient.status)"></div>
+        </div>
+
+        <div class="full-name">
+          <div class="patient-name" (click)="togglePatientSettingMenu(patient)">
+            {{ patient.userName }} - {{ patient.fullName }}
+          </div>
+
+          <div>
+            <button
+              class="open-modal-btn"
+              (click)="openLogModal(patient.userId)"
+              *ngIf="patient.log"
+              [ngClass]="{ 'animate-button': !shownLogs[patient.userId] }"
+            >
+              1
+            </button>
+          </div>
+
+          <div *ngIf="isLogModalOpen && patientLog && selectedPatientId == patient.userId" class="patient-log-modal">
+            <textarea type="text" [(ngModel)]="patientLog"></textarea>
+            <button class="close-btn" (click)="closeModal()">Close</button>
+            <button (click)="copyToClipboard()" title="copy" class="copy-btn">Copy</button>
+          </div>
+          <div *ngIf="isCopiedToClipboard" class="erase-log-modal">
+            <p>Text was copied</p>
+            <p>Do you want to erase log?</p>
+            <button class="close-btn top-up" (click)="closeEraseLogModal()">No</button>
+            <button class="copy-btn top-up" (click)="deletePatientLog()">Yes</button>
+          </div>
+        </div>
+        <div class="phone">
+          {{ patient.phone }}
+          <div class="contacts">
+            <div *ngFor="let contact of patient.contacts">
+              <img [title]="showContactDetails(contact)" src="../../../../assets/skel/info_black_24dp.svg" />
+            </div>
+          </div>
+        </div>
+        <div class="last-week-activity-content" [ngClass]="{ opened: patient.settingMenuOpen }">
+          <div *ngFor="let activity of patient.lastWeekActivity" class="patient-activity-image">
+            <img
+              [title]="getActivityTooltipText(activity)"
+              [src]="
+                !activity.duration
+                  ? '/assets/backoffice/therapist_side_activity_none.svg'
+                  : activity.withTherapistSession
+                  ? '/assets/backoffice/therapist_side_activity_with_therapist_session.svg'
+                  : '/assets/backoffice/therapist_side_activity_checked.svg'
+              "
+            />
+          </div>
+        </div>
+        <div class="last-login">
+          <div class="last-login-content">{{ patient.lastLogin | datepipe }}</div>
+        </div>
+        <div class="right-setting-drop-down" [ngClass]="{ 'arrow-up': patient.settingMenuOpen }"></div>
+        <div *ngIf="patient.settingMenuOpen" class="games-settings">
+          <div class="settings-header">{{ headerMessage }}</div>
+          <div class="settings-icon-container">
+            <div class="settings-icons" *ngFor="let game of patient.allGames">
+              <input type="checkbox" [checked]="game.isValid" (click)="toggleGame(game, patient)" />
+              <img
+                id="{{ 'game-icon-' + patient.id + '-' + game.id }}"
+                [src]="game.path"
+                (click)="openGameConfiguration(game, patient)"
+              />
+              {{ game.name }}
+            </div>
+            <div class="send-invitation">
+              <div class="settings-icons send" (click)="sendFastLoginLink(patient)"></div>
+              <div class="label">Send Invitation</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="audio-container"></div>

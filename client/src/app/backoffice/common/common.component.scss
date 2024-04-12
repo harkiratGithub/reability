@@ -1,0 +1,219 @@
+$ACTIONS-HEIGHT: 80px;
+$LEFT-SPACE: 16px;
+$RIGHT-SPACE: 16px;
+
+.main-menu-container {
+  height: 100%;
+  width: 100%;
+  color: #ffffff;
+  background: #f4f8f9;
+
+  .header {
+    width: 100%;
+    height: 75px;
+    display: flex;
+
+    .left {
+      width: 275px;
+      display: flex;
+      align-items: center;
+      background: linear-gradient(270.06deg, #385f7c 0%, #294259 100%, #272545 100%);
+
+      img {
+        height: 33px;
+        margin-left: 16px;
+      }
+    }
+    .right {
+      width: calc(100% - 275px);
+      background: linear-gradient(270.06deg, #385f7c 100%, #294259 100.67%, #272545 100%);
+
+      height: 75px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 15px;
+      background: linear-gradient(270.06deg, #385f7c 100%, #294259 100.67%, #272545 100%);
+
+      .tabs {
+        display: flex;
+
+        .tab {
+          text-transform: uppercase;
+          font-size: 14px;
+          font-weight: bold;
+          height: 40px;
+          line-height: 40px;
+          text-align: center;
+          width: 135px;
+          border-radius: 20px;
+          background-color: #4a7091;
+          margin-right: 20px;
+          cursor: pointer;
+
+          &.not-active {
+            opacity: 0.3;
+          }
+        }
+      }
+
+      .logout-container {
+        font-size: 18px;
+        cursor: pointer;
+        .log-out-image {
+          position: relative;
+          top: 5px;
+        }
+      }
+    }
+  }
+
+  .content {
+    height: calc(100% - 75px);
+
+    .actions-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: $ACTIONS-HEIGHT;
+      padding-left: $LEFT-SPACE;
+      padding-right: $RIGHT-SPACE;
+      border-bottom: 1px solid #e4e9ff;
+
+      .search-container {
+        height: 40px;
+        width: fit-content;
+      }
+      .action-buttons {
+        display: flex;
+
+        div {
+          margin-left: 10px;
+        }
+
+        .new {
+          display: flex;
+          align-items: center;
+          font-family: 'Roboto Bold';
+          font-size: 14px;
+          padding: 10px 12px;
+          background-color: #44d7b6;
+          border-radius: 20px;
+          cursor: pointer;
+
+          img {
+            margin-right: 8px;
+          }
+
+          &:hover {
+            background-color: #08c762;
+          }
+        }
+      }
+    }
+
+    .table-container {
+      height: calc(100% - #{$ACTIONS-HEIGHT});
+    }
+  }
+}
+
+.backdrop-container {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  width: 100%;
+  opacity: 1;
+  z-index: 100000;
+
+  .modal-container {
+    position: fixed;
+    height: 160px;
+    width: 450px;
+    border-radius: 4px;
+    background-color: white;
+    box-shadow: 0 24px 48px -8px rgba(17, 50, 102, 0.3);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+
+    .header {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .details {
+      font-size: 16px;
+      line-height: 21px;
+      margin-top: 20px;
+      white-space: pre-wrap;
+    }
+
+    .buttons-container {
+      display: flex;
+      justify-content: flex-start;
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+    }
+
+    .button {
+      height: 21px;
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 21px;
+      margin-right: 20px;
+      border-radius: 20px;
+
+      &:hover {
+        color: #0091ff;
+      }
+    }
+  }
+}
+.active-inactive {
+  display: flex;
+  margin-right: 144px;
+  align-self: center;
+  color: #6d9ec4;
+  font-family: 'Roboto';
+  font-size: 16px;
+
+  img {
+    width: 16px;
+    cursor: pointer;
+  }
+
+  .active-inactive-header {
+    margin-right: 4px;
+    font-family: 'Roboto Bold';
+  }
+}
+
+.export-btn{
+  background-color: #4a7091;
+  color: white;
+  width: 135px;
+  height: 40px;
+  font-weight: bold;
+  border-radius: 20px;
+  font-size: 14px;
+  opacity: 0.8;
+  cursor: pointer;
+  text-align: center;
+  line-height: 40px;
+  position: relative;
+  span{
+    margin-left:10px;
+  }
+  img{
+position: absolute;
+transform: rotate(270deg);
+left: 10px;
+top: 5px;
+  }
+}

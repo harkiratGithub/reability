@@ -1,0 +1,66 @@
+<form [formGroup]="customForm">
+  <div class="form-content">
+    <div class="column">
+      <label class="field-container">
+        <span class="description">First Name</span>
+        <input type="text" formControlName="first_name" required />
+      </label>
+      <label class="field-container">
+        <span class="description">Last Name</span>
+        <input type="text" formControlName="last_name" required />
+      </label>
+      <label class="field-container">
+        <span class="description">Email</span>
+        <input type="email" formControlName="email" />
+      </label>
+      <label class="field-container">
+        <span class="description">Phone</span>
+        <input type="text" formControlName="phone" />
+      </label>
+      <label class="field-container">
+        <span class="description">Referral by</span>
+        <input type="text" formControlName="referral" />
+      </label>
+    </div>
+    <div class="column">
+      <label class="field-container">
+        <span class="description">Contact Full name</span>
+        <input type="text" formControlName="contact_full_name" />
+      </label>
+      <label class="field-container">
+        <span class="description">Contact Phone</span>
+        <input type="tel" formControlName="contact_phone" />
+      </label>
+      <label class="field-container">
+        <span class="description">Contact Email</span>
+        <input type="email" formControlName="contact_email" />
+      </label>
+    </div>
+  </div>
+  <div class="remainder-input-container">
+    <label *ngIf="!lead" class="field-container">
+      <span class="description">Reminder</span>
+      <textarea type="text" formControlName="reminder" class="reminder-input"></textarea>
+    </label>
+  </div>
+</form>
+
+<div *ngIf="lead" class="reminder-container">
+  <hr />
+  <label class="field-container">
+    <span class="description">Add Note</span>
+    <div>
+      <textarea class="inputTextArea" [(ngModel)]="currentReminder" minlength="1" maxlength="250"></textarea>
+      <div class="save" [class.disabled]="currentReminder === ''" (click)="addReminder(currentReminder)">
+        <div class="save-text">ADD</div>
+      </div>
+    </div>
+  </label>
+  <div class="all-reminders-wrapper">
+    <div class="reminders selectable" *ngFor="let reminderData of lead.allReminders">
+      <hr />
+      {{ reminderData.created_at }} {{ reminderData.admin_first_name }} {{ reminderData.admin_last_name }} -
+      {{ reminderData.reminder }}
+    </div>
+  </div>
+</div>

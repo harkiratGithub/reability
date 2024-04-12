@@ -1,0 +1,21 @@
+<ng-container [ngSwitch]="pageStatus">
+  <!-- maybe we will have more statuses-->
+  <ng-container *ngSwitchCase="enumConst.FAST_LOGIN"> </ng-container>
+  <ng-container *ngSwitchCase="enumConst.ERROR_TOKEN_NOT_VALID">
+    <div class="main-menu-container">
+      <div class="header">
+        <img class="shiba-logo" src="assets/main-menu/beyond.png" />
+        <img class="logo" src="assets/main-menu/svg-cards/gertner_logo1.png" />
+      </div>
+      <div class="middle-container">
+        <div class="login-div">
+          <div class="login-header" [style.color]="'#ed605c'">Failed!</div>
+          <div class="not-valid-token">
+            This link expired or not valid.<br />
+            Please call your therapist for further instructions.
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</ng-container>

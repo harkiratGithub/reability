@@ -1,0 +1,299 @@
+.full-screen-container {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 11;
+  background-color: black;
+  height: auto;
+  max-height: 100%;
+  overflow: hidden;
+
+  .user-name {
+    width: 20%;
+    height: 5%;
+    color: #fff;
+    font-weight: 600;
+    position: absolute;
+    left: 2rem;
+    top: 2rem;
+    z-index: 13;
+    font-size: larger;
+    text-transform: capitalize;
+  }
+
+  .share-screen {
+    position: absolute;
+    height: 50px;
+    width: 220px;
+    border-radius: 25px;
+    background-color: #009c56;
+    right: 2rem;
+    z-index: 2;
+    top: 1rem;
+    padding: 1%;
+    justify-content: center;
+    display: flex;
+    .share-img {
+      background-image: url('../../../../assets/video-paitent/screen_share.svg');
+      background-repeat: no-repeat;
+      background-size: 100%;
+      height: 24px;
+      width: 24px;
+      margin-right: 10px;
+    }
+    .share-text {
+      height: 19px;
+      width: 115px;
+      color: #ffffff;
+      font-family: Roboto;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0;
+      line-height: 17px;
+      text-align: center;
+    }
+  }
+
+  .share-screen-active {
+    height: 80px;
+    position: absolute;
+    z-index: 1;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    top: 0;
+    width: 100%;
+    background-color: #009c56;
+    .share-screen-active-text {
+      width: 211px;
+      color: #ffffff;
+      font-family: Inter;
+      text-align: center;
+      font-size: 20px;
+      font-weight: 500;
+      letter-spacing: -0.11px;
+      line-height: 40px;
+      margin-right: 30px;
+    }
+    .stop-button {
+      height: 50px;
+      width: 110px;
+      border-radius: 30px;
+      background-color: #ffffff;
+      color: #1a3248;
+      font-family: Roboto Medium;
+      font-size: 16px;
+      font-weight: 500;
+      letter-spacing: 0;
+      line-height: 50px;
+      text-align: center;
+    }
+  }
+
+  .video-wrapper {
+    bottom: 60%;
+    right: 0px;
+    position: absolute;
+  }
+
+  .hide-video-wrapper {
+    visibility: hidden;
+  }
+
+  .remote-video {
+    object-fit: contain;
+    height: 100%;
+    width: 100%;
+  }
+
+  .remote-video-shared-screen {
+    min-width: 100%;
+    min-height: 100%;
+  }
+
+  .local-video {
+    border: 2px solid black;
+    border-radius: 10px;
+    z-index: 12;
+    width: 330px;
+  }
+
+  .video-wrapper-share-screen {
+    bottom: 255px;
+    right: 0px;
+    position: absolute;
+  }
+
+  .remote-video-share-screen {
+    border: 2px solid black;
+    border-radius: 10px;
+    z-index: 12;
+    width: 330px;
+  }
+
+  .exit-button {
+    position: absolute;
+    bottom: 10%;
+    right: 45%;
+    cursor: pointer;
+    color: white;
+    text-align: center;
+    font-weight: 600;
+    width: 120px;
+    line-height: 40px;
+    border-radius: 20px;
+    border-radius: 20px;
+    height: 40px;
+    background-color: red;
+  }
+  .mute-mic {
+    width: 50px;
+    cursor: pointer;
+    height: 45px;
+    position: absolute;
+    border-radius: 5px;
+    right: 53%;
+    bottom: 10%;
+    text-align: center;
+    img {
+      margin-top: 5%;
+      height: 100%;
+      width: 100%;
+    }
+  }
+
+  .mirror-button {
+    width: 50px;
+    height: 45px;
+    position: absolute;
+    border-radius: 5px;
+    right: 57%;
+    bottom: 10%;
+    text-align: center;
+    img {
+      margin-top: 5%;
+      height: 100%;
+      width: 100%;
+    }
+  }
+
+  .disabled {
+    background-color: transparent;
+    border: 0.8px solid #ffffff;
+  }
+
+  .patient-disconneted {
+    width: 200px;
+    height: 200px;
+    background-color: red;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    text-align: center;
+    line-height: 200px;
+  }
+}
+.backdrop {
+  position: fixed;
+  display: block;
+  top: 0;
+  left: 0;
+  z-index: 1080;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.hide {
+  visibility: hidden;
+}
+
+@media only screen and (max-height: 500px) and (orientation: landscape) {
+  .remote-video-shared-screen {
+    position: absolute !important;
+    transform-origin: top left !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    visibility: visible !important;
+    right: unset !important;
+    bottom: unset !important;
+    object-fit: fill;
+    transform: unset !important;
+  }
+  .video-wrapper-share-screen {
+    width: 25% !important;
+    bottom: 25% !important;
+    height: 25% !important;
+  }
+  .local-video {
+    width: 100% !important;
+    height: -webkit-fill-available;
+    object-fit: cover;
+  }
+  .video-wrapper {
+    z-index: -1;
+  }
+  .remote-video-share-screen {
+    width: 100% !important;
+    height: -webkit-fill-available;
+    object-fit: cover;
+  }
+  .remote-video {
+    object-fit: none !important;
+    height: 100%;
+    transform-origin: top left;
+    width: 100%;
+  }
+  .user-name {
+    left: 1rem !important;
+    top: 1rem !important;
+  }
+  .mute-mic {
+    width: 25px !important;
+    height: 25px !important;
+    left: 27% !important;
+    bottom: 45% !important;
+    right: unset !important;
+  }
+}
+@media only screen and (min-width: 280px) and (max-width: 640px) and (orientation: portrait) {
+  .remote-video-shared-screen {
+    position: absolute !important;
+    transform-origin: top left !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    visibility: visible !important;
+    right: unset !important;
+    bottom: unset !important;
+    transform: unset !important;
+  }
+  .video-wrapper-share-screen {
+    width: 40% !important;
+    max-height: 20% !important;
+    bottom: 20% !important;
+  }
+  .local-video {
+    width: 100% !important;
+    height: -webkit-fill-available;
+    object-fit: cover;
+  }
+  .video-wrapper {
+    width: 40% !important;
+    max-height: 20% !important;
+    bottom: 0 !important;
+    right: 0;
+    position: absolute;
+  }
+  .remote-video-share-screen {
+    width: 100% !important;
+    height: -webkit-fill-available;
+    object-fit: cover;
+  }
+  .remote-video {
+    object-fit: none;
+    height: 100%;
+    width: 100%;
+  }
+}

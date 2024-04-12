@@ -1,0 +1,92 @@
+<div class="file-uploader">
+  <div class="center">
+    <div class="left-section">
+      <p class="game">Whiteboard</p>
+      <ngx-file-drop dropZoneLabel="Drop files here" (onFileDrop)="dropped($event)">
+        <ng-template ngx-file-drop-content-tmp let-openFileSelector="openFileSelector">
+          <div class="file-drop">
+            <div>Drag files or directory</div>
+            <div>
+              <button type="button" class="browse-btn" (click)="openFileSelector()">Browse Files</button>
+            </div>
+          </div>
+        </ng-template>
+      </ngx-file-drop>
+      <div class="upload-table" *ngIf="files.length">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Files</th>
+            </tr>
+          </thead>
+          <tbody class="upload-name-style">
+            <tr *ngFor="let item of files; let i = index">
+              <td>
+                <strong>{{ item.relativePath }}</strong>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="success-msg" *ngIf="showMsg">{{ message }}</div>
+      <div class="error-files" *ngIf="errorMsg">
+        {{ message }}
+        <div *ngFor="let file of errorFiles">
+          <div class="error-msg">{{ file }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="delete-db">
+      <div>
+        <input type="text" #passwordRef placeholder="Enter password" />
+        <button (click)="checkPassword(passwordRef.value)">Check</button>
+      </div>
+      <div>{{ passwordMsg }}</div>
+      <button class="browse-btn" (click)="clearGameDataTable()" [disabled]="!isPasswordCorrect">Clear Database</button>
+      <div>{{ databaseMsg }}</div>
+    </div>
+  </div>
+  <div class="middle">
+    <div class="game">Images</div>
+    <ngx-file-drop dropZoneLabel="Drop files here" (onFileDrop)="droppedImages($event)">
+      <ng-template ngx-file-drop-content-tmp let-openFileSelector="openFileSelector">
+        <div class="file-drop">
+          <div>Drag images or directory</div>
+          <div>
+            <button type="button" class="browse-btn" (click)="openFileSelector()">Browse images</button>
+          </div>
+        </div>
+      </ng-template>
+    </ngx-file-drop>
+    <div class="upload-table" *ngIf="images.length">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Images</th>
+          </tr>
+        </thead>
+        <tbody class="upload-name-style">
+          <div class="url-list">
+            <div>
+              <tr *ngFor="let item of imageUrls; let i = index">
+                <td>
+                  <strong>{{ item.imageName }}</strong>
+                </td>
+                <td>
+                  <a>{{ item.url }}</a>
+                </td>
+              </tr>
+            </div>
+            <!-- <div>
+              <tr *ngFor="let url of imageUrls; let i = index">
+                <td>
+                  <a>{{ url }}</a>
+                </td>
+              </tr>
+            </div> -->
+          </div>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

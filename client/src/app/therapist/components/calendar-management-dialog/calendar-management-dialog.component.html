@@ -1,0 +1,21 @@
+<div class="container">
+  <div class="title">Set availability as</div>
+  <ul class="list">
+    <li class="bullet" (click)="response.isThisWeek = true; response.isAllWeeks = false">
+      <div class="select-outer" [ngStyle]="{ 'border-color': response.isThisWeek ? '#44d7b6' : '#9eb2c2' }">
+        <div class="select-inner" *ngIf="response.isThisWeek"></div>
+      </div>
+      This week only
+    </li>
+    <li class="bullet" (click)="response.isThisWeek = false; response.isAllWeeks = true">
+      <div class="select-outer" [ngStyle]="{ 'border-color': response.isAllWeeks ? '#44d7b6' : '#9eb2c2' }">
+        <div class="select-inner" *ngIf="response.isAllWeeks"></div>
+      </div>
+      Default
+    </li>
+  </ul>
+  <div class="actions">
+    <div (click)="onCancelClick()" class="submit cancel">Cancel</div>
+    <div [mat-dialog-close]="response" class="submit save">OK</div>
+  </div>
+</div>

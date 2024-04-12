@@ -1,0 +1,68 @@
+<div class="table-container">
+  <div class="table-header">
+    <div
+      *ngFor="let col of columns; trackBy: trackByIndex"
+      [style.width]="col.width || 'auto'"
+      [style.flex]="col.flex || 'unset'"
+    >
+      {{ col.displayName }}
+    </div>
+    <div class="tools"></div>
+  </div>
+  <div class="overflow-container" *ngIf="rows.length > 0">
+    <div class="table-body">
+      <div class="row" *ngFor="let row of rows">
+        <div
+          *ngFor="let col of columns"
+          class="cell ellipsis"
+          [title]="getCell(row, col)"
+          [style.width]="col.width || 'auto'"
+          [style.flex]="col.flex || 'unset'"
+          [ngSwitch]="col.cellType"
+        >
+          <div *ngSwitchCase="cellType.img" class="img-container">
+            <img src="{{ getImageSrc(row, col) }}" />
+          </div>
+          <div
+            *ngSwitchDefault
+            class="cell ellipsis"
+            [class.hyper]="col.onClick"
+            (click)="col.onClick && col.onClick(row)"
+          >
+            {{ col.datePipe ? (getCell(row, col) | date: 'd MMM y') : getCell(row, col) }}
+          </div>
+          <div *ngSwitchCase="cellType.email" class="cell ellipsis hyper" title="Click to send mail">
+            <a href="mailto:{{ getCell(row, col) }}">
+              {{ getCell(row, col) }}
+            </a>
+          </div>
+          <div *ngSwitchCase="cellType.copyToClip" class="cell ellipsis hyper" title="Click to copy">
+            <a href="" (click)="copyURI($event, getCell(row, col))">
+              {{ getCell(row, col) }}
+            </a>
+          </div>
+        </div>
+        <div class="tools">
+          <button
+            mat-button
+            [matMenuTriggerFor]="menu"
+            class="menu"
+            #trigger="matMenuTrigger"
+            [class.opened]="trigger.menuOpen"
+          >
+            <img src="assets/backoffice/icon_back_office_more.svg" />
+          </button>
+
+          <mat-menu #menu="matMenu" class="mat-menu-panel">
+            <div *ngFor="let action of additionalActions; trackBy: trackByIndex">
+              <button mat-menu-item class="menu-item" (click)="action.action(row)" [class.disabled]="!action.enabled">
+                <img class="menu-item-img" src="{{ action.image }}" />
+                {{ action.text }}
+              </button>
+            </div>
+          </mat-menu>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

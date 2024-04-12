@@ -1,0 +1,191 @@
+.container {
+  width: 320px;
+  height: fit-content;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  color: #113266;
+  font-family: 'Roboto';
+  background-color: white;
+  z-index: 100;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px 0 rgba(45, 75, 100, 0.16);
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 40px;
+    width: 320px;
+    border-radius: 4px 4px 0 0;
+    padding: 16px;
+    font-size: 14px;
+    background-color: #ea1537;
+    color: white;
+    img {
+      cursor: pointer;
+    }
+  }
+  .body {
+    margin: 16px 16px 24px 16px;
+    .title {
+      font-weight: bold;
+    }
+    .sub-title {
+      margin: 4px 0 0 0;
+      font-size: 16px;
+    }
+  }
+  .co-patients {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    margin: 0 0 18px 16px;
+    .group-title {
+      margin: 0 16px 4px 16px;
+      display: flex;
+      align-items: center;
+      img {
+        margin: 0 8px 0 0;
+      }
+    }
+    .items {
+      display: flex;
+      flex-direction: column;
+      margin: 0 0 0 42px;
+    }
+    .item-main {
+      display: flex;
+      justify-content: space-between;
+    }
+    .item {
+      display: flex;
+      flex-direction: column;
+      margin: 0 0 18px 8px;
+      width: 182px;
+      .reason {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        .disabled {
+          border: none;
+          background-color: inherit;
+          color: #9eb2c2;
+        }
+        input {
+          width: 160px;
+        }
+        .save {
+          position: absolute;
+          right: 46px;
+          width: 24px;
+          height: 24px;
+          margin-bottom: 4px;
+          cursor: pointer;
+          z-index: 1;
+          &:hover {
+            filter: invert(43%) sepia(79%) saturate(3115%) hue-rotate(186deg) brightness(100%) contrast(106%);
+          }
+        }
+        .alert {
+          position: absolute;
+          left: 20px;
+          width: 24px;
+          height: 24px;
+        }
+      }
+      &:last-child {
+        margin: 0 0 0 8px;
+      }
+    }
+    .single {
+      display: flex;
+      flex-direction: column;
+    }
+    .name {
+      font-size: 14px;
+      margin: 0 0 4px 0;
+    }
+    .phone {
+      color: #9eb2c2;
+    }
+    .call {
+      color: #0091ff;
+      text-decoration: none;
+    }
+  }
+
+  .actions {
+    display: flex;
+    justify-content: space-between;
+    height: 48px;
+    width: 320px;
+    border-radius: 0 0 4px 4px;
+    background-color: rgba(4, 155, 229, 0.08);
+    padding: 10px;
+  }
+  .actions {
+    img {
+      cursor: pointer;
+    }
+  }
+  .clickable {
+    cursor: pointer;
+  }
+
+  .action {
+    height: 32px;
+    width: 140px;
+    border-radius: 4px;
+    background-color: #ea1537;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .action-text {
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.1px;
+    line-height: 19px;
+    margin: 7px;
+    text-align: center;
+  }
+
+  .divider {
+    height: 24px;
+    width: 1.5px;
+    border-radius: 2px;
+    background-color: white;
+    margin-top: 4px;
+  }
+
+  .action-arrow {
+    height: 32px;
+    width: 34px;
+    border-radius: 0 4px 4px 0;
+    margin-top: 5px;
+  }
+
+  .more-actions {
+    width: 24px;
+    height: 24px;
+    display: inline-block;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-position: center;
+    -webkit-mask-position: center;
+    mask-repeat: no-repeat;
+    flex-shrink: 0;
+    background-color: #113266;
+    mask-image: url('/assets/backoffice/icon_back_office_more.svg');
+    -webkit-mask-image: url('/assets/backoffice/icon_back_office_more.svg');
+    cursor: pointer;
+    &:hover {
+      background-color: #0091ff;
+    }
+  }
+}

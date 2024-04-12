@@ -1,0 +1,83 @@
+upload a game
+==============
+git pull origin master
+npm run build
+go to s3 in every game and press Upload
+choose everything from the dist folder under the relevant subfolder
+go to the folderin s3 with the uploaded files (press on the destination link), check all of them , press actoions --> make public
+go to the bottom of the page and press "Make Public"
+
+
+add new game to reability DB
+-----------------------------------
+in heroku reability open settings tab and press on "Reveal Config Vars"
+change the SCRIPT_BUCKET_NAME to the name of the new game's bucket
+change the  SCRIPT_GAME_NAME to the name that will be shown in the UI
+in htrko press the More button and choose Run Console
+in the heroku console write: npm run db:add:game
+
+
+add a new game in amazone s3
+-----------------------------
+in the main s3 screen press on "Create Bucket"
+give name: gertner-<game name>-<environment>
+for example: gertnet-mygame-staging
+
+choose to copy from another bucket and choose the memory game
+
+uncheck "block all public access"
+
+check "I acknoledge"
+
+press on the Create button
+
+go to the folder and add the disable.png and enable.png files - these are the icon files of the game in the lobby
+
+proceed with regular upload game flow 
+
+since s3 doesn't allow to upload folders (like assets) you should select all files and folders from the dist and drag them .
+
+special case - no place in amazon - limit 100 buckets
+=======================================================
+if there are 100 buckets you need to send gil an email with the list of all 100 buckets and ask him which to remove
+for every bucket , mark it , press "Empty"  and only after that go back mark it again and press delete.
+
+
+special case - external company 
+===================================
+external company must know the the enable disable images must be in the main folder
+in addition we need to grant them permissions to the s3 bucket
+the external company must have amazone s3 account that has canonicial ID and they must provide it to us.
+go to the s3 buccket --> permissions tab --> scroll down to Acess Control List (ACL) and press "Edit" 
+scroll to "Access for other AWS accounts" and press "Add Grantee"
+put the cononicial id that you got from them  and check all options  and press on ""Save Changes" at the bottom
+
+
+
+special case on first time upload to production
+=================================================
+
+go to games table in db  and change the new game url to be in the same format as the others
+because we use cdn url.
+
+upload anat games 
+==================
+after pulling from master go to the webpack.config.js
+in the exports , change mode value from none to production and make comma in the devtools field
+press save all and then start the game upload
+
+module.exports = {
+    mode: 'production',
+    //devtool: "source-map",
+   
+
+
+
+
+
+
+
+
+
+
+

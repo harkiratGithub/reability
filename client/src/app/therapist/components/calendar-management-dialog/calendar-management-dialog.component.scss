@@ -1,0 +1,78 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+
+  .title {
+    margin: 24px;
+    font-family: Roboto;
+    font-size: 18px;
+    font-weight: bold;
+  }
+  .list {
+    list-style-type: none;
+
+    .bullet {
+      display: flex;
+      align-items: center;
+      margin-bottom: 16px;
+      color: #113266;
+      font-family: Roboto;
+      font-size: 16px;
+      cursor: pointer;
+
+      .select-outer {
+        height: 32px;
+        width: 32px;
+        margin-right: 8px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: 2px solid;
+        border-radius: 16px;
+
+        .select-inner {
+          height: 16px;
+          width: 16px;
+          border-radius: 8px;
+          background-color: #44d7b6;
+        }
+      }
+    }
+  }
+
+  .actions {
+    height: 56px;
+    width: 100%;
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    .submit {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 68px;
+      height: 42px;
+      margin-right: 24px;
+      cursor: pointer;
+    }
+    .save {
+      color: #0091ff;
+      border: 1px solid #0091ff;
+      border-radius: 20px;
+
+      &:hover {
+        border: 0;
+        background-color: rgba(0, 145, 255, 0.08);
+      }
+    }
+
+    .cancel {
+      &:hover {
+        color: #0091ff;
+      }
+    }
+  }
+}

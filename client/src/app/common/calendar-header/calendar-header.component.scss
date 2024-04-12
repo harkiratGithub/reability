@@ -1,0 +1,117 @@
+$ELEMENT-MARGIN: 0 8px;
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  height: 56px;
+  width: 100%;
+  border: 1px solid #e4e9ff;
+  color: #26435b;
+
+  .left {
+    display: flex;
+    align-items: center;
+    margin-left: 16px;
+
+    .menu-img {
+      width: 32px;
+      cursor: pointer;
+    }
+    .left-img {
+      cursor: pointer;
+    }
+
+    .user-name {
+      line-height: 21px;
+      font-weight: bold;
+      font-family: Roboto;
+      font-size: 16px;
+      text-transform: capitalize;
+      z-index: 2;
+      margin-left: 20px;
+    }
+  }
+
+  .middle {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+
+    .day {
+      height: 33px;
+      width: 78px;
+      line-height: 33px;
+      margin: $ELEMENT-MARGIN;
+      border: 1px solid #9eb2c2;
+      border-radius: 16px;
+      text-align: center;
+      cursor: pointer;
+      &:hover {
+        border: 0;
+        color: 0091ff;
+        background-color: rgba(0, 145, 255, 0.08);
+      }
+    }
+
+    .navigation {
+      display: flex;
+      align-items: center;
+      height: 24px;
+      margin: $ELEMENT-MARGIN;
+
+      button {
+        display: flex;
+        margin: $ELEMENT-MARGIN;
+        cursor: pointer;
+        border: none;
+        background-color: inherit;
+      }
+    }
+    .date {
+      margin: $ELEMENT-MARGIN;
+      line-height: 19px;
+      color: #26435b;
+      font-family: Roboto;
+      font-size: 14px;
+    }
+  }
+
+  .right {
+    display: flex;
+    align-items: center;
+    margin-right: 10px;
+
+    .view-option {
+      height: 70%;
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid #9ac6c6;
+      cursor: pointer;
+    }
+    .export {
+      height: 33px;
+      width: 78px;
+      line-height: 33px;
+      margin: $ELEMENT-MARGIN;
+      border: 1px solid #9eb2c2;
+      border-radius: 16px;
+      text-align: center;
+      cursor: pointer;
+      &:hover {
+        border: 0;
+        color: 0091ff;
+        background-color: rgba(0, 145, 255, 0.08);
+      }
+    }
+  }
+
+  .selected-view {
+    background-color: #9ac6c6;
+    color: white;
+  }
+}
+
+.hidden-views-select {
+  visibility: hidden;
+}

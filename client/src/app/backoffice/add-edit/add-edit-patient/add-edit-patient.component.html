@@ -1,0 +1,134 @@
+<ng-container [ngSwitch]="patientView">
+  <form [formGroup]="customForm" *ngSwitchCase="viewType.Details">
+    <div class="column">
+      <label class="field-container">
+        <span class="description">First Name</span>
+        <input type="text" formControlName="first_name" required />
+      </label>
+      <label class="field-container">
+        <span class="description">Last Name</span>
+        <input type="text" formControlName="last_name" required />
+      </label>
+      <label class="field-container">
+        <span class="description">Phone Number</span>
+        <input type="tel" formControlName="phone" />
+      </label>
+      <label class="field-container">
+        <span class="description">Email</span>
+        <input type="email" formControlName="email" required />
+      </label>
+      <label class="field-container">
+        <span class="description">Username</span>
+        <input type="text" formControlName="username" [class.disabled]="true" />
+      </label>
+      <label class="field-container">
+        <span class="description">Institute</span>
+        <app-select formControlName="institute_id" required [items]="institutes"> </app-select>
+      </label>
+      <label class="field-container">
+        <span class="description">Departments</span>
+        <app-select
+          formControlName="departments_ids"
+          required
+          [items]="filteredDepartments"
+          [multiSelect]="true"
+        ></app-select
+      ></label>
+    </div>
+    <div class="column">
+      <label class="field-container">
+        <span class="description">Contact Full name</span>
+        <input type="text" formControlName="primary_contact_full_name" />
+      </label>
+      <label class="field-container">
+        <span class="description">Contact Phone</span>
+        <input type="tel" formControlName="primary_contact_phone" />
+      </label>
+      <label class="field-container">
+        <span class="description">Contact Email</span>
+        <input type="email" formControlName="primary_contact_email" />
+      </label>
+      <label class="field-container">
+        <span class="description">Additional Contact Full name</span>
+        <input type="text" formControlName="secondary_contact_full_name" />
+      </label>
+      <label class="field-container">
+        <span class="description">Additional Contact Phone</span>
+        <input type="tel" formControlName="secondary_contact_phone" />
+      </label>
+      <label class="field-container">
+        <span class="description">Additional Contact Email</span>
+        <input type="email" formControlName="secondary_contact_email" />
+      </label>
+    </div>
+    <div class="column">
+      <label class="field-container">
+        <span class="description">Suspend</span>
+        <app-select formControlName="suspend" required [items]="suspendOptions"> </app-select>
+      </label>
+      <label class="field-container">
+        <span class="description">Tech Issue</span>
+        <app-select formControlName="tech_issue" required [items]="techIssues"> </app-select>
+      </label>
+      <label class="field-container" *ngIf="showTechReason()">
+        <span class="description">Reason</span>
+        <input type="text" formControlName="tech_reason" />
+      </label>
+      <label class="field-container">
+        <span class="description">Referral by</span>
+        <input type="text" formControlName="referral" />
+      </label>
+      <label class="field-container">
+        <span class="description">Session notification email</span>
+        <input type="text" formControlName="notification_email" />
+      </label>
+    </div>
+  </form>
+
+  <hr *ngIf="editedEntity?.id && patientView === viewType.Details" />
+
+  <ng-container *ngSwitchCase="viewType.Details">
+    <div *ngIf="editedEntity?.id" class="add-remark">
+      <label class="field-container">
+        <span class="description">Add Note</span>
+        <div class="remark-input-container">
+          <textarea class="inputTextArea" [(ngModel)]="currentRemark" minlength="1" maxlength="250"></textarea>
+          <div class="save" [class.disabled]="currentRemark === ''" (click)="onCreateRemark()">
+            <div class="save-text">ADD</div>
+          </div>
+        </div>
+      </label>
+    </div>
+    <div class="patient-log">
+      <app-user-log-entry *ngFor="let logEntry of userLog" [logEntry]="logEntry" class="log-entry"></app-user-log-entry>
+    </div>
+    <div *ngIf="editedEntity?.id" class="reset-password">
+      <span (click)="resetPassword(false)"> Generate patient password </span>
+    </div>
+    <div *ngIf="editedEntity?.id" class="reset-password">
+      <span (click)="resetPassword(true)"> Default patient password </span>
+    </div>
+  </ng-container>
+
+  <app-add-edit-patient-treatment
+    *ngSwitchCase="viewType.Treatments"
+    [editedEntity]="editedEntity"
+    [professions]="professions"
+    [expertises]="expertises"
+    [deletePatientTreatmentFunc]="deletePatientTreatmentFunc"
+    (innerAction)="onInnerAction($event)"
+    (setScheduleView)="backClicked(viewType.Schedule)"
+  >
+  </app-add-edit-patient-treatment>
+
+  <app-patient-schedule
+    *ngSwitchCase="viewType.Schedule"
+    [editedEntity]="editedEntity"
+    (goBack)="backClicked()"
+    (weekChanged)="onWeekChanged($event)"
+    (bookingViewShown)="onBookingViewShown($event)"
+    (createBooking)="onCreateBooking($event)"
+    (deleteBooking)="onDeleteBooking($event)"
+  >
+  </app-patient-schedule>
+</ng-container>

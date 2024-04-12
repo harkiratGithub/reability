@@ -1,0 +1,50 @@
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<div
+  *ngIf="!isMobile"
+  id="{{ 'gameWrapper-' + connectionId }}"
+  class="game-wrapper"
+  [ngClass]="{ 'therapist-wrapper': isTherapist }"
+>
+  <div
+    class="game-container"
+    [ngClass]="{
+      'game-container-regular-video': !enlargeVideo,
+      'game-container-enlarge-video': enlargeVideo,
+      'game-container-therapist': isTherapist
+    }"
+  >
+    <div class="outer-border">
+      <div class="content-background" [ngClass]="{ 'white-bg': currentGameName == 'whiteboard' }">
+        <div class="iframes-container" *ngIf="(isTherapist && gameUrl) || currentGameUrl">
+          <app-end-game *ngIf="isEndGameModalOpen"></app-end-game>
+          <iframe
+            id="{{ 'games-iframe-' + connectionId }}"
+            allow="autoplay *"
+            crossorigin="anonymous"
+            sandbox="allow-scripts allow-same-origin allow-modals allow-downloads allow-popups"
+            [ngClass]="['game-iframe']"
+            allowfullscreen
+            [src]="getIframeSrc() | urlSanitaizer"
+            (load)="handleIframeLoad()"
+          >
+          </iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div *ngIf="isMobile" id="{{ 'gameWrapper-' + connectionId }}" class="game-wrapper-mobile">
+  <div class="iframes-container" *ngIf="(isTherapist && gameUrl) || currentGameUrl">
+    <iframe
+      id="{{ 'games-iframe-' + connectionId }}"
+      allow="autoplay *"
+      [ngClass]="['game-iframe']"
+      allowfullscreen
+      [src]="getIframeSrc() | urlSanitaizer"
+      (load)="handleIframeLoad()"
+    >
+    </iframe>
+  </div>
+</div>

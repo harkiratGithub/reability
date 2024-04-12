@@ -1,0 +1,12 @@
+<div class="container">
+  <div *ngFor="let option of options; trackBy: trackByMenuItem" class="item">
+    <div class="option" (click)="clicked(option)">
+      <div class="img-container" *ngIf="withIcons">
+        <img *ngIf="option.iconPath" [src]="option.iconPath" />
+      </div>
+      <div class="option-text">
+        {{ option.title }}
+      </div>
+    </div>
+  </div>
+</div>

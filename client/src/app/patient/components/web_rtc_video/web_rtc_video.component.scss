@@ -1,0 +1,473 @@
+.skeleton-border-wrap {
+  margin-top: 1%;
+  background: linear-gradient(95deg, #f832cd 0%, #2b343b 49%);
+  padding: 2px;
+  width: auto;
+  border-radius: 9px;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.skeleton-border-wrap-hide {
+  display: none;
+}
+
+.skeleton-border-wrap-active {
+  background: linear-gradient(115deg, #80ff00 0%, #2b343b 49%);
+}
+
+.skeleton-border-loading {
+  background: linear-gradient(115deg, #848485 0%, #2b343b 49%);
+  height: auto;
+  width: auto;
+  cursor: default;
+}
+
+.skeleton-loading,
+.skeleton-ready {
+  border-radius: 8px;
+  background-color: #0e191f;
+}
+
+.skeleton-loading {
+  height: fit-content;
+}
+
+.skeleton-loading-section {
+  padding: 18px 24px 18px 24px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.skeleton-loading-title,
+.skeleton-loading-text,
+.skeleton-loading-message-text {
+  margin: 0;
+  font-family: 'Open Sans';
+  letter-spacing: 0;
+}
+.skeleton-loading-percentage {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.skeleton-loading-title {
+  color: #ececed;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 24px;
+  margin-bottom: 10px;
+}
+.skeleton-loading-text {
+  color: #ffffff;
+  font-size: 18px;
+  line-height: 24px;
+}
+
+.skeleton-loading-bar {
+  height: 32px;
+  border: 1px solid #b5b5ba;
+  border-radius: 6px;
+  background-color: #0e191f;
+  box-shadow: 0 4px 48px 0 rgba(0, 0, 0, 0.24);
+  padding: 8px;
+  margin-bottom: 10px;
+}
+.loading-fill {
+  background-color: #f832cd;
+  border-radius: 3px;
+  width: 100%;
+  height: 100%;
+  animation: loadingBar 20s linear;
+}
+@keyframes loadingBar {
+  0% {
+    width: 0;
+  }
+  100% {
+    width: 100%;
+  }
+}
+.skeleton-please-wait-message {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.skeleton-loading-message-image {
+  margin-right: 15px;
+}
+.skeleton-loading-message-text {
+  color: #b5b5ba;
+  font-size: 16px;
+  line-height: 22px;
+}
+
+.skeleton-image {
+  margin-right: 15px;
+}
+
+.skeleton-ready {
+  height: 80px;
+}
+.skeleton-ready-section {
+  padding: 18px 0 18px 24px;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  z-index: 1;
+}
+.skeleton-ready-message {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.skeleton-ready-title,
+.skeleton-ready-text {
+  margin: 0;
+  font-family: 'Open Sans';
+  letter-spacing: 0;
+}
+.skeleton-ready-title {
+  color: #ececed;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 24px;
+}
+.skeleton-ready-text {
+  color: #b5b5ba;
+  font-size: 16px;
+  line-height: 22px;
+}
+
+.video-btns-container {
+  position: absolute;
+  right: 75px;
+  top: 0;
+  z-index: 10;
+}
+.patient-canvas {
+  position: absolute;
+  left: 0;
+  bottom: 2%;
+  z-index: 10;
+  border-radius: 30px;
+  -o-object-fit: fill;
+  object-fit: cover;
+  width: 100%;
+  transform: scaleX(-1);
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(14, 25, 31, 0) 0%, rgba(14, 25, 31, 0.6) 100%);
+  box-shadow: 5px 5px 5px 0px rgba(0, 0, 0, 0.3);
+}
+
+.patient-canvas-regular-video {
+  height: auto;
+  max-height: 25vh;
+  margin-top: 3%;
+}
+
+.patient-canvas-enlarge-video {
+  height: auto;
+  max-height: 300px;
+  margin-top: 3%;
+}
+
+.hidden-video {
+  position: fixed;
+}
+.remote-video {
+  position: absolute;
+  bottom: 500px;
+  right: 20px;
+  z-index: 10;
+}
+
+.local-video {
+  position: absolute;
+  bottom: 525px;
+  right: 20px;
+  z-index: 10;
+}
+
+.skeleton-buttons {
+  position: absolute;
+  z-index: 10;
+  top: 1%;
+  right: 10%;
+  flex-direction: row;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 4%;
+  max-height: 50px;
+  max-width: 50px;
+  height: 7%;
+  img {
+    position: absolute;
+  }
+  .toggle-button {
+    background-repeat: no-repeat;
+    background-size: contain;
+    height: 100%;
+    width: 100%;
+  }
+  .enabled {
+    background-image: url('/assets/skel/enabled_hand.png');
+  }
+  .disabled {
+    background-image: url('/assets/skel/disabled_hand.png');
+  }
+  .unavailable {
+    background-image: url('/assets/skel/unavailable_hand.png');
+    cursor: auto;
+  }
+}
+:host ::ng-deep .hide-video {
+  visibility: hidden;
+}
+:host ::ng-deep .ios-hide {
+  z-index: -1 !important;
+}
+.video-content-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  .remoteVideo {
+    position: relative;
+    margin-bottom: 3%;
+    .therapist-busy-message {
+      position: absolute;
+      background-size: 30%;
+      background-repeat: no-repeat;
+      background-color: #2f455a;
+      background-position: center 30%;
+      border: 2px solid #154f53;
+      border-radius: 30px;
+      height: 80%;
+      width: 80%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      object-fit: fill;
+      z-index: 11;
+      opacity: 0.8;
+      display: flex;
+      align-items: center;
+    }
+    .therapist-busy-message-text {
+      width: 100%;
+      color: white;
+      text-align: center;
+      font-size: 22px;
+      font-weight: 600;
+      font-family: 'Open Sans';
+      letter-spacing: 0;
+      line-height: normal;
+      margin: 0;
+    }
+  }
+  .video-content-container-inner {
+    position: relative;
+    border-radius: 25px;
+  }
+  .video-content-container-inner-enlarge-video {
+    width: 30%;
+  }
+}
+
+.video-content-container-regular-video {
+  width: 100%;
+}
+
+.video-content-container-enlarge-video {
+  width: 100%;
+}
+
+:host ::ng-deep .therapist-video {
+  z-index: 10;
+  width: 100%;
+  object-fit: cover;
+  transform: scaleX(-1);
+  height: 180px;
+  border-radius: 8px;
+  box-shadow: 5px 5px 5px 0px rgba(0, 0, 0, 0.3);
+}
+
+:host ::ng-deep .therapist-video-regular-video {
+  max-height: 25vh;
+  height: auto;
+}
+
+:host ::ng-deep .therapist-video-enlarge-video {
+  max-height: 300px;
+  height: auto;
+}
+
+:host ::ng-deep .therapist-video-regular-video-mobile {
+  height: auto;
+}
+
+:host ::ng-deep .therapist-video-enlarge-video-mobile {
+  height: auto;
+}
+
+.no-camera-message {
+  position: absolute;
+  bottom: 60%;
+  background-image: url('/assets/video-paitent/camera.png');
+  background-size: 30%;
+  background-repeat: no-repeat;
+  padding-top: 10px;
+  background-color: #113d41;
+  background-position: center 30%;
+  color: white;
+  border: 3px solid #154f53;
+  border-radius: 20px;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: bold;
+  height: 25%;
+  width: 100%;
+  z-index: 12;
+}
+.body-tracking-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.body-tracking-enabled {
+  cursor: pointer;
+}
+:host ::ng-deep .active {
+  border: 2px solid #80ff00;
+  box-shadow: 5px 5px 5px 0px rgba(0, 0, 0, 0.3);
+  z-index: 11;
+}
+:host ::ng-deep .not-active {
+  border-color: grey;
+  border-width: 2px;
+  border: 2px solid #f832cd;
+}
+
+:host ::ng-deep .busy {
+  opacity: 0.5;
+}
+
+:host ::ng-deep .therapist-busy {
+  position: absolute;
+  z-index: 12;
+  bottom: 399px;
+  right: 46px;
+  height: 201px;
+  text-align: center;
+  width: 260px;
+  line-height: 200px;
+  color: red;
+  border: 3px solid;
+  background-color: transparent;
+  font-weight: 600;
+  border-radius: 30px;
+}
+
+.no-camera-div {
+  bottom: 14%;
+  position: absolute;
+  z-index: 15;
+  width: auto;
+  left: 8%;
+}
+
+.no-camera-div-text {
+  color: #ececed;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 24px;
+}
+
+.patient-video {
+  bottom: 0;
+  z-index: 10;
+  border-radius: 30px;
+  -o-object-fit: fill;
+  object-fit: cover;
+  width: 100%;
+  transform: scaleX(-1);
+  box-sizing: border-box;
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(14, 25, 31, 0) 0%, rgba(14, 25, 31, 0.6) 100%);
+  box-shadow: 5px 5px 5px 0px rgba(0, 0, 0, 0.3);
+}
+
+.patient-video-regular-video {
+  height: auto;
+  max-height: 25vh;
+}
+
+.patient-video-enlarge-video {
+  max-height: 300px;
+  height: auto;
+}
+
+.patient-no-camera-message {
+  position: absolute;
+  bottom: 5%;
+  background-image: url('/assets/video-paitent/camera.png');
+  background-size: 10%;
+  background-repeat: no-repeat;
+  background-color: #113d41;
+  background-position: center 30%;
+  border: 2px solid #154f53;
+  border-radius: 10px;
+  height: 25%;
+  width: 100%;
+  object-fit: fill;
+  z-index: 10;
+}
+
+.patient-no-camera-message-text {
+  width: 100%;
+  position: absolute;
+  bottom: 50px;
+  color: white;
+  text-align: center;
+  font-size: 1rem;
+  white-space: pre-line;
+  font-weight: bold;
+}
+
+.angles {
+  display: grid;
+  grid-template-columns: auto auto;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+  .angle-left {
+    margin-left: 0;
+  }
+  .angle-right {
+    margin-right: 0;
+  }
+}
+
+:host ::ng-deep .mobile-view {
+  position: fixed;
+  top: 15%;
+  right: 5%;
+  border-radius: 10px;
+  object-fit: fill;
+  width: 17%;
+  height: 25%;
+  border-width: 3px;
+}
+@media screen and (min-width: 300px) and (max-width: 640px) and (orientation: portrait) {
+  .mute-message {
+    z-index: 13;
+    color: #ececed;
+    text-align: center;
+  }
+}

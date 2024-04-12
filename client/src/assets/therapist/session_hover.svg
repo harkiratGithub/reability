@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1060px" height="597px" viewBox="0 0 1060 597" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 61.1 (89650) - https://sketch.com -->
+    <title>Mask</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Therapist" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" opacity="0.560000002">
+        <g id="02_Therapist--Sessions-Copy-8" transform="translate(-290.000000, -128.000000)" fill="#2E4C65">
+            <g id="Group-15" transform="translate(290.000000, 128.000000)">
+                <g id="Group-4">
+                    <g id="Group-19">
+                        <g id="Group-Copy">
+                            <g id="Squats-game">
+                                <path d="M5,0 L1055,0 C1057.76142,-5.07265313e-16 1060,2.23857625 1060,5 L1060,592 C1060,594.761424 1057.76142,597 1055,597 L5,597 C2.23857625,597 3.38176876e-16,594.761424 0,592 L0,5 C-3.38176876e-16,2.23857625 2.23857625,5.07265313e-16 5,0 Z" id="Mask" style="mix-blend-mode: multiply;"></path>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

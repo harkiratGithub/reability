@@ -1,0 +1,24 @@
+<form [formGroup]="customForm">
+  <div class="column">
+    <label class="field-container">
+      <span class="description">First Name</span>
+      <input type="text" formControlName="first_name" required />
+    </label>
+    <label class="field-container">
+      <span class="description">Last Name</span>
+      <input type="text" formControlName="last_name" required />
+    </label>
+    <label class="field-container">
+      <span class="description">Username</span>
+      <input type="text" formControlName="username" [class.disabled]="true" disabled />
+    </label>
+    <label class="field-container">
+      <span class="description">Email</span>
+      <input type="email" formControlName="email" required />
+    </label>
+    <label class="field-container">
+      <span class="description">Phone</span>
+      <input type="text" formControlName="phone" />
+    </label>
+  </div>
+</form>

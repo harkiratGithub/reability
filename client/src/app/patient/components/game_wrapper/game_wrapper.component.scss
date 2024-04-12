@@ -1,0 +1,285 @@
+.iframes-container {
+  display: flex;
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, 0);
+  width: 100%;
+  height: 100%;
+}
+
+.game-iframe {
+  flex: 1;
+  border-radius: 7px;
+  border: none;
+  width: 100%;
+  height: 100%;
+}
+.game-wrapper {
+  height: 100%;
+  width: 100%;
+  background-repeat: no-repeat;
+  background-size: cover;
+  overflow: hidden;
+
+  .header-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: #f9f8f3;
+    position: relative;
+    z-index: 2;
+    height: 10%;
+    transform: translate(0, calc(50%));
+
+    .header-title {
+      height: 100px;
+      font-size: 40px;
+      letter-spacing: 2px;
+      background-image: url('/assets/textures/bg_squats.png');
+      background-size: 100% 100%;
+      padding: 1em 2em;
+      margin: 0 8%;
+      margin-left: 8%;
+      display: flex;
+      align-items: center;
+      text-transform: capitalize;
+    }
+    .header-therapist {
+      margin-left: 8% !important;
+    }
+    .setting-btn {
+      width: 110px;
+      height: 110px;
+      cursor: pointer;
+      position: relative;
+      background-size: cover;
+      background-image: url('/assets/buttons/btn_settings.svg');
+    }
+    .info-btn {
+      width: 110px;
+      height: 110px;
+      cursor: pointer;
+      position: relative;
+      background-size: cover;
+      background-image: url('/assets/buttons/btn_more_info.png');
+
+      &.patient {
+        &.pressed {
+          background-image: url('/assets/buttons/btn_more_info_hover.png');
+        }
+      }
+    }
+    .home-btn {
+      width: 110px;
+      cursor: pointer;
+      height: 110px;
+      position: relative;
+      background-size: cover;
+      background-image: url('/assets/buttons/btn_home.png');
+
+      &.patient {
+        &.pressed {
+          background-image: url('/assets/buttons/btn_home_hover.png');
+        }
+      }
+    }
+    .loader {
+      visibility: hidden;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    .info-btn.patient,
+    .home-btn.patient {
+      cursor: pointer;
+      &.pressed {
+        .loader {
+          visibility: visible;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+          width: 113px;
+          .circle {
+            fill: none;
+            stroke-width: 1.5;
+            stroke-linecap: round;
+            animation: progress 2s ease-out forwards;
+            stroke: #00a4b5;
+          }
+          @keyframes progress {
+            0% {
+              stroke-dasharray: 0 100;
+            }
+          }
+        }
+      }
+    }
+  }
+  .game-container {
+    height: 97%;
+    width: 100%;
+    bottom: 1%;
+
+    .outer-border {
+      height: 100%;
+
+      .content-background {
+        position: relative;
+        height: 100%;
+        border-radius: 8px;
+        background-color: rgba(233, 233, 233, 0.2);
+        box-shadow: 0 12px 12px 0 rgba(4, 17, 24, 0.6);
+        background: linear-gradient(225.53deg, #fcf9ea 0%, #faf7e6 100%);
+
+        .content-container {
+          // half of header
+          transform: translateY(-110px);
+          height: calc(100%);
+
+          .filename {
+            height: 10%;
+            color: #46647e;
+            font-weight: 600;
+            position: absolute;
+            z-index: 1;
+            margin-top: 10px;
+            font-size: larger;
+            left: 10px;
+            text-transform: capitalize;
+            text-align: start;
+          }
+
+          .video-duration {
+            position: absolute;
+            right: 1%;
+            margin-top: 10px;
+            color: #46647e;
+            font-family: 'Fredoka One';
+            font-size: 20px;
+            letter-spacing: 0;
+            line-height: 50px;
+            text-align: center;
+          }
+          .game-status-container {
+            height: 140px;
+            padding-top: 14px;
+          }
+
+          .game-content-container {
+            height: calc(100% - 140px);
+          }
+        }
+      }
+    }
+
+    .game-content-container {
+      .main-section {
+        width: 100%;
+        height: 100%;
+        position: relative;
+
+        .media-container {
+          width: 100%;
+          height: 100%;
+          position: relative;
+
+          .gif-container {
+            width: 40%;
+            height: 100%;
+            margin: 0 auto;
+            display: flex;
+
+            img {
+              max-width: 100%;
+              max-height: 100%;
+              object-fit: contain;
+              padding-bottom: 8%;
+              height: auto;
+              width: auto;
+              margin: auto;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .game-container-therapist {
+    bottom: 3%;
+  }
+}
+
+.game-wrapper-mobile {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: linear-gradient(225.53deg, #fcf9ea 0%, #faf7e6 100%);
+  box-shadow: inset 0 1px 3px 0 rgba(0, 0, 0, 0.5), inset 0 -15px 13px 0 rgba(226, 219, 183, 0.67);
+  .game-iframe {
+    border-radius: 0;
+    height: 100vh !important;
+  }
+}
+
+@media screen and (min-device-width: 1200px) and (max-device-width: 1600px) and (-webkit-min-device-pixel-ratio: 1) {
+  .info-btn {
+    width: 70px !important;
+    height: 70px !important;
+  }
+  .home-btn {
+    width: 70px !important;
+    height: 70px !important;
+  }
+  .header-title {
+    height: 75px !important;
+    font-size: 2rem !important;
+    padding: 1em 3em !important;
+  }
+  .setting-btn {
+    width: 70px !important;
+    height: 70px !important;
+  }
+  .therapist-wrapper {
+    padding-top: 3%;
+  }
+}
+
+.game-container-regular-video {
+  width: 84%;
+}
+
+.game-container-enlarge-video {
+  width: 70%;
+}
+
+/* ----------- Retina Screens ----------- */
+@media screen and (min-device-width: 1200px) and (max-device-width: 1600px) and (-webkit-min-device-pixel-ratio: 2) and (min-resolution: 192dpi) {
+  .info-btn {
+    width: 70px !important;
+    height: 70px !important;
+  }
+  .home-btn {
+    width: 70px !important;
+    height: 70px !important;
+  }
+  .header-title {
+    height: 75px !important;
+    font-size: 2rem !important;
+    padding: 1em 3em !important;
+  }
+  .setting-btn {
+    width: 70px !important;
+    height: 70px !important;
+  }
+  .therapist-wrapper {
+    padding-top: 3%;
+  }
+}
+.white-bg {
+  background: white !important;
+}

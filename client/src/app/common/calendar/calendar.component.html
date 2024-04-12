@@ -1,0 +1,71 @@
+<div class="calendar-container">
+  <table>
+    <thead>
+      <tr>
+        <th></th>
+        <th></th>
+        <th *ngFor="let col of tableDaysHeadings; trackBy: trackByDayNumber">
+          <span class="day-number" [class.active]="col.isToday">{{ col.number }}</span>
+          <span class="day-text">{{ col.text }}</span>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let hour of workingHours; trackBy: trackByIndex">
+        <td class="time">
+          <div class="time-text">{{ hour }}:00</div>
+        </td>
+        <td class="lunge"></td>
+        <td class="hour" *ngFor="let x of WeekDays; trackBy: trackByIndex">
+          <div class="outer-text">
+            <div class="hour-split ellipsis" *ngFor="let y of hourSplit; trackBy: trackByIndex"></div>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="grid-container" css-grid-container [cols]="gridColumnsWidth" [rows]="gridRowsHeight">
+    <ng-container *ngFor="let dayShiftsPositions of weeklyAvailabilityPositions">
+      <div
+        class="availability"
+        *ngFor="let shiftPosition of dayShiftsPositions"
+        css-grid-item
+        [position]="shiftPosition"
+      ></div>
+    </ng-container>
+    <ng-container *ngIf="therapistBookingDetails; else patientBookingDetailsPositions">
+      <div
+        *ngFor="let therapistCalendarItem of therapistCalendarItems"
+        [ngClass]="'booking ' + getTherapistSlotClassName(therapistCalendarItem?.therapistBooking)"
+        css-grid-item
+        [position]="therapistCalendarItem.position"
+        [therapistBooking]="therapistCalendarItem.therapistBooking"
+        (gridItemClick)="gridItemClick($event)"
+      ></div>
+    </ng-container>
+    <ng-template #patientBookingDetailsPositions>
+      <div
+        *ngFor="let booking of weeklyBookingPositions; let i = index"
+        [ngClass]="'booking ' + getPatientSlotClassName(patientBookingDetails[i])"
+        css-grid-item
+        [position]="booking"
+        [patientBooking]="patientBookingDetails[i]"
+        (gridItemClick)="gridItemClick($event)"
+      ></div>
+    </ng-template>
+    <app-calendar-item-modal
+      *ngIf="showModal"
+      [coPatients]="coPatients"
+      [patientBooking]="patientBooking"
+      [headerTitle]="getModalHeaderTitle()"
+      [title]="getModalTitle()"
+      [subtitle]="getModalSubtitle()"
+      [sideMenuOptions]="getSideMenuOptions()"
+      [coPatientPersonalMenuOptions]="coPatientPersonalMenuOptions"
+      [deleteAction]="getDeleteAction()"
+      (onClose)="onItemModalClose($event)"
+      (onSelectedCoPatient)="onSelectedCoPatient($event)"
+      (onReasonSave)="updatePatientReason($event)"
+    ></app-calendar-item-modal>
+  </div>
+</div>

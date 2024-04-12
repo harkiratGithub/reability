@@ -1,0 +1,47 @@
+<div class="full-screen-container">
+  <div class="user-name">{{ remotePeerUserName }}</div>
+  <div
+    *ngIf="isTherapist && !isShareScreen"
+    class="share-screen"
+    [ngClass]="{ active: isShareScreen }"
+    (click)="toggleShareScreenView()"
+  >
+    <div class="share-img"></div>
+    <div class="share-text">SHARE SCREEN</div>
+  </div>
+  <div *ngIf="isTherapist && isShareScreen" class="share-screen-active">
+    <div class="share-screen-active-text">You are screensharing</div>
+    <div class="stop-button" (click)="toggleShareScreenView()">STOP</div>
+  </div>
+  <video
+    id="remote-video"
+    [ngStyle]="setScaleOfRemoteScreenShare()"
+    [ngClass]="isTherapistScreenShared ? 'remote-video-shared-screen' : 'remote-video'"
+    playsinline
+    autoplay
+  ></video>
+  <div
+    [ngClass]="{ hide: !shouldShowRemoteVideoOnShareScreen() }"
+    class="video-wrapper-share-screen"
+    cdkDrag
+    cdkDragBoundary=".backdrop"
+  >
+    <video id="remote-video-share-screen" class="remote-video-share-screen" playsinline muted autoplay></video>
+  </div>
+  <div 
+    class="video-wrapper" 
+    [ngClass]="isTherapist ? '' : 'hide-video-wrapper'"
+    cdkDrag cdkDragBoundary=".backdrop"
+  >
+    <video id="local-video" class="local-video" playsinline autoplay></video>
+  </div>
+  <div *ngIf="isTherapist" class="exit-button" (click)="onLeave()" title="Leave or press ESC">LEAVE</div>
+  <div *ngIf="isTherapist" class="mirror-button" (click)="handleVideoMirror()" title="Mirror webcam">
+    <img src="../../../assets/therapist/Mirror.png" />
+  </div>
+  <div class="mute-mic" (click)="muteMicrophone()" title="{{ isMuted() ? 'Unmute' : 'Mute' }}">
+    <img
+      [src]="isMuted() ? '../../../assets/therapist/btn_voice_off.svg' : '../../../assets/therapist/btn_voice_on.svg'"
+    />
+  </div>
+</div>

@@ -1,0 +1,146 @@
+<div class="main-menu-container">
+  <div class="header">
+    <div class="left">
+      <img src="assets/therapist/logo.svg" />
+    </div>
+    <div class="right">
+      <div class="tabs">
+        <div
+          *ngFor="let tab of tabs; let i = index"
+          class="tab"
+          [ngClass]="{ 'not-active': !isCurrentTab(i) }"
+          (click)="onClickTab(i)"
+        >
+          {{ tab.displayName }}
+        </div>
+      </div>
+      <div class="logout-container" (click)="logout()">
+        <img class="log-out-image" src="assets/main-menu/svg-cards/log_out.svg" />
+        Log out
+      </div>
+    </div>
+  </div>
+  <div class="content">
+    <app-export-to-excel
+      *ngIf="currentTabIndex == gamesTab"
+      (excelExport)="exportTableToExcel()"
+      [btnText]="'LOGS'"
+    ></app-export-to-excel>
+    <app-file-uploader *ngIf="currentTabIndex == gamesTab"></app-file-uploader>
+    <ng-template [ngIf]="isViewMode() && !isLoading">
+      <div class="actions-container">
+        <div class="search-container">
+          <app-backoffice-search
+            [data]="table.rows"
+            [disabled]="table.rows && table.rows.length === 0"
+            [filterFunc]="filterFunc"
+            [additionalFilters]="tabsAdditionalFilters[currentTabIndex]"
+            [sharedFilters]="getSharedFilters(currentTabIndex)"
+            [filterBy]="currentSearchText"
+            (filterTextChanged)="setCurrentSearchText($event)"
+          >
+          </app-backoffice-search>
+        </div>
+        <div *ngIf="showExportSessionsButton" class="export-btn" (click)="exportSessions()">Export all sessions</div>
+        <div class="action-buttons">
+          <div *ngIf="showActiveInactiveFilter" class="active-inactive">
+            <div class="active-inactive-header">
+              {{ selectedActiveInactiveOptions[0].displayName }}
+            </div>
+            <app-multi-select
+              [options]="activeInactiveOptions"
+              [selected]="selectedActiveInactiveOptions"
+              [isSingleSelect]="true"
+              (submit)="activeInactiveSubmit($event)"
+            >
+              <img src="assets/backoffice/arrow_down.png" alt="" />
+            </app-multi-select>
+          </div>
+          <div (click)="exportTableToExcel()" class="export-btn">
+            <img src="assets/main-menu/svg-cards/log_out.svg" /><span>EXPORT</span>
+          </div>
+          <div class="new" (click)="onClickNew()" *ngIf="showAddButton">
+            <img src="assets/backoffice/icon_back_office_plus_green.svg" />
+            {{ getCurrentTab().newButtonText }}
+          </div>
+        </div>
+      </div>
+      <div class="table-container">
+        <app-backoffice-table
+          [currentTabIndex]="currentTabIndex"
+          [columns]="table.columns"
+          [rows]="table.filtered"
+          [additionalActions]="tabsAdditionalActions[currentTabIndex]"
+        >
+        </app-backoffice-table>
+      </div>
+    </ng-template>
+    <ng-template [ngIf]="!isViewMode() && !isScheduleMode() && !isExpertiseMode()">
+      <app-backoffice-add-edit
+        [currentTab]="getCurrentTab()"
+        [currentTabIndex]="currentTabIndex"
+        [editedEntity]="editedEntity"
+        [allInstitutes]="allInstitutes"
+        [allDepartments]="allDepartments"
+        [allProfessions]="allProfessions"
+        [allExpertises]="allExpertises"
+        [allTherapists]="allTherapists"
+        [allFollowups]="allFollowups"
+        (goBack)="onReturnFromAddEdit($event)"
+        (refreshPatientDetails)="onRefreshPatientDetails($event)"
+        (openTherapistScheduler)="openTherapistScheduler($event)"
+      >
+      </app-backoffice-add-edit>
+    </ng-template>
+
+    <ng-template [ngIf]="isScheduleMode() && getCurrentTab().name === 'therapists'">
+      <app-admin-therapist-schedule
+        [currentTab]="getCurrentTab()"
+        [editedEntity]="editedEntity"
+        (goBack)="onReturnFromAddEdit()"
+      >
+      </app-admin-therapist-schedule>
+    </ng-template>
+
+    <ng-template [ngIf]="isScheduleMode() && getCurrentTab().name === 'professions'">
+      <app-admin-profession-schedule
+        [editedEntity]="editedEntity"
+        [professionName]="currentProfessionName"
+        (goBack)="onReturnFromAddEdit()"
+        (professionWeekChanged)="setProfessionSlots($event)"
+      >
+      </app-admin-profession-schedule>
+    </ng-template>
+
+    <ng-template [ngIf]="isExpertiseMode() && getCurrentTab().name === 'professions'">
+      <app-add-edit-expertise
+        [expertiseArray]="currentProfessionExpertise"
+        [deleteExpertiseFunc]="deleteExpertise"
+        (onCreateExpertise)="createExpertise($event)"
+        (onUpdateExpertise)="updateExpertise($event)"
+        (goBack)="onReturnFromAddEdit()"
+      >
+      </app-add-edit-expertise>
+    </ng-template>
+  </div>
+</div>
+<div class="backdrop-container" *ngIf="isDeleteConfirmationMessageShown">
+  <div class="modal-container">
+    <div class="header">Remove {{ tabs[this.currentTabIndex].messageDisplayName }}</div>
+    <div class="details">{{ currentDeleteMessage }}</div>
+    <div class="buttons-container">
+      <div class="button" (click)="hideDeleteConfirmation()">Cancel</div>
+      <div class="button" (click)="deleteEntity()">Delete</div>
+    </div>
+  </div>
+</div>
+<div class="backdrop-container" *ngIf="isDeleteConfirmationMessageShown">
+  <div class="modal-container">
+    <div class="header">Remove {{ tabs[this.currentTabIndex].messageDisplayName }}</div>
+    <div class="details">{{ currentDeleteMessage }}</div>
+    <div class="buttons-container">
+      <div class="button" (click)="hideDeleteConfirmation()">Cancel</div>
+      <div *ngIf="isDeleteEnabledInDeleteConfirmationMessage" class="button" (click)="deleteEntity()">Delete</div>
+    </div>
+  </div>
+</div>

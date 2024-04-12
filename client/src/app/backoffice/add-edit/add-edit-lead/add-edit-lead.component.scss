@@ -1,0 +1,111 @@
+.form-content {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 30px;
+
+  .column {
+    flex: 0.3;
+    display: flex;
+    flex-flow: column nowrap;
+  }
+}
+
+.field-container {
+  display: block;
+  margin-bottom: 24px;
+  margin-left: 34px;
+  :last-child {
+    margin-bottom: 0;
+  }
+  .description {
+    display: block;
+    color: #b6c5cf;
+    font-family: 'Roboto bold';
+    font-size: 16px;
+    margin-bottom: 10px;
+    .secondary {
+      font-family: 'Roboto';
+    }
+  }
+  input {
+    background: inherit;
+    height: 40px;
+    width: 280px;
+    padding-left: 8px;
+    padding-right: 8px;
+    font-size: 16px;
+    font-family: 'Roboto';
+    color: #6d7278;
+    border: 1px solid #b6c5cf;
+    border-radius: 10px;
+    outline: none;
+    &.disabled {
+      pointer-events: none;
+      opacity: 0.4;
+    }
+  }
+  .reminder-input{
+    width: 800px;
+    padding-left: 8px;
+    color: #6d7278;
+    border: 1px solid #b6c5cf;
+    border-radius: 10px;
+    min-height: 130px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    overflow: hidden;
+    outline: none;
+}
+}
+.remainder-input-container{
+  margin-left: 30px;
+}
+
+.reminder-container {
+  margin: 30px;
+  .reminder-input-container {
+    display: flex;
+    align-items: flex-end;
+  }
+  .all-reminders-wrapper {
+    width: 60vw;
+    height: 400px;
+    overflow-x: hidden;
+    .reminders {
+      color: #6d7278;
+    }
+  }
+  .save {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    width: 80px;
+    color: #ffffff;
+    border: 1px solid #44d7b6;
+    border-radius: 20px;
+    background-color: #44d7b6;
+    margin-left: 10px;
+    cursor: pointer;
+    .save-text {
+      font-size: 14px;
+      font-family: 'Roboto bold';
+      margin: 0 auto;
+    }
+    &.disabled {
+      opacity: 0.2;
+      pointer-events: none;
+    }
+  }
+  .inputTextArea {
+    width: 800px;
+    padding-left: 8px;
+    color: #6d7278;
+    border: 1px solid #b6c5cf;
+    border-radius: 10px;
+    min-height: 130px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    overflow: hidden;
+    outline: none;
+  }
+}

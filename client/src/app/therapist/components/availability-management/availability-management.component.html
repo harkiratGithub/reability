@@ -1,0 +1,65 @@
+<div class="container">
+  <header class="heading">
+    <h3>Working Hours</h3>
+    <p>Enable working hours to let people know when you're available for meetings.</p>
+  </header>
+
+  <div class="working-days">
+    <div
+      class="day"
+      *ngFor="let day of dayHeadings; trackBy: trackByIndex"
+      [class.active]="isDayPicked(day)"
+      (click)="toggleWorkingDay(day)"
+    >
+      {{ day | slice: 0:1 | titlecase }}
+    </div>
+  </div>
+  <div class="shifts">
+    <div class="specific-day-shifts" *ngFor="let dayShifts of dayHeadings">
+      <div class="actions" *ngIf="isDayPicked(dayShifts)">
+        {{ dayShifts | titlecase }}
+        <div class="action add" (click)="addShift(dayShifts)"></div>
+      </div>
+      <div *ngFor="let workingTime of localAvailability[dayShifts]; index as i">
+        <div class="actions" *ngIf="i % 2">
+          <div class="hour-range">
+            <div class="shift-time" [matMenuTriggerFor]="startTimeMenu">
+              {{ timeFloatToString(localAvailability[dayShifts][i - 1]) }}
+            </div>
+            <mat-menu class="shifts-dropbox" #startTimeMenu="matMenu">
+              <button
+                mat-menu-item
+                *ngFor="let time of possibleShiftTimings; trackBy: trackByIndex"
+                (click)="setShiftTime(localAvailability[dayShifts], time, i - 1)"
+              >
+                {{ time }}
+              </button>
+            </mat-menu>
+            <img src="/assets/backoffice/arrow_right_with_line.svg" alt="" />
+            <div class="shift-time" [matMenuTriggerFor]="endTimeMenu">
+              {{ timeFloatToString(localAvailability[dayShifts][i]) }}
+            </div>
+            <mat-menu class="shifts-dropbox" #endTimeMenu="matMenu">
+              <button
+                mat-menu-item
+                *ngFor="let time of possibleShiftTimings; trackBy: trackByIndex"
+                (click)="setShiftTime(localAvailability[dayShifts], time, i)"
+              >
+                {{ time }}
+              </button>
+            </mat-menu>
+          </div>
+          <div class="action del" *ngIf="i !== 0" (click)="dropShift(localAvailability[dayShifts], i)"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer *ngIf="duringLocalChanges" class="footer-actions">
+    <div class="submit cancel" (click)="resetChanges()">Cancel</div>
+    <div class="submit save" mat-button (click)="openDialog()">Save</div>
+  </footer>
+  <footer *ngIf="!duringLocalChanges && isUniqueWeek" class="footer-actions footer-actions-restore">
+    <div class="submit save restore" mat-button (click)="restoreDefault()">Restore Default</div>
+  </footer>
+</div>

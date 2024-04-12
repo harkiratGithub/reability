@@ -1,0 +1,41 @@
+.game-score {
+    width: auto;
+    border-radius: 8px;
+    background-color: #0E191F;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 10px;
+    max-height: 15vh;
+    .points-wrapper {
+        height: 100px;
+        display: flex;
+        flex: 1 1 auto;
+        justify-content: center;
+        align-items: center;
+        .points-text {
+            margin: 0;
+            color: #FFFFFF;
+            font-family: "Open Sans";
+            font-size: 27px;
+            font-weight: 300;
+            letter-spacing: 0;
+            line-height: 76px;
+            text-align: right;
+        }
+    }
+    .points-title-wrapper {
+        display: flex;
+        flex: 1 1 auto;
+        justify-content: center;
+        .points-title {
+            color: #ECECED;
+            font-family: "Open Sans";
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 0;
+            line-height: 24px;
+            margin: 0;
+        }
+    }
+}

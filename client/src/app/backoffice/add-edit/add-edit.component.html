@@ -1,0 +1,91 @@
+<div class="container">
+  <div *ngIf="showHeader()" class="header-container">
+    <div class="back" (click)="onClickBack()">
+      <img src="/assets/backoffice/icon_back_office_back.svg" />
+      {{ getHeaderText() }}
+    </div>
+  </div>
+  <div [ngClass]="showHeader() ? 'main-section' : 'main-section-without-header'">
+    <div class="background-container"></div>
+    <div class="overflow-container">
+      <div class="content">
+        <div class="form-container">
+          <div [ngSwitch]="currentTabIndex">
+            <app-add-edit-admin
+              *ngSwitchCase="tabsEnum.admins"
+              [editedEntity]="editedEntity"
+              (state)="setFormState($event)"
+              (valid)="setFormStatus($event)"
+            >
+            </app-add-edit-admin>
+            <app-add-edit-therapist
+              *ngSwitchCase="tabsEnum.therapists"
+              [editedEntity]="editedEntity"
+              [institutes]="parsedInstitutes"
+              [departments]="parsedDepartments"
+              [professions]="parsedProfessions"
+              [expertises]="parsedExpertises"
+              (state)="setFormState($event)"
+              (valid)="setFormStatus($event)"
+              (openTherapistScheduler)="onOpenTherapistScheduler()"
+            >
+            </app-add-edit-therapist>
+            <app-add-edit-patient
+              *ngSwitchCase="tabsEnum.patients"
+              [editedEntity]="editedEntity"
+              [institutes]="parsedInstitutes"
+              [departments]="parsedDepartments"
+              [professions]="parsedProfessions"
+              [expertises]="parsedExpertises"
+              [deletePatientTreatmentFunc]="deletePatientTreatment"
+              (state)="setFormState($event)"
+              (valid)="setFormStatus($event)"
+              (innerAction)="onInnerAction($event)"
+              (goBack)="onClickBack($event)"
+              (weekChanged)="onWeekChanged($event)"
+              (bookingViewShown)="onBookingViewShown($event)"
+              (createBooking)="onCreateBooking($event)"
+              (deleteBooking)="onDeleteBooking($event)"
+              (createRemark)="onCreateRemark($event)"
+            >
+            </app-add-edit-patient>
+            <app-add-edit-institute
+              *ngSwitchCase="tabsEnum.institutes"
+              [editedEntity]="editedEntity"
+              (state)="setFormState($event)"
+              (valid)="setFormStatus($event)"
+            >
+            </app-add-edit-institute>
+            <app-add-edit-followup
+              *ngSwitchCase="tabsEnum.followups"
+              [therapists]="parsedTherapists"
+              [editedEntity]="editedEntity"
+              (state)="setFormState($event)"
+              (valid)="setFormStatus($event)"
+            >
+            </app-add-edit-followup>
+            <app-add-edit-profession
+              *ngSwitchCase="tabsEnum.professions"
+              [editedEntity]="editedEntity"
+              (state)="setFormState($event)"
+              (valid)="setFormStatus($event)"
+            >
+            </app-add-edit-profession>
+            <app-add-edit-lead
+              *ngSwitchCase="tabsEnum.leads"
+              [lead]="editedEntity"
+              (state)="setFormState($event)"
+              (valid)="setFormStatus($event)"
+              (reminder)="setReminder($event)"
+            >
+            </app-add-edit-lead>
+          </div>
+        </div>
+        <div *ngIf="!isInternalView()" class="actions-container">
+          <div class="cancel" (click)="onClickCancel()">CANCEL</div>
+          <div class="save" [class.disabled]="!isValidForm" (click)="onClickSave()">SAVE</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

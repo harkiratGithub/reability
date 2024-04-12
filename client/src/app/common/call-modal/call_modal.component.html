@@ -1,0 +1,51 @@
+<div *ngIf="!isMobile" class="modal-container">
+  <div class="top-circle">
+    <img src="../../../assets/modal/camera.svg" />
+  </div>
+  <div class="header-section">Connection request</div>
+  <div class="main-section">
+    {{ content }}
+  </div>
+  <div class="actions-section">
+    <div
+      appHand
+      [hoverClass]="'timer'"
+      [selectable]="true"
+      [timeToWait]="2000"
+      (click)="handleApprove()"
+      matDialogClose
+      (outputFunc)="handleApprove()"
+      [class]="getActionButtonClass()"
+      [activeOnStartHover]="clearPopupTimeut"
+      [activeOnOutHover]="createPopupTimeut"
+    >
+      <button class="accept-btn">Accept</button>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="isMobile" class="modal-container-mobile">
+  <div class="top-circle-mobile">
+    <img src="../../../assets/modal/camera.svg" />
+  </div>
+  <div class="header-section-mobile">Connection request</div>
+  <div class="main-section-mobile">
+    {{ content }}
+  </div>
+  <div class="actions-section-mobile">
+    <div
+      appHand
+      [hoverClass]="'timer'"
+      [selectable]="true"
+      [timeToWait]="2000"
+      (click)="handleApprove()"
+      matDialogClose
+      (outputFunc)="handleApprove()"
+      [class]="getActionButtonClass()"
+      [activeOnStartHover]="clearPopupTimeut"
+      [activeOnOutHover]="createPopupTimeut"
+    >
+      <button class="accept-btn-mobile">Accept</button>
+    </div>
+  </div>
+</div>

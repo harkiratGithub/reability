@@ -1,0 +1,40 @@
+<form [formGroup]="customForm">
+    <label class='field-container'>
+      <span class='description'>Name</span>
+      <input type="text" formControlName="name" required>
+    </label>
+    <label class='field-container'>
+      <span class='description'>Logo<span class='secondary'> (JPG, PNG, PDF)</span></span>
+      <div class='input-container'>
+        <input type="text" class="disabled" formControlName="logo">
+        <div class='delete-container' *ngIf='customForm.controls.logo.value'>
+          <div class='delete-image-container' (click)="deleteImage()">
+            <img src='/assets/backoffice/icon_close_search.svg'>
+          </div>
+        </div>
+      </div>
+      <input type="file" id="file" (change)="onFileChange($event)">
+      <div class='upload-container'>
+        <label for="file" class='upload'>Choose a file</label>
+      </div>
+    </label>
+    <label class='field-container group' formArrayName="departments">
+      <span class='description'>Departments</span>
+      <div class='input-container' *ngFor="let input of departments.controls; let i = index"
+        [class.disabled]="isDepartmentFieldDisabled(i)">
+        <div [formGroupName]="i">
+          <input
+            formControlName="name"
+            type="text"
+            placeholder="{{ addDepartmentPlaceHolder }}"
+          />
+          <div class='delete-container' *ngIf='!isDepartmentFieldDisabled(i)'>
+            <div class='delete-image-container' (click)="deleteDepartmentField(i)">
+              <img src='/assets/backoffice/icon_close_search.svg'>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class='add-new-department' (click)="addNewDepartment()">+ Add Department</div>
+    </label>
+  </form>

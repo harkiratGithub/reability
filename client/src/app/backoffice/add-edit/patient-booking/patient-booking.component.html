@@ -1,0 +1,77 @@
+<div class="main-container">
+  <div class="header">
+    <div class="left">
+      <img src="/assets/backoffice/icon_back_office_back.svg" (click)="backToSchedular()" class="left-arrow-img" />
+      <div>{{ editedEntity.patientName }}</div>
+    </div>
+    <div class="middle">Book {{ expertise.expertiseName }} session</div>
+    <div class="right">
+      <div class="day" (click)="setCurrentWeek()">Today</div>
+      <div class="navigation">
+        <button (click)="setPreviousWeek()"><img class="arrow" src="/assets/backoffice/arrow_left.svg" /></button>
+        <button (click)="setNextWeek()"><img class="arrow" src="/assets/backoffice/arrow_right.svg" /></button>
+      </div>
+      {{ dateToDisplay }}
+    </div>
+  </div>
+  <div *ngIf="!hasOfferings()" class="header header-no-therapists">
+    <div class="middle">No available therapists</div>
+  </div>
+  <div class="details-container">
+    <div *ngIf="patientBooking.length > 0" class="patient-booking-details">
+      <div>
+        <u><b>Current Patient Appointments:</b></u>
+      </div>
+      <div *ngFor="let appointment of patientBooking">
+        {{ appointment.week_day }} {{ appointment.time | time }} - {{ appointment.time | time: appointment.duration }}
+        {{ appointment.name }} with {{ appointment.therapist_first_name }} {{ appointment.therapist_last_name }}
+      </div>
+    </div>
+    <div class="treatments">
+      <div *ngFor="let therapistBookingViewData of allTherapistsBookingViewData" class="treatment">
+        <app-treatment-list
+          [therapistBookingViewData]="therapistBookingViewData"
+          [currentDate]="currentDate"
+          [availabilityClickActionType]="clickActionType"
+          [bookingClickActionType]="clickActionType"
+          (actionSubmit)="showAppointmentOptions($event)"
+        ></app-treatment-list>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="isAppointmentOptionsShown" class="appointment-options">
+    <div class="appointment-options-header">{{ currentSlotDay }} with {{ currentTherapistName }}</div>
+    <div class="hour-range">
+      <div class="appointment-time" [matMenuTriggerFor]="appointmentTimeMenu" (click)="focusOnMenuItem()">
+        {{ appointmentTime }}
+      </div>
+      <mat-menu #appointmentTimeMenu="matMenu">
+        <button
+          #menuItem
+          mat-menu-item
+          *ngFor="let time of possibleAppointmentTimes; trackBy: trackByIndex"
+          (click)="setAppointmentTime(time)"
+        >
+          {{ time }}
+        </button>
+      </mat-menu>
+      <img src="/assets/backoffice/arrow_right_with_line.svg" alt="to" />
+      <div class="appointment-end-time">{{ endAppointmentTime }}</div>
+    </div>
+    <div class="appointment-repeat">
+      <div class="appointment-repeat-item">For</div>
+      <div class="appointment-repeat-item">
+        <select name="repeats" id="repeats" [(ngModel)]="selectedRepeat">
+          <option *ngFor="let repeat of repeatOptions" selectedRepeat="repeat.id" [ngValue]="repeat.id">
+            {{ repeat.name }}
+          </option>
+        </select>
+      </div>
+      <div class="appointment-repeat-item">times</div>
+    </div>
+    <div class="appointment-buttons">
+      <div class="appointment-button" (click)="hideAppointmentOptions()">Cancel</div>
+      <div class="appointment-button ok-button" (click)="saveAppointment()">OK</div>
+    </div>
+  </div>
+</div>

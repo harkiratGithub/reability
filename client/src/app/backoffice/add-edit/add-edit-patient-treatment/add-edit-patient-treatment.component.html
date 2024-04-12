@@ -1,0 +1,45 @@
+<div class="table-container">
+  <app-backoffice-table [columns]="columns" [rows]="treatments" [additionalActions]="actions"> </app-backoffice-table>
+  <hr *ngIf="treatments.length > 0" />
+</div>
+
+<form [formGroup]="customForm">
+  <div class="treatment">
+    <label class="field-container">
+      <app-select formControlName="profession_id" required [items]="professions"> </app-select>
+    </label>
+    <label class="field-container">
+      <app-select formControlName="expertise_id" required [items]="filteredExpertises"> </app-select>
+    </label>
+    <label class="field-container">
+      <app-select formControlName="payer" required [items]="payers"> </app-select>
+    </label>
+    <label class="field-container">
+      <app-select formControlName="times_per_week" required [items]="timesPerWeekOptions"> </app-select>
+    </label>
+    <label class="field-container">
+      <app-select formControlName="max_patients" required [items]="maxPatientsOptions"> </app-select>
+    </label>
+    <label class="field-container">
+      <div class="add" [class.disabled]="!isValid" (click)="savePatientTreatment()">
+        <div class="add-text">{{ editTreatmentMode ? 'SAVE' : 'ADD' }}</div>
+      </div>
+    </label>
+  </div>
+</form>
+
+<div class="backdrop-container" *ngIf="showBookingExistsMessage">
+  <div class="modal-container">
+    <div class="header">Delete patient treatment</div>
+    <div class="details">
+      There are {{ currentPatientTreatmentBookingsAmount }} sessions booked for this treatment.
+      <br />
+      Please remove them before deleting the treatment.
+      <br />
+    </div>
+    <div class="buttons-container">
+      <div class="button" (click)="hideBookingExistsMessage()">Cancel</div>
+      <div class="button" (click)="openSchedule()">Schedule</div>
+    </div>
+  </div>
+</div>

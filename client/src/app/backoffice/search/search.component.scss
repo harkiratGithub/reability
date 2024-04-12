@@ -1,0 +1,70 @@
+$BORDER_RADIUS: 26px;
+.container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  img {
+    width: 16px;
+  }
+
+  .filter {
+    color: #6d9ec4;
+    font-family: 'Roboto bold';
+    font-size: 16px;
+    margin-left: 12px;
+    align-self: center;
+    cursor: pointer;
+    &:hover {
+      border: none;
+      color: #c7b066;
+    }
+  }
+  .dropdown {
+    width: 16px;
+    margin-left: 6px;
+  }
+  .active {
+    color: #c7b066;
+    &:hover {
+      border: none;
+      color: #6d9ec4;
+    }
+  }
+
+  .search-bar {
+    width: 280px;
+    height: 40px;
+    position: relative;
+    border-radius: $BORDER_RADIUS;
+
+    input {
+      width: 100%;
+      height: 100%;
+      font-size: 16px;
+      border-radius: $BORDER_RADIUS;
+      color: #b6c5cf;
+      padding-left: 16px;
+      padding-right: 40px;
+      background-color: #edf2f4;
+      border: 1px solid #d7e1e6;
+      outline: none;
+
+      &::placeholder {
+        color: #b6c5cf;
+        font-size: 16px;
+      }
+      &:focus {
+        outline: none;
+        background-color: #ffffff;
+        box-shadow: 0 5px 10px 0 rgba(25, 148, 192, 0.1);
+        border: none;
+      }
+    }
+
+    img {
+      position: absolute;
+      right: 15px;
+      top: 10px;
+    }
+  }
+}

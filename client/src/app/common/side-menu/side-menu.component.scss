@@ -1,0 +1,42 @@
+.container {
+  position: absolute;
+  border-radius: 4px;
+  background-color: white;
+  box-shadow: 0 2px 4px 0 rgba(74, 112, 145, 0.3);
+  z-index: 100;
+  width: fit-content;
+  padding: 8px;
+  .option {
+    display: flex;
+    align-items: center;
+    padding: 6px;
+    &:hover {
+      background: rgba(0, 0, 0, 0.04);
+    }
+    .option-text {
+      height: 21px;
+      color: #385f7c;
+      font-size: 1rem;
+      font-weight: 500;
+      letter-spacing: 0;
+      line-height: 21px;
+    }
+    .img-container {
+      display: flex;
+      justify-content: center;
+      margin-right: 8px;
+      width: 22px;
+      height: 22px;
+      img {
+        width: inherit;
+        height: inherit;
+      }
+    }
+  }
+}
+
+.item {
+  &:hover {
+    background-color: #deeaed;
+  }
+}

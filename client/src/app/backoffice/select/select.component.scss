@@ -1,0 +1,106 @@
+$CONTAINER_WIDTH: 280px;
+$HEADER_HEIGHT: 40px;
+$ITEM_HEIGHT: 45px;
+$LEFT_SPACE: 12px;
+
+.select-container {
+  max-width: $CONTAINER_WIDTH;
+  height: $HEADER_HEIGHT;
+  position: relative;
+  border-radius: 10px;
+  border: 1px solid #B6C5CF;
+  background-color: #FFFFFF;
+  font-family: Roboto;
+  cursor: pointer;
+
+  &:hover {
+    border: none;
+    box-shadow: 0 0 10px 0 rgba(0,0,0,0.1);
+  }
+
+  &.open:hover {
+    border: 1px solid #B6C5CF;
+    box-shadow: none;
+  }
+
+  &.disabled {
+    pointer-events: none;
+    opacity: 0.8;
+  }
+
+  .header-container {
+    display: flex;
+    align-items: center;
+    height: $HEADER_HEIGHT;
+    padding-left: $LEFT_SPACE;
+    font-size: 16px;
+    color: #D2D2D2;
+
+    &.chosen {
+      color: #6D7278;
+    }
+
+    .text {
+      flex: 1;
+      padding-right: 10px;
+      text-transform: capitalize;
+    }
+    .arrow {
+      position: relative;
+      border: solid #B6C5CF;
+      border-width: 0 2px 2px 0;
+      padding: 3px;
+      margin-right: 10px;
+      transform: rotate(45deg);
+      -webkit-transform: rotate(45deg);
+      top: -1px;
+    }
+  }
+
+  .content {
+    position: absolute;
+    left: -1px;
+    right: -1px;
+    top: 44px;
+    border-radius: 10px;
+    background-color: #FFFFFF;
+    box-shadow: 0 0 10px 0 rgba(0,0,0,0.1);
+    overflow-y: auto;
+    max-height: calc(6 * #{$ITEM_HEIGHT});
+    z-index: 10;
+
+    .item {
+      display: flex;
+      align-items: center;
+      height: $ITEM_HEIGHT;
+      padding-left: $LEFT_SPACE;
+      color: #585858;
+      font-size: 18px;
+      text-transform: capitalize;
+
+      &:hover {
+        background-color: rgba(68,215,182, 0.1);
+      }
+
+      &.selected {
+        font-family:'Roboto bold';
+        color: #FFFFFF;
+        background-color: rgba(68,215,182,1);
+      }
+
+      &:first-child {
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+      }
+
+      &.scroll-visible:first-child {
+        border-top-right-radius: 0;
+      }
+
+      &:last-child {
+        border-bottom-left-radius: 10px;
+        border-bottom-right-radius: 10px;
+      }
+    }
+  }
+}

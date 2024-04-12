@@ -1,0 +1,183 @@
+<ng-container *ngIf="isMobile; else desktop">
+  <div class="main-menu-container-mobile">
+    <div class="header-mobile">
+      <img class="shiba-logo" src="assets/main-menu/beyond.png" />
+      <img class="logo" src="assets/main-menu/svg-cards/gertner_logo1.png" />
+    </div>
+    <div class="login-div-border-wrap-mobile">
+      <div class="error-message-wrapper-mobile">
+        <div
+          class="error-message-mobile"
+          *ngIf="submitted && f.username.errors && f.username.errors.errorName === 'already_connected'"
+        >
+          <img class="inputs-error-mobile" src="../../../../assets/login/inputs_error.svg" />
+          <p class="error-message-text-mobile">The user is connected on another machine</p>
+        </div>
+        <div
+          class="error-message-mobile"
+          *ngIf="submitted && f.username.errors && f.username.errors.errorName === 'not_valid'"
+        >
+          <img class="inputs-error-mobile" src="../../../../assets/login/inputs_error.svg" />
+          <p class="error-message-text-mobile">Please check your username and password</p>
+        </div>
+      </div>
+      <div class="login-div-mobile">
+        <h2 class="login-header-mobile">Welcome</h2>
+        <p
+          class="login-tagline-mobile"
+          [ngClass]="{
+            'login-tagline-error-mobile': submitted && f.username.errors && f.username.errors.errorName === 'not_valid'
+          }"
+        >
+          Login to Reability Online
+        </p>
+        <form class="login-form-mobile" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+          <div class="form-inputs-mobile">
+            <div class="form-group-mobile">
+              <div class="field-header-mobile">Username</div>
+              <input
+                type="text"
+                formControlName="username"
+                class="form-control-mobile"
+                [ngClass]="{
+                  'input-error-mobile': submitted && f.username.errors && f.username.errors.errorName === 'not_valid'
+                }"
+              />
+            </div>
+            <div class="form-group-mobile">
+              <div class="field-header-mobile">Password</div>
+              <div class="password-container-mobile">
+                <input
+                  type="{{ statusPassword }}"
+                  formControlName="password"
+                  class="form-control-mobile"
+                  [ngClass]="{
+                    'input-error-mobile': submitted && f.username.errors && f.username.errors.errorName === 'not_valid'
+                  }"
+                  [(ngModel)]="textPassword"
+                />
+                <div class="eye-icon-wrapper-mobile" (click)="seePassword()">
+                  <img src="{{ iconPassword }}" class="eye-icon-mobile" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group login-mobile">
+            <button [disabled]="loading" class="btn-mobile btn-primary" [ngClass]="{ on: textPassword !== '' }">
+              Login
+            </button>
+            <img
+              *ngIf="loading"
+              src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA=="
+            />
+          </div>
+          <a href="/#/forgot_password" class="forgot-password-mobile">Forgot Password?</a>
+        </form>
+      </div>
+    </div>
+    <div class="footer-mobile">
+      <div class="footer-version-mobile">
+        <p class="version-bold-mobile">version:&ensp;</p>
+        <p class="version-mobile">{{ appVersion }}</p>
+      </div>
+      <div class="footer-recaptcha-description-mobile">
+        <p>
+          This site is protected by reCAPTCHA and the Google
+          <a href="https://policies.google.com/privacy">Privacy Policy</a>
+          and <a href="https://policies.google.com/terms">Terms of Service</a> apply.
+        </p>
+      </div>
+    </div>
+  </div>
+</ng-container>
+
+<ng-template #desktop>
+  <div class="main-menu-container">
+    <div class="header">
+      <img class="shiba-logo" src="assets/main-menu/beyond.png" />
+      <img class="logo" src="assets/main-menu/svg-cards/gertner_logo1.png" />
+    </div>
+    <div class="login-div-border-wrap">
+      <div class="error-message-wrapper">
+        <div
+          class="error-message"
+          *ngIf="submitted && f.username.errors && f.username.errors.errorName === 'already_connected'"
+        >
+          <img class="inputs-error" src="../../../../assets/login/inputs_error.svg" />
+          <p class="error-message-text">The user is connected on another machine</p>
+        </div>
+        <div
+          class="error-message"
+          *ngIf="submitted && f.username.errors && f.username.errors.errorName === 'not_valid'"
+        >
+          <img class="inputs-error" src="../../../../assets/login/inputs_error.svg" />
+          <p class="error-message-text">Please check your username and password</p>
+        </div>
+      </div>
+      <div class="login-div">
+        <h2 class="login-header">Welcome</h2>
+        <p
+          class="login-tagline"
+          [ngClass]="{
+            'login-tagline-error': submitted && f.username.errors && f.username.errors.errorName === 'not_valid'
+          }"
+        >
+          Login to Reability Online
+        </p>
+        <form class="login-form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+          <div class="form-inputs">
+            <div class="form-group">
+              <div class="field-header">Username</div>
+              <input
+                type="text"
+                formControlName="username"
+                class="form-control"
+                [ngClass]="{
+                  'input-error': submitted && f.username.errors && f.username.errors.errorName === 'not_valid'
+                }"
+              />
+            </div>
+            <div class="form-group">
+              <div class="field-header">Password</div>
+              <div class="password-container">
+                <input
+                  type="{{ statusPassword }}"
+                  formControlName="password"
+                  class="form-control"
+                  [ngClass]="{
+                    'input-error': submitted && f.username.errors && f.username.errors.errorName === 'not_valid'
+                  }"
+                  [(ngModel)]="textPassword"
+                />
+                <div class="eye-icon-wrapper" (click)="seePassword()">
+                  <img src="{{ iconPassword }}" class="eye-icon" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group login">
+            <button [disabled]="loading" class="btn btn-primary" [ngClass]="{ on: textPassword !== '' }">Login</button>
+            <img
+              *ngIf="loading"
+              src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA=="
+            />
+          </div>
+          <a href="/#/forgot_password" class="forgot-password">Forgot Password?</a>
+        </form>
+      </div>
+    </div>
+    <div class="footer">
+      <div class="footer-version">
+        <p class="version-bold">version:&ensp;</p>
+        <p class="version">{{ appVersion }}</p>
+      </div>
+      <div class="footer-recaptcha-description">
+        <p>
+          This site is protected by reCAPTCHA and the Google
+          <a href="https://policies.google.com/privacy">Privacy Policy</a>
+          and <a href="https://policies.google.com/terms">Terms of Service</a> apply.
+        </p>
+      </div>
+    </div>
+  </div>
+</ng-template>

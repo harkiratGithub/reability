@@ -1,0 +1,19 @@
+<div class="select-container" appClickOutside (clickOutside)="setIsOpen(false)" [class.open]="isOpen" [class.disabled]="disabled">
+  <div class="header-container" [class.chosen]="isThereSelecteItem()" (click)="onClickHeader()">
+    <div class="text ellipsis">
+      {{ getPlaceHolderText() }}
+    </div>
+    <div class="arrow"></div>
+  </div>
+  <div class="content" #container *ngIf="isOpen">
+    <div
+      class="item"
+      *ngFor="let item of items"
+      [class.selected]="isSelected(item)"
+      [class.scroll-visible]="isScrollVisible()"
+      (click)="onSelect(item.id)"
+    >
+      {{ item.name }}
+    </div>
+  </div>
+</div>

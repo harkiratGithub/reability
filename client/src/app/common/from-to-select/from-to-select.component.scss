@@ -1,0 +1,27 @@
+.hour-range {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 148px;
+  height: 30px;
+  margin: 15px 0;
+  border-radius: 4px;
+  border: 1px solid #44d7b6;
+  color: black;
+
+  .shift-time {
+    width: 58px;
+    line-height: 30px;
+    text-align: center;
+    &:hover {
+      cursor: pointer;
+      color: #0091ff;
+    }
+  }
+  .disabled {
+    pointer-events: none;
+    &:hover {
+      color: initial;
+    }
+  }
+}

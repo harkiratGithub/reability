@@ -1,0 +1,35 @@
+.logs-container{
+    margin-top: 10px;
+    position: relative;
+}
+textarea{
+    width: 100%;
+    height: 10vh;
+    direction: rtl;
+    border-radius: 8px;
+    border:none;
+    background-color: #0E191F;
+    color: white;
+    resize: none;
+}
+textarea::-webkit-scrollbar {
+    display: none;
+  }
+.save-btn {
+    position: absolute;
+    top: 3px;
+    button{
+        background: none;
+        border: none;
+        cursor: pointer;
+        &:disabled{
+        cursor: text;
+        }
+    }
+    img {
+        width: 20px;
+        filter: invert(1);
+        transform: rotate(180deg);
+    }
+
+}

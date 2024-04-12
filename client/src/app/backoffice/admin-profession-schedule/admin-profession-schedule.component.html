@@ -1,0 +1,29 @@
+<div class="container">
+  <app-calendar-header
+    class="header"
+    [showExportButton]="true"
+    [loggedInUsername]="headerText"
+    [showBack]="true"
+    (goBack)="backClicked()"
+    (exportToExcel)="exportCalendarToExcel()"
+    [dateToDisplay]="headerDateString"
+    (weekChangeEvent)="weekChange($event)"
+  ></app-calendar-header>
+  <div *ngIf="!hasOfferings()" class="header header-no-therapists">
+    <div>No available therapists</div>
+  </div>
+  <div class="details-container">
+    <div class="treatments">
+      <div *ngFor="let therapistBookingViewData of allTherapistsBookingViewData" class="treatment">
+        <app-treatment-list
+          [therapistBookingViewData]="therapistBookingViewData"
+          [bookingTimeClickActionType]="bookingClickActionType.ModifySession"
+          [currentDate]="currentDate"
+          [viewOnly]="true"
+          [isFormerDates]="isFormerDates"
+          (deleteOrReplaceBooking)="handleDeleteOrReplaceBooking($event)"
+        ></app-treatment-list>
+      </div>
+    </div>
+  </div>
+</div>

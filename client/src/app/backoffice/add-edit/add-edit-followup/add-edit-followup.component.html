@@ -1,0 +1,29 @@
+<form [formGroup]="customForm" id="followupForm">
+  <label class="field-container">
+    <span class="description">Name</span>
+    <div class='input-container'>
+    <input type="text" class="disabled" [attr.disabled]="true" formControlName="name"/>
+  </div>
+  </label>
+  <label class="field-container">
+    <span class="description">Assignee</span>
+    <app-select formControlName="therapist_id" required [items]="therapists">
+    </app-select>
+  </label>
+  <label class="field-container">
+    <span class="description">Description</span>
+    <div class='input-container'>
+    <textarea class ="inputTextArea" formControlName="description" form="followupForm" minlength="1" maxlength="80" required ></textarea>
+  </div>
+  </label>
+  <label class="field-container">
+    <p>
+      <span class="description">Date</span>
+      <mat-form-field appearance="standard">
+        <input matInput [matDatepicker]="datePicker" [min]="minDate" formControlName="date" disabled >
+        <mat-datepicker-toggle matSuffix [for]="datePicker"></mat-datepicker-toggle>
+        <mat-datepicker #datePicker disabled="false"></mat-datepicker>
+      </mat-form-field>
+    </p>
+  </label>
+</form>

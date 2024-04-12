@@ -1,0 +1,60 @@
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<div class="modal-container">
+  <div class="header-section">
+    {{ header }}
+  </div>
+
+  <div class="main-section">
+    {{ content }}
+  </div>
+
+  <div class="actions-section">
+    <div
+      appHand
+      [hoverClass]="'timer'"
+      [selectable]="true"
+      [timeToWait]="2000"
+      (click)="handleApprove()"
+      (outputFunc)="handleApprove()"
+      [class]="getActionButtonClass()"
+    >
+      <img class="img-hover" [src]="acceptBtnImgHover" alt="accept hover" />
+      <img [src]="acceptBtnImg" alt="accept" />
+
+      <svg viewBox="0 0 36 36" class="loader">
+        <path
+          class="circle"
+          stroke-dasharray="100, 100"
+          d="M18 2.0845
+          a 15.9155 15.9155 0 0 1 0 31.831
+          a 15.9155 15.9155 0 0 1 0 -31.831"
+        />
+      </svg>
+    </div>
+
+    <div
+      *ngIf="declineCallback"
+      appHand
+      [hoverClass]="'timer'"
+      [selectable]="true"
+      [timeToWait]="2000"
+      (click)="handleDecline()"
+      (outputFunc)="handleDecline()"
+      [class]="getActionButtonClass()"
+    >
+      <svg viewBox="0 0 36 36" class="loader">
+        <path
+          class="circle"
+          stroke-dasharray="100, 100"
+          d="M18 2.0845
+          a 15.9155 15.9155 0 0 1 0 31.831
+          a 15.9155 15.9155 0 0 1 0 -31.831"
+        />
+      </svg>
+      <img class="img-hover" [src]="declineBtnImgHover" alt="decline hover" />
+      <img [src]="declineBtnImg" alt="decline" />
+    </div>
+  </div>
+</div>

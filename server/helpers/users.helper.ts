@@ -1,0 +1,347 @@
+import { map, findLast } from 'lodash';
+
+import * as UserModel from '../models/users.model';
+import * as PatientModel from '../models/patient.model';
+import * as GameModel from '../models/game.model';
+import * as TherapistSessionModel from '../models/therapist-session.model';
+
+import * as GameSessionHelper from '../helpers/game-session.helper';
+import * as TherapistSessionHelper from '../helpers/therapist-session.helper';
+
+import * as EmailHelper from '../helpers/email.helper';
+import * as SMSHelper from '../helpers/sms.helper';
+
+import * as EncryptHelper from '../services/encrypt.helper';
+import * as Helper from '../services/util.helper';
+import * as Scheduler from '../services/scheduler.service';
+
+import { PEERS_STATUS, ROLE, PATIENT_AUTO_PASSWORD_LENGTH } from '../const';
+import { delayedHeartbeat } from '../../constants/heartbeat';
+import moment from 'moment';
+
+export const onLogIn = async (user: {
+	id: number;
+	role: string;
+	username: string;
+	isTherapist: boolean;
+	peerId: string;
+}): Promise<any> => {
+	try {
+		await UserModel.updateById(user.id, {
+			logged_in_at: Helper.createTimeForDb(),
+			logged_out_at: Helper.createTimeForDb(),
+		});
+		switch (user.role) {
+			case ROLE.ADMIN:
+				return user;
+			case ROLE.THERAPIST:
+			case ROLE.VIDEO_PATIENT:
+				const userDetails = await UserModel.getUserDetails(user.id);
+				const { id, first_name: firstName, last_name: lastName } = EncryptHelper.decryptJson(userDetails[0]);
+				return { ...user, id, firstName, lastName };
+			case ROLE.PATIENT:
+				const details = await UserModel.getUserDetails(user.id);
+				const {
+					id: patientId,
+					first_name: firstNameDetails,
+					last_name: lastNameDetails,
+					fast_login_link: fast_login_link,
+				} = EncryptHelper.decryptJson(details[0]);
+				const validGames = await GameModel.getValidGameForPatient(patientId);
+				const patient = await PatientModel.findPatientByUserId(user.id);
+				const disabledSkeleton = patient.disabled_skeleton;
+				return {
+					...user,
+					id: patientId,
+					firstName: firstNameDetails,
+					lastName: lastNameDetails,
+					validGames,
+					disabledSkeleton,
+					fast_login_link,
+				};
+		}
+	} catch (error) {
+		throw error;
+	}
+};
+
+export const getPatientsByTherapist = async (therapistId) => {
+	const patients = await UserModel.getPatientsByTherapistId(therapistId);
+	return map(patients, (patient) => {
+		const decryptPatient = EncryptHelper.decryptJson(patient);
+		return {
+			patientId: decryptPatient.patient_id,
+			firstName: decryptPatient.first_name,
+			lastName: decryptPatient.last_name,
+			peerId: decryptPatient.peer_id.toString(),
+			isTherapist: decryptPatient.role === ROLE.THERAPIST,
+			role: decryptPatient.role,
+			username: decryptPatient.user_name,
+			notification_email: decryptPatient.notification_email,
+			disabledSkeleton: decryptPatient.disabled_skeleton,
+			hasCamera: decryptPatient.has_camera,
+			phone: decryptPatient.phone,
+		};
+	});
+};
+
+export const updateUserUsage = async (userId) => {
+	return UserModel.updateUserUsage(userId);
+};
+
+export const updateHeartBeat = async (userId, onTherapistSession = undefined, onGameSession = undefined) => {
+	try {
+		const promiseArray = [];
+		promiseArray.push(updateUserUsage(Number(userId)));
+		if (onTherapistSession) {
+			promiseArray.push(TherapistSessionHelper.updateTherapistSession(Number(userId)));
+		}
+		const promiseRes = await Promise.all(promiseArray);
+		if (onGameSession) {
+			const therapistSessionId = promiseRes[1] && promiseRes[1].id;
+			await GameSessionHelper.updateGameSession(userId, therapistSessionId);
+		}
+	} catch (err) {
+		throw err;
+	}
+};
+
+export const getOpenPeers = async (therapistId) => {
+	try {
+		const openPeers = await UserModel.getPeersByTherapistId(therapistId);
+		const busyPeers = await TherapistSessionModel.getBusyPeers();
+		const peersStatus = openPeers.map((peer) => {
+			let userStatus;
+			userStatus = peer.active ? PEERS_STATUS.LOGGED_OUT : PEERS_STATUS.DISABLED;
+			const openPeer = peer.logged_out_at
+				? !Helper.checkIfPassedAmountOfMs(peer.logged_out_at, delayedHeartbeat)
+				: false;
+			userStatus = openPeer ? PEERS_STATUS.AVAILABLE : PEERS_STATUS.LOGGED_OUT;
+			const therapistLastSession = findLast(busyPeers, (b) => b.patient_id === peer.patient_id);
+			if (userStatus === PEERS_STATUS.AVAILABLE && therapistLastSession) {
+				userStatus = therapistLastSession.therapist_id === therapistId ? PEERS_STATUS.CONNECTED : PEERS_STATUS.BUSY;
+			}
+			delete peer['patient_id'];
+			delete peer['active'];
+			return {
+				...peer,
+				peerStatus: userStatus,
+			};
+		});
+		return peersStatus;
+	} catch (err) {
+		throw err;
+	}
+};
+
+export const create = async (user, client = null) => {
+	const defaultPassword = 'Aa123456';
+	try {
+		const user_name = await generateUniqUsername();
+
+		let plainTextPassword = Helper.generateRandomString();
+		if (user.role === ROLE.THERAPIST) {
+			plainTextPassword = plainTextPassword.substring(0, PATIENT_AUTO_PASSWORD_LENGTH);
+		} else if (user.role === ROLE.PATIENT || user.role === ROLE.VIDEO_PATIENT) {
+			// plainTextPassword = Helper.generateUserPassword();
+			plainTextPassword = defaultPassword;
+		}
+
+		const password = EncryptHelper.hashPassword(plainTextPassword);
+		const token = Helper.generateSecureRandomString();
+		const token_timestamp = Helper.createTimeForDb();
+		const userCreated = await UserModel.create(
+			{
+				user_name,
+				email: user.email,
+				role: user.role,
+				password,
+				token,
+				token_timestamp,
+			},
+			client
+		);
+		if (user.role === ROLE.PATIENT || user.role === ROLE.THERAPIST || user.role === ROLE.VIDEO_PATIENT) {
+			await EmailHelper.sendPatientCredentialsEmail(user.email, user_name, plainTextPassword);
+		} else {
+			await EmailHelper.sendNewUserEmail(user.email, token);
+		}
+		return userCreated;
+	} catch (err) {
+		throw err;
+	}
+};
+
+export const checkEmailToken = async (token) => {
+	try {
+		const users = await UserModel.findByToken(token);
+		if (users.length !== 1) {
+			throw new Error('token not valid');
+		}
+		const [user] = users;
+		if (Helper.checkIfPassedAmountOfMs(user.token_timestamp, 60 * 60 * 1000)) {
+			throw new Error('token expired');
+		}
+		return user;
+	} catch (err) {
+		throw new Error(err);
+	}
+};
+
+export const changePassword = async (token, password) => {
+	try {
+		if (Helper.checkPasswordStrength(password)) {
+			throw new Error('password not strength');
+		}
+		const user = await checkEmailToken(token);
+		await UserModel.updateById(user.id, {
+			password: EncryptHelper.hashPassword(password),
+			token: null,
+			token_timestamp: null,
+		});
+		await EmailHelper.sendUpdatedUserEmail(EncryptHelper.decryptPersonalData(user.email), user.user_name, password);
+	} catch (err) {
+		throw new Error(err);
+	}
+};
+
+export const forgotPassword = async (username) => {
+	const defaultPassword = 'Aa123456';
+	try {
+		const users = await UserModel.findByUsername(username);
+		if (users.length !== 1) {
+			throw new Error('username not valid');
+		}
+		const [user] = users;
+		// block old password
+		const randomPassword = Helper.generateRandomShortString();
+		const password =
+			user.role == ROLE.PATIENT || user.role == ROLE.VIDEO_PATIENT
+				? EncryptHelper.hashPassword(defaultPassword)
+				: EncryptHelper.hashPassword(randomPassword);
+		const token = Helper.generateSecureRandomString();
+		const token_timestamp = Helper.createTimeForDb();
+		await UserModel.updateById(user.id, { password, token, token_timestamp });
+		const passwordToSend =
+			user.role == ROLE.PATIENT || user.role == ROLE.VIDEO_PATIENT ? defaultPassword : randomPassword;
+		await EmailHelper.sendNewPasswordEmail(EncryptHelper.decryptPersonalData(user.email), username, passwordToSend);
+	} catch (err) {
+		throw new Error(err);
+	}
+};
+
+// PRIVATE
+export const generateUniqUsername = async () => {
+	const numberOfTries = 3;
+	for (let i = 0; i < numberOfTries; i++) {
+		const newUsername = Helper.generateUsername();
+		const user = await UserModel.findByUsername(newUsername);
+		if (user.length === 0) {
+			return newUsername;
+		}
+	}
+	throw new Error("can't create unique username, please change algorithm");
+};
+
+export const createFastLoginToken = async (
+	userId: number,
+	emailOrPhone: string,
+	dateTime: string,
+	link_type: string
+) => {
+	try {
+		const users = await UserModel.findById(userId);
+		if (users.length !== 1) {
+			throw new Error('user id not valid');
+		}
+		const [user] = users;
+		if (!user) {
+			throw new Error('user id not valid');
+		}
+		if (dateTime && moment.unix(Number.parseInt(dateTime)).isValid()) {
+			const dateForScheduler = moment.unix(Number.parseInt(dateTime)); //Helper.getUTCMomentDateFromString(dateTime);
+			Scheduler.setSchedulerByMoment(dateForScheduler, () => {
+				sendSMSOrEmail(user, emailOrPhone, link_type);
+			});
+		} else {
+			sendSMSOrEmail(user, emailOrPhone, link_type);
+		}
+	} catch (err) {
+		throw new Error(err);
+	}
+};
+
+export const sendSMSOrEmail = async (user, emailOrPhone, link_type) => {
+	const fast_login_token = Helper.generateSecureRandomString();
+	const fast_login_token_timestamp = Helper.createTimeForDb();
+	const fast_login_link = link_type;
+	await UserModel.updateById(user.id, { fast_login_token, fast_login_token_timestamp, fast_login_link });
+	if (emailOrPhone.includes('@')) {
+		await EmailHelper.sendFastLoginEmail(
+			emailOrPhone, //user.email
+			fast_login_token
+		);
+	} else {
+		await SMSHelper.sendFastLoginSMS(emailOrPhone, fast_login_token);
+	}
+};
+
+export const checkFastLoginToken = async (token) => {
+	try {
+		const users = await UserModel.findByFastLoginToken(token);
+		if (users.length !== 1) {
+			throw new Error('token not valid');
+		}
+		const [user] = users;
+		if (Helper.checkIfPassedAmountOfMs(user.fast_login_token_timestamp, 60 * 60 * 1000)) {
+			throw new Error('token expired');
+		}
+		return user;
+	} catch (err) {
+		throw new Error(err);
+	}
+};
+
+export const getUserContactData = async (patientId) => {
+	try {
+		const userDetails = await UserModel.getUserDetails(patientId);
+		const { id, phone, email } = EncryptHelper.decryptJson(userDetails[0]);
+		return {
+			id,
+			phone,
+			email,
+		};
+	} catch (err) {
+		throw new Error(err);
+	}
+};
+
+export const resetPassword = async (user, setDefaultPassword) => {
+	const defaultPassword = 'Aa123456';
+	const { id: userId, user_name: username, email, role } = user;
+	try {
+		let plainTextPassword = setDefaultPassword ? defaultPassword : Helper.generateRandomString();
+		if (role === ROLE.PATIENT || role === ROLE.VIDEO_PATIENT) {
+			plainTextPassword = setDefaultPassword ? defaultPassword : Helper.generateUserPassword();
+		}
+		const password = EncryptHelper.hashPassword(plainTextPassword);
+
+		await UserModel.updateById(userId, {
+			password,
+			token: null,
+			token_timestamp: null,
+		});
+		await EmailHelper.sendPatientCredentialsEmail(
+			EncryptHelper.decryptPersonalData(email),
+			username,
+			plainTextPassword
+		);
+	} catch (err) {
+		throw new Error(err);
+	}
+};
+
+export const getUserById = async (userId) => {
+	const results = await UserModel.findById(userId);
+	return results[0];
+};

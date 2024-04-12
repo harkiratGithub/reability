@@ -1,0 +1,87 @@
+<div class="container">
+  <div class="header">{{ headerTitle }}<img src="/assets/backoffice/x.svg" alt="X" (click)="onPressClose()" /></div>
+  <div class="body">
+    <div class="title">{{ title }}</div>
+    <div class="sub-title">{{ subtitle }}</div>
+  </div>
+
+  <ng-container *ngIf="coPatients">
+    <div class="co-patients">
+      <div class="group-title">
+        <img src="/assets/backoffice/persons.svg" />
+        <div>Co patients details</div>
+      </div>
+      <div class="items">
+        <div class="item-main" *ngFor="let patient of coPatients">
+          <div class="item">
+            <div class="name">{{ patient.patientName }}</div>
+            <div *ngIf="isMobile; else desktop">
+              <a class="call" href="tel:{{ patient.phone }}">{{ patient.phone }}</a>
+            </div>
+            <ng-template #desktop>
+              <div class="phone">{{ patient.phone }}</div>
+            </ng-template>
+            <div *ngIf="isTechIssue(patient.techIssue)">
+              <div class="reason">
+                <img class="alert" src="../../../../assets/backoffice/alert.svg" alt="" />
+                <ng-container *ngIf="currentPatientIdInEdit !== patient.patientId">
+                  <input
+                    type="text"
+                    class="disabled"
+                    [(ngModel)]="patient.techReason"
+                    title="{{ patient.techReason }}"
+                    disabled
+                    placeholder="{{ patient.techReason }}"
+                  />
+                  <img
+                    class="save"
+                    (click)="editPatient(patient)"
+                    src="../../../../assets/backoffice/edit.svg"
+                    alt="edit"
+                  />
+                </ng-container>
+                <ng-container *ngIf="currentPatientIdInEdit === patient.patientId">
+                  <input
+                    type="text"
+                    [(ngModel)]="techReason"
+                    title="{{ patient.techReason }}"
+                    placeholder="{{ patient.techReason }}"
+                  />
+                  <img
+                    class="save"
+                    (click)="saveReason(patient)"
+                    src="../../../../assets/backoffice/icon_check.svg"
+                    alt="save"
+                  />
+                </ng-container>
+              </div>
+            </div>
+          </div>
+          <div class="item-personal-actions">
+            <div class="more-actions" (click)="onCoPatientPersonalMenuClick(patient)"></div>
+            <app-side-menu
+              class="clickable"
+              *ngIf="patient.selected"
+              [options]="coPatientPersonalMenuOptions"
+              (optionClicked)="resetPatientSelection(patient)"
+            ></app-side-menu>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-container>
+    <div class="actions" *ngIf="deleteAction">
+      <div class="action" *ngIf="deleteAction">
+        <div class="action-text" (click)="deleteAction.callback()">{{ deleteAction.title }}</div>
+        <div class="divider"></div>
+        <div class="action-arrow" (click)="toggleSideMenuShown()">
+          <img *ngIf="!sideMenuShown" src="/assets/backoffice/arrow_down_thin.svg" alt="down" />
+          <img *ngIf="sideMenuShown" src="/assets/backoffice/arrow_up_thin.svg" alt="up" />
+        </div>
+      </div>
+    </div>
+  </ng-container>
+  <app-side-menu *ngIf="sideMenuShown" [options]="sideMenuOptions"></app-side-menu>
+</div>

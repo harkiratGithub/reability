@@ -1,0 +1,103 @@
+$FORM-WIDTH: 280px;
+
+form {
+  width: $FORM-WIDTH;
+  padding: 30px;
+}
+
+.field-container {
+  display: block;
+  margin-bottom: 24px;
+  position: relative;
+
+  :last-child {
+    margin-bottom: 0;
+  }
+
+  ::ng-deep .mat-form-field-infix:not(.mat-form-field-infix-selected) {
+    padding: 0 0 0.5em 0;
+    border: none;
+  }
+  ::ng-deep .mat-form-field-flex:not(.mat-form-field-flex-selected) {
+    padding: 0;
+  }
+
+  .description {
+    display: block;
+    color: #b6c5cf;
+    font-family: 'Roboto bold';
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+
+  input,
+  .inputTextArea {
+    background: inherit;
+    height: 40px;
+    width: 280px;
+    padding-left: 8px;
+    padding-right: 8px;
+    font-size: 16px;
+    font-family: 'Roboto';
+    color: #6d7278;
+    border: 1px solid #b6c5cf;
+    border-radius: 10px;
+    outline: none;
+
+    &[type='file'] {
+      height: 0;
+      width: 0;
+      padding: 0;
+      border: 0;
+      overflow: hidden;
+      display: none;
+    }
+  }
+  .inputTextArea {
+    min-height: 65px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    overflow: hidden;
+  }
+
+  input::placeholder {
+    color: #d2d2d2;
+    font-family: Roboto;
+    font-size: 16px;
+  }
+
+  .input-container {
+    position: relative;
+    --paddingRight: 28px;
+
+    input,
+    .inputTextArea {
+      padding-right: var(--paddingRight);
+    }
+
+    .delete-container {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: calc(#{$FORM-WIDTH} - var(--paddingRight));
+      right: 0;
+      cursor: default;
+
+      .delete-image-container {
+        display: flex;
+        height: 100%;
+        width: 100%;
+        cursor: pointer;
+
+        img {
+          margin: auto;
+        }
+      }
+    }
+  }
+}
+
+.disabled {
+  pointer-events: none;
+  opacity: 0.4;
+}

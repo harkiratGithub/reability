@@ -1,0 +1,46 @@
+<div class="container">
+  <div class="search-bar">
+    <input
+      type="text"
+      [disabled]="disabled"
+      (keyup)="keyUp.next($event)"
+      class="form-control"
+      placeholder="Search"
+      [value]="filterBy"
+    />
+    <img src="assets/backoffice/icon_back_office_search.svg" />
+  </div>
+  <ng-container *ngFor="let filter of additionalFilters; index as i">
+    <div class="filter" (click)="filter.filter(this.data)" [class.active]="filter.isActive">
+      {{ filter.displayText }} <span *ngIf="filter.amount !== undefined">({{ filter.amount }})</span>
+    </div>
+    <div class="dropdown">
+      <app-multi-select
+        [options]="filter.allOptions"
+        [selected]="filter.selectedOptions"
+        [isSingleSelect]="filter.isSingleSelect"
+        (submit)="multiSelectSubmit($event, filter)"
+        *ngIf="filter.isActive && filter.allOptions"
+      >
+        <img src="assets/backoffice/arrow_down.png" alt="" />
+      </app-multi-select>
+    </div>
+  </ng-container>
+  <ng-container *ngFor="let sharedFilter of sharedFilters; index as i">
+    <div class="filter" (click)="sharedFilter.filter(this.data)" [class.active]="sharedFilter.isActive">
+      {{ sharedFilter.displayText }}
+    </div>
+    <div class="dropdown">
+      <app-multi-select
+        [options]="sharedFilter.allOptions"
+        [sharedFilter]="sharedFilter"
+        [selected]="sharedFilter.selectedOptions"
+        [isSingleSelect]="sharedFilter.isSingleSelect"
+        (submit)="multiSelectSubmit($event, sharedFilter)"
+        *ngIf="sharedFilter.isActive && sharedFilter.allOptions"
+      >
+        <img src="assets/backoffice/arrow_down.png" alt="" />
+      </app-multi-select>
+    </div>
+  </ng-container>
+</div>

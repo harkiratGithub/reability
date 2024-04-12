@@ -1,0 +1,153 @@
+<div
+  id="skeleton-border-wrap"
+  class="skeleton-border-wrap"
+  [ngClass]="[
+    isBodyTrackingReady() || trackBody ? '' : 'skeleton-border-loading',
+    isInGame ? 'skeleton-border-wrap-hide' : '',
+    isBodyTrackingReady() && trackBody ? 'skeleton-border-wrap-active' : ''
+  ]"
+  title="{{ getSkeletonTitle() }}"
+  (click)="handleBodyTracking()"
+  *ngIf="!videoSessionDisplay && !isMobile"
+>
+  <div [ngClass]="[isBodyTrackingReady() || trackBody ? 'skeleton-ready' : 'skeleton-loading']">
+    <div *ngIf="!isBodyTrackingReady()" class="skeleton-loading-section">
+      <div class="skeleton-loading-percentage">
+        <p class="skeleton-loading-title">Loading Hands</p>
+        <p class="skeleton-loading-text">{{ loadingBarPercentage }}%</p>
+      </div>
+      <div id="loadingBarWrapper" class="skeleton-loading-bar">
+        <div id="loadingBar" class="loading-fill"></div>
+      </div>
+      <div class="skeleton-please-wait-message">
+        <img class="skeleton-loading-message-image" src="../../../../assets/skel/info_black_24dp.svg" />
+        <p class="skeleton-loading-message-text">Hands interaction will be available shortly</p>
+      </div>
+    </div>
+    <div id="skeleton-ready-section" *ngIf="isBodyTrackingReady() || trackBody" class="skeleton-ready-section">
+      <img class="skeleton-image" src="../../../../assets/skel/waving_hand_black_24dp.svg" />
+      <div class="skeleton-ready-message">
+        <p class="skeleton-ready-title">Hands</p>
+        <p class="skeleton-ready-text" *ngIf="!this.trackBody">Ready to use</p>
+        <p class="skeleton-ready-text" *ngIf="this.trackBody">Hands active</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="videos-wrapper">
+  <div
+    class="video-content-container"
+    id="web-rtc-wrapper"
+    [ngClass]="{
+      'video-content-container-regular-video': !enlargeVideo,
+      'video-content-container-enlarge-video': enlargeVideo
+    }"
+  >
+    <div id="remoteVideo" class="remoteVideo">
+      <div *ngIf="therapistBusy && !isMobile" class="therapist-busy-message">
+        <div class="therapist-busy-message-text">Therapist<br />on mute</div>
+      </div>
+      <div
+        *ngIf="therapistBusy && isMobile"
+        class="therapist-video therapist-video-regular-video-mobile mobile-view not-active mute-message"
+      >
+        Therapist<br />on mute
+      </div>
+    </div>
+    <div
+      class="video-content-container-inner"
+      [ngClass]="{
+        'video-content-container-inner-enlarge-video': enlargeVideo
+      }"
+    >
+      <!-- <div *ngIf="isCameraCheckComplete && !userHasCamera" class="no-camera-div">
+        <p class="no-camera-div-text">{{ PATIENT_CAMERA_ERROR }}</p>
+        <div class="dark-background"></div>
+        <img src="../../../../assets/main-menu/no_camera.svg" />
+      </div> -->
+      <video
+        *ngIf="!isDepthCameraConnected()"
+        id="patient-video"
+        [ngClass]="{
+          'patient-video-regular-video': !enlargeVideo,
+          'patient-video-enlarge-video': enlargeVideo,
+          'hide-video':
+            (!isIosDevice() && !showLocalVideo) ||
+            !this.currentUser.disabledSkeleton ||
+            (trackBody && !bodyTrackingLoading),
+          'disabled-skeleton': this.currentUser.disabledSkeleton || trackBody,
+          'ios-hide': isIosDevice()
+        }"
+        class="patient-video"
+        width="200"
+        height="200"
+        muted
+        autoplay
+        playsinline
+      ></video>
+      <video
+        *ngIf="isDepthCameraConnected()"
+        id="patient-video"
+        [ngClass]="{
+          'patient-video-regular-video': !enlargeVideo,
+          'patient-video-enlarge-video': enlargeVideo,
+          'hide-video': !showLocalVideo || !this.currentUser.disabledSkeleton,
+          'disabled-skeleton': this.currentUser.disabledSkeleton
+        }"
+        class="patient-video"
+        width="257"
+        height="200"
+        muted
+        autoplay
+        playsinline
+      ></video>
+
+      <div *ngIf="receivedRemoteVideo && connectionLost" class="no-camera-message">{{ connection_error_message }}</div>
+      <div *ngIf="isCameraCheckComplete && !userHasCamera" class="patient-no-camera-message">
+        <div class="patient-no-camera-message-text">
+          {{ PATIENT_CAMERA_ERROR }}
+        </div>
+      </div>
+      <canvas
+        id="patient-canvas"
+        [ngClass]="{
+          'patient-video-regular-video': !enlargeVideo,
+          'patient-video-enlarge-video': enlargeVideo,
+          'hide-video': !showLocalVideo || showPatientVideo || !trackBody
+        }"
+        width="257"
+        height="192"
+        class="patient-canvas"
+      ></canvas>
+      <canvas
+        id="patient-canvas-skeleton"
+        [ngClass]="{
+          'patient-video-regular-video': !enlargeVideo,
+          'patient-video-enlarge-video': enlargeVideo,
+          'hide-video': !showLocalVideo || !showPatientVideo || !displaySkeleton
+        }"
+        width="257"
+        height="192"
+        class="patient-canvas"
+      ></canvas>
+      <div *ngIf="trackBody && showAngles" class="angles">
+        <div
+          *ngFor="let organAngle of organAngles; let i = index"
+          [ngClass]="{ 'angle-left': i % 2 === 0, 'angle-right': i % 2 !== 0 }"
+        >
+          {{ organAngle.organName }}: {{ organAngle.angle }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <video
+    id="patient-video-skeleton"
+    class="hidden-video"
+    [ngClass]="{ 'hide-video': true }"
+    muted
+    autoplay
+    playsinline
+  ></video>
+</div>

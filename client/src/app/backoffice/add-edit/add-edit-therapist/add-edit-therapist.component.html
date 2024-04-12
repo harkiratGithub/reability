@@ -1,0 +1,46 @@
+<form [formGroup]="customForm">
+  <div class="column">
+    <label class="field-container">
+      <span class="description">First Name</span>
+      <input type="text" formControlName="first_name" required />
+    </label>
+    <label class="field-container">
+      <span class="description">Last Name</span>
+      <input type="text" formControlName="last_name" required />
+    </label>
+    <label class="field-container">
+      <span class="description">Username</span>
+      <input type="text" formControlName="username" [class.disabled]="true" disabled />
+    </label>
+    <label class="field-container">
+      <span class="description">Email</span>
+      <input type="email" formControlName="email" required />
+    </label>
+    <button class="schedule-btn" (click)="goToSchedule()">Schedule</button>
+  </div>
+  <div class="column">
+    <label class="field-container">
+      <span class="description">Institute</span>
+      <app-select formControlName="institute_id" required [items]="institutes"> </app-select>
+    </label>
+    <label class="field-container">
+      <span class="description">Departments</span>
+      <app-select formControlName="departments_ids" required [items]="filteredDepartments" [multiSelect]="true">
+      </app-select>
+    </label>
+    <label class="field-container">
+      <span class="description">Profession</span>
+      <app-select formControlName="profession_id" required [items]="professions"> </app-select>
+    </label>
+    <label class="field-container">
+      <span class="description">Expertises</span>
+      <app-select formControlName="expertises_ids" required [items]="filteredExpertises" [multiSelect]="true">
+      </app-select>
+    </label>
+    <label class="field-container">
+      <span class="description">Therapist Type</span>
+      <app-select formControlName="therapist_type" required [items]="therapistTypes" [multiSelect]="false">
+      </app-select>
+    </label>
+  </div>
+</form>

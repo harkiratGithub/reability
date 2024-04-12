@@ -1,0 +1,39 @@
+<form class="fast-login-form" [formGroup]="customForm">
+  <label class="field-container email">
+    <!-- <span class="description">Email\Phone: </span> -->
+    <input matInput type="text" formControlName="email_or_phone" required />
+  </label>
+  <mat-radio-group *ngIf="userData && userData.email && userData.phone" aria-labelledby="radio-group-label" class="radio-group"
+    [formControl]="inviteMethod">
+    <mat-radio-button class="radio-button" *ngFor="let method of methods" [value]="method"
+      (change)="getUserData(method)">
+      {{method}}
+    </mat-radio-button>
+  </mat-radio-group>
+
+  <div class=" error-msg" *ngIf="!isFormValid || !isRegexValid">{{errorText}}</div>
+
+
+  <label class="field-container date">
+    <!-- <span class="description">Send later: </span> -->
+    <div class="frame">
+      <mat-form-field>
+        <input matInput [ngxMatDatetimePicker]="picker" formControlName="date_time" [min]="minDate" [max]="maxDate">
+        <div *ngIf="!customForm.controls.date_time.value" class="place-holder">Now</div>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <ngx-mat-datetime-picker #picker [showSpinners]="showSpinners" [showSeconds]="showSeconds" [stepHour]="stepHour"
+          [stepMinute]="stepMinute" [stepSecond]="stepSecond" [touchUi]="touchUi" [color]="color"
+          [enableMeridian]="enableMeridian">
+        </ngx-mat-datetime-picker>
+      </mat-form-field>
+    </div>
+  </label>
+  <label class="field-container link-type">
+    <span class="description">Link Type</span>
+    <select formControlName="link_type" name="link_type">
+      <option *ngFor="let link_type of linkTypes" [value]="link_type">
+        {{link_type}}
+      </option>
+    </select>
+  </label>
+</form>

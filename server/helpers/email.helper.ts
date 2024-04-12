@@ -1,0 +1,52 @@
+import * as EmailHelper from '../services/email.service';
+
+const baseUrl = () => {
+	return process.env.SERVER_URL + '/#';
+};
+
+const therapistEmail = process.env.THERAPIST_EMAIL;
+
+export const sendNewUserEmail = async (userEmail, token) => {
+	const tokenUrl = `${baseUrl()}/email_auth/${token}`;
+	const subject = 'ReAbility';
+	const html = `<div>Welcome to ReAbility system. Please <a href="${tokenUrl}">click here</a> to set your password</div>`;
+	await EmailHelper.sendMail(userEmail, subject, html);
+};
+
+export const sendNewPasswordEmail = async (userEmail, userName, password) => {
+	const url = `${baseUrl()}`;
+	const subject = 'ReAbility';
+	const html = `<div>This are your login details:<br>Username: ${userName}<br>Password: ${password}<br> Please <a href="${url}">click here</a> to login</div>`;
+	await EmailHelper.sendMail(userEmail, subject, html);
+};
+
+export const sendUpdatedUserEmail = async (userEmail, userName, password) => {
+	const url = `${baseUrl()}`;
+	const subject = 'ReAbility New User';
+	const html = `<div>Please make a note of:<br>Username: ${userName}<br>Password: ${password}<br>Website:  <a href="${url}">${url}</a></div>`;
+	await EmailHelper.sendMail(userEmail, subject, html);
+};
+
+export const sendFastLoginEmail = async (userEmail, fastLoginToken) => {
+	const tokenUrl = `${baseUrl()}/fast_login/${fastLoginToken}`;
+	const subject = 'ReAbility';
+	const html = `<div>Welcome to ReAbility system. Please <a href="${tokenUrl}">click here</a> to login</div>`;
+	await EmailHelper.sendMail(userEmail, subject, html);
+};
+
+export const sendPatientCredentialsEmail = async (userEmail, userName, password) => {
+	const url = `${baseUrl()}`;
+	const subject = 'Welcome to ReAbility';
+	const html = `<div style="direction:rtl">ברכות להצטרפותך לשיקום מרחוק, שיבא ביונד.<br><br>להלן ההנחיות להתחברות:<br><br> מחשב עם מצלמת אינטרנט, מיקרופון (לרוב אינטגרלי במצלמה) רמקולים,  <span style="font-weight:bold; ">דרישות טכניות:</span>דפדפן Chrome. יש לעדכן אותנו בהקדם אם אין ברשותך הציוד המתאים .<br><br><div>
+	- יש לוודא שהמצלמה והרמקולים מחוברים למחשב (בתכנית קול יש להשתמש באזניות שקיבלת מאיתנו)<br>-  להיכנס לקישור:<a href="${url}">${process.env.SERVER_URL}</a><br>-  להקליד שם משתמש וסיסמא:</div><br>
+	<div style="font-weight:bold;font-size:20px; ">שם משתמש: ${userName}<br>סיסמה: ${password}</div><br><div></div>-  לאשר להשתמש במיקרופון ומצלמה<br>-  להמתין שנחייג אליך דרך המחשב <br><br>
+<div style="font-weight:bold;">*לכניסה מהירה מומלץ לאשר לשמור את שם המשתמש והסיסמא וכמו כן לשמור את הלינק לאתר שלנו ב"סרגל הסימניות" של כרום או באמצעות קישור על שולחן העבודה</div>
+	<br><div style="font-weight:bold;"><div style="text-decoration:underline; margin-top:10px;">נא להכין תעודת זהות להצגה בתחילת הטיפול</div><br>בהצלחה,<br><br>שיקום מרחוק, שיבא ביונד<br>03-5309661</div></div>`;
+	await EmailHelper.sendMail(userEmail, subject, html, therapistEmail);
+};
+
+export const sendUserConnectedEmail = async (patient, therapist) => {
+	const subject = 'Session started notification';
+	const html = `<div>Patient ${patient.username} started a session with ${therapist.firstName} ${therapist.lastName} </div>`;
+	await EmailHelper.sendMail(patient.notification_email, subject, html);
+};

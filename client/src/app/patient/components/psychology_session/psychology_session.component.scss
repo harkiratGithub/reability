@@ -1,0 +1,593 @@
+.main-container {
+  height: 100%;
+  width: 100vw;
+  background-image: url("../../../../assets/main-menu/games_lobby_bg.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  overflow: hidden;
+
+  .header {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 7%;
+    z-index: 1;
+    .left-container {
+      position: absolute;
+      top: 20%;
+      left: 1.5%;
+      display: flex;
+      .logo {
+        width: 50px;
+      }
+      .left-container-text {
+        color: white;
+        text-align: center;
+        line-height: 50px;
+        font-weight: bold;
+        margin-left: 10px;
+      }
+    }
+
+    .right-container {
+      position: absolute;
+      right: 3%;
+      display: flex;
+      top: 20%;
+      width: 17%;
+      align-items: center;
+      justify-content: flex-end;
+      color: #f9f8f3;
+      font-family: "Fredoka One";
+      font-size: 30px;
+      text-shadow: 2px 2px 0 #122638;
+
+      .user-name {
+        padding-top: 3%;
+        height: 5%;
+        margin-right: 10px;
+        color: #fff;
+        font-weight: 600;
+        line-height: 5%;
+        z-index: 2;
+        font-size: 1.5rem;
+        text-transform: capitalize;
+      }
+
+      .logout-container {
+        position: relative;
+        font-size: 18px;
+        cursor: pointer;
+        .log-out-image {
+          position: relative;
+          top: 5px;
+        }
+      }
+    }
+  }
+
+  .mid-container {
+    width: 100%;
+    height: 100%;
+    padding: 3% 3.5% 3% 3.5%;
+
+    .outer-border {
+      height: 97%;
+      border: 9px solid #4fb6bf;
+      border-radius: 34px;
+      position: relative;
+
+      .content-background {
+        position: relative;
+        height: 100%;
+        border: 3px solid #27828a;
+        border-radius: 25px;
+        background: linear-gradient(225.53deg, #fcf9ea 0%, #faf7e6 100%);
+        box-shadow: inset 0 1px 3px 0 rgba(0, 0, 0, 0.5), inset 0 -15px 13px 0 rgba(226, 219, 183, 0.67);
+
+        .header-container {
+          transform: translateY(-50px);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          text-align: center;
+          color: #f9f8f3;
+
+          .header-title {
+            height: 100px;
+            background-image: url("../../../../assets/textures/header_title.png");
+            background-size: 100% 100%;
+            padding: 1em 2em;
+            margin: 0 8%;
+            display: flex;
+            align-items: center;
+            color: #f9f8f3;
+            font-family: "Fredoka One";
+            font-size: 40px;
+            font-weight: 500;
+            letter-spacing: 2px;
+            line-height: 36px;
+            text-align: center;
+            text-shadow: 2px 2px 0 #098186;
+          }
+          .loader {
+            visibility: hidden;
+            position: absolute;
+            top: 0;
+            left: 0;
+          }
+        }
+        .content-container {
+          transform: translateY(-55px);
+          height: calc(100% - 55px);
+        }
+      }
+      .connection-message-container {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        width: 50%;
+        height: 45%;
+        margin-top: -17%;
+        margin-left: -25%;
+        flex-direction: column;
+        display: flex;
+        // direction: rtl;
+
+        .connection-image {
+          background-image: url("../../../../assets/video-paitent/empty_state_video_call.png");
+          background-size: 100% 100%;
+          height: 30%;
+          background-repeat: no-repeat;
+          display: block;
+          margin-left: auto;
+          margin-right: auto;
+          width: 30%;
+        }
+
+        .message-header {
+          color: #4f7597;
+          font-family: Assistant;
+          font-size: 43px;
+          font-weight: bold;
+          letter-spacing: 1.2px;
+          line-height: 63px;
+          text-align: center;
+          margin-bottom: 30px;
+          margin-top: 30px;
+        }
+        .message-content {
+          color: #4fb6bf;
+          font-family: Assistant;
+          font-size: 32px;
+          letter-spacing: 0.8px;
+          line-height: 42px;
+          text-align: center;
+          white-space: pre-wrap;
+        }
+      }
+      .waiting-for-call-spinner-container {
+        box-sizing: border-box;
+        border: 1px solid #69758b;
+        border-radius: 27px;
+        background-color: rgba(174, 217, 214, 0.5);
+        display: inline-block;
+        position: absolute;
+        bottom: 4%;
+        left: 0;
+        right: 0;
+        width: 640px;
+        height: 54px;
+        margin: auto;
+
+        .spinner-icon {
+          background-image: url("../../../../assets/video-paitent/indication_important_message.png");
+          background-size: 100% 100%;
+          background-repeat: no-repeat;
+          height: 40px;
+          width: 40px;
+          position: absolute;
+          left: 15px;
+          top: 5px;
+        }
+        .waiting-text {
+          color: #2e4369;
+          font-family: Assistant;
+          font-size: 32px;
+          line-height: 45px;
+          text-align: center;
+          position: absolute;
+          right: 60px;
+          width: 80%;
+        }
+        .spinner {
+          width: 70px;
+          text-align: center;
+          position: absolute;
+          right: 9px;
+          top: 27px;
+        }
+
+        .spinner > div {
+          width: 15px;
+          height: 15px;
+          background-color: #2e4369;
+
+          border-radius: 100%;
+          display: inline-block;
+          -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+          animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+        }
+
+        .spinner .bounce1 {
+          -webkit-animation-delay: -0.32s;
+          animation-delay: -0.32s;
+        }
+
+        .spinner .bounce2 {
+          -webkit-animation-delay: -0.16s;
+          animation-delay: -0.16s;
+        }
+
+        @-webkit-keyframes sk-bouncedelay {
+          0%,
+          80%,
+          100% {
+            -webkit-transform: scale(0);
+          }
+          40% {
+            -webkit-transform: scale(1);
+          }
+        }
+
+        @keyframes sk-bouncedelay {
+          0%,
+          80%,
+          100% {
+            -webkit-transform: scale(0);
+            transform: scale(0);
+          }
+          40% {
+            -webkit-transform: scale(1);
+            transform: scale(1);
+          }
+        }
+      }
+    }
+    .video-wrapper {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      background-color: #154f53;
+      border: 3px solid #154f53;
+      border-radius: 20px;
+      border-bottom: 0px;
+      width: 20%;
+      .patient-video {
+        border-radius: 20px;
+        transform: scaleX(-1);
+        width: 100%;
+      }
+    }
+
+    .no-camera-message {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      background-image: url("../../../../assets/video-paitent/camera.png");
+      background-size: 30%;
+      background-repeat: no-repeat;
+      padding-top: 10px;
+      background-color: #113d41;
+      background-position: center 30%;
+      color: white;
+      border: 3px solid #154f53;
+      border-radius: 20px;
+      text-align: center;
+      line-height: 290px;
+      font-size: 20px;
+      font-weight: bold;
+      width: 20%;
+      height: auto;
+    }
+
+    .waiting-for-session {
+      text-align: center;
+      font-size: 20px;
+      line-height: 70px;
+    }
+  }
+}
+.hide {
+  visibility: hidden;
+}
+@media only screen and (max-width: 1000px) {
+  .video-wrapper {
+    width: 30% !important;
+  }
+  @media only screen and (max-width: 660px) {
+    .video-wrapper {
+      width: 40% !important;
+    }
+  }
+}
+@media only screen and (max-height: 800px) {
+  .connection-message-container {
+    margin-top: -13% !important;
+    .message-header {
+      font-size: 2.5rem !important;
+      line-height: 2.5rem !important;
+    }
+    .message-content {
+      font-size: 1.8rem !important;
+      line-height: 1.8rem !important;
+    }
+  }
+}
+@media only screen and (max-height: 740px) {
+  .connection-message-container {
+    margin-top: -11% !important;
+    .message-header {
+      font-size: 2rem !important;
+      line-height: 2rem !important;
+    }
+    .message-content {
+      font-size: 1.5rem !important;
+      line-height: 1.5rem !important;
+    }
+  }
+}
+
+@media only screen and (min-width: 300px) and (max-width: 550px) and (min-height: 200px) and (max-height: 600px) and (orientation: portrait) {
+  .right-container {
+    top: 35% !important;
+    width: 45% !important;
+    font-size: 10vw !important;
+    .user-name {
+      line-height: 5vw !important;
+      font-size: 5vw !important;
+    }
+    .logout-container {
+      font-size: 5vw !important;
+    }
+  }
+  .mid-container {
+    padding: 25% 3.5% 3% 3.5% !important;
+    .outer-border {
+      height: 100% !important;
+      .content-background {
+        .header-container {
+          transform: translateY(-40px) !important;
+        }
+        .header-title {
+          height: 65px !important;
+          font-size: 8vw !important;
+          line-height: 8vw !important;
+        }
+      }
+      .connection-message-container {
+        top: 25% !important;
+        padding-top: 15% !important;
+        .connection-image {
+          width: 80% !important;
+        }
+        .message-header {
+          font-size: 5vw !important;
+          line-height: 5vw !important;
+        }
+        .message-content {
+          font-size: 4vw !important;
+          line-height: 4vw !important;
+        }
+      }
+      .waiting-for-call-spinner-container {
+        bottom: 20vh !important;
+        width: 75vw !important;
+        height: 10% !important;
+        .spinner-icon {
+          height: 25px !important;
+          width: 25px !important;
+          top: 10px !important;
+        }
+        .waiting-text {
+          font-size: 3.5vw !important;
+          line-height: 3.5vw !important;
+          margin: 0 !important;
+          top: 50% !important;
+          transform: translateY(-50%) !important;
+          right: 34px !important;
+        }
+        .spinner {
+          width: 7% !important;
+          top: 40% !important;
+        }
+
+        .spinner > div {
+          width: 33% !important;
+          height: 5px !important;
+        }
+      }
+    }
+  }
+  .video-wrapper {
+    width: 30% !important;
+    max-height: 20%;
+  }
+  .patient-video {
+    height: -webkit-fill-available;
+    object-fit: cover;
+  }
+}
+@media only screen and (max-height: 500px) and (orientation: landscape) {
+  .ios-main {
+    height: 100vh !important;
+  }
+  .header-container {
+    transform: translateY(-35px) !important;
+  }
+  .logo {
+    width: 35px !important;
+    height: 35px !important;
+  }
+  .left-container-text {
+    line-height: 35px !important;
+  }
+  .right-container {
+    width: 25% !important;
+    right: 2% !important;
+    .user-name {
+      font-weight: 500 !important;
+      font-size: 1.3rem !important;
+    }
+    .logout-container {
+      font-size: 1rem !important;
+    }
+  }
+  .mid-container {
+    padding: 7% 3.5% 3% 3.5% !important;
+    .header-title {
+      font-size: 1.2rem !important;
+      height: 50px !important;
+      font-weight: 500 !important;
+    }
+    .connection-message-container {
+      margin-top: -9% !important;
+      .message-header {
+        font-size: 1.2rem !important;
+        line-height: 1rem !important;
+      }
+      .message-content {
+        display: none !important;
+      }
+    }
+    .waiting-for-call-spinner-container {
+      width: 40vw !important;
+      height: 40px !important;
+      .spinner-icon {
+        width: 25px !important;
+        height: 25px !important;
+        top: 7px !important;
+      }
+      .waiting-text {
+        display: none;
+      }
+      .spinner {
+        width: 41px !important;
+        right: 6px !important;
+        top: 20px !important;
+      }
+      .spinner > div {
+        width: 7px !important;
+        height: 7px !important;
+        top: 20px !important;
+      }
+    }
+  }
+  .waiting-text-mobile {
+    display: block !important;
+    color: #2e4369;
+    font-family: Assistant;
+    font-size: 1.1rem;
+    line-height: 38px;
+    text-align: center;
+    position: absolute;
+    left: 16px;
+    text-transform: capitalize;
+    width: 90%;
+  }
+  .video-wrapper {
+    width: 20% !important;
+  }
+}
+@media only screen and (min-width: 300px) and (max-width: 550px) and (min-height: 550px) and (orientation: portrait) {
+  .right-container {
+    top: 35% !important;
+    width: 45% !important;
+    font-size: 10vw !important;
+    .user-name {
+      line-height: 5vw !important;
+      font-size: 5vw !important;
+    }
+    .logout-container {
+      font-size: 5vw !important;
+    }
+  }
+  .mid-container {
+    padding: 25% 3.5% 3% 3.5% !important;
+    .outer-border {
+      height: 100% !important;
+      .content-background {
+        .header-container {
+          transform: translateY(-40px) !important;
+        }
+        .header-title {
+          height: 65px !important;
+          font-size: 8vw !important;
+          line-height: 8vw !important;
+        }
+      }
+      .connection-message-container {
+        top: 25% !important;
+        padding-top: 15% !important;
+        .connection-image {
+          width: 80% !important;
+        }
+        .message-header {
+          font-size: 5vw !important;
+          line-height: 5vw !important;
+          margin-bottom: 15px !important;
+          margin-top: 10px !important;
+        }
+        .message-content {
+          font-size: 4vw !important;
+          line-height: 4vw !important;
+        }
+      }
+      .waiting-for-call-spinner-container {
+        bottom: 20vh !important;
+        width: 75vw !important;
+        .spinner-icon {
+          height: 25px !important;
+          width: 25px !important;
+          top: 10px !important;
+        }
+        .waiting-text {
+          font-size: 3.5vw !important;
+          line-height: 3.5vw !important;
+          margin: 0 !important;
+          top: 50% !important;
+          transform: translateY(-50%) !important;
+          right: 20px !important;
+        }
+        .spinner {
+          width: 7% !important;
+        }
+
+        .spinner > div {
+          width: 33% !important;
+          height: 5px !important;
+        }
+      }
+    }
+  }
+  .video-wrapper {
+    width: 40% !important;
+    max-height: 20%;
+  }
+  .patient-video {
+    height: -webkit-fill-available;
+    object-fit: cover;
+  }
+}
+.web-rtc-wrapper {
+  z-index: -1;
+  position: absolute;
+  top: 0;
+}
+.therapist-video {
+  z-index: -1;
+  position: relative;
+}
+.waiting-text-mobile {
+  display: none;
+}

@@ -1,0 +1,57 @@
+.game-timer-wrapper {
+    width: auto;
+    border-radius: 8px;
+    background-color: #0E191F;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 12px;
+    max-height: 12vh;
+}
+.timer {
+    flex: 1 1 auto;
+    display: flex;
+    max-width: 50%;
+}
+.square {
+    box-sizing: border-box;
+    height: 80px;
+    width: 72px;
+    border: 2px solid #364045;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.square-text {
+    color: #FF52A0;
+    font-family: "Open Sans";
+    font-size: 34px;
+    letter-spacing: 0;
+    line-height: 46px;
+    text-align: center;
+    margin: 0;
+}
+.timer-colon {
+    color: #ECECED;
+    font-family: "Open Sans";
+    font-size: 44px;
+    letter-spacing: 0;
+    line-height: 60px;
+    text-align: center;
+    margin: 0 10px;
+}
+.timer-title-wrapper {
+    display: flex;
+    flex: 1 1 auto;
+    justify-content: center;
+}
+.timer-title {
+    color: #ECECED;
+    font-family: "Open Sans";
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0;
+    line-height: 24px;
+    margin: 0;
+}

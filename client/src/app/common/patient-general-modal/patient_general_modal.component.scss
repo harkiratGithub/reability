@@ -1,0 +1,112 @@
+.modal-container {
+  height: 466px;
+  width: 496px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #3F4850 0%, #2B343B 100%);
+  box-shadow: 0 12px 12px 0 rgba(4,17,24,0.6);
+padding: 50px;
+text-align: left;
+.top-circle{
+  position: relative;
+  height: 72px;
+  width: 72px;
+  border-radius: 36px;
+  background-color: #0E191F;
+margin-bottom: 40px;
+  img {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+  }
+}
+  .header-section {
+    color: #ECECED;
+    font-family: "Open Sans";
+    font-size: 38px;
+    font-weight: 300;
+  }
+  .main-section {
+    padding: 10px 0 ;
+    color: #ECECED;
+    font-size: 22px;
+    margin-bottom: 70px;
+  }
+
+  .actions-section {
+   text-align: center;
+    .accept-btn {
+   width: 400px;
+   height: 72px;
+   border-radius: 8px;
+   background-color: #FF52A0;
+   color: #0E191F;
+   font-family: "Open Sans";
+   font-size: 22px;
+   font-weight: bold;
+   letter-spacing: 0;
+   line-height: 30px;
+   text-align: center;
+   border:none;
+   cursor: pointer;
+   &:hover{
+     opacity: 0.9;
+   }
+    }
+  }
+}
+@media only screen and (min-width: 360px) and (max-width: 500px) and (orientation: landscape) {
+  .modal-container {
+    min-width: unset !important;
+    .header-section {
+      font-size: 6vw !important;
+    }
+    .main-section {
+      padding: 45px !important;
+      text-align: center !important;
+      white-space: unset !important;
+      font-size: 3.5vw !important;
+      line-height: 5vw !important;
+    }
+    .actions-section {
+      bottom: -45px !important;
+      width: 100% !important;
+      .action-btn {
+        height: 90px !important;
+        width: 90px !important;
+        img {
+          height: 90px !important;
+        }
+      }
+    }
+  }
+}
+@media only screen and (min-width: 360px) and (max-width: 500px) and (orientation: portrait) {
+  .modal-container {
+    min-width: unset !important;
+    .header-section {
+      font-size: 6vw !important;
+    }
+    .main-section {
+      text-align: center !important;
+      white-space: unset !important;
+      font-size: 6vw !important;
+      line-height: 6vw !important;
+      padding-top: 20px !important;
+      padding-bottom: 20px!important;
+    }
+    .actions-section {
+      bottom: -45px !important;
+      width: 100% !important;
+      .action-btn {
+        height: 100px !important;
+        width: 100px !important;
+        img {
+          height: 100px !important;
+        }
+      }
+    }
+  }
+}

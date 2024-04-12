@@ -1,0 +1,34 @@
+1. the main app gets from posenet values in range between 0-1.
+2. the main app checks the width and height of the webRTC componenet and translate the landmarks from posenet to new landmarks that fits the game iFrame and send them to the game.
+3. The game can listen to these landmarks (via the sdk) and take actions according.
+
+organs drawing
+================
+1. the sdk supports drawing organs on the game screen (currently only both hands).
+2. in order to show hands, the game needs to call the sdk's setHandImagesPaths function and pass the path to the images files of the left and right hands.
+Example: 
+sdk.setHandImagesPaths('/assets/left_hand.svg','/assets/right_hand.svg');
+3. incase the game needs the hands/any organ to be only in an inner area (and not the whole game screen) then the game needs to call the sdk's setGameAreaBounds method and pass the inner area's location (top-left and right-bottom points)
+Example:
+sdk.setGameAreaBounds({x:100, y:100}, {x:500, y:800});
+
+Hands drawing logic
+=====================
+when the sdk gets landmarks from the main app , it checks if there is an inner area defined.
+If an inner area is set (by calling the setGameAreaBounds), the sdk translates the landmark coming from the main app to fit the inner area and then draws the hands inside it.
+If there isn't an inner area set, then the sdk draws the hands accoring to the landmark coming from the main app. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

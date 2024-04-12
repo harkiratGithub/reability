@@ -1,0 +1,877 @@
+$HEADER_HEIGHT: 60px;
+$HEADER_BACKGROUND: linear-gradient(270.06deg, #385f7c 100%, #294259 100.67%, #272545 100%);
+$SIDE_BAR_BACKGROUND: linear-gradient(270.06deg, #385f7c 0%, #294259 100%, #272545 100%);
+.main-menu-container {
+  height: 100%;
+  width: 100%;
+  color: #ffffff;
+  background: #f4f8f9;
+
+  .skeleton-border-wrap {
+    background: linear-gradient(115deg, #f832cd 0%, #2B343B 49%);
+    padding: 2px;
+    border-radius: 9px;
+    cursor: pointer;
+    position: absolute;
+    z-index: 2;
+    top: 90px;
+    right: 1.5%;
+    width: 19%;
+    max-width: 350px;
+    animation: reveal 0s 1s forwards;
+    visibility: hidden;
+  }
+  @keyframes reveal {
+    to   { visibility: visible; }
+  }
+  .skeleton-border-wrap-split-screen {
+    top: 50px;
+  }
+  .skeleton-border-wrap-enlarge-video {
+    width: 27%;
+    max-width: none;
+  }
+  .skeleton-border-wrap-hide {
+    display: none;
+  }
+
+  .skeleton-border-loading {
+    background: linear-gradient(115deg, #848485 0%, #2B343B 49%);
+    height: fit-content;
+    cursor: default;
+  }
+
+  .skeleton-loading-section {
+    padding: 18px 24px 18px 24px;
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }  
+  .skeleton-loading-section-split-screen {
+    padding: 5px 8px 8px 2px;
+    height: unset;
+  }
+  .skeleton-border-wrap-active {
+    background: linear-gradient(115deg, #80FF00 0%, #2B343B 49%);
+  }
+
+  .skeleton-loading-percentage {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  .skeleton-loading-title {
+    color: #ECECED;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 24px;
+    margin: 0 0 0 10px;
+  }
+  .skeleton-loading-title-split-screen {
+    line-height: normal;
+    font-size: 12px;
+  }
+  .skeleton-loading-text {
+    color: #FFFFFF;
+    font-size: 18px;
+    line-height: 24px;
+    margin: 0;
+  }
+  .skeleton-loading-bar {
+    height: 32px;
+    border: 1px solid #B5B5BA;
+    border-radius: 6px;
+    background-color: #0E191F;
+    box-shadow: 0 4px 48px 0 rgba(0,0,0,0.24);
+    padding: 8px;
+    margin: 5px 0 0 10px;
+  }
+  .loading-fill {
+    background-color: #f832cd;
+    border-radius: 3px;
+    width: 100%;
+    height: 100%;
+    animation: loadingBar 20s linear;
+  }
+  @keyframes loadingBar {
+    0% { width: 0; }
+    100% { width: 100%; }
+  }
+  .skeleton-please-wait-message {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 5px;
+  }
+  .skeleton-please-wait-message-split-screen {
+    display: none;
+  }
+  // .hand-btn{
+  //   animation: borderColor 18s ;
+  // }
+  // @keyframes borderColor {
+  //   0% { border-right:3px solid #f832cd }
+  //   12% { border-bottom:3px solid #f832cd }
+  //   25% { border-left:3px solid #f832cd }
+  //   37% { border-top:3px solid #f832cd }
+  //   50% { border-right:3px solid #f832cd }
+  //   62% { border-bottom:3px solid #f832cd }
+  //   75% { border-left:3px solid #f832cd }
+  //   87% { border-top:3px solid #f832cd }
+  //   100% { border-right:3px solid #f832cd }
+  // }
+  .skeleton-loading-message-image {
+    margin-right: 15px;
+  }
+  .skeleton-loading-message-text {
+    color: #B5B5BA;
+    font-size: 16px;
+    line-height: 22px;
+    margin: 0;
+  }
+  .skeleton-image {
+    margin-right: 15px;
+  }
+  .skeleton-image-split-screen {
+    margin-right: 5px;
+    width: 20%;
+  }
+  .skeleton-loading, .skeleton-ready {
+    border-radius: 8px;
+    background-color: #0E191F;
+  }
+  
+  .skeleton-loading {
+    height: fit-content;
+  }
+  .skeleton-ready-section {
+    padding: 18px 0 18px 24px;
+    height: 75px;
+    display: flex;
+    flex-direction: row;
+    z-index: 1;
+  }
+  .skeleton-ready-section-split-screen {
+    padding: 8px;
+    height: unset;
+  }
+  .skeleton-ready-message {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  .skeleton-ready-message {
+    justify-content: center;
+  }
+  .skeleton-ready-title, .skeleton-ready-text {
+    margin: 0;
+    font-family: "Open Sans";
+    letter-spacing: 0;
+  }
+  .skeleton-ready-title {
+    color: #ECECED;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 24px;
+  }
+  .skeleton-ready-title-split-screen {
+    line-height: normal;
+    font-size: 11px;
+  }
+  .skeleton-ready-text {
+    color: #B5B5BA;
+    font-size: 16px;
+    line-height: 22px;
+  }
+  .skeleton-ready-text-split-screen {
+    line-height: normal;
+    font-size: 12px;
+  }
+  .header {
+    width: 100%;
+    height: 60px;
+    display: flex;
+
+    .left {
+      width: 275px;
+      display: flex;
+      align-items: center;
+      background: $SIDE_BAR_BACKGROUND;
+
+      img {
+        height: 33px;
+        margin-left: 16px;
+      }
+    }
+    .middle{
+      width: 250px;
+      background: $HEADER_BACKGROUND;
+      p{
+        margin: 2px;
+        font-size:15px;
+      }
+    }
+    .right {
+      width: calc(100% - 525px);
+      background: $HEADER_BACKGROUND;
+
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 15px;
+      background: $HEADER_BACKGROUND;
+
+      .user-name {
+        height: 20%;
+        color: #fff;
+        margin-right: 10px;
+        font-weight: 600;
+        z-index: 2;
+        font-size: 1rem;
+        text-transform: capitalize;
+      }
+
+      .tabs {
+        display: flex;
+
+        .tab {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: fit-content;
+          height: 40px;
+          margin-right: 8px;
+          padding: 0px 24px;
+          line-height: 21px;
+          text-transform: capitalize;
+          font-size: 16px;
+          font-family: Roboto;
+          font-weight: 500;
+          border-radius: 20px;
+          background-color: #4a7091;
+          cursor: pointer;
+          &.not-active {
+            opacity: 0.7;
+          }
+        }
+      }
+
+      .logout-container {
+        font-size: 18px;
+        cursor: pointer;
+        .log-out-image {
+          position: relative;
+          top: 5px;
+        }
+      }
+    }
+  }
+
+  .content {
+    display: flex;
+    height: calc(100% - #{$HEADER_HEIGHT});
+
+    .side-bar {
+      width: 220px;
+      height: 100%;
+      background: $SIDE_BAR_BACKGROUND;
+      border-top: 1px solid rgba(106, 148, 186, 0.3);
+
+      .search {
+        height: 85px;
+        padding-top: 16px;
+
+        .search-bar {
+          width: calc(100% - 32px);
+          height: 40px;
+          margin: auto;
+          position: relative;
+
+          input {
+            width: 100%;
+            height: 100%;
+            font-size: 16px;
+            border-radius: 26px;
+            color: #a1c8eb;
+            padding-left: 16px;
+            padding-right: 40px;
+            background-color: rgba(106, 148, 186, 0.34);
+            border-style: none;
+
+            &::placeholder {
+              color: #a1c8eb;
+            }
+            &:focus {
+              outline: none;
+            }
+          }
+
+          img {
+            position: absolute;
+            right: 15px;
+            top: 10px;
+          }
+        }
+      }
+
+      .patients-logged {
+        height: 70%;
+        overflow-y: auto;
+
+        .summary {
+          display: flex;
+          height: 50px;
+          padding-left: 16px;
+          padding-right: 20px;
+          font-weight: 500;
+          color: #00da67;
+
+          .description {
+            text-transform: uppercase;
+            font-size: 15px;
+          }
+          .count {
+            margin-left: auto;
+          }
+        }
+
+        .user {
+          font-size: 16px;
+          height: 50px;
+          padding-left: 16px;
+          padding-right: 20px;
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          cursor: pointer;
+
+          &:hover {
+            background-color: #2f4e68;
+            box-shadow: 0 0 10px 0 #1f3f58;
+            background-image: url('../../../assets/therapist/icon_plus_patient.svg');
+            background-repeat: no-repeat;
+            background-size: 30px 30px;
+            background-position-x: 95%;
+            background-position-y: 45%;
+
+            &.remove-hover-plus {
+              background-image: none;
+            }
+
+            .ringing {
+              //visibility: hidden;
+            }
+
+            .missed-call {
+              background-image: none;
+            }
+
+            .no-camera {
+              background-image: none;
+            }
+
+            .in-session {
+              background-image: none;
+            }
+          }
+
+          &.selected {
+            background-color: #426585;
+            box-shadow: none;
+          }
+
+          .ringing {
+            margin-left: auto;
+            padding: 0 8px;
+            color: #6fafdc;
+            font-size: 13px;
+            font-weight: 300;
+          }
+
+          .call-duration {
+            margin-left: auto;
+            padding: 0 8px;
+            color: white;
+            font-size: 13px;
+            font-weight: 300;
+          }
+
+          .missed-call {
+            background-image: url('../../../assets/therapist/icon_no_answer.svg');
+            background-repeat: no-repeat;
+            background-size: 20px 20px;
+            width: 25%;
+            height: 100%;
+            background-position-x: 95%;
+            background-position-y: 45%;
+          }
+
+          &.hang-up {
+            margin-left: auto;
+            padding: 0 8px;
+          }
+
+          .in-session {
+            background-image: url('../../../assets/therapist/icon_video_on.svg');
+            background-repeat: no-repeat;
+            background-size: 20px 20px;
+            width: 25%;
+            height: 100%;
+            background-position-x: 95%;
+            background-position-y: 45%;
+          }
+
+          .no-camera {
+            float: left;
+            background-image: url('../../../assets/therapist/icon_video_off.svg');
+            background-repeat: no-repeat;
+            background-size: 20px 20px;
+            width: 25%;
+            height: 100%;
+            background-position-x: 95%;
+            background-position-y: 45%;
+          }
+        }
+      }
+      .camera-details {
+        position: absolute;
+        bottom: 6px;
+        left: 6px;
+        .row-camera-details {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          .camera-img {
+            background-image: url('../../../assets/video-paitent/camera.svg');
+            background-repeat: no-repeat;
+            background-size: 100%;
+            height: 18px;
+            width: 18px;
+            margin-right: 6px;
+            z-index: 100;
+          }
+
+          .toggle-on-camera {
+            background-image: url('../../../assets/video-paitent/toggle-on.svg');
+            background-repeat: no-repeat;
+            background-size: 100%;
+            height: 24px;
+            width: 38px;
+            z-index: 100;
+          }
+
+          .toggle-off-camera {
+            background-image: url('../../../assets/video-paitent/toggle-off.svg');
+            background-repeat: no-repeat;
+            background-size: 100%;
+            height: 24px;
+            width: 38px;
+            z-index: 100;
+          }
+        }
+      }
+    }
+
+    .data {
+      width: calc(100% - 220px);
+      height: 100%;
+      position: relative;
+
+      .session-container {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: linear-gradient(135deg, #3F4850 0%, #1b2125 100%);
+
+        .therapist-split-screen {
+          display: flex;
+          height: 100%;
+          margin: 15px;
+          border-radius: 10px;
+          overflow: hidden;
+        }
+
+        .iframes-container {
+          display: flex;
+          border-radius: 10px;
+          background-color: white;
+          box-shadow: 0 2px 9px 0 rgba(178, 178, 178, 0.5);
+
+          .session-container-wrapper {
+            width: 100%;
+          }
+
+          .session-container-header {
+            height: 0;
+            width: auto;
+            border-radius: 5px 5px 0 0;
+            position: absolute;
+            z-index: 3;
+            top: 5px;
+            left: 15px;
+            overflow: hidden;
+            transition: height .8s ease;
+            .header-buttons-wrapper {
+              height: 62px;
+              min-width: 440px;
+              padding: 0 4px;
+              border-radius: 8px;
+              background-color: #3E474B;
+              display: flex;
+              flex-direction: row;
+              align-items: center;
+              justify-content: space-around;
+              .btn {
+                height: 44px;
+                width: 44px;
+                border-radius: 8px;
+                background-color: #727272;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+              }
+              .toggle-btn {
+                transition: background-color 0.3s ease;
+                img {
+                  transition: filter 0.3s ease;
+                }
+              }
+              .toggle-btn:hover {
+                background-color: #ffffff;
+                img {
+                  filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(-22deg) brightness(81%) contrast(125%);
+                }
+              }
+              .btn-disabled {
+                background-color: #ffffff;
+                cursor:auto
+              }
+              .btn-disabled img {
+                filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(-22deg) brightness(81%) contrast(125%);
+              }
+              .hang-up {
+                height: 44px;
+                width: 72px;
+                background-color: #EA4336;
+              }
+              .show-hang-up-buttons {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-around;
+                position: relative;
+              }
+              .hang-up-confirm-icon {
+                font-size: 30px;
+                margin: 0;
+                width: 100%;
+                padding: 15px;
+              }
+              .buttons-seperator {
+                border-left: 2px solid #2B343B;
+                height: 75%;
+              }
+            }
+          }
+
+        }
+
+        .iframes-container:hover .session-container-header {
+          height: 62px;
+        }
+
+        .iframes-container a {
+          display: inline-block;
+          position: absolute;
+          height: 100%;
+          width: 100%;
+          z-index: 2;
+        }
+
+        .full-screen-link {
+          cursor: pointer;
+        }
+
+        .iframes-container a:after {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: #2e4c65;
+          content: 'OPEN SESSION';
+          background-image: url('../../../assets/therapist/icon_open_full_screen.svg');
+          background-repeat: no-repeat;
+          display: flex;
+          justify-content: center;
+          background-size: var(--my-background-size-var);
+          background-position: var(--my-background-position-var);
+          align-items: center;
+          color: white;
+          opacity: 0;
+          transition: opacity 0.5s;
+        }
+
+        .iframes-container a:hover:after {
+          opacity: 0.56;
+          z-index: 1;
+        }
+
+        .game-iframe {
+          flex: 1;
+          position: absolute;
+          top: 0px;
+          z-index: 1;
+          left: 0px;
+          border: 0;
+          font-size: 1.2rem;
+          height: 100%;
+          width: 100%;
+        }
+
+        .menu-options-wrapper {
+          width: 100%;
+          height: 100%;
+        }
+
+        .no-sessions {
+          margin: 0;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          align-items: center;
+          .no-session-image {
+            width: 100%;
+          }
+          .no-session-text {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            .no-session-title, .no-session-subtitle {
+              margin: 0;
+              color: #ECECED;
+              font-family: "Open Sans";
+              letter-spacing: 0;
+              text-align: center;
+            }
+            .no-session-title {
+              font-size: 34px;
+              font-weight: 300;
+              line-height: 46px;
+            }
+            .no-session-subtitle {
+              font-size: 26px;
+              font-weight: 600;
+              line-height: 36px;
+            }
+          }
+        }
+      }
+      .hide-session {
+        display: none !important;
+      }
+    }
+  }
+}
+
+.mat-grid-list {
+  width: 100%;
+  height: 100%;
+}
+
+.users-list {
+  padding-inline-start: 0;
+  .user-list-row {
+    display: flex;
+    position: relative;
+    font-weight: 500;
+    padding-left: -18px;
+    height: 45px;
+    padding-top: 25px;
+    padding-left: 30px;
+    font-size: 18px;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+  }
+}
+.patient-list-body {
+  width: 100%;
+  height: 100%;
+}
+
+.game-iframe-swapped-screens {
+  flex: 1;
+  position: absolute;
+  border: 0;
+  font-size: 1.2rem;
+  z-index: 1;
+}
+
+.iframe-wrapper {
+  height: 100%;
+  width: 100%;
+  z-index: 1;
+}
+
+.menu-container a {
+  display: inline-block;
+  position: absolute !important;
+  bottom: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 2 !important;
+}
+
+.menu-container a:after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #2e4c65;
+  background-image: url('../../../assets/therapist/icon_open_full_screen.svg');
+  background-repeat: no-repeat;
+  display: flex;
+  justify-content: center;
+  background-size: var(--my-background-size-var);
+  background-position: var(--my-background-position-var);
+  align-items: center;
+  color: white;
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+
+.menu-container a:hover:after {
+  opacity: 0.56;
+  z-index: 1;
+}
+.hide {
+  top: 0;
+  visibility: hidden;
+  z-index: -1;
+  position: absolute;
+}
+.hide-video {
+  visibility: hidden;
+}
+.no-camera-message {
+  position: absolute;
+  bottom: 0;
+  background-image: url('/assets/video-paitent/camera.png');
+  background-size: 30%;
+  background-repeat: no-repeat;
+  padding-top: 120px;
+  background-color: #113d41;
+  background-position: center 30%;
+  color: white;
+  border: 3px solid #154f53;
+  border-radius: 10px;
+  text-align: center;
+  line-height: 20px;
+  font-size: 1rem;
+  white-space: pre-line;
+  font-weight: bold;
+  height: auto;
+  width: 220px;
+  z-index: 11;
+  object-fit: fill;
+  max-height: 30%;
+}
+
+.therapist-video {
+  bottom: 0;
+  position: absolute;
+  width: 220px;
+  height: auto;
+  object-fit: fill;
+  max-height: 30%;
+  transform: scaleX(-1);
+}
+
+app-therapist-web-rtc-video {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.full-screen {
+  height: 97%;
+}
+.full-screen-session {
+  height: 85vh;
+}
+
+@media screen and (min-device-width: 1200px) and (max-device-width: 1600px) and (-webkit-min-device-pixel-ratio: 1) {
+  .right-button-menu {
+    width: 40% !important;
+    max-width: 230px !important;
+  }
+  .toggle-button {
+    max-width: 40px;
+    max-height: 40px;
+  }
+  .mute-mic {
+    max-height: 35px;
+    max-width: 39px;
+    line-height: 60px !important;
+  }
+  .mute-speaker {
+    max-height: 35px;
+    max-width: 39px;
+  }
+  .swap-screen-button {
+    max-height: 35px;
+    max-width: 35px;
+  }
+  .hang-up-button {
+    max-height: 35px;
+    max-width: 35px;
+  }
+  .mute-game-sound {
+    max-height: 35px;
+    max-width: 39px;
+  }
+}
+
+/* ----------- Retina Screens ----------- */
+@media screen and (min-device-width: 1200px) and (max-device-width: 1600px) and (-webkit-min-device-pixel-ratio: 2) and (min-resolution: 192dpi) {
+  .right-button-menu {
+    width: 40% !important;
+    max-width: 230px !important;
+  }
+  .toggle-button {
+    max-width: 40px;
+    max-height: 40px;
+  }
+  .mute-mic {
+    max-height: 35px;
+    max-width: 39px;
+    line-height: 60px !important;
+  }
+  .mute-speaker {
+    max-height: 35px;
+    max-width: 39px;
+  }
+  .swap-screen-button {
+    max-height: 35px;
+    max-width: 35px;
+  }
+  .hang-up-button {
+    max-height: 35px;
+    max-width: 35px;
+  }
+  .mute-game-sound {
+    max-height: 35px;
+    max-width: 39px;
+  }
+}

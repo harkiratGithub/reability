@@ -1,0 +1,161 @@
+$TABLE_BACK_GROUND: white;
+$BORDER_COLOR: #e4e9ff;
+$GENERIC_COLUMN_WIDTH: auto;
+//First + Second COLUMN width must match HEADER_COLUMNS_WIDTH in TS
+$FIRST_COLUMN_WIDTH: 50px;
+$SECOND_COLUMN_WIDTH: 20px;
+//Header height must match HEADER_HEIGHT in TS
+$HEADER_HEIGHT: 54px;
+
+.calendar-container {
+  display: block;
+  height: 100%;
+  position: relative;
+
+  .grid-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
+  .availability {
+    background-color: rgba(68, 215, 182, 0.16);
+  }
+  .booking {
+    width: 95%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border-radius: 0 4px 4px 0;
+    white-space: nowrap;
+    z-index: 2;
+    cursor: pointer;
+  }
+  .available {
+    color: #113266;
+    background-color: #cae1e0;
+    z-index: 1;
+  }
+  .unavailable {
+    color: #ea1537;
+    background-color: #fce3e7;
+  }
+
+  table {
+    width: 100%;
+    height: 100%;
+    table-layout: fixed;
+    font-family: Roboto;
+    margin-bottom: 5px;
+    border-spacing: 0px;
+    border-collapse: collapse;
+
+    thead {
+      tr {
+        height: $HEADER_HEIGHT;
+        th {
+          overflow: hidden;
+          width: $GENERIC_COLUMN_WIDTH;
+          position: sticky;
+          top: 0;
+          background: white;
+          color: #26435b;
+          border: 1px solid $BORDER_COLOR;
+          outline: 1px solid $BORDER_COLOR;
+          border-top: none;
+          text-align: left;
+          z-index: 3;
+
+          &:first-child {
+            width: 50px;
+            border: none;
+            outline: none;
+            position: initial;
+          }
+          &:nth-child(2) {
+            width: 20px;
+            border: none;
+            outline: none;
+            border-bottom: 1px solid $BORDER_COLOR;
+            position: initial;
+          }
+
+          .day-number {
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            justify-content: center;
+            padding: 4px 9px;
+            vertical-align: middle;
+            font-size: 20px;
+            font-weight: 500;
+            border-radius: 20px;
+
+            &.active {
+              background: #44d7b6;
+              color: white;
+            }
+          }
+          .day-text {
+            margin-left: 2px;
+            font-size: 14px;
+          }
+        }
+      }
+    }
+    tbody {
+      tr {
+        background: $TABLE_BACK_GROUND;
+        td {
+          position: relative;
+          height: 32px;
+          padding: 0;
+          text-align: center;
+          vertical-align: middle;
+          border: 1px solid $BORDER_COLOR;
+
+          &.time {
+            width: 50px;
+            font-size: 14px;
+            color: #9eb2c2;
+            border: none;
+            position: relative;
+            .time-text {
+              position: absolute;
+              top: -8px;
+              right: 5px;
+            }
+          }
+          &.lunge {
+            width: 20px;
+            border: none;
+            border-bottom: 1px solid $BORDER_COLOR;
+          }
+          .hour-split {
+            table-layout: fixed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 25px;
+            width: $GENERIC_COLUMN_WIDTH;
+            margin: -0.14px 0;
+            border-bottom: 1px dashed $BORDER_COLOR;
+
+            &:last-child {
+              border-bottom: 0;
+              margin-bottom: 0;
+            }
+          }
+          .outer-text {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+          }
+        }
+      }
+    }
+  }
+}

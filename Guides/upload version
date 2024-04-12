@@ -1,0 +1,61 @@
+production version upload process
+----------------------------------
+1. merge from staging to master
+2. go to master and pull 
+3. change version in packet.json , commit and push to master
+4. git tag -a v1.0.XXX -m "***version upload on 01.01.2021***"   3 stars means bold and italic
+5. git push origin v1.0.XX
+6. git push reability-prod master
+7. login to heroku and run in console: npm run migrate:run
+8. start tests
+
+
+
+version numbers are in the server's packet.json file
+zugi numbers are production versions like 1.0.14 and fixes are 1.0.14a or b or c - this is production hot fixes
+
+first version to staging after a lot of changes are e-zugi meaning 1.0.15 and little fixes 1.0.15a b c....
+the version number is in thelogin screen in bottomleft side
+
+
+
+
+in your local computer go to the branch of the main code 
+
+
+make pull make merge if needed  
+
+run the application locally 
+
+git push reability-staging staging:master    (meaning push from 0.11 to master in the remote)
+
+or 
+git push reability-prod staging:master
+
+
+after all done and chaecked on prod including fixes !!! , we need to merge staging to master
+
+after that we need to set versioning on master with git
+
+git tag ---> versioning
+=========================
+on master only (reability project)
+
+see all versions:
+git tag 
+
+to see dtails versions 
+git tag -n
+
+to searach by string
+git tag -n "v1.0" 
+
+
+add new version
+git tag -a v1.0.14b -m "this is a nice version"
+
+change to a version.
+1. create and move to a new branch
+2. git checkout v1.0.14b
+
+

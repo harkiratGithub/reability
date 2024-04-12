@@ -1,0 +1,133 @@
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { ReCaptchaV3Service } from 'ng-recaptcha';
+import { ActivatedRoute, Router } from '@angular/router';
+import _ from 'lodash';
+
+import { AlertService } from '../../services/alert.service';
+import { AppActions } from '../../../app.actions';
+import { AuthenticationService } from '../../services/authentication.service';
+import { version } from '../../../../../../package.json';
+import { AjaxService } from '../../../therapist/services/ajax.service';
+import { roleMainRoute } from '../../../routes';
+import { isMobileDevice, MOBILE_OR_SMALL_RESOLUTION } from '../../utils';
+
+@Component({
+  selector: 'app-login',
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.scss'],
+})
+export class LoginPageComponent implements OnInit, OnDestroy {
+  loginForm: FormGroup;
+  loading = false;
+  submitted = false;
+
+  statusPassword = 'password';
+  iconPassword = '/../../../assets/login/show_password_white.svg';
+  textPassword = '';
+  appVersion = version;
+  isMobile = false;
+  mainMenu;
+  ShowLoginErrorMobile = false;
+
+  constructor(
+    private formBuilder: FormBuilder,
+    private route: ActivatedRoute,
+    private router: Router,
+    private authenticationService: AuthenticationService,
+    private alertService: AlertService,
+    private appActions: AppActions,
+    private ajax: AjaxService,
+    private recaptchaV3Service: ReCaptchaV3Service,
+    private ref: ChangeDetectorRef
+  ) {
+    this.isMobile = MOBILE_OR_SMALL_RESOLUTION ? true : false;
+    window.addEventListener('resize', () => {
+      this.isMobile = MOBILE_OR_SMALL_RESOLUTION ? true : false;
+    });
+  }
+
+  ngOnInit() {
+    this.loginForm = this.formBuilder.group({
+      username: ['', Validators.required],
+      password: ['', Validators.required],
+    });
+    this.showCaptchaBadge();
+  }
+
+  ngOnDestroy() {
+    this.hideCaptchaBadge();
+  }
+
+  // convenience getter for easy access to form fields
+  get f() {
+    return this.loginForm.controls;
+  }
+
+  async onSubmit() {
+    this.ShowLoginErrorMobile = false;
+    try {
+      var cookieEnabled = navigator.cookieEnabled;
+      if (!cookieEnabled) {
+        this.appActions.openCallModal(
+          {
+            panelClass: 'generic-dialog-container',
+            header: 'ENABLE COOKIES',
+            content: 'Please allow cookies in your browser',
+            acceptBtnImg: '../../../../assets/buttons/btn_decline.png',
+            acceptBtnImgHover: '../../../../assets/buttons/btn_decline_hover.png',
+            approveCallback: async () => await this.authenticationService.logout(),
+            declineCallback: async () => await this.authenticationService.logout(),
+          },
+          false
+        );
+      } else {
+        this.submitted = true;
+        this.loading = true;
+        this.f.username.setErrors(null);
+        const token = await this.recaptchaV3Service.execute('login').toPromise();
+        const user = await this.ajax.login(this.f.username.value, this.f.password.value, token).toPromise();
+        this.authenticationService.updateUser(user);
+        this.appActions.setTherapist(user.isTherapist);
+        this.router.navigate([`${roleMainRoute(user.role)}`]);
+      }
+    } catch (error) {
+      console.log('login errors !:', error);
+      this.alertService.error(error);
+      if (error && _.includes(error, 'already connected')) {
+        this.f.username.setErrors({ errorName: 'already_connected' });
+      } else {
+        this.f.username.setErrors({ errorName: 'not_valid' });
+      }
+      this.ShowLoginErrorMobile = true;
+      this.loading = false;
+      this.ref.detectChanges();
+    }
+  }
+
+  seePassword() {
+    if (this.statusPassword === 'password') {
+      this.statusPassword = 'text';
+      this.iconPassword = '/../../../assets/login/hide_password_white.svg';
+    } else {
+      this.statusPassword = 'password';
+      this.iconPassword = '/../../../assets/login/show_password_white.svg';
+    }
+  }
+
+  private showCaptchaBadge = () => {
+    const elements = document.getElementsByClassName('grecaptcha-badge');
+    if (elements.length > 0) {
+      elements[0].setAttribute('id', 'grecaptcha_badge');
+      document.getElementById('grecaptcha_badge').style.display = 'block';
+    }
+  };
+
+  private hideCaptchaBadge = () => {
+    const elements = document.getElementsByClassName('grecaptcha-badge');
+    if (elements.length > 0) {
+      elements[0].setAttribute('id', 'grecaptcha_badge');
+      document.getElementById('grecaptcha_badge').style.display = 'none';
+    }
+  };
+}

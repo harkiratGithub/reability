@@ -1,0 +1,511 @@
+.video-content-container {
+  position: absolute;
+  height: 80%;
+  right: 47px;
+  right: 1%;
+  z-index: 1;
+  .video-content-container-inner {
+    height: 100%;
+    display: flex;
+    flex-direction: column-reverse;
+    .patient-video-wrapper {
+      position: relative;
+      .patient-video-buttons {
+        position: absolute;
+        display: flex;
+        justify-content: space-between;
+        z-index: 1;
+        right: 0px;
+        top: 10px;
+        width: 95%;
+        .left-video-buttons {
+          display: flex;
+        }
+        .button-background {
+          cursor: pointer;
+          height: 25px;
+          width: 25px;
+          border-radius: 8px;
+          background: rgba(57, 57, 57, 0.75);
+          display: flex;
+          justify-content: center;
+          margin-right: 12px;
+          transition: 0.3s;
+          .button-image {
+            width: 60%;
+            opacity: 1 !important;
+          }
+        }
+        .button-background:hover {
+          opacity: 1;
+          background-color: #ffffff;
+          .button-image {
+            filter: brightness(0);
+          }
+        }
+        .debug-image {
+          height: 14px;
+          width: 14px;
+          margin-top: 7px;
+          &:hover {
+            filter: unset !important;
+          }
+        }
+      }
+      .patient-rotation-buttons {
+        position: absolute;
+        display: flex;
+        justify-content: space-between;
+        z-index: 1;
+        right: 5%;
+        bottom: 10px;
+        width: 90%;
+        .button-background {
+          cursor: pointer;
+          height: 20px;
+          width: 20px;
+          border-radius: 8px;
+          background: rgba(57, 57, 57, 0.75);
+          display: flex;
+          justify-content: space-between;
+          transition: 0.3s;
+          .button-image {
+            width: 70%;
+            opacity: 1 !important;
+            margin-left: 3px;
+          }
+        }
+        .button-background:hover {
+          opacity: 1;
+          background-color: #ffffff;
+          .button-image {
+            filter: brightness(0);
+          }
+        }
+      }
+    }
+  }
+}
+
+.video-content-container-regular-video {
+  width: 20%;
+}
+
+.video-content-container-enlarge-video {
+  width: 23%;
+}
+
+.video-content-container-depth-cam {
+  bottom: 0;
+}
+
+.video-content-container-split-screen {
+  position: absolute;
+  top: 34%;
+  right: 4%;
+  width: 18%;
+  height: 45%;
+}
+
+.video-content-container-split-screen-no-skeleton {
+}
+
+.web-cam-sidebar-container {
+  height: 90%;
+  width: 100%;
+  position: relative;
+  .patient-video-sidebar {
+    min-width: 80%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, -10%) scaleY(0.75);
+    box-shadow: 0 0 10px 0 #1f3f58;
+    right: 15px;
+    border-radius: 10px;
+    transform: scaleX(-1);
+    *.focus {
+      outline: none;
+    }
+  }
+  .patient-video-sidebar-no-skeleton {
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, 0%) scaleX(-1);
+    box-shadow: 0 21px 21px 0 rgba(4, 17, 24, 0.6);
+    right: 15px;
+    border-radius: 7.03px;
+    height: 158px;
+    width: 250px;
+    object-fit: cover;
+    background-color: rgba(233, 233, 233, 0.2);
+  }
+}
+
+.patient-canvas {
+  position: absolute;
+  z-index: 11;
+  bottom: 0;
+  height: 244px;
+  width: 323px;
+  transform: scaleX(-1);
+}
+
+.patient-canvas-split-screen {
+  position: absolute;
+  z-index: 11;
+  bottom: 0;
+  height: 122px;
+  width: 160px;
+  transform: scaleX(-1);
+}
+
+.patient-video {
+  width: 100%;
+  border-radius: 10px;
+  min-width: 100%;
+  height: inherit;
+  object-fit: cover;
+  position: absolute;
+  transform: scaleX(-1);
+  z-index: 10;
+  *.focus {
+    outline: none;
+  }
+}
+
+.patient-video-no-skeleton {
+  width: 100%;
+  border: 2px solid #80ff00;
+  border-radius: 10px;
+  object-fit: cover;
+  height: 100%;
+  transform: scaleX(-1);
+  z-index: 10;
+}
+
+.patient-video-active-skeleton {
+  display: block;
+  width: 100%;
+  border: 2px solid #80ff00;
+  border-radius: 10px;
+  object-fit: cover;
+  height: 100%;
+  z-index: 10;
+  transform: scaleX(-1);
+}
+
+.patient-video-full-screen-swapped-split-screen-no-skeleton {
+  display: inline-block;
+  width: calc(100vw);
+  max-width: 100%;
+  object-fit: fill;
+  // height: 40vh;
+  position: relative;
+  transform: scaleX(-1);
+}
+.patient-video-depth-cam {
+  left: 0;
+  transform: unset;
+  bottom: 0;
+}
+
+.patient-video-split-screen {
+  width: 100%;
+  height: 100%;
+  max-height: 150px;
+  border: 2px solid black;
+  object-fit: fill;
+  border-radius: 10px;
+  z-index: 10;
+  transform: scaleX(-1);
+}
+
+.patient-video-split-screen-no-skeleton {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  position: absolute;
+  bottom: 0%;
+  border: 2px solid #80ff00;
+  border-radius: 8px;
+  transform: scaleX(-1);
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  object-fit: cover;
+  box-sizing: border-box;
+  background: linear-gradient(180deg, rgba(14, 25, 31, 0) 0%, rgba(14, 25, 31, 0.6) 100%);
+  box-shadow: 5px 5px 5px 0px rgba(0, 0, 0, 0.3);
+}
+
+.patient-video-split-screen-active-skeleton {
+  width: 100%;
+  border: 2px solid #80ff00;
+  border-radius: 10px;
+  -o-object-fit: cover;
+  object-fit: cover;
+  height: 100%;
+  transform: scaleX(-1);
+  z-index: 10;
+  transform: translate(-50%, -50%) scaleX(-1);
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+}
+.remote-video {
+  position: absolute;
+  bottom: 500px;
+  right: 20px;
+  z-index: 10;
+}
+
+.cdk-drag {
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.local-video {
+  width: 100%;
+  box-shadow: 5px 5px 5px 0px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  object-fit: cover;
+  height: 100%;
+  transform: scaleX(-1);
+  *.focus {
+    outline: none;
+  }
+}
+
+.local-video-depth-cam {
+  bottom: 250px;
+}
+
+.therapist-remote {
+  bottom: 230px;
+}
+
+.hide-video {
+  visibility: hidden;
+  position: absolute;
+}
+.zoom-video {
+  transform: scale(1.4) scaleX(-1);
+}
+.video-border {
+  border: 2px solid #80ff00;
+  border-radius: 10px;
+}
+
+.mute-buttons {
+  width: 200px;
+  display: flex;
+  flex-direction: row-reverse;
+  position: absolute;
+  top: 10px;
+  justify-content: space-around;
+  right: 3%;
+  height: 30px;
+
+  .mute-mic {
+    background-color: limegreen;
+    width: 40px;
+    height: 28px;
+    border-radius: 5px;
+    img {
+      margin-left: 30%;
+      margin-top: 10%;
+    }
+  }
+  .mute-remote {
+    background-color: red;
+    width: 50px;
+  }
+}
+
+.video-content-container-full-screen-swapped {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.patient-video-full-screen-swapped {
+  display: inline-block;
+  width: 100vw;
+  max-width: 100%;
+  object-fit: fill;
+  height: 100%;
+  position: relative;
+  transform: scaleX(-1);
+  *.focus {
+    outline: none;
+  }
+}
+
+.patient-video-full-screen-swapped-canvas {
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  bottom: 0;
+  transform: scaleY(0.7);
+}
+
+.patient-video-full-screen-swapped-split-screen {
+  display: inline-block;
+  width: calc(100vw);
+  max-width: 100%;
+  height: 100%;
+  position: relative;
+  transform: scaleX(-1);
+
+  *.focus {
+    outline: none;
+  }
+}
+
+.patient-video-full-screen-swapped-canvas-split-screen {
+  position: absolute;
+  z-index: 1;
+  height: 100%;
+  width: 100%;
+  transform: scaleY(0.7);
+}
+
+.local-video-full-screen-swapped {
+  width: 100%;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  border: 2px solid black;
+  border-radius: 10px;
+  transform: scaleX(-1);
+  *.focus {
+    outline: none;
+  }
+}
+
+.video-wrapper-swapped-local {
+  z-index: 1;
+  position: absolute;
+  right: 0px;
+  bottom: 35%;
+  width: 20%;
+}
+
+.video-wrapper-swapped {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #154f53;
+}
+.video-box-wrapper-swapped {
+  height: 100%;
+}
+
+.video-wrapper-rotate-regular-video {
+  position: absolute;
+  height: 25%;
+  bottom: 34%;
+  width: 100%;
+}
+
+.video-wrapper-rotate-enlarge-video {
+  position: absolute;
+  height: 15%;
+  bottom: 33%;
+}
+
+.video-wrapper-no-skeleton {
+  height: 25%;
+}
+.video-wrapper-no-skeleton-enlarge-video {
+  height: 40%;
+}
+
+.video-wrapper-no-skeleton-split-screen {
+  height: 30%;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  overflow: hidden;
+}
+
+.video-wrapper-split-screen {
+  height: 60%;
+}
+
+.video-wrapper {
+  overflow: hidden;
+  box-sizing: border-box;
+  box-shadow: 5px 5px 5px 0px rgba(0, 0, 0, 0.3);
+}
+
+.video-wrapper-regular-video {
+  width: 100%;
+  bottom: 60%;
+}
+
+.video-wrapper-enlarge-video {
+  bottom: 50%;
+}
+
+.backdrop {
+  position: fixed;
+  display: block;
+  top: 0;
+  left: 0;
+  z-index: 1080;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.mirror-video {
+  transform: scaleX(-1);
+}
+.swap-screen-button {
+  height: 30px;
+  width: 30px;
+  position: absolute;
+  z-index: 11;
+  cursor: pointer;
+}
+
+.no-rotation {
+  right: 0;
+  top: 0;
+}
+
+.image-90-rotation {
+  left: 0;
+  top: 0;
+}
+.image-180-rotation {
+  bottom: 0;
+  left: 0;
+}
+.image-270-rotation {
+  bottom: 0;
+  right: 0;
+}
+.video-box-wrapper {
+  position: relative;
+  width: 100%;
+  border-radius: 20px;
+  background-color: #154f53;
+}
+.video-box-wrapper:after {
+  content: '';
+  display: block;
+  padding-bottom: 100%;
+}

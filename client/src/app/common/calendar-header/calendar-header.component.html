@@ -1,0 +1,29 @@
+<div class="container">
+  <div class="left">
+    <img class="menu-img" *ngIf="isToggleUsed" src="/assets/backoffice/menu_icon.svg" (click)="toggleMenuClick()" />
+    <img class="left-img" *ngIf="showBack" src="/assets/backoffice/icon_back_office_back.svg" (click)="backClicked()" />
+    <div class="user-name">{{ loggedInUsername }} {{ phone }}</div>
+  </div>
+  <div class="middle">
+    <div *ngIf="isUniqueWeek"><img src="/assets/backoffice/unique.svg" /></div>
+    <div *ngIf="allowWeekChange" class="day" (click)="setCurrentWeek()">Today</div>
+    <div *ngIf="allowWeekChange" class="navigation">
+      <button (click)="setPreviousWeek()"><img class="arrow" src="/assets/backoffice/arrow_left.svg" /></button>
+      <button (click)="setNextWeek()"><img class="arrow" src="/assets/backoffice/arrow_right.svg" /></button>
+    </div>
+    <div class="date">
+      {{ dateToDisplay }}
+    </div>
+  </div>
+  <div class="right" [class.hidden-views-select]="!showViewOptions">
+    <div class="view-option" [class.selected-view]="isListView" (click)="setListView(true)">
+      <div class="selected-view-text">List</div>
+    </div>
+    <div class="view-option" [class.selected-view]="!isListView" (click)="setListView(false)">
+      <div>Calendar</div>
+    </div>
+  </div>
+  <div class="right" [class.hidden-views-select]="!showExportButton">
+    <div class="export" (click)="exportCalendarToExcel()">Export</div>
+  </div>
+</div>

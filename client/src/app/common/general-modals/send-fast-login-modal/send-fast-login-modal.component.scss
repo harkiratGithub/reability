@@ -1,0 +1,153 @@
+.fast-login-form {
+  position: relative;
+  width: 420px;
+  left: 15%;
+  height: 170px;
+  margin-top: 30px;
+  .field-container {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: unset;
+    // margin-bottom: 24px;
+    &.email {
+      span {
+        width: 120px;
+      }
+      input {
+        background: inherit;
+        height: 40px;
+        width: 260px;
+        padding-left: 8px;
+        padding-right: 8px;
+        font-size: 16px;
+        font-family: "Roboto";
+        color: #6d7278;
+        border: 1px solid #b6c5cf;
+        border-radius: 10px;
+        outline: none;
+
+        &.disabled {
+          pointer-events: none;
+          opacity: 0.4;
+        }
+      }
+    }
+    &.date {
+      .frame {
+        span {
+          width: 120px;
+        }
+      }
+      input {
+        background: inherit;
+        height: 40px;
+        width: 260px;
+        padding-left: 8px;
+        padding-right: 8px;
+        font-size: 16px;
+        font-family: "Roboto";
+        color: #6d7278;
+        border: 1px solid #b6c5cf;
+        border-radius: 10px;
+        outline: none;
+
+        &.disabled {
+          pointer-events: none;
+          opacity: 0.4;
+        }
+      }
+      .mat-datepicker-toggle {
+        color: #a1c8eb;
+        position: absolute;
+        left: -34px;
+        top: 0px;
+      }
+    }
+    &.link-type {
+      select {
+        background: inherit;
+        height: 40px;
+        width: 260px;
+        padding-left: 8px;
+        padding-right: 8px;
+        font-size: 16px;
+        font-family: "Roboto";
+        color: #6d7278;
+        border: 1px solid #b6c5cf;
+        border-radius: 10px;
+        outline: none;
+      }
+      .description {
+        display: block;
+        color: #b6c5cf;
+        font-family: "Roboto bold";
+        font-size: 16px;
+        margin-bottom: 10px;
+
+        .secondary {
+          font-family: "Roboto";
+        }
+      }
+    }
+  }
+  .error-msg {
+    font-size: 16px;
+    font-family: "Roboto";
+    color: red;
+  }
+  .radio-group {
+    position: absolute;
+    top: 10px;
+    right: 0;
+    .radio-button {
+      margin-right: 5px;
+    }
+  }
+}
+
+::ng-deep .send-later-radio .mat-radio-label {
+  margin-right: 8px;
+}
+
+::ng-deep .mat-form-field-appearance-legacy .mat-form-field-underline {
+  display: none !important;
+}
+::ng-deep .mat-form-field-wrapper {
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+::ng-deep .mat-form-field-appearance-legacy .mat-form-field-infix {
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+}
+
+::ng-deep .mat-radio-button.mat-accent.mat-radio-checked .mat-radio-outer-circle {
+  border-color: #4a7091 !important;
+}
+
+::ng-deep .mat-radio-button.mat-accent .mat-radio-inner-circle {
+  background-color: #4a7091 !important;
+}
+
+::ng-deep .mat-form-field-suffix {
+  margin: auto;
+  padding-top: 15px;
+}
+
+::ng-deep .mat-form-field-appearance-legacy .mat-form-field-suffix .mat-datepicker-toggle-default-icon {
+  width: 30px !important;
+  height: 30px !important;
+}
+
+::ng-deep .mat-form-field-infix {
+  width: 260px !important;
+}
+.place-holder {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 16px;
+  font-family: "Roboto";
+  color: #6d7278;
+}

@@ -1,0 +1,80 @@
+*{
+	user-select: text;
+}
+.center{
+	position: absolute;
+	left:40px;
+	color: black;
+	display: flex;
+	justify-content: space-between;
+	margin-top: 40px;
+	width: 90%;
+}
+.left-section{
+	display: flex;
+	justify-content: space-between;
+}
+.middle {
+	position: absolute;
+	left:40px;
+	color: black;
+	display: flex;
+	margin-top: 240px;
+}
+.game{
+	font-size: 24px;
+	line-height: 100px;
+	margin-right: 20px;
+}
+
+.file-drop{
+	display: flex;
+	flex-direction: column;
+	padding: 10px;
+
+}
+.delete-db{
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	height: 100px;
+	input{
+		width: 150px;
+	}
+}
+.browse-btn{
+	font-weight: bold;
+	height: 40px;
+	line-height: 40px;
+	text-align: center;
+	width: 135px;
+	border-radius: 20px;
+	background-color: #4a7091;
+    margin-left: 10px;
+	margin-top: 10px;
+	cursor: pointer;
+	border: none;
+	color: white;
+	&:hover{
+		opacity: 0.9;
+	}
+	&:disabled{
+		background-color: lightgray;
+		opacity: 1.0;
+		cursor: not-allowed;
+	}
+}
+.error-files{
+	display: flex;
+	flex-direction: column;
+}
+
+.success-msg{
+	color: green;
+}
+.error-msg{
+	color: red;
+}
+.url-list{
+	display: flex;
+}

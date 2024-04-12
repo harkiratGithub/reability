@@ -1,0 +1,22 @@
+<div class="modal-container">
+  <div class="header-section">{{ header }}</div>
+  <div class="main-section">
+    {{ content }}
+  </div>
+  <div class="actions-section">
+    <div
+      appHand
+      [hoverClass]="'timer'"
+      [selectable]="true"
+      [timeToWait]="2000"
+      (click)="handleApprove()"
+      matDialogClose
+      (outputFunc)="handleApprove()"
+      [class]="getActionButtonClass()"
+      [activeOnStartHover]="clearPopupTimeut"
+      [activeOnOutHover]="createPopupTimeut"
+    >
+      <button class="accept-btn">{{ acceptBtnText || 'Close' }}</button>
+    </div>
+  </div>
+</div>

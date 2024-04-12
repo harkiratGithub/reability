@@ -1,0 +1,119 @@
+.modal-container {
+  height: 466px;
+  width: 496px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #3f4850 0%, #2b343b 100%);
+  box-shadow: 0 12px 12px 0 rgba(4, 17, 24, 0.6);
+  padding: 50px;
+  text-align: left;
+  .top-circle {
+    position: relative;
+    height: 72px;
+    width: 72px;
+    border-radius: 36px;
+    background-color: #0e191f;
+    margin-bottom: 40px;
+    img {
+      margin: 0;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      -ms-transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%);
+    }
+  }
+  .header-section {
+    color: #ececed;
+    font-family: 'Open Sans';
+    font-size: 38px;
+    font-weight: 300;
+  }
+  .main-section {
+    padding: 10px 0;
+    color: #ececed;
+    font-size: 22px;
+    margin-bottom: 70px;
+  }
+
+  .actions-section {
+    text-align: center;
+    .accept-btn {
+      width: 400px;
+      height: 72px;
+      border-radius: 8px;
+      background-color: #ff52a0;
+      color: #0e191f;
+      font-family: 'Open Sans';
+      font-size: 22px;
+      font-weight: bold;
+      letter-spacing: 0;
+      line-height: 30px;
+      text-align: center;
+      border: none;
+      cursor: pointer;
+      &:hover {
+        opacity: 0.9;
+      }
+    }
+  }
+}
+
+.modal-container-mobile {
+  height: 466px;
+  width: 496px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #3f4850 0%, #2b343b 100%);
+  box-shadow: 0 12px 12px 0 rgba(4, 17, 24, 0.6);
+  padding: 50px;
+  text-align: left;
+  .top-circle-mobile {
+    position: relative;
+    height: 72px;
+    width: 72px;
+    border-radius: 36px;
+    background-color: #0e191f;
+    margin-bottom: 40px;
+    img {
+      margin: 0;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      -ms-transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%);
+    }
+  }
+  .header-section-mobile {
+    color: #ececed;
+    font-family: 'Open Sans';
+    font-size: 38px;
+    font-weight: 300;
+  }
+  .main-section-mobile {
+    padding: 10px 0;
+    color: #ececed;
+    font-size: 22px;
+    margin-bottom: 70px;
+  }
+
+  .actions-section-mobile {
+    text-align: center;
+    .accept-btn-mobile {
+      width: 400px;
+      height: 72px;
+      border-radius: 8px;
+      background-color: #ff52a0;
+      color: #0e191f;
+      font-family: 'Open Sans';
+      font-size: 22px;
+      font-weight: bold;
+      letter-spacing: 0;
+      line-height: 30px;
+      text-align: center;
+      border: none;
+      cursor: pointer;
+      &:hover {
+        opacity: 0.9;
+      }
+    }
+  }
+}

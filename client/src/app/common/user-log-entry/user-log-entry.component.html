@@ -1,0 +1,26 @@
+<div class="container">
+  <div>
+    <div class="selectable">
+      {{ logEntry.logDate }} {{ logEntry.performedByName }} {{ logEntry.actionDescription }} the following
+      {{ logEntry.subject }}:
+    </div>
+
+    <div *ngIf="logEntry.action === 'Create'" class="changes">
+      <div *ngFor="let valueChange of logEntry.valueChanges">{{ valueChange.key }}: {{ valueChange.newValue }}</div>
+    </div>
+
+    <div *ngIf="logEntry.action === 'Update'" class="changes selectable">
+      <div *ngFor="let valueChange of logEntry.valueChanges">
+        {{ valueChange.key }}: from {{ valueChange.oldValue }} to {{ valueChange.newValue }}
+      </div>
+    </div>
+
+    <div *ngIf="logEntry.action === 'Delete'" class="changes selectable">
+      <div *ngFor="let valueChange of logEntry.valueChanges">{{ valueChange.key }}: {{ valueChange.oldValue }}</div>
+    </div>
+
+    <div *ngIf="logEntry.remarks" class="changes selectable">{{ logEntry.remarks }}</div>
+  </div>
+
+  <hr />
+</div>

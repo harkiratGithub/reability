@@ -1,0 +1,32 @@
+<div class="dropdown">
+  <div
+    class="clickable"
+    [style.transform]="rotateOnClick && 'rotate(' + (isDropdownOpen ? 180 : 0) + 'deg)'"
+    (click)="toggleDropdown()"
+  >
+    <ng-content></ng-content>
+  </div>
+  <div class="dropdown-content" *ngIf="isDropdownOpen">
+    <label
+      class="dropdown-item ellipsis"
+      (click)="toggleAll($event)"
+      *ngIf="sharedFilter?.displayText == 'Departments'"
+    >
+      Select all
+      <input type="checkbox" id="uniqId" [(ngModel)]="isToggleAllChecked" />
+    </label>
+    <label
+      class="dropdown-item"
+      *ngFor="let option of options"
+      for="{{ option.displayName }}"
+      title="{{ option.displayName }}"
+    >
+      <span class="ellipsis"> {{ option.displayName }}</span>
+      <input type="checkbox" id="{{ option.displayName }}" (change)="toggleSelection(option)" #checkboxes />
+    </label>
+    <div class="actions">
+      <button (click)="toggleDropdown()">Cancel</button>
+      <button (click)="submitSelection()">Save</button>
+    </div>
+  </div>
+</div>

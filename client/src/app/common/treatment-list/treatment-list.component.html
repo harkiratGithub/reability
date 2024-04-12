@@ -1,0 +1,105 @@
+<div *ngIf="therapistBookingViewData" class="container" [ngClass]="{ disabled: isFormerDates }">
+  <div *ngIf="therapistBookingViewData.therapistId" class="header">
+    <!-- used for patient booking and profession screen only -->
+    <div class="header-text">
+      {{ therapistBookingViewData.therapistName }} ({{ getTherapistDailyBookingNumber() }}) Available -
+      {{ calcTherapistSlotsByMinutes() | minutesToDuration }}
+    </div>
+    <div class="header-right">
+      <div *ngIf="therapistBookingViewData.isUniqueWeek"><img src="../../../assets/backoffice/unique.svg" /></div>
+      <div *ngIf="!viewOnly">
+        <div class="add-button" (click)="toggleDaysMenu()">
+          <img src="../../../assets/backoffice/big_plus.svg" />
+        </div>
+        <app-side-menu *ngIf="showDaysMenu" [options]="getAddButtonMenuOptions()"></app-side-menu>
+      </div>
+    </div>
+  </div>
+  <div *ngFor="let dayData of therapistBookingViewData.dailyBookingViewData; index as i" class="day-container">
+    <div class="day">
+      <div class="day-circle">
+        <div class="day-circle-text">
+          {{ getDayDate(dayData.day) }}
+        </div>
+      </div>
+      <div class="day-text">
+        {{ dayData.day | day }}
+      </div>
+    </div>
+    <div class="day-details">
+      <div *ngFor="let slot of allSlots[i]" class="slot">
+        <ng-container ngSwitch="{{ slot.type }}">
+          <ng-container *ngSwitchCase="slotType.availability">
+            <div class="slot-time available">
+              <div class="slot-time-text">{{ slot.time | time }} - {{ slot.time | time : slot.duration }}</div>
+            </div>
+            <div
+              class="slot-description"
+              (click)="onActionSubmit(this.availabilityClickActionType, dayData.day, slot.time)"
+            >
+              <div class="slot-description-text">Available</div>
+            </div>
+          </ng-container>
+          <ng-container *ngSwitchDefault>
+            <div
+              class="slot-time pointer clickable-slot-time"
+              [ngClass]="getSubscriptionClass(slot, dayData.therapistsBooking)"
+              (click)="openModifySessionModal(this.bookingTimeClickActionType, slot)"
+            >
+              <div
+                [class.not-available]="!isBookingInsideAvailability(slot, dayData.offeringAvailability)"
+                class="slot-time-text"
+              >
+                {{ slot.time | time }} - {{ slot.time | time : slot.duration }}
+              </div>
+            </div>
+            <div
+              class="slot-description slot-description-detailed"
+              (click)="onActionSubmit(this.bookingClickActionType, slot.day, slot.time)"
+            >
+              <div>
+                <div class="treatment-name">{{ slot.treatmentName }}</div>
+                <div>{{ isTechIssueBlocking(slot.patientTechIssue) ? '!!' : '' }}{{ slot.patientName }}</div>
+              </div>
+              <div class="phone">{{ slot.phone }}</div>
+            </div>
+          </ng-container>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-container" *ngIf="isModifySessionModalOpen()">
+  <app-generic-modal (closeModal)="closeModifySessionModal()">
+    <div class="modal-content">
+      <div class="title">Modify Session</div>
+      <div class="middle-container">
+        <app-from-to-select
+          #modifySessionSelect
+          [startTime]="bookingStartTime"
+          [endTime]="bookingEndTime"
+        ></app-from-to-select>
+        <div class="week-day" #daySelect [matMenuTriggerFor]="dayMenu" (click)="focusOnDayMenuItem(pickedBookingDay)">
+          {{ pickedBookingDay }}
+        </div>
+        <mat-menu class="shifts-dropbox" #dayMenu="matMenu">
+          <button
+            mat-menu-item
+            #daySelectItems
+            *ngFor="let day of possibleWeekDays; trackBy: trackByIndex"
+            (click)="setBookingDayFromSelect(day)"
+          >
+            {{ day }}
+          </button>
+        </mat-menu>
+      </div>
+      <div class="actions">
+        <div class="button delete" (click)="deletePickedBooking()">Delete</div>
+        <div class="right-side">
+          <button class="button" (click)="closeModifySessionModal()">Cancel</button>
+          <button class="button ok" (click)="modifyBooking()">OK</button>
+        </div>
+      </div>
+    </div>
+  </app-generic-modal>
+</div>

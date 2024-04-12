@@ -1,0 +1,25 @@
+sdk explanations
+==================
+every game has the sdk.js file 
+the version number is in method sendSdkVersion
+
+in the future the reability needs to the sdk version and see if it feets and if not - not start the game
+
+
+in reability the file is located under the assets/sdk folder - it is not functional there but just to have acopy in our source
+
+
+upload sdk
+-------------
+1. make the change on an updated sdk file in one of the games
+2. update sdk version number under method send sdk version (put const on top)
+3. replace the sdk file in reability client assets folder with the new one 
+4. on every game update the new sdk 
+5. after that : npm run build
+6. go to s3 in every game and press Upload
+7. choose everything from the dist folder under the relevant subfolder
+
+
+
+
+

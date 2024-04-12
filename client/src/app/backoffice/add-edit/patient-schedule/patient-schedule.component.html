@@ -1,0 +1,59 @@
+<div *ngIf="isMainView; else bookingView" class="container">
+  <app-calendar-header
+    class="header"
+    [loggedInUsername]="editedEntity.patientName"
+    [phone]="editedEntity.phone"
+    [showBack]="true"
+    (goBack)="backClicked()"
+    [dateToDisplay]="headerDateString"
+    (weekChangeEvent)="weekChange($event)"
+  ></app-calendar-header>
+
+  <div class="main">
+    <div class="prescriptions">
+      <div class="prescriptions-header">
+        <div>Patient appointments</div>
+        <div>{{ totalBooked }}/{{ totalTimesPerWeek }}</div>
+      </div>
+      <div class="prescriptions-data">
+        <div
+          *ngFor="let treatment of treatments; let i = index; trackBy: trackByExpertise"
+          class="prescription-data-item"
+        >
+          <div class="data-index">{{ i + 1 }}</div>
+          <div
+            class="prescription-details"
+            [class.disabled]="isFullyBooked(treatment)"
+            (click)="showBookingView(treatment)"
+          >
+            <div class="prescription-data-item-first-line">{{ treatment.expertiseName }}</div>
+            <div class="prescription-data-item-second-line">
+              <div>{{ treatment.duration }} minutes</div>
+              <div>{{ treatment.booked }}/{{ treatment.timesPerWeek }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <app-calendar
+      class="calendar"
+      [dayOfWeekToShow]="currentDate"
+      [patientBookingDetails]="patientBooking"
+      (deleteBooking)="onDeleteBooking($event)"
+    ></app-calendar>
+  </div>
+</div>
+
+<ng-template #bookingView>
+  <app-patient-booking
+    [editedEntity]="editedEntity"
+    [patientBooking]="editedEntity.patientBooking"
+    (goBack)="showSchedularView()"
+    [currentDate]="currentDate"
+    [expertise]="currentExpertise"
+    [dateToDisplay]="headerDateString"
+    (createBooking)="onCreateBooking($event)"
+    (weekChangeEvent)="weekChange($event, true)"
+  ></app-patient-booking>
+</ng-template>

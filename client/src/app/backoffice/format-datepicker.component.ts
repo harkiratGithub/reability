@@ -1,0 +1,26 @@
+import { MatDateFormats, NativeDateAdapter } from '@angular/material/core';
+import { padStart } from 'lodash';
+
+export class AppDateAdapter extends NativeDateAdapter {
+  format(date: Date, displayFormat: Object): string {
+    if (displayFormat !== 'input') {
+      return date.toDateString().replace(/^\S+\s/,'');
+    }
+    const day = padStart(date.getDate().toString(), 2, '0');
+    const month = padStart((date.getMonth() + 1).toString(), 2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  }
+}
+
+export const APP_DATE_FORMATS: MatDateFormats = {
+  parse: {
+    dateInput: { month: 'short', year: 'numeric', day: 'numeric' },
+  },
+  display: {
+    dateInput: 'input',
+    monthYearLabel: { year: 'numeric', month: 'numeric' },
+    dateA11yLabel: { year: 'numeric', month: 'long', day: 'numeric' },
+    monthYearA11yLabel: { year: 'numeric', month: 'long' },
+  },
+};

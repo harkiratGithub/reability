@@ -1,0 +1,18 @@
+<div class="side-bar-full-screen-mode">
+  <div (click)="onLeaveFullScreenMode()" class="full-screen-header">
+    {{currentUserInFullScreenMode.user.firstName}} {{currentUserInFullScreenMode.user.lastName}}
+  </div>
+  <div class="web-cams-container">
+    <div class="webcam-single-container" *ngFor="let therapistPatientConnection of videoSessionComponents"
+      (click)="selectCurrentUserInFullScreen(therapistPatientConnection);$event.stopPropagation();$event.preventDefault()">
+      <div class="webcam-full-screen-header">
+        {{therapistPatientConnection.user.firstName}} {{therapistPatientConnection.user.lastName}}
+      </div>
+      <app-therapist-web-rtc-video [therapistPatientConnection]="therapistPatientConnection.connection"
+        [activeCallStream]="getCurrentStream(therapistPatientConnection.connection.peer)"
+        [localStream]="getLocalStream(therapistPatientConnection.connection.peer)" [isInWebcamContainer]="true"
+        [isDisabledSkeletonVideo]="therapistPatientConnection.user.disabledSkeleton" [volume]="therapistPatientConnection.volume">
+      </app-therapist-web-rtc-video>
+    </div>
+  </div>
+</div>

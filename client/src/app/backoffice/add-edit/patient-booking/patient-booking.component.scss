@@ -1,0 +1,262 @@
+$ELEMENT-MARGIN: 0 8px;
+
+.main-container {
+  font-family: Roboto;
+  color: #113266;
+  font-size: 14px;
+  letter-spacing: 0;
+  line-height: 19px;
+  margin-right: 15px;
+
+  .header {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 56px;
+    margin-left: 0px;
+    padding-left: 20px;
+    padding-right: 20px;
+    color: #26435b;
+    background-color: #f4f8f9;
+    line-height: 21px;
+    font-weight: 500;
+    font-family: Roboto;
+    font-size: 16px;
+    text-transform: capitalize;
+    z-index: 2;
+
+    .left {
+      display: flex;
+      justify-content: flex-start;
+      flex: 1;
+      cursor: pointer;
+    }
+
+    .middle {
+      display: flex;
+      justify-content: center;
+      flex: 1;
+    }
+
+    .right {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 10px;
+      flex: 1;
+
+      .day {
+        height: 33px;
+        width: 78px;
+        line-height: 33px;
+        margin: $ELEMENT-MARGIN;
+        border: 1px solid #9eb2c2;
+        border-radius: 16px;
+        text-align: center;
+        cursor: pointer;
+        &:hover {
+          border: 0;
+          color: 0091ff;
+          background-color: rgba(0, 145, 255, 0.08);
+        }
+      }
+
+      .navigation {
+        display: flex;
+        align-items: center;
+        height: 24px;
+        margin: $ELEMENT-MARGIN;
+
+        button {
+          display: flex;
+          margin: $ELEMENT-MARGIN;
+          cursor: pointer;
+          border: none;
+          background-color: inherit;
+        }
+      }
+    }
+
+    .left-arrow-img {
+      margin-right: 10px;
+    }
+
+    .right-arrow-img {
+      margin-left: 10px;
+    }
+  }
+
+  .header-no-therapists {
+    background-color: white;
+  }
+
+  .therapist-name {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 21px;
+  }
+
+  .availability-container {
+    height: 80px;
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+
+  .therapist-availability-item {
+    margin-bottom: 30px;
+  }
+
+  .availability {
+    background-color: #dfeaed;
+    padding: 5px;
+    margin-right: 15px;
+  }
+
+  .hours-container {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .hours {
+    margin: 10px;
+    padding: 6px;
+    height: 32px;
+    opacity: 0.48;
+    border-radius: 4px;
+    background-color: white;
+
+    &:hover {
+      background-color: #cae1e0;
+    }
+
+    &.booked {
+      background-color: #44d7b6;
+    }
+  }
+
+  .appointment-options {
+    position: absolute;
+    height: 150px;
+    width: 350px;
+    border-radius: 4px;
+    background-color: white;
+    box-shadow: 0 24px 48px -8px rgba(17, 50, 102, 0.3);
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, 0);
+    z-index: 1;
+    padding: 20px;
+  }
+
+  .appointment-options-header {
+    font-size: 18px;
+    font-weight: bold;
+  }
+
+  .appointment-options-details {
+    font-size: 16px;
+    line-height: 21px;
+    margin-top: 20px;
+  }
+
+  .appointment-repeat {
+    display: flex;
+  }
+
+  .appointment-repeat-item {
+    margin-right: 10px;
+  }
+
+  .appointment-buttons {
+    display: flex;
+    justify-content: flex-start;
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+  }
+
+  .appointment-button {
+    height: 21px;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 21px;
+    margin-right: 20px;
+    border-radius: 20px;
+
+    &.ok-button {
+      color: #0091ff;
+    }
+  }
+}
+
+.hour-range {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 148px;
+  height: 30px;
+  margin: 15px 0;
+  border-radius: 4px;
+  border: 1px solid #44d7b6;
+
+  .appointment-time {
+    width: 58px;
+    padding: 10px;
+    cursor: pointer;
+    &:hover {
+      color: #0091ff;
+    }
+  }
+
+  .appointment-end-time {
+    width: 58px;
+    padding: 10px;
+  }
+}
+
+.patient-booking-details {
+  margin-top: 30px;
+  margin-left: 10px;
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+.treatments {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-box;
+  display: box;
+  height: 100vh;
+  margin-top: 50px;
+
+  .treatment {
+    margin-left: 50px;
+    margin-bottom: 20px;
+  }
+}
+
+.add-button {
+  background-color: #f4f7f7;
+  display: flex;
+  align-items: center;
+  height: 40px;
+  margin-left: 20px;
+  padding: 10px;
+  cursor: pointer;
+
+  .add-button-text {
+    color: #113266;
+    font-size: 14px;
+    letter-spacing: 0;
+    line-height: 16px;
+    margin-left: 3px;
+  }
+}
+
+.details-container {
+  height: calc(100vh - 150px);
+  overflow-x: scroll;
+}

@@ -1,0 +1,51 @@
+.main-menu-container {
+  height: calc(100vh);
+  width: calc(100vw);
+  background: linear-gradient(
+    270.06deg,
+    #385f7c 100%,
+    #294259 100.67%,
+    #272545 100%
+  );
+}
+
+.header {
+  height: 20%;
+  padding-left: 3rem;
+  padding-top: 1rem;
+  display: flex;
+  align-items: flex-start;
+}
+
+.middle-container {
+  height: 60%;
+  .login-div {
+    position: absolute;
+    box-sizing: border-box;
+    width: 420px;
+    border-radius: 0.625rem;
+    padding: 50px;
+    font-weight: 600;
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 5px 15px 8px rgba(33, 63, 90, 0.47);
+    background-color: #406382;
+
+    .login-header {
+      font-size: 30px;
+      line-height: 49px;
+      margin-bottom: 40px;
+      text-align: center;
+      color: #00da67;
+      font-family: "Roboto medium";
+    }
+  }
+  .not-valid-token {
+    color: #ed605c;
+    font-size: 18px;
+    line-height: 40px;
+  }
+}

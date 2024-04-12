@@ -1,0 +1,36 @@
+.side-bar-full-screen-mode {
+  height: 90%;
+  .web-cams-container {
+    display: flex;
+    flex-direction: column;
+    height: 90%;
+    .webcam-single-container {
+      margin-bottom: 10%;
+      height: 33%;
+      .webcam-full-screen-header {
+        text-align: start;
+        text-transform: capitalize;
+        padding-left: 15px;
+        margin-bottom: 5px;
+        color: #f3f8f9;
+      }
+    }
+  }
+  .full-screen-header {
+    height: 5%;
+    width: 100%;
+    text-align: start;
+    padding-left: 40px;
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: 0.25px;
+    margin-top: 10%;
+    margin-bottom: 20%;
+    text-transform: capitalize;
+    color: #84caf3;
+    background-image: url("../../../../assets/therapist/icon_go_back.svg");
+    background-repeat: no-repeat;
+    background-size: 18px;
+    background-position-x: 18px;
+  }
+}
