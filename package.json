@@ -10,6 +10,7 @@
 		"start": "ts-node server/server.ts",
 		"start:development": "npm run build:develop --prefix client && NODE_ENV=development nodemon",
 		"start:client": "npm run start:dev --prefix client",
+		"start:production": "npm run build:develop --prefix client && nodemon",
 		"start:server": "NODE_ENV=development nodemon",
 		"migrate:create": "node-pg-migrate -m server/migrations create",
 		"migrate:run": "node-pg-migrate -m server/migrations up",
