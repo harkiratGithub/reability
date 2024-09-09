@@ -1,3 +1,4 @@
+require('newrelic');
 import dotenv from 'dotenv';
 import rootpath from 'rootpath';
 
