@@ -13,7 +13,7 @@ export const environment = {
   port: 8080,
   signalingServerUrl: `https://${MY_IP}:3001`,
   signalingServer: MY_IP,
-  signalingServerPort: 3000,
+  signalingServerPort: 3001,
   serverUrl: `https://${MY_IP}:8080`,
   secretKey: 'gertner-little-secret',
   recaptchaKey: '6Lc8yKspAAAAAAQ6ItzKFYZ-uJ5GG2PdWGtHZwhM',

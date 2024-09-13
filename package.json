@@ -8,7 +8,7 @@
 		"heroku-postbuild": "npm run config-angular && cd client && npm install && npm run postinstall-peerjs && npm run build",
 		"config-angular": "ts-node ./server/tasks/config-env.ts",
 		"start": "ts-node server/server.ts",
-		"start:development": "npm run build:develop --prefix client && NODE_ENV=development nodemon",
+		"start:development": "npm run build:develop --prefix client && NODE_ENV=development NEW_RELIC_APP_NAME=Reability NEW_RELIC_LICENSE_KEY=50e685627e91e135f966fd5fa02f2ddbFFFFNRAL nodemon --experimental-loader=newrelic/esm-loader.mjs ./server/server.ts",
 		"start:client": "npm run start:dev --prefix client",
 		"start:production": "npm run build:develop --prefix client && nodemon",
 		"start:server": "NODE_ENV=development nodemon",
