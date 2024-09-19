@@ -84,7 +84,6 @@ export const endGameSession = async (userId, gameSummary) => {
 };
 
 export const feedbackGameSession = async (userId, gameFeedback) => {
-	console.log(userId, gameFeedback, "Feedback Game Session");
 	try {
 		const lastGameSession = await GameSessionHelper.getLastGameSession(userId);
 		const gameFeedbackJsonString = JSON.stringify(gameFeedback);

@@ -298,6 +298,8 @@ export const getPatientRelevantSessions = async (patientIds: number[], startTime
 		.field('start_time')
 		.field(`(${TABLE_NAME.GAME_SESSION}.end_time - ${TABLE_NAME.GAME_SESSION}.start_time) as duration`)
 		.field(`${TABLE_NAME.GAME_SESSION}.game_id`)
+		.field(`${TABLE_NAME.GAME_SESSION}.game_summary`) 
+        .field(`${TABLE_NAME.GAME_SESSION}.session_feedback`)
 		.field('therapist_session_id')
 		.from(TABLE_NAME.GAME_SESSION)
 		.where(

@@ -336,3 +336,9 @@ export interface FeedbackQuestion {
   type: 'checkbox' | 'text' | 'radio';
   options?: FeedbackOption[];
 }
+
+export interface IPatientLog {
+  gameName?: string;
+  duration?: string;
+  gameSummary?: any;
+}
