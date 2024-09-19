@@ -16,6 +16,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { AppActions } from 'src/app/app.actions';
 import { ScoreType } from 'src/constants';
 import { MenuOptionsAppActions } from 'src/app/patient/components/menu-options/menu-options.actions';
+import { FeedbackFormComponent } from '../feedback-form/feedback-form.component';
 
 @Component({
   selector: 'app-game-wrapper',
@@ -689,7 +690,22 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
     if (this.dialogRef) {
       this.dialogRef.close();
       this.dialogRef = null;
+      
     }
+    if(this.dialogRef == null ){
+      this.dialogRef = this.dialog.open(FeedbackFormComponent, {
+        hasBackdrop: true,
+        id: this.peerId,
+        data: {
+          isSwappedScreen: this.isSwappedScreen,
+          isSplitScreen: this.isInSplitScreen,
+          has_backdrop: false,
+          isTherapist:this.isTherapist,
+        },
+      });
+  
+    }
+    
   }
 
   handleMediaStreamToIFrameSettingsChange = (settings) => {

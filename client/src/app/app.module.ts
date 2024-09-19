@@ -14,6 +14,7 @@ import { AdminComponent } from './therapist/adminPage/therapist.component';
 import { LoginPageComponent } from './common/password-routes/login/login.component';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
@@ -126,6 +127,7 @@ import { FileUploaderComponent } from './backoffice/file-uploader/file-uploader.
 import { GameLogsComponent } from './patient/components/game-logs/game-logs.component';
 import { ExportToExcelComponent } from './backoffice/export-to-excel/export-to-excel.component';
 import { PatientGeneralModalComponent } from './common/patient-general-modal/patient_general_modal.component';
+import { FeedbackFormComponent } from './patient/components/feedback-form/feedback-form.component';
 
 export const CUSTOM_MOMENT_FORMATS = {
   parse: {
@@ -213,6 +215,7 @@ export const CUSTOM_MOMENT_FORMATS = {
     GameLogsComponent,
     ExportToExcelComponent,
     PatientGeneralModalComponent,
+    FeedbackFormComponent,
   ],
   imports: [
     RouterModule.forRoot(routes, { useHash: true }),
@@ -220,6 +223,7 @@ export const CUSTOM_MOMENT_FORMATS = {
     NgReduxModule,
     NgReduxRouterModule.forRoot(),
     MatDialogModule,
+    MatIconModule,
     MatTabsModule,
     MatSlideToggleModule,
     FormsModule,
@@ -273,6 +277,7 @@ export const CUSTOM_MOMENT_FORMATS = {
     ModalComponent,
     ConfiguratorModalComponent,
     PatientGeneralModalComponent,
+    FeedbackFormComponent,
   ],
 })
 export class AppModule {

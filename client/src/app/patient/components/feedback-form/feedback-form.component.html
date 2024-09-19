@@ -1,0 +1,43 @@
+<div class="custom-modal">
+  <div class="custom-modal-header">
+    <h2>Give Feedback</h2>
+    <button mat-icon-button (click)="closeDialog()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  <div class="custom-modal-body">
+    <div class="carousel">
+      <div class="question-container">
+        <p class="question">{{ currentQuestion.question }}</p>
+        <div *ngIf="currentQuestion.type === 'radio'" class="answer-container">
+          <mat-radio-group [(ngModel)]="answers[currentQuestion.id]" name="{{ currentQuestion.question }}">
+            <div *ngFor="let option of currentQuestion.options" class="option-container">
+              <mat-radio-button class="custom-radio" [value]="option.value"></mat-radio-button>
+              <label>{{ option.label }}</label>
+            </div>
+          </mat-radio-group>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="custom-modal-footer">
+    <button mat-raised-button (click)="prevQuestion()" [disabled]="currentIndex === 0">
+      <mat-icon>navigate_before</mat-icon>
+      Previous
+    </button>
+    
+    <button mat-raised-button (click)="skipQuestion()" *ngIf="currentIndex < questions.length - 1">
+      Skip
+      <mat-icon>skip_next</mat-icon>
+    </button>
+
+    <button mat-raised-button (click)="nextQuestion()" *ngIf="currentIndex < questions.length - 1" [disabled]="!answers[currentQuestion.id]">
+      Next
+      <mat-icon>navigate_next</mat-icon>
+    </button>
+
+    <button mat-raised-button color="primary" (click)="submitFeedback()" *ngIf="currentIndex === questions.length - 1" [disabled]="!isFormValid()">
+      Submit
+    </button>
+  </div>
+</div>

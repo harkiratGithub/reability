@@ -274,6 +274,16 @@ export class AjaxService {
     }
   };
 
+  updateGameFeedback = (gameFeedback) => {
+    try {
+      return this.http.post<any>(`${this.baseUrl}/patient/gameSession/updateSession`, {
+        gameFeedback,
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   saveGameSettings = (gameId, settings) => {
     try {
       this.http

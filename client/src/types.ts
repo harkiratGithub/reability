@@ -324,3 +324,15 @@ export interface IGameData {
   active: boolean;
   target_answer: any;
 }
+
+export interface FeedbackOption {
+  value: string;
+  label: string;
+}
+
+export interface FeedbackQuestion {
+  id: number;
+  question: string;
+  type: 'checkbox' | 'text' | 'radio';
+  options?: FeedbackOption[];
+}

@@ -82,3 +82,17 @@ export const endGameSession = async (userId, gameSummary) => {
 		throw err;
 	}
 };
+
+export const feedbackGameSession = async (userId, gameFeedback) => {
+	console.log(userId, gameFeedback, "Feedback Game Session");
+	try {
+		const lastGameSession = await GameSessionHelper.getLastGameSession(userId);
+		const gameFeedbackJsonString = JSON.stringify(gameFeedback);
+		await GameSessionHelper.updateSessionGame(lastGameSession.id, {
+			game_id: lastGameSession.game_id,
+			session_feedback: gameFeedbackJsonString,
+		});
+	} catch (err) {
+		throw err;
+	}
+};

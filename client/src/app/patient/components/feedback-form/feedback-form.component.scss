@@ -1,0 +1,89 @@
+.custom-modal {
+  width: 600px;
+  max-width: 100%;
+  background-color: #fff;
+  border-radius: 6px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  margin: auto;
+}
+
+.custom-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #dee2e6;
+  padding-bottom: 10px;
+}
+
+.custom-modal-header h2 {
+  margin: 0;
+}
+
+.custom-modal-body {
+  padding: 20px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.carousel {
+  // display: flex;
+  // flex-direction: column;
+  // align-items: center;
+}
+
+.question-container .question {
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 15px;
+}
+
+.answer-container {
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  padding: 15px;
+  background-color: #f8f9fa;
+}
+
+.option-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 10px;
+  width: 100%;
+  background-color: white;
+}
+
+.option-container label {
+  font-size: 16px;
+  margin-left: 10px;
+  flex-grow: 1;
+}
+
+.custom-radio .mat-radio-outer-circle {
+  border-radius: 50%;
+}
+
+.custom-radio .mat-radio-button {
+  margin-right: 10px;
+}
+
+.mat-dialog-container {
+  background-color: rgba(0, 0, 0, 0.5); /* Dark overlay */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.custom-modal-footer {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 10px;
+  border-top: 1px solid #dee2e6;
+}
