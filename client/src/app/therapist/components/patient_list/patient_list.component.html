@@ -155,8 +155,10 @@
                     <div class="session-feedback">
                       <h4>Session Feedback:</h4>
                       <div class="session-feedback-que" *ngFor="let question of game?.sessionFeedback?.questions">
-                        <label>{{ question?.question }}</label>
-                        <span>{{ question?.answer || 'No answer provided' }}</span>
+                        <div *ngIf="question?.answer !== 'skipped'">
+                          <label>{{ question?.question }}</label>
+                          <span>{{ question?.answer || 'No answer provided' }}</span>
+                        </div>
                       </div>
                     </div>
                   </ng-container>

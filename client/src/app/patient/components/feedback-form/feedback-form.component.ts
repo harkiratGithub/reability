@@ -1,7 +1,5 @@
-import { Component, Inject, Input, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { ModalComponent } from 'src/app/common/modal/modal.component';
+import { Component, Inject, OnInit } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FeedbackQuestion } from 'src/types';
 import { feedbackQuestions } from '../../utils/utils';
 import { AjaxService } from 'src/app/therapist/services/ajax.service';
@@ -12,17 +10,23 @@ import { AjaxService } from 'src/app/therapist/services/ajax.service';
   styleUrls: ['./feedback-form.component.scss'],
 })
 export class FeedbackFormComponent implements OnInit {
-  @Input() isTherapist = false;
-  @Input() isInSplitScreen = false;
-  @Input() peerId;
-  questions: FeedbackQuestion[] = [];
   currentIndex = 0;
-  answers: { [id: number]: string } = {};
+  hoverValue: number = 0;
+  questions: FeedbackQuestion[] = [];
+  answers: { [key: number]: number | 'skipped' | null } = {};
+  ratingValue: number | null = null;
 
   constructor(public dialogRef: MatDialogRef<FeedbackFormComponent>, private ajax: AjaxService) {}
+
   ngOnInit(): void {
-    this.questions = this.getRandomQuestions(feedbackQuestions, 5);
+    const nonRatingQuestions = feedbackQuestions.filter((q) => q.questionType !== 'rating');
+    this.questions = this.getRandomQuestions(nonRatingQuestions, 4);
+    const ratingQuestion = feedbackQuestions.find((q) => q.questionType === 'rating');
+    if (ratingQuestion) {
+      this.questions.push(ratingQuestion);
+    }
   }
+
   getRandomQuestions(questions: FeedbackQuestion[], num: number): FeedbackQuestion[] {
     const shuffledQuestions = questions.map((q) => ({ ...q })).sort(() => 0.5 - Math.random());
     return shuffledQuestions.slice(0, num);
@@ -43,20 +47,29 @@ export class FeedbackFormComponent implements OnInit {
       this.currentIndex--;
     }
   }
-
-  skipQuestion(): void {
-    this.answers[this.currentQuestion.id] = 'skipped'; 
-    this.nextQuestion();
+  selectRating(value: number): void {
+    this.answers[this.currentQuestion.id] = value;
+    this.hoverValue = null;
   }
 
+  skipQuestion(): void {
+    this.answers[this.currentQuestion.id] = null;
+    if (this.currentIndex === this.questions.length - 1 && this.currentQuestion.questionType === 'rating') {
+      this.submitFeedback();
+      this.closeDialog();
+    } else {
+      this.nextQuestion();
+    }
+  }
 
   submitFeedback(): void {
     const feedbackData = {
-      questions: this.questions.map((q) => ({
+      questions: this.questions?.map((q) => ({
         id: q.id,
         question: q.question,
         type: q.type,
-        answer: this.answers[q.id] || '',
+        questionType: q.questionType,
+        answer: this.answers[q.id] || 'skipped',
       })),
     };
     this.saveFeedback(feedbackData);
@@ -70,4 +83,17 @@ export class FeedbackFormComponent implements OnInit {
   closeDialog() {
     this.dialogRef.close();
   }
+
+
+  isFormValid(): boolean {
+    return this.questions.every((q) => {
+      const answer = this.answers[q.id];
+      if (q.questionType === 'rating') {
+        return typeof answer === 'number' && answer !== null;
+      }
+      return answer !== null && (typeof answer === 'number' || answer === 'skipped');
+    });
+  }
+  
+  
 }

@@ -326,14 +326,15 @@ export interface IGameData {
 }
 
 export interface FeedbackOption {
-  value: string;
+  value: string | number;
   label: string;
 }
 
 export interface FeedbackQuestion {
   id: number;
   question: string;
-  type: 'checkbox' | 'text' | 'radio';
+  questionType?: string;
+  type: 'checkbox' | 'text' | 'radio' | 'rating';
   options?: FeedbackOption[];
 }
 
