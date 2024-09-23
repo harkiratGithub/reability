@@ -53,7 +53,6 @@
       <mat-icon>navigate_before</mat-icon>
       Previous
     </button>
-  
     <button
       mat-raised-button
       *ngIf="currentIndex === questions.length - 1 && currentQuestion.question_type === 'rating'"
@@ -62,7 +61,6 @@
       Skip
       <mat-icon>skip_next</mat-icon>
     </button>
-  
     <button
       mat-raised-button
       *ngIf="currentIndex < questions.length - 1"
@@ -72,10 +70,10 @@
       Next
       <mat-icon>navigate_next</mat-icon>
     </button>
-  
     <button
       mat-raised-button
       color="primary"
+      [disabled]="!isFormValid()"
       (click)="submitFeedback()"
       *ngIf="currentIndex === questions.length - 1 && currentQuestion.question_type === 'rating'"
     >

@@ -14,7 +14,6 @@ export class FeedbackFormComponent implements OnInit {
   hoverValue: number = 0;
   questions: FeedbackQuestion[] = [];
   answers: { [key: number]: number | 'skipped' | null } = {};
-  ratingValue: number | null = null;
 
   constructor(public dialogRef: MatDialogRef<FeedbackFormComponent>, private ajax: AjaxService) {}
 
@@ -97,24 +96,24 @@ export class FeedbackFormComponent implements OnInit {
   }
 
   saveFeedback(feedbackData: any): void {
-    this.ajax.updateGameFeedback(feedbackData).subscribe(() => {});
-    this.closeDialog();
+
+    this.ajax.updateGameFeedback(feedbackData).subscribe((res) => {
+      console.log('Feedback submitted successfully', res);
+      this.closeDialog();
+    }, (err) => {
+      console.error('Error submitting feedback', err);
+      this.closeDialog();
+
+    });
+        
   }
 
   closeDialog() {
     this.dialogRef.close();
   }
 
-
-  isFormValid(): boolean {
-    return this.questions.every((q) => {
-      const answer = this.answers[q.id];
-      if (q.question_type === 'rating') {
-        return typeof answer === 'number' && answer !== null;
-      }
-      return answer !== null && (typeof answer === 'number' || answer === 'skipped');
-    });
+  isFormValid(){
+    const answerValues = Object.values(this.answers) as (number | null)[];
+    return answerValues.length === this?.questions?.length;
   }
-  
-  
 }
