@@ -122,7 +122,7 @@
                 <div *ngFor="let game of patientLog" class="game-info">
                   <div class="game-name">
                     <label>Game Name:</label>
-                    <span>{{ game?.gameName || 'No Game Name' }}</span>
+                    <span>{{ game?.gameName || 'No Game Name'  | titlecase  }}</span>
                   </div>
 
                   <div class="game-duration">
