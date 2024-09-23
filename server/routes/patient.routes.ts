@@ -30,5 +30,6 @@ router.get('/userGameData/get/:gameId/:userId', UserGameDataController.getUserGa
 router.put('/userGameData/delete', UserGameDataController.deleteUserGameData);
 
 router.post('/addServerLog', ServerLogController.sendLogToServer);
+router.get('/feedback/questions', PatientController.getFeedbackQuestions);
 
 export default router;

@@ -332,8 +332,9 @@ export interface FeedbackOption {
 
 export interface FeedbackQuestion {
   id: number;
+  created_at: string;
   question: string;
-  questionType?: string;
+  question_type?: string;
   type: 'checkbox' | 'text' | 'radio' | 'rating';
   options?: FeedbackOption[];
 }

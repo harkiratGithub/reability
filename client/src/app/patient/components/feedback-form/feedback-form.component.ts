@@ -1,7 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FeedbackQuestion } from 'src/types';
-import { feedbackQuestions } from '../../utils/utils';
+// import { feedbackQuestions } from '../../utils/utils';
 import { AjaxService } from 'src/app/therapist/services/ajax.service';
 
 @Component({
@@ -19,12 +19,33 @@ export class FeedbackFormComponent implements OnInit {
   constructor(public dialogRef: MatDialogRef<FeedbackFormComponent>, private ajax: AjaxService) {}
 
   ngOnInit(): void {
-    const nonRatingQuestions = feedbackQuestions.filter((q) => q.questionType !== 'rating');
-    this.questions = this.getRandomQuestions(nonRatingQuestions, 4);
-    const ratingQuestion = feedbackQuestions.find((q) => q.questionType === 'rating');
-    if (ratingQuestion) {
-      this.questions.push(ratingQuestion);
-    }
+    // const nonRatingQuestions = feedbackQuestions.filter((q) => q.question_type !== 'rating');
+    // this.questions = this.getRandomQuestions(nonRatingQuestions, 4);
+    // const ratingQuestion = feedbackQuestions.find((q) => q.question_type === 'rating');
+    // if (ratingQuestion) {
+    //   this.questions.push(ratingQuestion);
+    // }
+
+    this.loadFeedbackQuestions();
+  }
+
+  loadFeedbackQuestions(): void {
+    this.ajax.getFeedbackQuestions().subscribe(
+      (response: FeedbackQuestion[]) => {
+        console.log("the response::", response);
+        
+        const nonRatingQuestions = response.filter((q) => q.question_type !== 'rating');
+        this.questions = this.getRandomQuestions(nonRatingQuestions, 4);
+
+        const ratingQuestion = response.find((q) => q.question_type === 'rating');
+        if (ratingQuestion) {
+          this.questions.push(ratingQuestion);
+        }
+      },
+      (error) => {
+        console.error('Error fetching feedback questions', error);
+      }
+    );
   }
 
   getRandomQuestions(questions: FeedbackQuestion[], num: number): FeedbackQuestion[] {
@@ -54,7 +75,7 @@ export class FeedbackFormComponent implements OnInit {
 
   skipQuestion(): void {
     this.answers[this.currentQuestion.id] = null;
-    if (this.currentIndex === this.questions.length - 1 && this.currentQuestion.questionType === 'rating') {
+    if (this.currentIndex === this.questions.length - 1 && this.currentQuestion.question_type === 'rating') {
       this.submitFeedback();
       this.closeDialog();
     } else {
@@ -68,7 +89,7 @@ export class FeedbackFormComponent implements OnInit {
         id: q.id,
         question: q.question,
         type: q.type,
-        questionType: q.questionType,
+        question_type: q.question_type,
         answer: this.answers[q.id] || 'skipped',
       })),
     };
@@ -88,7 +109,7 @@ export class FeedbackFormComponent implements OnInit {
   isFormValid(): boolean {
     return this.questions.every((q) => {
       const answer = this.answers[q.id];
-      if (q.questionType === 'rating') {
+      if (q.question_type === 'rating') {
         return typeof answer === 'number' && answer !== null;
       }
       return answer !== null && (typeof answer === 'number' || answer === 'skipped');

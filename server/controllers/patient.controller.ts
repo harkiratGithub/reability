@@ -11,6 +11,7 @@ import * as LeadHelper from '../helpers/lead.helper';
 import * as PatientTreatmentHelper from '../helpers/patient-treatment.helper';
 import * as BookingHelper from '../helpers/booking.helper';
 import * as UserHelper from '../helpers/users.helper';
+import * as FeedbackHelper from '../helpers/feedback.helper';
 
 export interface IPatientContact {
 	patient_id: number;
@@ -230,5 +231,16 @@ export const activatePatient = (req, res, next) => {
 	const { patientId } = req.body;
 	PatientHelper.activatePatient(patientId)
 		.then((patient) => res.json(patient))
+		.catch((err) => next(err));
+};
+
+export const getFeedbackQuestions = (req: Request, res: Response, next: NextFunction) => {
+	FeedbackHelper.getFeedbackQuestions()
+		.then((questions) => {
+			if (!questions || questions.length === 0) {
+				return res.status(404).json({ message: 'No feedback questions found.' });
+			}
+			res.json(questions);
+		})
 		.catch((err) => next(err));
 };

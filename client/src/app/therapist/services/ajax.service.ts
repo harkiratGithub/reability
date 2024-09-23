@@ -6,7 +6,7 @@ import _ from 'lodash';
 
 import { environment } from '../../../environments/environment';
 import { User } from '../../common/models/user';
-import { IPatient, ITherapistAvailability, ITreatmentListItem } from '../../../types';
+import { FeedbackQuestion, IPatient, ITherapistAvailability, ITreatmentListItem } from '../../../types';
 
 @Injectable()
 export class AjaxService {
@@ -528,4 +528,8 @@ export class AjaxService {
       console.error(error);
     }
   };
+
+  getFeedbackQuestions(): Observable<FeedbackQuestion[]> {
+    return this.http.get<FeedbackQuestion[]>(`${this.baseUrl}/patient/feedback/questions`);
+  }
 }
