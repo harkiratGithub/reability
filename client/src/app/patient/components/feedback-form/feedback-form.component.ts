@@ -97,12 +97,12 @@ export class FeedbackFormComponent implements OnInit {
     }, (err) => {
       console.error('Error submitting feedback', err);
       this.closeDialog();
-
     });
         
   }
 
   closeDialog() {
+    console.log('Closing feedback');
     this.dialogRef.close();
   }
 
