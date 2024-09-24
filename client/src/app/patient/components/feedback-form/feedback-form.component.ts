@@ -55,8 +55,7 @@ export class FeedbackFormComponent implements OnInit {
         answer: this.answers[q.id] || 'skipped',
       })),
     };
-    console.log(feedbackData, "feedbackData")
-    // this.saveFeedback(feedbackData);
+    this.saveFeedback(feedbackData);
   }
 
   saveFeedback(feedbackData: any): void {
