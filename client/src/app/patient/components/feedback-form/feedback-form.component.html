@@ -8,13 +8,13 @@
   <div class="custom-modal-body">
     <div class="carousel">
       <div class="question-container">
-        <p class="question">{{ currentQuestion.question }}</p>
+        <p class="question">{{ currentQuestion?.question }}</p>
         <div
-          *ngIf="currentQuestion.type === 'radio' && currentQuestion.question_type === 'text'"
+          *ngIf="currentQuestion?.type === 'radio' && currentQuestion?.question_type === 'text'"
           class="answer-container"
         >
-          <mat-radio-group [(ngModel)]="answers[currentQuestion.id]" name="{{ currentQuestion.question }}">
-            <div *ngFor="let option of currentQuestion.options" class="option-container">
+          <mat-radio-group [(ngModel)]="answers[currentQuestion?.id]" name="{{ currentQuestion?.question }}">
+            <div *ngFor="let option of currentQuestion?.options" class="option-container">
               <mat-radio-button class="custom-radio" [value]="option.value"></mat-radio-button>
               <label>{{ option.label }}</label>
             </div>
@@ -23,14 +23,14 @@
       </div>
     </div>
   </div>
-  <div class="rating-container" *ngIf="currentQuestion.question_type === 'rating'">
+  <div class="rating-container" *ngIf="currentQuestion?.question_type === 'rating'">
     <div class="star-container">
-      <mat-radio-group [(ngModel)]="answers[currentQuestion.id]" name="{{ currentQuestion.question }}" required>
-        <div *ngFor="let option of currentQuestion.options" class="star-option">
+      <mat-radio-group [(ngModel)]="answers[currentQuestion?.id]" name="{{ currentQuestion?.question }}" required>
+        <div *ngFor="let option of currentQuestion?.options" class="star-option">
           <mat-radio-button [value]="option.value" class="hidden-radio"></mat-radio-button>
           <span
             class="star"
-            [class.selected]="answers[currentQuestion.id] >= option.value"
+            [class.selected]="answers[currentQuestion?.id] >= option.value"
             [class.hovered]="hoverValue >= option.value"
             (mouseenter)="hoverValue = option.value"
             (mouseleave)="hoverValue = null"
@@ -41,9 +41,9 @@
         </div>
       </mat-radio-group>
     </div>
-    <span *ngIf="answers[currentQuestion.id] && answers[currentQuestion.id] > 0" class="selected-rating">
+    <span *ngIf="answers[currentQuestion?.id] && answers[currentQuestion?.id] > 0" class="selected-rating">
       <span class="rating-text">You rated:</span>
-      <span class="rating-value">{{ answers[currentQuestion.id] }}</span>
+      <span class="rating-value">{{ answers[currentQuestion?.id] }}</span>
       <mat-icon class="rating-icon">star</mat-icon>
     </span>
   </div>
@@ -61,7 +61,7 @@
     <button
       mat-raised-button
       *ngIf="currentIndex < questions.length - 1"
-      [disabled]="!answers[currentQuestion.id]"
+      [disabled]="!answers[currentQuestion?.id]"
       (click)="nextQuestion()"
     >
       Next
@@ -72,7 +72,7 @@
       color="primary"
       [disabled]="!isFormValid()"
       (click)="submitFeedback()"
-      *ngIf="currentIndex === questions.length - 1 && currentQuestion.question_type === 'rating'"
+      *ngIf="currentIndex === questions.length - 1 && currentQuestion?.question_type === 'rating'"
     >
       Submit
     </button>

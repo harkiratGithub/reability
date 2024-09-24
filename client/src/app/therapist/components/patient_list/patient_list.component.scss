@@ -225,7 +225,7 @@
             flex-direction: column;
             gap: 20px;
             max-height: 100%;
-            overflow-y: auto; // Makes the content scrollable
+            overflow-y: auto;
           }
 
           .game-heading {
@@ -269,20 +269,12 @@
               .game-name,
               .game-duration,
               .game-summary,
-              .session-feedback {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 8px;
-
-                &:last-child {
-                  margin-bottom: 0;
-                }
-              }
-
               .no-summary {
                 color: #999;
                 font-style: italic;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
               }
             }
           }
@@ -296,26 +288,56 @@
             align-items: unset;
             text-align: center;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
+            display: flex;
+            justify-content: space-between;
+            // align-items: center;
+            margin-bottom: 8px;
+            &:last-child {
+              margin-bottom: 0;
+            }
+            h4 {
+              margin: 10px 0;
+            }
             .session-feedback-que {
               display: flex;
               margin-top: 10px;
               flex-direction: column;
               justify-content: start;
+              .ques-container {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+                .question {
+                  font-size: 12px;
+                  text-align: left;
+                  flex-grow: 1;
+                }
+                .answer {
+                  font-size: 12px;
+                  text-align: right;
+                  margin-left: 20px;
+                  white-space: nowrap;
+                }
+              }
             }
           }
-
           .total-duration {
-            font-size: 18px;
-            font-weight: bold;
-            text-align: right;
             padding: 15px;
+            display: flex;
+            font-size: 18px;
+            text-align: right;
+            font-weight: bold;
             border-top: 1px solid #ddd;
+            justify-content: space-between;
+            h4 {
+              margin: 0 0;
+            }
           }
 
           .modal-actions {
             display: flex;
-            justify-content: space-between;
+            justify-content: space-around;
             padding-top: 15px;
             border-top: 1px solid #ddd;
 
@@ -328,37 +350,53 @@
               border-radius: 5px;
               cursor: pointer;
               transition: background-color 0.3s ease;
-
               &:hover {
                 background-color: #385f7cf4;
               }
             }
           }
         }
-        
+
         .open-modal-btn {
           border-radius: 50%;
           background-color: #5d9c49;
           cursor: pointer;
         }
         .erase-log-modal {
+          // position: fixed;
+          // top: 20%;
+          // left: 40%;
+          // width: 20%;
+          // height: 20%;
+          // border: 1px solid #385f7c;
+          // z-index: 100;
+          // border-radius: 10px;
+          // background-color: white;
+          // text-align: center;
           position: fixed;
           top: 20%;
-          left: 40%;
-          width: 20%;
-          height: 20%;
-          border: 1px solid #385f7c;
-          z-index: 100;
+          left: 50%;
+          transform: translateX(-50%);
+          background-color: #fff;
           border-radius: 10px;
-          background-color: white;
+          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+          // width: 50%;
           text-align: center;
+          // max-height: 150vh;
+          padding: 30px;
+          overflow: hidden;
+          z-index: 1000;
+        }
+        .modal-btns {
+          display: flex;
+          justify-content: space-between;
         }
         .close-btn {
           cursor: pointer;
           background-color: #4a7091;
-          position: absolute;
-          top: 85%;
-          left: 55%;
+          // position: absolute;
+          // top: 85%;
+          // left: 55%;
           color: white;
           padding: 5px;
           border-radius: 20px;
@@ -369,9 +407,9 @@
         }
         .copy-btn {
           cursor: pointer;
-          position: absolute;
-          top: 85%;
-          left: 35%;
+          // position: absolute;
+          // top: 85%;
+          // left: 35%;
           background-color: #4a7091;
           color: white;
           padding: 5px;
@@ -546,4 +584,79 @@
       }
     }
   }
+
+  .carousel-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .game-info-wrapper {
+    display: flex;
+    overflow: hidden;
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  
+  .game-info {
+    min-width: 100%;
+    transition: transform 0.5s ease;
+    // opacity: 0;
+    display: none !important;
+    pointer-events: none;
+  }
+  
+  .game-info.active-slide {
+    display: flex !important;
+    // opacity: 1;
+    pointer-events: auto;
+  }
+  
+  .carousel-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    width: 100%;
+  }
+  
+  .prev-btn,
+  .next-btn {
+    background-color: #385f7c;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 24px;
+    border-radius: 50%;
+  }
+  
+  .pagination-count {
+    font-size: 16px;
+    font-weight: bold;
+  }
+  
+  .modal-actions {
+    // margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .close-btn,
+  .copy-btn {
+    background-color: #385f7c;
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .total-duration {
+    // margin-top: 20px;
+    font-weight: bold;
+  }
+  
+  
 }

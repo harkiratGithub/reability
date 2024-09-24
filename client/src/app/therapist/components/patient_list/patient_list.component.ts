@@ -17,7 +17,7 @@ import { PeersStatus, PATIENT_LOG_STORAGE_KEY } from '../../../../constants';
 import { ConfiguratorModalComponent } from '../configurator-modal/configurator-modal.component';
 import { ReCaptchaV3Service } from 'ng-recaptcha';
 import { setAudioStreamsToComponent } from '../../../common/utils';
-import { IGame, IPatientLog } from '../../../../types';
+import { IGame } from '../../../../types';
 
 @Component({
   selector: 'app-patient-patient-list-component',
@@ -46,6 +46,8 @@ export class PatientListComponent implements OnInit, OnDestroy {
   shownLogs = {};
   isCopiedToClipboard: boolean = false;
   isLogModalOpen: boolean = false;
+  selectedGame: any = {};
+  selectedGameIndex: number = 0;
 
   constructor(
     private ajax: AjaxService,
@@ -95,6 +97,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
               patient.status = this.peersStatusConst.LOGGED_OUT;
             }
           });
+          console.log('tet', patients, this.patientList);
           this.patientList = this.buildPatientActivities(patients);
           this.patientList.forEach((patient) => {
             patient.log = '';
@@ -106,7 +109,6 @@ export class PatientListComponent implements OnInit, OnDestroy {
             }
           });
           this.patientListGrouped = groupBy(this.patientList, (p) => p.status);
-
           this.patientListFiltered = this.patientList;
         });
       });
@@ -213,11 +215,6 @@ export class PatientListComponent implements OnInit, OnDestroy {
             }
             const gameSummary = a.game_summary;
             const sessionFeedback = a.session_feedback;
-            console.log(
-              `Game: ${game.name}, Duration: ${a.duration}, Summary: ${JSON.stringify(
-                gameSummary
-              )} and FeedBack:: ${JSON.stringify(sessionFeedback)}`
-            );
             const gameName = game ? game.name : a.game_id.toString();
             const gameDuration = acc.gamesDuration.find((gameDuration) => gameDuration.gameName === gameName);
             if (gameDuration) {
@@ -278,6 +275,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
       this.getPatientActivities();
     }, 600000);
   };
+
   getGameIcon = (game) => {
     const currGame = game;
     currGame.path = `/assets/game-icons-patient-list/${game.name}.png`;
@@ -395,26 +393,23 @@ export class PatientListComponent implements OnInit, OnDestroy {
     this.shownLogs[patientId] = true;
     this.selectedPatientId = patientId;
     const selectedPatient = this.patientListFiltered.find((patient) => patient.userId == patientId);
-
     const gameSummaryData: any[] = [];
     const gameNameToLatestGame: { [key: string]: any } = {};
-
-    // Iterate over the lastWeekActivity array
     selectedPatient.lastWeekActivity.forEach((activity: any) => {
-      // Iterate over the gamesDuration array inside each activity
       activity.gamesDuration.forEach((game: any) => {
         const gameKey = game.gameName;
-
         // Always take the latest occurrence of the game (the last entry in this case)
         gameNameToLatestGame[gameKey] = game;
       });
     });
-
     // Convert the object into an array of games
     gameSummaryData.push(...Object.values(gameNameToLatestGame));
     selectedPatient.gameSummaryData = gameSummaryData;
 
+    console.log(this.patientLog, "jf")
     this.patientLog = selectedPatient.gameSummaryData;
+    this.selectedGame = this.patientLog[0];
+    console.log("ghg", this.patientLog)
   };
 
   objectKeys = Object.keys;
@@ -501,4 +496,18 @@ export class PatientListComponent implements OnInit, OnDestroy {
     }
     this.closeEraseLogModal();
   };
+
+  prevGame() {
+    if(this.selectedGameIndex > 0 ){
+      this.selectedGameIndex--;
+      this.selectedGame = this.patientLog[this.selectedGameIndex];
+    }
+  }
+
+  nextGame() {
+    if(this.selectedGameIndex < this.patientLog.length - 1){
+      this.selectedGameIndex++;
+      this.selectedGame = this.patientLog[this.selectedGameIndex];
+    }
+  }
 }

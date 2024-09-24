@@ -24,18 +24,14 @@ export class FeedbackFormComponent implements OnInit {
     // if (ratingQuestion) {
     //   this.questions.push(ratingQuestion);
     // }
-
     this.loadFeedbackQuestions();
   }
 
   loadFeedbackQuestions(): void {
     this.ajax.getFeedbackQuestions().subscribe(
-      (response: FeedbackQuestion[]) => {
-        console.log("the response::", response);
-        
+      (response: FeedbackQuestion[]) => {  
         const nonRatingQuestions = response.filter((q) => q.question_type !== 'rating');
         this.questions = this.getRandomQuestions(nonRatingQuestions, 4);
-
         const ratingQuestion = response.find((q) => q.question_type === 'rating');
         if (ratingQuestion) {
           this.questions.push(ratingQuestion);
@@ -96,9 +92,7 @@ export class FeedbackFormComponent implements OnInit {
   }
 
   saveFeedback(feedbackData: any): void {
-
     this.ajax.updateGameFeedback(feedbackData).subscribe((res) => {
-      console.log('Feedback submitted successfully', res);
       this.closeDialog();
     }, (err) => {
       console.error('Error submitting feedback', err);

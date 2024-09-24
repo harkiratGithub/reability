@@ -99,7 +99,6 @@
           <div class="patient-name" (click)="togglePatientSettingMenu(patient)">
             {{ patient.userName }} - {{ patient.fullName }}
           </div>
-
           <div>
             <button
               class="open-modal-btn"
@@ -110,8 +109,7 @@
               1
             </button>
           </div>
-
-          <div
+          <!-- <div
             *ngIf="isLogModalOpen && patientLog?.length && selectedPatientId == patient.userId"
             class="patient-log-modal"
           >
@@ -155,9 +153,9 @@
                     <div class="session-feedback">
                       <h4>Session Feedback:</h4>
                       <div class="session-feedback-que" *ngFor="let question of game?.sessionFeedback?.questions">
-                        <div *ngIf="question?.answer !== 'skipped'">
-                          <label>{{ question?.question }}</label>
-                          <span>{{ question?.answer || 'No answer provided' }}</span>
+                        <div class="ques-container" *ngIf="question?.answer !== 'skipped'">
+                            <div class="question">{{ question?.question }}</div>
+                            <span class="answer">{{ question?.answer || 'No answer provided' |  titlecase }}</span>
                         </div>
                       </div>
                     </div>
@@ -175,13 +173,91 @@
                 <button (click)="copyToClipboard()" title="copy" class="copy-btn">Copy</button>
               </div>
             </div>
+          </div> -->
+
+          <!-- Game Summary modal implementtion with carousel-->
+          <div
+            *ngIf="isLogModalOpen && patientLog?.length && selectedPatientId == patient.userId"
+            class="patient-log-modal"
+          >
+            <div class="patient-log-content">
+              <h3 class="game-heading">Game Information</h3>
+
+              <div class="carousel-wrapper">
+                <div class="game-info-wrapper">
+                  <div
+                    *ngFor="let game of patientLog"
+                    class="game-info"
+                    [ngClass]="{ 'active-slide': selectedGame?.gameName === game?.gameName }"
+                  >
+                    <div class="game-name">
+                      <label>Game Name:</label>
+                      <span>{{ game?.gameName || 'No Game Name' | titlecase }}</span>
+                    </div>
+
+                    <div class="game-duration">
+                      <label>Game Duration:</label>
+                      <span>{{ game?.duration || 'No Duration' }}</span>
+                    </div>
+
+                    <ng-container *ngIf="game?.gameSummary">
+                      <div class="game-summary" *ngFor="let key of objectKeys(game.gameSummary)">
+                        <label>{{ key | titlecase }}:</label>
+                        <span>
+                          <ng-container *ngIf="isArray(game.gameSummary[key]); else simpleValue">
+                            {{ game.gameSummary[key]?.join(', ') || 'Not Available' }}
+                          </ng-container>
+                          <ng-template #simpleValue>
+                            {{ game.gameSummary[key] !== null ? game.gameSummary[key] : 'Not Available' }}
+                          </ng-template>
+                        </span>
+                      </div>
+                    </ng-container>
+
+                    <ng-container *ngIf="!game?.gameSummary">
+                      <div class="no-summary">
+                        <label>Game Summary:</label>
+                        <span>No Summary Available</span>
+                      </div>
+                    </ng-container>
+
+                    <ng-container *ngIf="game?.sessionFeedback">
+                      <div class="session-feedback">
+                        <h4>Session Feedback:</h4>
+                        <div class="session-feedback-que" *ngFor="let question of game?.sessionFeedback?.questions">
+                          <div class="ques-container" *ngIf="question?.answer !== 'skipped'">
+                            <div class="question">{{ question?.question }}</div>
+                            <span class="answer">{{ question?.answer || 'No answer provided' | titlecase }}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </ng-container>
+                  </div>
+                </div>
+                <div class="carousel-pagination">
+                  <button class="prev-btn" (click)="prevGame()">&#10094;</button>
+                  <span class="pagination-count"> {{ selectedGameIndex + 1 }} / {{ patientLog.length }} </span>
+                  <button class="next-btn" (click)="nextGame()">&#10095;</button>
+                </div>
+              </div>
+              <div class="total-duration">
+                <h4>Total Time Spent on Games:</h4>
+                <span>{{ getTotalDuration(patientLog) || '00:00:00' }}</span>
+              </div>
+              <div class="modal-actions">
+                <button class="close-btn" (click)="closeModal()">Close</button>
+                <button (click)="copyToClipboard()" title="copy" class="copy-btn">Copy</button>
+              </div>
+            </div>
           </div>
 
           <div *ngIf="isCopiedToClipboard" class="erase-log-modal">
             <p>Text was copied</p>
             <p>Do you want to erase log?</p>
-            <button class="close-btn top-up" (click)="closeEraseLogModal()">No</button>
-            <button class="copy-btn top-up" (click)="deletePatientLog()">Yes</button>
+            <div class="modal-btns">
+              <button class="close-btn top-up" (click)="closeEraseLogModal()">No</button>
+              <button class="copy-btn top-up" (click)="deletePatientLog()">Yes</button>
+            </div>
           </div>
         </div>
         <div class="phone">
