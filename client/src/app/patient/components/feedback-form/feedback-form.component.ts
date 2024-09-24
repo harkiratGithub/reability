@@ -10,77 +10,44 @@ import { AjaxService } from 'src/app/therapist/services/ajax.service';
   styleUrls: ['./feedback-form.component.scss'],
 })
 export class FeedbackFormComponent implements OnInit {
-  currentIndex = 0;
-  hoverValue: number = 0;
   questions: FeedbackQuestion[] = [];
-  answers: { [key: number]: number | 'skipped' | null } = {};
+  answers: { [key: number]: number | null } = {};
+  hoverValues: { [key: number]: number | null } = {};
 
   constructor(public dialogRef: MatDialogRef<FeedbackFormComponent>, private ajax: AjaxService) {}
 
   ngOnInit(): void {
-    // const nonRatingQuestions = feedbackQuestions.filter((q) => q.question_type !== 'rating');
-    // this.questions = this.getRandomQuestions(nonRatingQuestions, 4);
-    // const ratingQuestion = feedbackQuestions.find((q) => q.question_type === 'rating');
-    // if (ratingQuestion) {
-    //   this.questions.push(ratingQuestion);
-    // }
     this.loadFeedbackQuestions();
   }
-
   loadFeedbackQuestions(): void {
     this.ajax.getFeedbackQuestions().subscribe(
-      (response: FeedbackQuestion[]) => {  
-        const nonRatingQuestions = response.filter((q) => q.question_type !== 'rating');
-        this.questions = this.getRandomQuestions(nonRatingQuestions, 4);
-        const ratingQuestion = response.find((q) => q.question_type === 'rating');
-        if (ratingQuestion) {
-          this.questions.push(ratingQuestion);
-        }
+      (response: FeedbackQuestion[]) => {
+        this.questions = this.getRandomQuestions(response, 5); 
+        this.questions.forEach((q) => {
+          this.answers[q.id] = null;
+          this.hoverValues[q.id] = null;
+        });
       },
       (error) => {
         console.error('Error fetching feedback questions', error);
       }
     );
   }
+  
 
   getRandomQuestions(questions: FeedbackQuestion[], num: number): FeedbackQuestion[] {
     const shuffledQuestions = questions.map((q) => ({ ...q })).sort(() => 0.5 - Math.random());
     return shuffledQuestions.slice(0, num);
   }
 
-  get currentQuestion(): FeedbackQuestion {
-    return this.questions[this.currentIndex];
-  }
-
-  nextQuestion(): void {
-    if (this.currentIndex < this.questions.length - 1) {
-      this.currentIndex++;
-    }
-  }
-
-  prevQuestion(): void {
-    if (this.currentIndex > 0) {
-      this.currentIndex--;
-    }
-  }
-  selectRating(value: number): void {
-    this.answers[this.currentQuestion.id] = value;
-    this.hoverValue = null;
-  }
-
-  skipQuestion(): void {
-    this.answers[this.currentQuestion.id] = null;
-    if (this.currentIndex === this.questions.length - 1 && this.currentQuestion.question_type === 'rating') {
-      this.submitFeedback();
-      this.closeDialog();
-    } else {
-      this.nextQuestion();
-    }
+  selectRating(questionId: number, value: number): void {
+    this.answers[questionId] = value;
+    this.hoverValues[questionId] = null;
   }
 
   submitFeedback(): void {
     const feedbackData = {
-      questions: this.questions?.map((q) => ({
+      questions: this.questions.map((q) => ({
         id: q.id,
         question: q.question,
         type: q.type,
@@ -88,26 +55,29 @@ export class FeedbackFormComponent implements OnInit {
         answer: this.answers[q.id] || 'skipped',
       })),
     };
-    this.saveFeedback(feedbackData);
+    console.log(feedbackData, "feedbackData")
+    // this.saveFeedback(feedbackData);
   }
 
   saveFeedback(feedbackData: any): void {
-    this.ajax.updateGameFeedback(feedbackData).subscribe((res) => {
-      this.closeDialog();
-    }, (err) => {
-      console.error('Error submitting feedback', err);
-      this.closeDialog();
-    });
-        
+    this.ajax.updateGameFeedback(feedbackData).subscribe(
+      (res) => {
+        this.closeDialog();
+      },
+      (err) => {
+        console.error('Error submitting feedback', err);
+        this.closeDialog();
+      }
+    );
   }
 
-  closeDialog() {
-    console.log('Closing feedback');
+  closeDialog(): void {
     this.dialogRef.close();
   }
 
-  isFormValid(){
-    const answerValues = Object.values(this.answers) as (number | null)[];
-    return answerValues.length === this?.questions?.length;
+  isFormValid(): boolean {
+    return Object.values(this.answers).every((answer) => answer !== null);
   }
 }
+
+// In the current implementation, feedback form is implemented in suach a way that the question & answers are displaying & when clicking on nect & previous question and answer index is changing. Now I want to implement the functionality that when the modal is open all five randow question will be show on left and in front of it instead of (yes & no) five starts will be dissplayed as it's orking for last question. Please re-write the code as per new scerios.
