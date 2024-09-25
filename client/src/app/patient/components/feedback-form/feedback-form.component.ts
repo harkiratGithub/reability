@@ -13,7 +13,6 @@ export class FeedbackFormComponent implements OnInit {
   questions: FeedbackQuestion[] = [];
   answers: { [key: number]: number | null } = {};
   hoverValues: { [key: number]: number | null } = {};
-
   constructor(public dialogRef: MatDialogRef<FeedbackFormComponent>, private ajax: AjaxService) {}
 
   ngOnInit(): void {
@@ -78,5 +77,3 @@ export class FeedbackFormComponent implements OnInit {
     return Object.values(this.answers).every((answer) => answer !== null);
   }
 }
-
-// In the current implementation, feedback form is implemented in suach a way that the question & answers are displaying & when clicking on nect & previous question and answer index is changing. Now I want to implement the functionality that when the modal is open all five randow question will be show on left and in front of it instead of (yes & no) five starts will be dissplayed as it's orking for last question. Please re-write the code as per new scerios.
