@@ -166,7 +166,14 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
     communicationUtil.registerToCallback(
       MESSAGES.SUMMARY,
       debounce((gameSummary) => {
-        this.ajax.updateGameSummary(gameSummary).subscribe(() => {});
+        this.ajax.updateGameSummary(gameSummary).subscribe((res) => {
+        });
+      }, 5000)
+    );
+    communicationUtil.registerToCallback(
+      MESSAGES.SESSION_FEEDBACK,
+      debounce((gameFeedback) => {
+        this.ajax.updateGameFeedback(gameFeedback).subscribe(() => {});
       }, 5000)
     );
     communicationUtil.registerToCallback(MESSAGES.QUIT_GAME, (e) => {
@@ -690,20 +697,17 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
     if (this.dialogRef) {
       this.dialogRef.close();
       this.dialogRef = null;
-      
     }
-      if(this.dialogRef == null ){
-        this.dialogRef = this.dialog.open(FeedbackFormComponent, {
+    if (!this.isTherapist && !this.inTherapistSession) {
+      this.dialogRef = this.dialog.open(FeedbackFormComponent, {
         hasBackdrop: true,
         id: this.peerId,
         data: {
-          isSwappedScreen: this.isSwappedScreen,
-          isSplitScreen: this.isInSplitScreen,
           has_backdrop: false,
-          isTherapist:this.isTherapist,
+          inTherapistSession: this.inTherapistSession,
+          isTherapist: this.isTherapist,
         },
-        });
-  
+      });
     }
     
   }
@@ -744,7 +748,6 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
     const userId = this.peerId;
     const gameId = this.gameIdTherapist;
     userGameData = map(userGameData, (item) => ({ ...item, gameId, userId }));
-    console.log("userGameData", userGameData);
     this.ajax.createUserGameData(userGameData).subscribe((data) => {
       communicationUtil.sendMessageToIframe(this.iframeEl, data, MESSAGES.USER_GAME_DATA_CREATED);
     });
