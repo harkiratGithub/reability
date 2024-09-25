@@ -17,7 +17,7 @@ import { PeersStatus, PATIENT_LOG_STORAGE_KEY } from '../../../../constants';
 import { ConfiguratorModalComponent } from '../configurator-modal/configurator-modal.component';
 import { ReCaptchaV3Service } from 'ng-recaptcha';
 import { setAudioStreamsToComponent } from '../../../common/utils';
-import { IGame } from '../../../../types';
+import { IGame, IPatientLog } from '../../../../types';
 
 @Component({
   selector: 'app-patient-patient-list-component',
@@ -36,7 +36,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
   gamesNames: string[] = [];
   patientListGrouped: any = [];
   intervalId = undefined;
-  patientLog: string[] = [];
+  patientLog: IPatientLog[] = [];
   selectedPatientId: string = '';
   filterFunc: (data: [], text: string) => void;
   peersStatusConst = PeersStatus;
@@ -87,7 +87,6 @@ export class PatientListComponent implements OnInit, OnDestroy {
     this.ajax
       .getPatientActivities(this.lastWeekActivityArray[0], this.lastWeekActivityArray[6])
       .subscribe((patients) => {
-
         this.ajax.getConnectedPeers().subscribe((peerUsers) => {
           patients.map((patient) => {
             if (
@@ -109,6 +108,8 @@ export class PatientListComponent implements OnInit, OnDestroy {
             }
           });
           this.patientListGrouped = groupBy(this.patientList, (p) => p.status);
+          console.log('the filtered list::', this.patientList);
+
           this.patientListFiltered = this.patientList;
         });
       });
@@ -392,24 +393,39 @@ export class PatientListComponent implements OnInit, OnDestroy {
     this.isLogModalOpen = true;
     this.shownLogs[patientId] = true;
     this.selectedPatientId = patientId;
-    const selectedPatient = this.patientListFiltered.find((patient) => patient.userId == patientId);
-    const gameSummaryData: any[] = [];
-    const gameNameToLatestGame: { [key: string]: any } = {};
-    selectedPatient.lastWeekActivity.forEach((activity: any) => {
-      activity.gamesDuration.forEach((game: any) => {
-        const gameKey = game.gameName;
-        // Always take the latest occurrence of the game (the last entry in this case)
-        gameNameToLatestGame[gameKey] = game;
-      });
-    });
-    // Convert the object into an array of games
-    gameSummaryData.push(...Object.values(gameNameToLatestGame));
-    selectedPatient.gameSummaryData = gameSummaryData;
 
-    console.log(this.patientLog, "jf")
-    this.patientLog = selectedPatient.gameSummaryData;
-    this.selectedGame = this.patientLog[0];
-    console.log("ghg", this.patientLog)
+    const selectedPatient = this.patientListFiltered.find((patient) => patient.userId === patientId);
+    console.log('the selectedPatient::', selectedPatient);
+
+    const gameMap = new Map<string, any[]>();
+
+    if (selectedPatient && selectedPatient.lastWeekActivity) {
+      selectedPatient.lastWeekActivity.forEach((activity) => {
+        activity.gamesDuration.forEach((game) => {
+          if (!gameMap.has(game.gameName)) {
+            gameMap.set(game.gameName, []);
+          }
+          gameMap.get(game.gameName)?.push({
+            duration: game.duration,
+            gameSummary: game.gameSummary,
+            sessionFeedback: game.sessionFeedback.questions,
+          });
+        });
+      });
+    }
+
+    this.patientLog = Array.from(gameMap.entries()).map(([gameName, sessions]) => {
+      sessions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      const latestSession = sessions[0]; 
+      const remainingSessions = sessions.slice(1);
+
+      return {
+        gameName,
+        latestSession,
+        remainingSessions,
+        showMore: false, 
+      };
+    });
   };
 
   objectKeys = Object.keys;
@@ -422,9 +438,11 @@ export class PatientListComponent implements OnInit, OnDestroy {
     let totalSeconds = 0;
 
     games.forEach((game) => {
-      const duration = game.duration || '00:00:00';
-      const [hours, minutes, seconds] = duration.split(':').map(Number);
-      totalSeconds += hours * 3600 + minutes * 60 + seconds;
+      const latestSession = game.latestSession;
+      if (latestSession && latestSession.duration) {
+        const [hours, minutes, seconds] = latestSession.duration.split(':').map(Number);
+        totalSeconds += hours * 3600 + minutes * 60 + seconds;
+      }
     });
 
     const hours = Math.floor(totalSeconds / 3600);
@@ -443,44 +461,51 @@ export class PatientListComponent implements OnInit, OnDestroy {
 
   async copyToClipboard() {
     try {
-      const formattedLogs = this.patientLog
-        .map((game: any) => {
-          const gameName = `Game Name: ${game.gameName}`;
-          const duration = `Duration: ${game.duration || 'N/A'}`;
+      if (!this.patientLog || !this.patientLog.length) {
+        console.log('No game session logs available to copy.');
+        return;
+      }
 
-          let summary = '';
-          if (game.gameSummary) {
-            summary += `Total Squats: ${
-              game.gameSummary.totalSquats !== undefined ? game.gameSummary.totalSquats : 'N/A'
-            }\n`;
-            summary += `Squats Per Set: ${game.gameSummary.squatsPerSet?.join(', ') || 'N/A'}\n`;
-            summary += `Game Time (seconds): ${
-              game.gameSummary.gameTimeSeconds !== null ? game.gameSummary.gameTimeSeconds : 'N/A'
-            }\n`;
-          } else {
-            summary += 'No game summary available\n';
-          }
+      const latestGame = this.patientLog[this.patientLog.length - 1];
 
-          let feedback = '';
-          if (game.sessionFeedback?.questions?.length) {
-            feedback += 'Session Feedback:\n';
-            game.sessionFeedback.questions.forEach((question: any) => {
-              feedback += `${question.question}: ${question.answer || 'N/A'}\n`;
-            });
-          } else {
-            feedback += 'No session feedback available\n';
-          }
+      const gameName = `Game Name: ${latestGame.gameName}`;
+      const duration = `Duration: ${latestGame.latestSession?.duration || 'N/A'}`;
 
-          return `${gameName}\n${duration}\n${summary}\n${feedback}`;
-        })
-        .join('\n-------------------\n'); 
+      let summary = '';
+      if (latestGame.latestSession?.gameSummary) {
+        summary += `Total Squats: ${
+          latestGame.latestSession.gameSummary.totalSquats !== undefined
+            ? latestGame.latestSession.gameSummary.totalSquats
+            : 'N/A'
+        }\n`;
+        summary += `Squats Per Set: ${latestGame.latestSession.gameSummary.squatsPerSet?.join(', ') || 'N/A'}\n`;
+        summary += `Game Time (seconds): ${
+          latestGame.latestSession.gameSummary.gameTimeSeconds !== null
+            ? latestGame.latestSession.gameSummary.gameTimeSeconds
+            : 'N/A'
+        }\n`;
+      } else {
+        summary += 'No game summary available\n';
+      }
 
-      await navigator.clipboard.writeText(formattedLogs);
+      let feedback = '';
+      if (latestGame.latestSession?.sessionFeedback?.questions?.length) {
+        feedback += 'Session Feedback:\n';
+        latestGame.latestSession.sessionFeedback.questions.forEach((question: any) => {
+          feedback += `${question.question}: ${question.answer || 'N/A'}\n`;
+        });
+      } else {
+        feedback += 'No session feedback available\n';
+      }
+
+      const formattedLog = `${gameName}\n${duration}\n${summary}\n${feedback}`;
+
+      await navigator.clipboard.writeText(formattedLog);
 
       this.isLogModalOpen = false;
       this.isCopiedToClipboard = true;
     } catch (e) {
-      console.log(e);
+      console.log('Failed to copy log to clipboard:', e);
     }
   }
 
@@ -498,14 +523,14 @@ export class PatientListComponent implements OnInit, OnDestroy {
   };
 
   prevGame() {
-    if(this.selectedGameIndex > 0 ){
+    if (this.selectedGameIndex > 0) {
       this.selectedGameIndex--;
       this.selectedGame = this.patientLog[this.selectedGameIndex];
     }
   }
 
   nextGame() {
-    if(this.selectedGameIndex < this.patientLog.length - 1){
+    if (this.selectedGameIndex < this.patientLog.length - 1) {
       this.selectedGameIndex++;
       this.selectedGame = this.patientLog[this.selectedGameIndex];
     }

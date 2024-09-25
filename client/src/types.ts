@@ -341,7 +341,21 @@ export interface FeedbackQuestion {
 }
 
 export interface IPatientLog {
-  gameName?: string;
-  duration?: string;
-  gameSummary?: any;
+  gameName: string;
+  latestSession: {
+    duration: string;
+    gameSummary: {
+      totalSquats: number;
+      squatsPerSet: number[];
+      gameTimeSeconds: number;
+    };
+    sessionFeedback: {
+      questions: {
+        question: string;
+        answer: string;
+      }[];
+    };
+  };
+  remainingSessions: any[];
+  showMore: boolean;
 }
