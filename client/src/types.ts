@@ -326,8 +326,9 @@ export interface IGameData {
 }
 
 export interface FeedbackOption {
-  value: string | number;
+  value: string;
   label: string;
+  tooltip: string;
 }
 
 export interface FeedbackQuestion {

@@ -11,7 +11,7 @@ import { AjaxService } from 'src/app/therapist/services/ajax.service';
 })
 export class FeedbackFormComponent implements OnInit {
   questions: FeedbackQuestion[] = [];
-  answers: { [key: number]: number | null } = {};
+  answers: { [key: string]: string | null } = {};
   hoverValues: { [key: number]: number | null } = {};
   constructor(public dialogRef: MatDialogRef<FeedbackFormComponent>, private ajax: AjaxService) {}
 
@@ -39,7 +39,7 @@ export class FeedbackFormComponent implements OnInit {
     return shuffledQuestions.slice(0, num);
   }
 
-  selectRating(questionId: number, value: number): void {
+  selectRating(questionId: number, value: string): void {
     this.answers[questionId] = value;
     this.hoverValues[questionId] = null;
   }

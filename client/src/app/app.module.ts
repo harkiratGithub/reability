@@ -75,6 +75,9 @@ import { MatNativeDateModule, MAT_DATE_FORMATS, DateAdapter } from '@angular/mat
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatRadioModule } from '@angular/material/radio';
+import { MatTooltipModule } from '@angular/material/tooltip';
+
+
 import {
   NgxMatMomentModule,
   NgxMatMomentAdapter,
@@ -239,6 +242,7 @@ export const CUSTOM_MOMENT_FORMATS = {
     MatInputModule,
     MatButtonModule,
     MatRadioModule,
+    MatTooltipModule,
     NgxMatMomentModule,
     NgxMatDatetimePickerModule,
     NgxMatTimepickerModule,
