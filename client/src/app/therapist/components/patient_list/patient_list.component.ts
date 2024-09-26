@@ -73,7 +73,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
     clearInterval(this.intervalId);
   }
 
-  toggleGame(game, patient) {
+  toggleGame(game: { id: number; }, patient: { allGames: { isValid: any; }[]; id: any; }) {
     const gameIndex = this.allGames.findIndex((obj) => obj.id == game.id);
     patient.allGames[gameIndex].isValid = !patient.allGames[gameIndex].isValid;
     if (!patient.allGames[gameIndex].isValid) {
@@ -88,7 +88,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
       .getPatientActivities(this.lastWeekActivityArray[0], this.lastWeekActivityArray[6])
       .subscribe((patients) => {
         this.ajax.getConnectedPeers().subscribe((peerUsers) => {
-          patients.map((patient) => {
+          patients.map((patient: { status: string; user_id: { toString: () => any; }; }) => {
             if (
               patient.status === this.peersStatusConst.AVAILABLE &&
               !peerUsers.find((peerUser) => peerUser.id === patient.user_id.toString())
@@ -117,7 +117,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
     return Object.keys(obj);
   }
 
-  setFilteredData = (filteredData) => (this.patientListFiltered = filteredData);
+  setFilteredData = (filteredData: any[]) => (this.patientListFiltered = filteredData);
 
   filterByName = (data: any[], filterText: string) => {
     if (!filterText) {
@@ -134,7 +134,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
     this.setFilteredData(filteredData);
   };
 
-  checkIfSettingModalOpened = (patient) => {
+  checkIfSettingModalOpened = (patient: { id: any; }) => {
     if (this.patientList.length > 0) {
       const patientFound = this.patientList.find((currPatient) => currPatient.id === patient.id);
       return patientFound ? patientFound.settingMenuOpen || false : false;
@@ -142,7 +142,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
     return false;
   };
 
-  buildPatientActivities = (patientList) => {
+  buildPatientActivities = (patientList: any) => {
     const patients = chain(patientList)
       .groupBy('id')
       .mapValues((items) => ({
@@ -235,7 +235,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
     return patients;
   };
 
-  getPeerStatusColor = (status) => {
+  getPeerStatusColor = (status: any) => {
     switch (status) {
       case this.peersStatusConst.AVAILABLE:
         return '#2EFFD0';
@@ -275,27 +275,27 @@ export class PatientListComponent implements OnInit, OnDestroy {
     }, 600000);
   };
 
-  getGameIcon = (game) => {
+  getGameIcon = (game: IGame) => {
     const currGame = game;
     currGame.path = `/assets/game-icons-patient-list/${game.name}.png`;
     currGame.url = this.getUrlGame(game.url);
   };
 
-  getUrlGame(url) {
+  getUrlGame(url: string) {
     return url + 'index.html';
   }
 
-  getPatientRecentGameActivity = (patient) => {
+  getPatientRecentGameActivity = (patient: { id: any; fullName?: any; userName?: any; status?: any; lastLogin?: any; gameSummary?: any; lastWeekActivity: any; settingMenuOpen?: any; userId?: any; phone?: any; contacts?: any; therapistSessionId?: any; games?: any; allGames?: any; gameIds?: any; }) => {
     this.ajax.getValidGames(patient.id).subscribe((games) => {
       patient.games = games;
-      const validGameIds = games.map((game) => game.id);
+      const validGameIds = games.map((game: { id: any; }) => game.id);
       patient.allGames = this.allGames.map((game) => {
         const isValid = validGameIds.includes(game.id);
         return { ...game, isValid };
       });
       patient.gameIds = [];
-      patient.lastWeekActivity.map((activity) => {
-        if (activity.game_id && !patient.gameIds.find((game) => game.id === activity.game_id)) {
+      patient.lastWeekActivity.map((activity: { game_id: any; }) => {
+        if (activity.game_id && !patient.gameIds.find((game: { id: any; }) => game.id === activity.game_id)) {
           patient.gameIds.push({
             id: activity.game_id,
           });
@@ -303,16 +303,16 @@ export class PatientListComponent implements OnInit, OnDestroy {
       });
       // icon & which games have configorator need to come from server
       // patient.games = patient.games.filter(game => game.name === 'studio');
-      patient.games.map((game) => this.getGameIcon(game));
+      patient.games.map((game: any) => this.getGameIcon(game));
       // when more games filter be availble sort by activity (game, index) => game.id === patient.gameIds[index]
     });
   };
 
-  togglePatientSettingMenu = (patient) => {
+  togglePatientSettingMenu = (patient: { settingMenuOpen: boolean; }) => {
     patient.settingMenuOpen = !patient.settingMenuOpen;
   };
 
-  openGameConfiguration = (game, patient) => {
+  openGameConfiguration = (game: any, patient: any) => {
     const dialogRef = this.dialog.open(ConfiguratorModalComponent, {
       data: {
         game,
@@ -321,7 +321,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
     });
   };
 
-  sendFastLoginLink = (patient) => {
+  sendFastLoginLink = (patient: { id: any; userId: number; }) => {
     const modalData: GeneralModalData = {
       modalStyle: GENERAL_MODAL_STYLE.WHITE,
       content: GENERAL_MODAL_CONTENT.SEND_FAST_LOGIN,
@@ -359,7 +359,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
     this.appActions.openGeneralModal(modalData);
   };
 
-  getActivityTooltipText = (activity) => {
+  getActivityTooltipText = (activity: { duration: string; gamesDuration: any; }) => {
     if (!activity.duration) {
       return '';
     }
@@ -398,8 +398,8 @@ export class PatientListComponent implements OnInit, OnDestroy {
     const gameMap = new Map<string, any[]>();
 
     if (selectedPatient && selectedPatient.lastWeekActivity) {
-      selectedPatient.lastWeekActivity.forEach((activity) => {
-        activity.gamesDuration.forEach((game) => {
+      selectedPatient.lastWeekActivity.forEach((activity: { gamesDuration: any[]; }) => {
+        activity.gamesDuration.forEach((game: { gameName: string; duration: any; gameSummary: any; sessionFeedback: { questions: any; }; }) => {
           if (!gameMap.has(game.gameName)) {
             gameMap.set(game.gameName, []);
           }
@@ -549,12 +549,12 @@ export class PatientListComponent implements OnInit, OnDestroy {
   //   return quesfeedbacks;
   // };
 
-  getFeedbackTooltipText = (feedbacks) => {
-    const convertToSeconds = (timeStr) => {
+  getFeedbackTooltipText = (feedbacks: { lastWeekActivity: any[]; }) => {
+    const convertToSeconds = (timeStr: { split: (arg0: string) => { (): any; new(): any; map: { (arg0: NumberConstructor): [any, any, any]; new(): any; }; }; }) => {
       const [hours, minutes, seconds] = timeStr.split(':').map(Number);
       return (hours || 0) * 3600 + (minutes || 0) * 60 + (seconds || 0);
     };
-    const convertToTimeFormat = (totalSeconds) => {
+    const convertToTimeFormat = (totalSeconds: number) => {
       const hours = Math.floor(totalSeconds / 3600);
       const minutes = Math.floor((totalSeconds % 3600) / 60);
       const seconds = totalSeconds % 60;
@@ -563,26 +563,35 @@ export class PatientListComponent implements OnInit, OnDestroy {
         '0'
       )}`;
     };
-
+    const options = [
+      { "value": "Very Poor", "label": "😡", "tooltip": "Angry" },
+      { "value": "Unsatisfied", "label": "🙁", "tooltip": "Slightly Frowning" },
+      { "value": "Neutral", "label": "😐", "tooltip": "Neutral" },
+      { "value": "Somewhat Satisfied", "label": "😊", "tooltip": "Smiling with Eyes" },
+      { "value": "Satisfied", "label": "😁", "tooltip": "Beaming with Smiling Eyes" }
+    ];
     let totalTimeInSeconds = 0;
     const quesfeedbacks = feedbacks?.lastWeekActivity
-      .map((activity) => {
+      .map((activity: { duration: any; gamesDuration: any[]; }) => {
         if (activity.duration) {
           totalTimeInSeconds += convertToSeconds(activity.duration);
         }
         const gameFeedbacks = activity.gamesDuration
-          ?.map((gameDuration) => {
+          ?.map((gameDuration: { sessionFeedback: any; duration: any; gameName: string; }) => {
             const feedback = gameDuration.sessionFeedback;
             const gameDurationText = gameDuration.duration ? ` (${gameDuration.duration})` : '';
             if (feedback && feedback.questions) {
               const feedbackText = feedback.questions
-                .map((q) => `* ${q.question}: ${q.answer || 'No answer provided'}`)
+                .map((q: { question: any; answer: string; }) => {
+                  return `* ${q.question}: ${options?.find((o)=>o?.value ==q.answer)?.label || 'No answer provided'}`;
+                })
                 .join('\n');
-              return `* ${gameDuration.gameName}${gameDurationText}\n${feedbackText}`;
+
+              return `\n* ${gameDuration.gameName.toUpperCase()}${gameDurationText}\n\n${feedbackText}`;
             }
             return '';
           })
-          .filter((text) => text) 
+          .filter((text: any) => text)
           .join('\n');
 
         if (gameFeedbacks) {
@@ -590,12 +599,10 @@ export class PatientListComponent implements OnInit, OnDestroy {
         }
         return '';
       })
-      .filter((text) => text) 
+      .filter((text: any) => text)
       .join('\n');
 
     const totalDurationFormatted = convertToTimeFormat(totalTimeInSeconds);
-    return totalTimeInSeconds > 0
-      ? `* Total Time: ${totalDurationFormatted}\n${quesfeedbacks}`
-      : quesfeedbacks;
+    return totalTimeInSeconds > 0 ? `* Total Time: ${totalDurationFormatted}\n${quesfeedbacks}` : quesfeedbacks;
   };
 }

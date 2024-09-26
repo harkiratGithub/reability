@@ -308,6 +308,7 @@ type ExcludeFunctionPropertyNames<T extends object> = MarkFunctionPropertyNames<
 type ExcludeFunctions<T extends object> = Pick<T, ExcludeFunctionPropertyNames<T>>;
 
 export interface IGame {
+  path?: string;
   id: number;
   name: string;
   url: string;
