@@ -109,72 +109,7 @@
               1
             </button>
           </div>
-          <!-- <div
-            *ngIf="isLogModalOpen && patientLog?.length && selectedPatientId == patient.userId"
-            class="patient-log-modal"
-          >
-            <div class="patient-log-content">
-              <h3 class="game-heading">Game Information</h3>
-
-              <div class="game-info-wrapper">
-                <div *ngFor="let game of patientLog" class="game-info">
-                  <div class="game-name">
-                    <label>Game Name:</label>
-                    <span>{{ game?.gameName || 'No Game Name'  | titlecase  }}</span>
-                  </div>
-
-                  <div class="game-duration">
-                    <label>Game Duration:</label>
-                    <span>{{ game?.duration || 'No Duration' }}</span>
-                  </div>
-
-                  <ng-container *ngIf="game?.gameSummary">
-                    <div class="game-summary" *ngFor="let key of objectKeys(game.gameSummary)">
-                      <label>{{ key | titlecase }}:</label>
-                      <span>
-                        <ng-container *ngIf="isArray(game.gameSummary[key]); else simpleValue">
-                          {{ game.gameSummary[key]?.join(', ') || 'Not Available' }}
-                        </ng-container>
-                        <ng-template #simpleValue>
-                          {{ game.gameSummary[key] !== null ? game.gameSummary[key] : 'Not Available' }}
-                        </ng-template>
-                      </span>
-                    </div>
-                  </ng-container>
-
-                  <ng-container *ngIf="!game?.gameSummary">
-                    <div class="no-summary">
-                      <label>Game Summary:</label>
-                      <span>No Summary Available</span>
-                    </div>
-                  </ng-container>
-
-                  <ng-container *ngIf="game?.sessionFeedback">
-                    <div class="session-feedback">
-                      <h4>Session Feedback:</h4>
-                      <div class="session-feedback-que" *ngFor="let question of game?.sessionFeedback?.questions">
-                        <div class="ques-container" *ngIf="question?.answer !== 'skipped'">
-                            <div class="question">{{ question?.question }}</div>
-                            <span class="answer">{{ question?.answer || 'No answer provided' |  titlecase }}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </ng-container>
-                </div>
-              </div>
-
-              <div class="total-duration">
-                <h4>Total Time Spent on Games:</h4>
-                <span>{{ getTotalDuration(patientLog) || '00:00:00' }}</span>
-              </div>
-
-              <div class="modal-actions">
-                <button class="close-btn" (click)="closeModal()">Close</button>
-                <button (click)="copyToClipboard()" title="copy" class="copy-btn">Copy</button>
-              </div>
-            </div>
-          </div> -->
-
+         
           <div
             *ngIf="isLogModalOpen && patientLog?.length && selectedPatientId == patient.userId"
             class="patient-log-modal"
@@ -185,60 +120,75 @@
               <div class="logs-container">
                 <div *ngFor="let log of patientLog">
                   <div class="game-log">
-                    <h3>{{ log.gameName }}</h3>
-                    <p><strong>Duration:</strong> {{ log.latestSession.duration }}</p>
-                    <p><strong>Game Summary:</strong></p>
-                    <ul>
-                      <li *ngIf="log.latestSession.gameSummary.totalSquats !== undefined">
-                        Total Squats: {{ log.latestSession.gameSummary.totalSquats }}
-                      </li>
-                      <li *ngIf="log.latestSession.gameSummary.gameTimeSeconds !== undefined">
-                        Game Time (seconds): {{ log.latestSession.gameSummary.gameTimeSeconds }}
-                      </li>
-                      <li *ngIf="log.latestSession.gameSummary.difficult !== undefined">
-                        Difficulty: {{ log.latestSession.gameSummary.difficult }}
-                      </li>
-                      <li *ngIf="log.latestSession.gameSummary.gameScore !== undefined">
-                        Game Score: {{ log.latestSession.gameSummary.gameScore.join(', ') }}
-                      </li>
-                    </ul>
+                    <h3>Game Name: {{ log.gameName | titlecase }}</h3>
+                    <div class="duration">
+                      <p><strong>Duration:</strong></p>
+                      <p>{{ log.latestSession.duration }}</p>
+                    </div>
+                    <div class="game-summary">
+                      <p><strong>Game Summary:</strong></p>
+                      <div>
+                        <p *ngIf="log.latestSession.gameSummary.totalSquats !== undefined">
+                          Total Squats: {{ log.latestSession.gameSummary.totalSquats }}
+                        </p>
+                        <p *ngIf="log.latestSession.gameSummary.gameTimeSeconds !== undefined">
+                          Game Time (seconds): {{ log.latestSession.gameSummary.gameTimeSeconds }}
+                        </p>
+                        <p *ngIf="log.latestSession.gameSummary.difficult !== undefined">
+                          Difficulty: {{ log.latestSession.gameSummary.difficult }}
+                        </p>
+                        <p *ngIf="log.latestSession.gameSummary.gameScore !== undefined">
+                          Game Score: {{ log.latestSession.gameSummary.gameScore.join(', ') }}
+                        </p>
+                      </div>
+                    </div>
 
-                    <p><strong>Session Feedback:</strong></p>
+                    <!-- <p class="session-feedback"><strong>Session Feedback</strong></p>
                     <ul>
                       <li *ngFor="let feedback of log.latestSession.sessionFeedback">
                         {{ feedback.question }} - {{ feedback.answer }}
                       </li>
-                    </ul>
+                    </ul> -->
 
-                    <button *ngIf="log.remainingSessions.length > 0" (click)="log.showMore = !log.showMore">
-                      {{ log.showMore ? 'Show Less' : 'Show More' }}
-                    </button>
+                    <div class="button-container">
+                      <button
+                        class="submit-button"
+                        *ngIf="log.remainingSessions.length > 0"
+                        (click)="log.showMore = !log.showMore"
+                      >
+                        {{ log.showMore ? 'Show Less' : 'Show More' }}
+                      </button>
+                    </div>
 
                     <div *ngIf="log.showMore">
                       <div *ngFor="let session of log.remainingSessions">
-                        <hr />
                         <p><strong>Additional Session - Duration:</strong> {{ session.duration }}</p>
-                        <ul>
-                          <li *ngIf="session.gameSummary.totalSquats !== undefined">
+                        <hr />
+                        <div class="additional-session">
+                          <p *ngIf="session.gameSummary.totalSquats !== undefined">
                             Total Squats: {{ session.gameSummary.totalSquats }}
-                          </li>
-                          <li *ngIf="session.gameSummary.gameTimeSeconds !== undefined">
+                          </p>
+                          <p *ngIf="session.gameSummary.gameTimeSeconds !== undefined">
                             Game Time (seconds): {{ session.gameSummary.gameTimeSeconds }}
-                          </li>
-                          <li *ngIf="session.gameSummary.difficult !== undefined">
+                          </p>
+                          <p *ngIf="session.gameSummary.difficult !== undefined">
                             Difficulty: {{ session.gameSummary.difficult }}
-                          </li>
-                          <li *ngIf="session.gameSummary.gameScore !== undefined">
+                          </p>
+                          <p *ngIf="session.gameSummary.gameScore !== undefined">
                             Game Score: {{ session.gameSummary.gameScore.join(', ') }}
-                          </li>
-                        </ul>
+                          </p>
+                        </div>
 
-                        <p><strong>Session Feedback:</strong></p>
-                        <ul>
-                          <li *ngFor="let feedback of session.sessionFeedback">
-                            {{ feedback.question }} - {{ feedback.answer }}
-                          </li>
-                        </ul>
+                        <!-- <p class="session-feedback" *ngIf="session?.sessionFeedback?.length > 0">
+                          <strong>Session Feedback:</strong>
+                        </p> -->
+
+                        <!-- <div *ngFor="let feedback of session.sessionFeedback">
+                          <ul class="ques-ans">
+                            <li>{{ feedback?.question }}</li>
+                            <p>{{ feedback?.answer }}</p>
+                          </ul>
+                        </div> -->
                       </div>
                     </div>
                   </div>
@@ -272,6 +222,15 @@
               <img [title]="showContactDetails(contact)" src="../../../../assets/skel/info_black_24dp.svg" />
             </div>
           </div>
+        </div>
+        <!--  Session Feedback -->
+        <div class="feeds" *ngIf="patient.log">
+          <img
+            src="../../../../assets/skel/conversation.png"
+            alt="Feedback Icon"
+            class="feedback-icon"
+            [title]="getFeedbackTooltipText(patient)"
+          />
         </div>
         <div class="last-week-activity-content" [ngClass]="{ opened: patient.settingMenuOpen }">
           <div *ngFor="let activity of patient.lastWeekActivity" class="patient-activity-image">

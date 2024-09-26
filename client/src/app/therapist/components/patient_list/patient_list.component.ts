@@ -64,8 +64,8 @@ export class PatientListComponent implements OnInit, OnDestroy {
     setAudioStreamsToComponent(audioContainerElement, this.audioStreams);
     this.ajax.getAllGames().subscribe((allGames) => {
       this.allGames = allGames;
-      this.gamesNames = this.allGames.map((game) => game.name);
-      this.allGames.map((game) => this.getGameIcon(game));
+      this.gamesNames = this.allGames?.map((game) => game?.name);
+      this.allGames?.map((game) => this.getGameIcon(game));
     });
   }
 
@@ -96,7 +96,6 @@ export class PatientListComponent implements OnInit, OnDestroy {
               patient.status = this.peersStatusConst.LOGGED_OUT;
             }
           });
-          console.log('tet', patients, this.patientList);
           this.patientList = this.buildPatientActivities(patients);
           this.patientList.forEach((patient) => {
             patient.log = '';
@@ -109,7 +108,6 @@ export class PatientListComponent implements OnInit, OnDestroy {
           });
           this.patientListGrouped = groupBy(this.patientList, (p) => p.status);
           console.log('the filtered list::', this.patientList);
-
           this.patientListFiltered = this.patientList;
         });
       });
@@ -405,10 +403,10 @@ export class PatientListComponent implements OnInit, OnDestroy {
           if (!gameMap.has(game.gameName)) {
             gameMap.set(game.gameName, []);
           }
-          gameMap.get(game.gameName)?.push({
-            duration: game.duration,
-            gameSummary: game.gameSummary,
-            sessionFeedback: game.sessionFeedback.questions,
+          gameMap.get(game?.gameName)?.push({
+            duration: game?.duration,
+            gameSummary: game?.gameSummary,
+            sessionFeedback: game?.sessionFeedback?.questions,
           });
         });
       });
@@ -416,14 +414,14 @@ export class PatientListComponent implements OnInit, OnDestroy {
 
     this.patientLog = Array.from(gameMap.entries()).map(([gameName, sessions]) => {
       sessions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-      const latestSession = sessions[0]; 
+      const latestSession = sessions[0];
       const remainingSessions = sessions.slice(1);
 
       return {
         gameName,
         latestSession,
         remainingSessions,
-        showMore: false, 
+        showMore: false,
       };
     });
   };
@@ -535,4 +533,69 @@ export class PatientListComponent implements OnInit, OnDestroy {
       this.selectedGame = this.patientLog[this.selectedGameIndex];
     }
   }
+
+  // getFeedbackTooltipText = (feedbacks:any) => {
+  //   console.log("feedbacks ", feedbacks);
+  //   const quesfeedbacks = feedbacks?.lastWeekActivity
+  //     .map((activity: { gamesDuration: { sessionFeedback: any }[] }) => {
+  //       const feedback = activity.gamesDuration?.find((gameDuration) => gameDuration.sessionFeedback)?.sessionFeedback;
+  //       if (feedback && feedback.questions) {
+  //         return feedback.questions.map((q) => `* ${q.question}:  ${q.answer || 'No answer provided'}`).join('\n');
+  //       }
+  //       return '';
+  //     })
+  //     .filter((text) => text)
+  //     .join('\n');
+  //   return quesfeedbacks;
+  // };
+
+  getFeedbackTooltipText = (feedbacks) => {
+    const convertToSeconds = (timeStr) => {
+      const [hours, minutes, seconds] = timeStr.split(':').map(Number);
+      return (hours || 0) * 3600 + (minutes || 0) * 60 + (seconds || 0);
+    };
+    const convertToTimeFormat = (totalSeconds) => {
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+      return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(
+        2,
+        '0'
+      )}`;
+    };
+
+    let totalTimeInSeconds = 0;
+    const quesfeedbacks = feedbacks?.lastWeekActivity
+      .map((activity) => {
+        if (activity.duration) {
+          totalTimeInSeconds += convertToSeconds(activity.duration);
+        }
+        const gameFeedbacks = activity.gamesDuration
+          ?.map((gameDuration) => {
+            const feedback = gameDuration.sessionFeedback;
+            const gameDurationText = gameDuration.duration ? ` (${gameDuration.duration})` : '';
+            if (feedback && feedback.questions) {
+              const feedbackText = feedback.questions
+                .map((q) => `* ${q.question}: ${q.answer || 'No answer provided'}`)
+                .join('\n');
+              return `${gameDuration.gameName}${gameDurationText}\n${feedbackText}`;
+            }
+            return '';
+          })
+          .filter((text) => text) 
+          .join('\n');
+
+        if (gameFeedbacks) {
+          return `${gameFeedbacks}`;
+        }
+        return '';
+      })
+      .filter((text) => text) 
+      .join('\n');
+
+    const totalDurationFormatted = convertToTimeFormat(totalTimeInSeconds);
+    return totalTimeInSeconds > 0
+      ? `Total Time: ${totalDurationFormatted}\n${quesfeedbacks}`
+      : quesfeedbacks;
+  };
 }
