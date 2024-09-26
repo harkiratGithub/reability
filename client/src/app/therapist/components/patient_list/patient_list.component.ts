@@ -578,7 +578,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
               const feedbackText = feedback.questions
                 .map((q) => `* ${q.question}: ${q.answer || 'No answer provided'}`)
                 .join('\n');
-              return `${gameDuration.gameName}${gameDurationText}\n${feedbackText}`;
+              return `* ${gameDuration.gameName}${gameDurationText}\n${feedbackText}`;
             }
             return '';
           })
@@ -595,7 +595,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
 
     const totalDurationFormatted = convertToTimeFormat(totalTimeInSeconds);
     return totalTimeInSeconds > 0
-      ? `Total Time: ${totalDurationFormatted}\n${quesfeedbacks}`
+      ? `* Total Time: ${totalDurationFormatted}\n${quesfeedbacks}`
       : quesfeedbacks;
   };
 }
