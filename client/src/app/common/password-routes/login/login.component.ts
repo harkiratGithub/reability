@@ -87,12 +87,29 @@ export class LoginPageComponent implements OnInit, OnDestroy {
         this.f.username.setErrors(null);
         const token = await this.recaptchaV3Service.execute('login').toPromise();
         const user = await this.ajax.login(this.f.username.value, this.f.password.value, token).toPromise();
+
+        if (window && (window as any).NREUM) {
+          (window as any).NREUM.addPageAction('LoginSuccess', {
+            username: this.f.username.value,
+            isTherapist: user.isTherapist,
+            userRole: user.role,
+          });
+        }
+
         this.authenticationService.updateUser(user);
         this.appActions.setTherapist(user.isTherapist);
         this.router.navigate([`${roleMainRoute(user.role)}`]);
       }
     } catch (error) {
       console.log('login errors !:', error);
+
+      if (window && (window as any).NREUM) {
+        (window as any).NREUM.addPageAction('LoginError', {
+          username: this.f.username.value,
+          errorMessage: error.message || 'Unknown error',
+        });
+      }
+      
       this.alertService.error(error);
       if (error && _.includes(error, 'already connected')) {
         this.f.username.setErrors({ errorName: 'already_connected' });
