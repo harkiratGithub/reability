@@ -88,6 +88,7 @@ export class LoginPageComponent implements OnInit, OnDestroy {
         const token = await this.recaptchaV3Service.execute('login').toPromise();
         const user = await this.ajax.login(this.f.username.value, this.f.password.value, token).toPromise();
         this.authenticationService.updateUser(user);
+        console.log("login successful");
         this.appActions.setTherapist(user.isTherapist);
         this.router.navigate([`${roleMainRoute(user.role)}`]);
       }
