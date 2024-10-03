@@ -1,0 +1,43 @@
+<div class="body-container">
+  <div class="card">
+    <div class="header">
+      <a href="/#/login" class="back-icon-wrapper">
+        <img src="../../../../assets/login/back-button.png" alt="back-icon" width="22" height="22" class="back-icon" />
+      </a>
+      <a href="/#/login" class="login-btn">Back to Login</a>
+    </div>
+    <img src="../../../../assets/login/2F-auth.png" alt="2FA Icon" class="auth-icon" />
+
+    <div class="two-factor-auth-container">
+      <div *ngIf="viewTab == 'enable2FA'">
+        <h2>Two-Factor Authentication</h2>
+        <button class="btn enable-btn" (click)="enable2FA()">Enable 2FA</button>
+        <button class="btn disable-btn" (click)="skip()">Skip</button>
+      </div>
+
+      <div *ngIf="viewTab == 'generatedQR'" class="qr-code-section">
+        <img [src]="qrCodeUrl" alt="QR Code" />
+        <p>Scan the QR Code using your authentication app.</p>
+        <button class="btn enable-btn" (click)="viewTab = 'verifyOtp'">Verify Now (First scan the code)</button>
+      </div>
+
+      <div *ngIf="viewTab == 'verifyOtp'">
+        <label for="verificationCode">Enter Verification Code</label>
+        <input
+          type="text"
+          id="verificationCode"
+          [(ngModel)]="verificationCode"
+          placeholder="Enter verification code"
+          maxlength="6"
+          pattern="[0-9]*"
+          (keypress)="isNumberKey($event)"
+        />
+        <button class="btn submit-btn" (click)="verifyCode()">Submit</button>
+      </div>
+
+      <div *ngIf="viewTab == 'verified'">
+        <p>2FA has been successfully enabled.</p>
+      </div>
+    </div>
+  </div>
+</div>

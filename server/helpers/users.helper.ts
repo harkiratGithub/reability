@@ -19,6 +19,9 @@ import { PEERS_STATUS, ROLE, PATIENT_AUTO_PASSWORD_LENGTH } from '../const';
 import { delayedHeartbeat } from '../../constants/heartbeat';
 import moment from 'moment';
 
+import speakeasy from 'speakeasy';
+import qrcode from 'qrcode';
+
 export const onLogIn = async (user: {
 	id: number;
 	role: string;
@@ -37,8 +40,13 @@ export const onLogIn = async (user: {
 			case ROLE.THERAPIST:
 			case ROLE.VIDEO_PATIENT:
 				const userDetails = await UserModel.getUserDetails(user.id);
-				const { id, first_name: firstName, last_name: lastName } = EncryptHelper.decryptJson(userDetails[0]);
-				return { ...user, id, firstName, lastName };
+				const {
+					id,
+					first_name: firstName,
+					last_name: lastName,
+					is_two_factor_enabled: is_two_factor_enabled,
+				} = EncryptHelper.decryptJson(userDetails[0]);
+				return { ...user, id, firstName, lastName, is_two_factor_enabled };
 			case ROLE.PATIENT:
 				const details = await UserModel.getUserDetails(user.id);
 				const {
@@ -344,4 +352,41 @@ export const resetPassword = async (user, setDefaultPassword) => {
 export const getUserById = async (userId) => {
 	const results = await UserModel.findById(userId);
 	return results[0];
+};
+
+export const enable2FAForUser = async (userId) => {
+	let user = await UserModel.findById(userId);
+	user = EncryptHelper.decryptJson(user[0]);
+	console.log(user, 'Role');
+	if (user.role !== ROLE.ADMIN && user.role !== ROLE.THERAPIST) {
+		throw new Error('2FA can only be enabled for Admin and Therapist roles.');
+	}
+	const secret = speakeasy.generateSecret({ name: 'ReAbility Online Auth' });
+	console.log(secret, 'secret');
+	user.two_factor_secret = secret.base32;
+	user.is_two_factor_enabled = true;
+	await UserModel.updateById(user.id, user);
+	const qrCodeData = await qrcode.toDataURL(secret.otpauth_url);
+	console.log(qrCodeData, 'qrCodeData');
+	return { qrCodeData };
+};
+
+export const verify2FAToken = async (userId, token) => {
+	try {
+		let user = await UserModel.findById(userId);
+		user = EncryptHelper.decryptJson(user[0]);
+		const isValid = speakeasy.totp.verify({
+			secret: user.two_factor_secret,
+			encoding: 'base32',
+			token: token,
+		});
+		if (!isValid) {
+			throw new Error('Invalid 2FA token');
+		}
+		return { success: true, message: '2FA verified successfully' };
+	} catch (error) {
+		throw new Error('Error verifying 2FA token');
+	} finally {
+		console.error('In finally block');
+	}
 };

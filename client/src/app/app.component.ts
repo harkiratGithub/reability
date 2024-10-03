@@ -14,7 +14,7 @@ import { CallModalComponent } from './common/call-modal/call_modal.component';
 import { AppActions } from '../app/app.actions';
 import { AudioContext } from 'standardized-audio-context';
 import { DisconnectedVideoSessionComponent } from './common/video-session-disconneted-modal/video_session_disconneted_modal.component';
-import { roleMainRoute } from './routes';
+import { roleMainRoute, ROUTES } from './routes';
 import { AjaxService } from './therapist/services/ajax.service';
 import { PatientGeneralModalComponent } from './common/patient-general-modal/patient_general_modal.component';
 import { MOBILE_OR_SMALL_RESOLUTION } from './common/utils';
@@ -151,7 +151,23 @@ export class AppComponent implements OnInit, OnDestroy {
         if (!userDataResult) {
           return;
         } else {
+          console.log(userDataResult , "userDataResult")
           this.authenticationService.updateUser(userDataResult);
+          if (
+            (!localStorage.getItem('verified2FA') || localStorage.getItem('verified2FA') == 'false') &&
+            ['therapist', 'admin'].includes(userDataResult.role)
+          ) {
+            if (userDataResult.is_two_factor_enabled) {
+              this.router.navigate([`/${ROUTES.VERIFY_2FA.split(':id')[0]}${userDataResult.peerId}`], {
+                queryParams: { enable2FA: true },
+              });
+            } else {
+              this.router.navigate([`/${ROUTES.VERIFY_2FA.split(':id')[0]}${userDataResult.peerId}`], {
+                queryParams: { enable2FA: false },
+              });
+            }
+            return;
+          }
           this.router.navigate([`${roleMainRoute(userDataResult.role)}`]);
         }
       }

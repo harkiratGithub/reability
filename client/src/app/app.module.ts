@@ -126,6 +126,7 @@ import { FileUploaderComponent } from './backoffice/file-uploader/file-uploader.
 import { GameLogsComponent } from './patient/components/game-logs/game-logs.component';
 import { ExportToExcelComponent } from './backoffice/export-to-excel/export-to-excel.component';
 import { PatientGeneralModalComponent } from './common/patient-general-modal/patient_general_modal.component';
+import { TwoFactorAuthVerifyComponent } from './common/password-routes/two-factor-auth-verify/two-factor-auth-verify.component';
 
 export const CUSTOM_MOMENT_FORMATS = {
   parse: {
@@ -213,6 +214,7 @@ export const CUSTOM_MOMENT_FORMATS = {
     GameLogsComponent,
     ExportToExcelComponent,
     PatientGeneralModalComponent,
+    TwoFactorAuthVerifyComponent,
   ],
   imports: [
     RouterModule.forRoot(routes, { useHash: true }),
