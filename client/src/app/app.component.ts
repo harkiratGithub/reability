@@ -151,7 +151,6 @@ export class AppComponent implements OnInit, OnDestroy {
         if (!userDataResult) {
           return;
         } else {
-          console.log(userDataResult , "userDataResult")
           this.authenticationService.updateUser(userDataResult);
           if (
             (!localStorage.getItem('verified2FA') || localStorage.getItem('verified2FA') == 'false') &&
