@@ -90,6 +90,7 @@ export class LoginPageComponent implements OnInit, OnDestroy {
         this.appActions.setTherapist(user?.isTherapist);
         this.authenticationService.updateUser(user);
         if (['therapist', 'admin'].includes(user.role)) {
+          localStorage.setItem('verified2FA', 'false');
           if (user?.is_two_factor_enabled) {
             this.router.navigate([`/${ROUTES.VERIFY_2FA.split(':id')[0]}${user.peerId}`], {
               queryParams: { enable2FA: true },
@@ -99,7 +100,10 @@ export class LoginPageComponent implements OnInit, OnDestroy {
               queryParams: { enable2FA: false },
             });
           }
-        } else this.router.navigate([`${roleMainRoute(user.role)}`]);
+        } else{
+          localStorage.setItem('verified2FA', 'true');
+          this.router.navigate([`${roleMainRoute(user.role)}`]);
+        } 
       }
     } catch (error) {
       this.alertService.error(error);

@@ -50,11 +50,18 @@ export class AjaxService {
   };
 
   verify2FA = (id,code) => {
-
     try {
       return this.http.post<any>(`${this.baseUrl}/verify-2fa/${id}`, {
         token: code,
       });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  reVerify2FA = (id) => {
+    try {
+      return this.http.put<any>(`${this.baseUrl}/re-verify-2fa/${id}` , null);
     } catch (err) {
       console.error(err);
     }

@@ -22,7 +22,11 @@
       </div>
 
       <div *ngIf="viewTab == 'verifyOtp'">
+        <div class="verifyotp-container">
         <label for="verificationCode">Enter Verification Code</label>
+        <!-- Resend OTP Button -->
+        <a class="btn resend-btn" (click)="resendOTP()">Resend Code</a>
+      </div>
         <input
           type="text"
           id="verificationCode"
@@ -35,9 +39,15 @@
         <button class="btn submit-btn" (click)="verifyCode()">Submit</button>
       </div>
 
+
       <div *ngIf="viewTab == 'verified'">
         <p>2FA has been successfully enabled.</p>
       </div>
+
+      <!-- <div *ngIf="viewTab == 'reverified'">
+        <p>2FA has been reverified successfully.</p>
+      </div> -->
     </div>
   </div>
 </div>
+<!-- I want to implement the new case to add the Reverify otp button to be redirected through the <a> tag link. If I click on click on Resend otp then *ngIf="viewTab == 'generatedQR'" will be enable process will get start.  -->

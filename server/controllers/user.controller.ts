@@ -102,3 +102,13 @@ export const verify2FA = async (req, res) => {
         res.status(400).json({ success: false, message: error.message });
     }
 };
+
+export const reVerify2FA = async (req, res) => {
+	const { id } = req.params;
+    try {
+        const verificationResult = await UserHelper.reVerify2FAToken(id);
+        res.json(verificationResult);
+    } catch (error) {
+        res.status(400).json({ success: false, message: error.message });
+    }
+};

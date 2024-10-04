@@ -24,6 +24,11 @@ router.post(
 	UserController.verify2FA
 );
 
+router.put(
+	'/re-verify-2fa/:id',
+	UserController.reVerify2FA
+);
+
 router.get('/users/getUserData', permitAccess(), UserController.authenticate);
 router.post('/logout', (req: any, res, next) => {
 	try {

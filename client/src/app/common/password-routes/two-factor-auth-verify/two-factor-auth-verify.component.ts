@@ -104,4 +104,32 @@ export class TwoFactorAuthVerifyComponent implements OnInit {
       },
     });
   }
+
+  resendOTP() {; 
+    // this.enable2FA();
+    this.ajax.reVerify2FA(this.userId)?.subscribe({
+      next: (response) => {
+        console.log(response,  "response: ");
+        this.viewTab = 'generatedQR';
+        this.qrCodeUrl = response?.qrCodeData;
+        // this.viewTab = 'reverified';
+        // setTimeout(() => {
+        //   this.viewTab = 'verifyOtp';
+        // }, 5000);
+      },
+      error: (error) => {
+        this.verificationCode = '';
+        this.snackBar.open(error, 'Invalid OTP !!!', {
+          duration: 1000,
+          verticalPosition: 'top',
+          horizontalPosition: 'right',
+          panelClass: ['error-snackbar'],
+        });
+      },
+      complete: () => {
+        this.verificationCode = '';
+      },
+    });
+    
+  }
 }

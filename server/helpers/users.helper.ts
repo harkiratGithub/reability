@@ -357,17 +357,14 @@ export const getUserById = async (userId) => {
 export const enable2FAForUser = async (userId) => {
 	let user = await UserModel.findById(userId);
 	user = EncryptHelper.decryptJson(user[0]);
-	console.log(user, 'Role');
 	if (user.role !== ROLE.ADMIN && user.role !== ROLE.THERAPIST) {
 		throw new Error('2FA can only be enabled for Admin and Therapist roles.');
 	}
 	const secret = speakeasy.generateSecret({ name: 'ReAbility Online Auth' });
-	console.log(secret, 'secret');
 	user.two_factor_secret = secret.base32;
 	user.is_two_factor_enabled = true;
 	await UserModel.updateById(user.id, user);
 	const qrCodeData = await qrcode.toDataURL(secret.otpauth_url);
-	console.log(qrCodeData, 'qrCodeData');
 	return { qrCodeData };
 };
 
@@ -378,12 +375,29 @@ export const verify2FAToken = async (userId, token) => {
 		const isValid = speakeasy.totp.verify({
 			secret: user.two_factor_secret,
 			encoding: 'base32',
-			token: token,
+			token: token,	
 		});
 		if (!isValid) {
 			throw new Error('Invalid 2FA token');
 		}
 		return { success: true, message: '2FA verified successfully' };
+	} catch (error) {
+		throw new Error('Error verifying 2FA token');
+	} finally {
+		console.error('In finally block');
+	}
+};
+
+export const reVerify2FAToken = async (userId) => {
+	try {
+		let user = await UserModel.findById(userId);
+		user = EncryptHelper.decryptJson(user[0]);
+		const secret = speakeasy.generateSecret({ name: 'ReAbility Online Re-Auth' });
+		user.two_factor_secret = secret.base32;
+		user.is_two_factor_enabled = true;
+		await UserModel.updateById(user.id, user);
+		const qrCodeData = await qrcode.toDataURL(secret.otpauth_url);
+		return { qrCodeData };
 	} catch (error) {
 		throw new Error('Error verifying 2FA token');
 	} finally {
