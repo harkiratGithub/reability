@@ -81,3 +81,34 @@ export const getUserContactData = (req, res, next) => {
 		.then((patientData) => res.json(patientData))
 		.catch((err) => next(err));
 };
+
+export const enable2FA = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const { qrCodeData } = await UserHelper.enable2FAForUser(id);
+        res.json({ qrCodeData });
+    } catch (error) {
+        res.status(403).json({ message: error.message });
+    }
+};
+
+export const verify2FA = async (req, res) => {
+	const { id } = req.params;
+    const {  token } = req.body;
+    try {
+        const verificationResult = await UserHelper.verify2FAToken(id, token);
+        res.json(verificationResult);
+    } catch (error) {
+        res.status(400).json({ success: false, message: error.message });
+    }
+};
+
+export const reVerify2FA = async (req, res) => {
+	const { id } = req.params;
+    try {
+        const verificationResult = await UserHelper.reVerify2FAToken(id);
+        res.json(verificationResult);
+    } catch (error) {
+        res.status(400).json({ success: false, message: error.message });
+    }
+};

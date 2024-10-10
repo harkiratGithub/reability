@@ -39,6 +39,34 @@ export class AjaxService {
     }
   };
 
+  enable2FA = (id,data) => {
+    try {
+      return this.http.post<any>(`${this.baseUrl}/enable-2fa/${id}`, {
+        data,
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  verify2FA = (id,code) => {
+    try {
+      return this.http.post<any>(`${this.baseUrl}/verify-2fa/${id}`, {
+        token: code,
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  reVerify2FA = (id) => {
+    try {
+      return this.http.put<any>(`${this.baseUrl}/re-verify-2fa/${id}` , null);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   logout = () => {
     return this.http.post<any>(`${this.baseUrl}/logout`, {});
   };
@@ -58,7 +86,7 @@ export class AjaxService {
           onTherapistSession,
           onGameSession,
         })
-        .subscribe(() => { });
+        .subscribe(() => {});
     } catch (err) {
       console.error(err);
     }
@@ -133,7 +161,7 @@ export class AjaxService {
           patientId,
           gameId,
         })
-        .subscribe(() => { });
+        .subscribe(() => {});
     } catch (err) {
       console.error(err);
     }
@@ -146,7 +174,7 @@ export class AjaxService {
           patientId,
           gameId,
         })
-        .subscribe(() => { });
+        .subscribe(() => {});
     } catch (err) {
       console.error(err);
     }
@@ -163,7 +191,7 @@ export class AjaxService {
         .post<any>(`${this.baseUrl}/therapist/sessions/therapistStartTime`, {
           userId,
         })
-        .subscribe(() => { });
+        .subscribe(() => {});
     } catch (err) {
       console.error(err);
     }
@@ -281,7 +309,7 @@ export class AjaxService {
           gameId,
           settings,
         })
-        .subscribe(() => { });
+        .subscribe(() => {});
     } catch (err) {
       console.error(err);
     }
@@ -295,7 +323,7 @@ export class AjaxService {
           gameId,
           settings,
         })
-        .subscribe(() => { });
+        .subscribe(() => {});
     } catch (err) {
       console.error(err);
     }
@@ -337,7 +365,7 @@ export class AjaxService {
           patientId,
           hasCamera,
         })
-        .subscribe(() => { });
+        .subscribe(() => {});
     } catch (err) {
       console.error(err);
     }
@@ -350,6 +378,7 @@ export class AjaxService {
       console.error(err);
     }
   };
+
   deleteBookingById = (bookingId: number) => {
     try {
       return this.http.delete<any>(`${this.baseUrl}/therapist/booking/${bookingId}`);
@@ -357,6 +386,7 @@ export class AjaxService {
       console.error(err);
     }
   };
+
   editBookingById = (booking: Partial<ITreatmentListItem>) => {
     try {
       return this.http.post<any>(`${this.baseUrl}/therapist/booking/`, booking);
@@ -518,4 +548,5 @@ export class AjaxService {
       console.error(error);
     }
   };
+  
 }

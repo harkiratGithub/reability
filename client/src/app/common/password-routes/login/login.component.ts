@@ -9,7 +9,7 @@ import { AppActions } from '../../../app.actions';
 import { AuthenticationService } from '../../services/authentication.service';
 import { version } from '../../../../../../package.json';
 import { AjaxService } from '../../../therapist/services/ajax.service';
-import { roleMainRoute } from '../../../routes';
+import { roleMainRoute, ROUTES } from '../../../routes';
 import { isMobileDevice, MOBILE_OR_SMALL_RESOLUTION } from '../../utils';
 
 @Component({
@@ -87,7 +87,6 @@ export class LoginPageComponent implements OnInit, OnDestroy {
         this.f.username.setErrors(null);
         const token = await this.recaptchaV3Service.execute('login').toPromise();
         const user = await this.ajax.login(this.f.username.value, this.f.password.value, token).toPromise();
-
         if (window && (window as any).NREUM) {
           (window as any).NREUM.addPageAction('LoginSuccess', {
             username: this.f.username.value,
@@ -95,14 +94,26 @@ export class LoginPageComponent implements OnInit, OnDestroy {
             userRole: user.role,
           });
         }
-
+        this.appActions.setTherapist(user?.isTherapist);
         this.authenticationService.updateUser(user);
-        this.appActions.setTherapist(user.isTherapist);
-        this.router.navigate([`${roleMainRoute(user.role)}`]);
+        if (['therapist', 'admin'].includes(user.role)) {
+          localStorage.setItem('verified2FA', 'false');
+          if (user?.is_two_factor_enabled) {
+            this.router.navigate([`/${ROUTES.VERIFY_2FA.split(':id')[0]}${user.peerId}`], {
+              queryParams: { enable2FA: true },
+            });
+          } else {
+            this.router.navigate([`/${ROUTES.VERIFY_2FA.split(':id')[0]}${user.peerId}`], {
+              queryParams: { enable2FA: false },
+            });
+          }
+        } else{
+          localStorage.setItem('verified2FA', 'true');
+          this.router.navigate([`${roleMainRoute(user.role)}`]);
+        } 
       }
     } catch (error) {
       console.log('login errors !:', error);
-
       if (window && (window as any).NREUM) {
         (window as any).NREUM.addPageAction('LoginError', {
           username: this.f.username.value,
