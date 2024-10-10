@@ -56,6 +56,7 @@ export const MESSAGES = {
   ADD_USER_GAME_LOG: 'add_user_game_log',
   SEND_LOG_TO_SERVER: 'send_log_to_server',
   REDIRECT_TO_HOME: 'redirect_to_home',
+  SESSION_FEEDBACK: 'session_feedback',
 };
 
 export interface IEnlargeVideoMessage {

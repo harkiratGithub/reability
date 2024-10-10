@@ -1,0 +1,44 @@
+<div class="custom-modal">
+  <div class="custom-modal-header">
+    <h2>Give Feedback</h2>
+    <button mat-icon-button (click)="closeDialog()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  <div class="custom-modal-body">
+    <div class="question-list">
+      <div *ngFor="let question of questions; let i = index" class="question-container">
+        <div class="question-text"><li>{{ question?.question }}</li></div>
+        <div class="rating-emojis">
+          <mat-radio-group [(ngModel)]="answers[question?.id]" name="rating{{i}}" required>
+            <div *ngFor="let option of question?.options" class="emoji-option">
+              <mat-radio-button [value]="option?.value" class="hidden-radio"></mat-radio-button>
+              <span
+                class="emoji"
+                [class.selected]="answers[question?.id] === option?.value"
+                [class.hovered]="hoverValues[question?.id] === option?.value"
+                (mouseenter)="hoverValues[question?.id] = option?.value"
+                (mouseleave)="hoverValues[question?.id] = null"
+                (click)="selectRating(question?.id, option?.value)"
+                matTooltip="{{ option?.tooltip }}"
+                matTooltipPosition="above"
+              >
+                {{ option?.label }}
+              </span>
+            </div>
+          </mat-radio-group>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="custom-modal-footer">
+    <button
+      mat-raised-button
+      color="primary"
+      [disabled]="!isFormValid()"
+      (click)="submitFeedback()"
+    >
+      Submit
+    </button>
+  </div>
+</div>

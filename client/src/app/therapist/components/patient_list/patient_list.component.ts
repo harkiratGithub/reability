@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { reduce, chain, filter, groupBy, capitalize, startsWith } from 'lodash';
+import { reduce, chain, filter, groupBy, capitalize, startsWith, head } from 'lodash';
 import moment from 'moment';
 
 import {
@@ -17,7 +17,7 @@ import { PeersStatus, PATIENT_LOG_STORAGE_KEY } from '../../../../constants';
 import { ConfiguratorModalComponent } from '../configurator-modal/configurator-modal.component';
 import { ReCaptchaV3Service } from 'ng-recaptcha';
 import { setAudioStreamsToComponent } from '../../../common/utils';
-import { IGame } from '../../../../types';
+import { IGame, IPatientLog } from '../../../../types';
 
 @Component({
   selector: 'app-patient-patient-list-component',
@@ -36,7 +36,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
   gamesNames: string[] = [];
   patientListGrouped: any = [];
   intervalId = undefined;
-  patientLog: string = '';
+  patientLog: IPatientLog[] = [];
   selectedPatientId: string = '';
   filterFunc: (data: [], text: string) => void;
   peersStatusConst = PeersStatus;
@@ -46,6 +46,8 @@ export class PatientListComponent implements OnInit, OnDestroy {
   shownLogs = {};
   isCopiedToClipboard: boolean = false;
   isLogModalOpen: boolean = false;
+  selectedGame: any = {};
+  selectedGameIndex: number = 0;
 
   constructor(
     private ajax: AjaxService,
@@ -62,8 +64,8 @@ export class PatientListComponent implements OnInit, OnDestroy {
     setAudioStreamsToComponent(audioContainerElement, this.audioStreams);
     this.ajax.getAllGames().subscribe((allGames) => {
       this.allGames = allGames;
-      this.gamesNames = this.allGames.map((game) => game.name);
-      this.allGames.map((game) => this.getGameIcon(game));
+      this.gamesNames = this.allGames?.map((game) => game?.name);
+      this.allGames?.map((game) => this.getGameIcon(game));
     });
   }
 
@@ -71,7 +73,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
     clearInterval(this.intervalId);
   }
 
-  toggleGame(game, patient) {
+  toggleGame(game: { id: number; }, patient: { allGames: { isValid: any; }[]; id: any; }) {
     const gameIndex = this.allGames.findIndex((obj) => obj.id == game.id);
     patient.allGames[gameIndex].isValid = !patient.allGames[gameIndex].isValid;
     if (!patient.allGames[gameIndex].isValid) {
@@ -86,7 +88,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
       .getPatientActivities(this.lastWeekActivityArray[0], this.lastWeekActivityArray[6])
       .subscribe((patients) => {
         this.ajax.getConnectedPeers().subscribe((peerUsers) => {
-          patients.map((patient) => {
+          patients.map((patient: { status: string; user_id: { toString: () => any; }; }) => {
             if (
               patient.status === this.peersStatusConst.AVAILABLE &&
               !peerUsers.find((peerUser) => peerUser.id === patient.user_id.toString())
@@ -105,12 +107,17 @@ export class PatientListComponent implements OnInit, OnDestroy {
             }
           });
           this.patientListGrouped = groupBy(this.patientList, (p) => p.status);
+          console.log('the filtered list::', this.patientList);
           this.patientListFiltered = this.patientList;
         });
       });
   };
 
-  setFilteredData = (filteredData) => (this.patientListFiltered = filteredData);
+  getKeys(obj: any): string[] {
+    return Object.keys(obj);
+  }
+
+  setFilteredData = (filteredData: any[]) => (this.patientListFiltered = filteredData);
 
   filterByName = (data: any[], filterText: string) => {
     if (!filterText) {
@@ -127,7 +134,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
     this.setFilteredData(filteredData);
   };
 
-  checkIfSettingModalOpened = (patient) => {
+  checkIfSettingModalOpened = (patient: { id: any; }) => {
     if (this.patientList.length > 0) {
       const patientFound = this.patientList.find((currPatient) => currPatient.id === patient.id);
       return patientFound ? patientFound.settingMenuOpen || false : false;
@@ -135,25 +142,41 @@ export class PatientListComponent implements OnInit, OnDestroy {
     return false;
   };
 
-  buildPatientActivities = (patientList) => {
+  buildPatientActivities = (patientList: any) => {
     const patients = chain(patientList)
-      .map((patient) => {
-        return {
-          id: patient.id,
-          fullName: patient.full_name,
-          userName: patient.user_name,
-          status: patient.status,
-          lastLogin: patient.logged_in_at,
-          lastWeekActivity: [],
-          settingMenuOpen: this.checkIfSettingModalOpened(patient),
-          userId: patient.user_id,
-          phone: patient.phone,
-          contacts: patient.contacts,
-        };
-      })
+      .groupBy('id')
+      .mapValues((items) => ({
+        id: items[0].id,
+        fullName: items[0].full_name,
+        userName: items[0].user_name,
+        status: items[0].status,
+        lastLogin: items[0].logged_in_at,
+        // gameSummaries: items
+        //   ?.filter((item) => Object.keys(item?.game_summary || {})?.length)
+        //   ?.map((item) => ({ start_time: item.start_time, game_summary: item?.game_summary }))
+        //   ?.sort((a, b) => new Date(b?.start_time)?.getTime() - new Date(a?.start_time)?.getTime()),
+        gameSummary: head(
+          items
+            ?.filter((item) => Object.keys(item?.game_summary || {})?.length)
+            ?.map((item) => ({
+              start_time: item.start_time,
+              game_summary: item?.game_summary,
+              session_feedback: item?.session_feedback,
+            }))
+            ?.sort((a, b) => new Date(b?.start_time)?.getTime() - new Date(a?.start_time)?.getTime())
+        )?.game_summary,
+        lastWeekActivity: [],
+        settingMenuOpen: this.checkIfSettingModalOpened(items[0]),
+        userId: items[0].user_id,
+        phone: items[0].phone,
+        contacts: items[0].contacts,
+        therapistSessionId: items[0].therapist_session_id,
+      }))
+      .values()
       .uniqBy('id')
-      .orderBy('status')
+      .orderBy([(p) => (p.status === 'online' ? 1 : 0), (p) => new Date(p.lastLogin)], ['desc', 'desc'])
       .value();
+
     patients.forEach((patient) => {
       for (let i = 0; i < this.lastWeekActivityArray.length; i++) {
         const checkActivity = filter(
@@ -170,6 +193,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
             if (!a.duration) {
               return acc;
             }
+
             acc.duration = addTwoDurationTimeTogether(acc.duration, a.duration);
             acc.withTherapistSession = (a && a.therapist_session_id) || acc.withTherapistSession;
 
@@ -178,16 +202,24 @@ export class PatientListComponent implements OnInit, OnDestroy {
               return acc;
             }
 
-            const game = this.allGames.find((game) => game.id === a.game_id);
-            if (!game) {
+            if (!this.allGames || this.allGames.length === 0) {
+              console.error('No games available in this.allGames');
               return acc;
             }
+
+            const game = this.allGames.find((game) => game.id === a.game_id);
+            if (!game) {
+              console.warn(`Game not found for game_id: ${a.game_id}`);
+              return acc;
+            }
+            const gameSummary = a.game_summary;
+            const sessionFeedback = a.session_feedback;
             const gameName = game ? game.name : a.game_id.toString();
             const gameDuration = acc.gamesDuration.find((gameDuration) => gameDuration.gameName === gameName);
             if (gameDuration) {
               gameDuration.duration = addTwoDurationTimeTogether(gameDuration.duration, a.duration);
             } else {
-              acc.gamesDuration.push({ gameName, duration: a.duration });
+              acc.gamesDuration.push({ gameName, duration: a.duration, gameSummary, sessionFeedback });
             }
             return acc;
           },
@@ -203,7 +235,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
     return patients;
   };
 
-  getPeerStatusColor = (status) => {
+  getPeerStatusColor = (status: any) => {
     switch (status) {
       case this.peersStatusConst.AVAILABLE:
         return '#2EFFD0';
@@ -242,27 +274,28 @@ export class PatientListComponent implements OnInit, OnDestroy {
       this.getPatientActivities();
     }, 600000);
   };
-  getGameIcon = (game) => {
+
+  getGameIcon = (game: IGame) => {
     const currGame = game;
     currGame.path = `/assets/game-icons-patient-list/${game.name}.png`;
     currGame.url = this.getUrlGame(game.url);
   };
 
-  getUrlGame(url) {
+  getUrlGame(url: string) {
     return url + 'index.html';
   }
 
-  getPatientRecentGameActivity = (patient) => {
+  getPatientRecentGameActivity = (patient: { id: any; fullName?: any; userName?: any; status?: any; lastLogin?: any; gameSummary?: any; lastWeekActivity: any; settingMenuOpen?: any; userId?: any; phone?: any; contacts?: any; therapistSessionId?: any; games?: any; allGames?: any; gameIds?: any; }) => {
     this.ajax.getValidGames(patient.id).subscribe((games) => {
       patient.games = games;
-      const validGameIds = games.map((game) => game.id);
+      const validGameIds = games.map((game: { id: any; }) => game.id);
       patient.allGames = this.allGames.map((game) => {
         const isValid = validGameIds.includes(game.id);
         return { ...game, isValid };
       });
       patient.gameIds = [];
-      patient.lastWeekActivity.map((activity) => {
-        if (activity.game_id && !patient.gameIds.find((game) => game.id === activity.game_id)) {
+      patient.lastWeekActivity.map((activity: { game_id: any; }) => {
+        if (activity.game_id && !patient.gameIds.find((game: { id: any; }) => game.id === activity.game_id)) {
           patient.gameIds.push({
             id: activity.game_id,
           });
@@ -270,16 +303,16 @@ export class PatientListComponent implements OnInit, OnDestroy {
       });
       // icon & which games have configorator need to come from server
       // patient.games = patient.games.filter(game => game.name === 'studio');
-      patient.games.map((game) => this.getGameIcon(game));
+      patient.games.map((game: any) => this.getGameIcon(game));
       // when more games filter be availble sort by activity (game, index) => game.id === patient.gameIds[index]
     });
   };
 
-  togglePatientSettingMenu = (patient) => {
+  togglePatientSettingMenu = (patient: { settingMenuOpen: boolean; }) => {
     patient.settingMenuOpen = !patient.settingMenuOpen;
   };
 
-  openGameConfiguration = (game, patient) => {
+  openGameConfiguration = (game: any, patient: any) => {
     const dialogRef = this.dialog.open(ConfiguratorModalComponent, {
       data: {
         game,
@@ -288,7 +321,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
     });
   };
 
-  sendFastLoginLink = (patient) => {
+  sendFastLoginLink = (patient: { id: any; userId: number; }) => {
     const modalData: GeneralModalData = {
       modalStyle: GENERAL_MODAL_STYLE.WHITE,
       content: GENERAL_MODAL_CONTENT.SEND_FAST_LOGIN,
@@ -326,7 +359,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
     this.appActions.openGeneralModal(modalData);
   };
 
-  getActivityTooltipText = (activity) => {
+  getActivityTooltipText = (activity: { duration: string; gamesDuration: any; }) => {
     if (!activity.duration) {
       return '';
     }
@@ -358,9 +391,66 @@ export class PatientListComponent implements OnInit, OnDestroy {
     this.isLogModalOpen = true;
     this.shownLogs[patientId] = true;
     this.selectedPatientId = patientId;
-    const selectedPatient = this.patientListFiltered.find((patient) => patient.userId == patientId);
-    this.patientLog = selectedPatient.log;
+
+    const selectedPatient = this.patientListFiltered.find((patient) => patient.userId === patientId);
+    console.log('the selectedPatient::', selectedPatient);
+
+    const gameMap = new Map<string, any[]>();
+
+    if (selectedPatient && selectedPatient.lastWeekActivity) {
+      selectedPatient.lastWeekActivity.forEach((activity: { gamesDuration: any[]; }) => {
+        activity.gamesDuration.forEach((game: { gameName: string; duration: any; gameSummary: any; sessionFeedback: { questions: any; }; }) => {
+          if (!gameMap.has(game.gameName)) {
+            gameMap.set(game.gameName, []);
+          }
+          gameMap.get(game?.gameName)?.push({
+            duration: game?.duration,
+            gameSummary: game?.gameSummary,
+            sessionFeedback: game?.sessionFeedback?.questions,
+          });
+        });
+      });
+    }
+
+    this.patientLog = Array.from(gameMap.entries()).map(([gameName, sessions]) => {
+      sessions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      const latestSession = sessions[0];
+      const remainingSessions = sessions.slice(1);
+
+      return {
+        gameName,
+        latestSession,
+        remainingSessions,
+        showMore: false,
+      };
+    });
   };
+
+  objectKeys = Object.keys;
+
+  isArray(value: any): boolean {
+    return Array.isArray(value);
+  }
+
+  getTotalDuration(games: any[]): string {
+    let totalSeconds = 0;
+
+    games.forEach((game) => {
+      const latestSession = game.latestSession;
+      if (latestSession && latestSession.duration) {
+        const [hours, minutes, seconds] = latestSession.duration.split(':').map(Number);
+        totalSeconds += hours * 3600 + minutes * 60 + seconds;
+      }
+    });
+
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds
+      .toString()
+      .padStart(2, '0')}`;
+  }
 
   closeModal = () => {
     this.isLogModalOpen = false;
@@ -369,11 +459,51 @@ export class PatientListComponent implements OnInit, OnDestroy {
 
   async copyToClipboard() {
     try {
-      await navigator.clipboard.writeText(this.patientLog);
+      if (!this.patientLog || !this.patientLog.length) {
+        console.log('No game session logs available to copy.');
+        return;
+      }
+
+      const latestGame = this.patientLog[this.patientLog.length - 1];
+
+      const gameName = `Game Name: ${latestGame.gameName}`;
+      const duration = `Duration: ${latestGame.latestSession?.duration || 'N/A'}`;
+
+      let summary = '';
+      if (latestGame.latestSession?.gameSummary) {
+        summary += `Total Squats: ${
+          latestGame.latestSession.gameSummary.totalSquats !== undefined
+            ? latestGame.latestSession.gameSummary.totalSquats
+            : 'N/A'
+        }\n`;
+        summary += `Squats Per Set: ${latestGame.latestSession.gameSummary.squatsPerSet?.join(', ') || 'N/A'}\n`;
+        summary += `Game Time (seconds): ${
+          latestGame.latestSession.gameSummary.gameTimeSeconds !== null
+            ? latestGame.latestSession.gameSummary.gameTimeSeconds
+            : 'N/A'
+        }\n`;
+      } else {
+        summary += 'No game summary available\n';
+      }
+
+      let feedback = '';
+      if (latestGame.latestSession?.sessionFeedback?.questions?.length) {
+        feedback += 'Session Feedback:\n';
+        latestGame.latestSession.sessionFeedback.questions.forEach((question: any) => {
+          feedback += `${question.question}: ${question.answer || 'N/A'}\n`;
+        });
+      } else {
+        feedback += 'No session feedback available\n';
+      }
+
+      const formattedLog = `${gameName}\n${duration}\n${summary}\n${feedback}`;
+
+      await navigator.clipboard.writeText(formattedLog);
+
       this.isLogModalOpen = false;
       this.isCopiedToClipboard = true;
     } catch (e) {
-      console.log(e);
+      console.log('Failed to copy log to clipboard:', e);
     }
   }
 
@@ -388,5 +518,91 @@ export class PatientListComponent implements OnInit, OnDestroy {
       localStorage.removeItem(this.selectedPatientId + '_' + game + PATIENT_LOG_STORAGE_KEY);
     }
     this.closeEraseLogModal();
+  };
+
+  prevGame() {
+    if (this.selectedGameIndex > 0) {
+      this.selectedGameIndex--;
+      this.selectedGame = this.patientLog[this.selectedGameIndex];
+    }
+  }
+
+  nextGame() {
+    if (this.selectedGameIndex < this.patientLog.length - 1) {
+      this.selectedGameIndex++;
+      this.selectedGame = this.patientLog[this.selectedGameIndex];
+    }
+  }
+
+  // getFeedbackTooltipText = (feedbacks:any) => {
+  //   console.log("feedbacks ", feedbacks);
+  //   const quesfeedbacks = feedbacks?.lastWeekActivity
+  //     .map((activity: { gamesDuration: { sessionFeedback: any }[] }) => {
+  //       const feedback = activity.gamesDuration?.find((gameDuration) => gameDuration.sessionFeedback)?.sessionFeedback;
+  //       if (feedback && feedback.questions) {
+  //         return feedback.questions.map((q) => `* ${q.question}:  ${q.answer || 'No answer provided'}`).join('\n');
+  //       }
+  //       return '';
+  //     })
+  //     .filter((text) => text)
+  //     .join('\n');
+  //   return quesfeedbacks;
+  // };
+
+  getFeedbackTooltipText = (feedbacks: { lastWeekActivity: any[]; }) => {
+    const convertToSeconds = (timeStr: { split: (arg0: string) => { (): any; new(): any; map: { (arg0: NumberConstructor): [any, any, any]; new(): any; }; }; }) => {
+      const [hours, minutes, seconds] = timeStr.split(':').map(Number);
+      return (hours || 0) * 3600 + (minutes || 0) * 60 + (seconds || 0);
+    };
+    const convertToTimeFormat = (totalSeconds: number) => {
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+      return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(
+        2,
+        '0'
+      )}`;
+    };
+    const options = [
+      { "value": "Very Poor", "label": "😡", "tooltip": "Angry" },
+      { "value": "Unsatisfied", "label": "🙁", "tooltip": "Slightly Frowning" },
+      { "value": "Neutral", "label": "😐", "tooltip": "Neutral" },
+      { "value": "Somewhat Satisfied", "label": "😊", "tooltip": "Smiling with Eyes" },
+      { "value": "Satisfied", "label": "😁", "tooltip": "Beaming with Smiling Eyes" }
+    ];
+    let totalTimeInSeconds = 0;
+    const quesfeedbacks = feedbacks?.lastWeekActivity
+      .map((activity: { duration: any; gamesDuration: any[]; }) => {
+        if (activity.duration) {
+          totalTimeInSeconds += convertToSeconds(activity.duration);
+        }
+        const gameFeedbacks = activity.gamesDuration
+          ?.map((gameDuration: { sessionFeedback: any; duration: any; gameName: string; }) => {
+            const feedback = gameDuration.sessionFeedback;
+            const gameDurationText = gameDuration.duration ? ` (${gameDuration.duration})` : '';
+            if (feedback && feedback.questions) {
+              const feedbackText = feedback.questions
+                .map((q: { question: any; answer: string; }) => {
+                  return `* ${q.question}: ${options?.find((o)=>o?.value ==q.answer)?.label || 'No answer provided'}`;
+                })
+                .join('\n');
+
+              return `\n* ${gameDuration.gameName.toUpperCase()}${gameDurationText}\n\n${feedbackText}`;
+            }
+            return '';
+          })
+          .filter((text: any) => text)
+          .join('\n');
+
+        if (gameFeedbacks) {
+          return `${gameFeedbacks}`;
+        }
+        return '';
+      })
+      .filter((text: any) => text)
+      .join('\n');
+
+    const totalDurationFormatted = convertToTimeFormat(totalTimeInSeconds);
+    return totalTimeInSeconds > 0 ? `* Total Time: ${totalDurationFormatted}\n${quesfeedbacks}` : quesfeedbacks;
   };
 }

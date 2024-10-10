@@ -14,6 +14,7 @@ import { AdminComponent } from './therapist/adminPage/therapist.component';
 import { LoginPageComponent } from './common/password-routes/login/login.component';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
@@ -74,6 +75,9 @@ import { MatNativeDateModule, MAT_DATE_FORMATS, DateAdapter } from '@angular/mat
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatRadioModule } from '@angular/material/radio';
+import { MatTooltipModule } from '@angular/material/tooltip';
+
+
 import {
   NgxMatMomentModule,
   NgxMatMomentAdapter,
@@ -127,6 +131,7 @@ import { GameLogsComponent } from './patient/components/game-logs/game-logs.comp
 import { ExportToExcelComponent } from './backoffice/export-to-excel/export-to-excel.component';
 import { PatientGeneralModalComponent } from './common/patient-general-modal/patient_general_modal.component';
 import { TwoFactorAuthVerifyComponent } from './common/password-routes/two-factor-auth-verify/two-factor-auth-verify.component';
+import { FeedbackFormComponent } from './patient/components/feedback-form/feedback-form.component';
 
 export const CUSTOM_MOMENT_FORMATS = {
   parse: {
@@ -215,6 +220,7 @@ export const CUSTOM_MOMENT_FORMATS = {
     ExportToExcelComponent,
     PatientGeneralModalComponent,
     TwoFactorAuthVerifyComponent,
+    FeedbackFormComponent,
   ],
   imports: [
     RouterModule.forRoot(routes, { useHash: true }),
@@ -222,6 +228,7 @@ export const CUSTOM_MOMENT_FORMATS = {
     NgReduxModule,
     NgReduxRouterModule.forRoot(),
     MatDialogModule,
+    MatIconModule,
     MatTabsModule,
     MatSlideToggleModule,
     FormsModule,
@@ -237,6 +244,7 @@ export const CUSTOM_MOMENT_FORMATS = {
     MatInputModule,
     MatButtonModule,
     MatRadioModule,
+    MatTooltipModule,
     NgxMatMomentModule,
     NgxMatDatetimePickerModule,
     NgxMatTimepickerModule,
@@ -275,6 +283,7 @@ export const CUSTOM_MOMENT_FORMATS = {
     ModalComponent,
     ConfiguratorModalComponent,
     PatientGeneralModalComponent,
+    FeedbackFormComponent,
   ],
 })
 export class AppModule {

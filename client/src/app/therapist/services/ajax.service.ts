@@ -6,7 +6,7 @@ import _ from 'lodash';
 
 import { environment } from '../../../environments/environment';
 import { User } from '../../common/models/user';
-import { IPatient, ITherapistAvailability, ITreatmentListItem } from '../../../types';
+import { FeedbackQuestion, IPatient, ITherapistAvailability, ITreatmentListItem } from '../../../types';
 
 @Injectable()
 export class AjaxService {
@@ -302,6 +302,16 @@ export class AjaxService {
     }
   };
 
+  updateGameFeedback = (gameFeedback) => {
+    try {
+      return this.http.post<any>(`${this.baseUrl}/patient/gameSession/updateSession`, {
+        gameFeedback,
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   saveGameSettings = (gameId, settings) => {
     try {
       this.http
@@ -549,4 +559,7 @@ export class AjaxService {
     }
   };
   
+  getFeedbackQuestions(): Observable<FeedbackQuestion[]> {
+    return this.http.get<FeedbackQuestion[]>(`${this.baseUrl}/patient/feedback/questions`);
+  }
 }

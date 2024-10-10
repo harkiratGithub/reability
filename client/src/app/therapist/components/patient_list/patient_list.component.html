@@ -99,7 +99,6 @@
           <div class="patient-name" (click)="togglePatientSettingMenu(patient)">
             {{ patient.userName }} - {{ patient.fullName }}
           </div>
-
           <div>
             <button
               class="open-modal-btn"
@@ -110,17 +109,110 @@
               1
             </button>
           </div>
+         
+          <div
+            *ngIf="isLogModalOpen && patientLog?.length && selectedPatientId == patient.userId"
+            class="patient-log-modal"
+          >
+            <div class="patient-log-content">
+              <h3 class="game-heading">Game Information</h3>
 
-          <div *ngIf="isLogModalOpen && patientLog && selectedPatientId == patient.userId" class="patient-log-modal">
-            <textarea type="text" [(ngModel)]="patientLog"></textarea>
-            <button class="close-btn" (click)="closeModal()">Close</button>
-            <button (click)="copyToClipboard()" title="copy" class="copy-btn">Copy</button>
+              <div class="logs-container">
+                <div *ngFor="let log of patientLog">
+                  <div class="game-log">
+                    <h3>Game Name: {{ log.gameName | titlecase }}</h3>
+                    <div class="duration">
+                      <p><strong>Duration:</strong></p>
+                      <p>{{ log.latestSession.duration }}</p>
+                    </div>
+                    <div class="game-summary">
+                      <p><strong>Game Summary:</strong></p>
+                      <div>
+                        <p *ngIf="log.latestSession.gameSummary.totalSquats !== undefined">
+                          Total Squats: {{ log.latestSession.gameSummary.totalSquats }}
+                        </p>
+                        <p *ngIf="log.latestSession.gameSummary.gameTimeSeconds !== undefined">
+                          Game Time (seconds): {{ log.latestSession.gameSummary.gameTimeSeconds }}
+                        </p>
+                        <p *ngIf="log.latestSession.gameSummary.difficult !== undefined">
+                          Difficulty: {{ log.latestSession.gameSummary.difficult }}
+                        </p>
+                        <p *ngIf="log.latestSession.gameSummary.gameScore !== undefined">
+                          Game Score: {{ log.latestSession.gameSummary.gameScore.join(', ') }}
+                        </p>
+                      </div>
+                    </div>
+
+                    <!-- <p class="session-feedback"><strong>Session Feedback</strong></p>
+                    <ul>
+                      <li *ngFor="let feedback of log.latestSession.sessionFeedback">
+                        {{ feedback.question }} - {{ feedback.answer }}
+                      </li>
+                    </ul> -->
+
+                    <div class="button-container">
+                      <button
+                        class="submit-button"
+                        *ngIf="log.remainingSessions.length > 0"
+                        (click)="log.showMore = !log.showMore"
+                      >
+                        {{ log.showMore ? 'Show Less' : 'Show More' }}
+                      </button>
+                    </div>
+
+                    <div *ngIf="log.showMore">
+                      <div *ngFor="let session of log.remainingSessions">
+                        <p><strong>Additional Session - Duration:</strong> {{ session.duration }}</p>
+                        <hr />
+                        <div class="additional-session">
+                          <p *ngIf="session.gameSummary.totalSquats !== undefined">
+                            Total Squats: {{ session.gameSummary.totalSquats }}
+                          </p>
+                          <p *ngIf="session.gameSummary.gameTimeSeconds !== undefined">
+                            Game Time (seconds): {{ session.gameSummary.gameTimeSeconds }}
+                          </p>
+                          <p *ngIf="session.gameSummary.difficult !== undefined">
+                            Difficulty: {{ session.gameSummary.difficult }}
+                          </p>
+                          <p *ngIf="session.gameSummary.gameScore !== undefined">
+                            Game Score: {{ session.gameSummary.gameScore.join(', ') }}
+                          </p>
+                        </div>
+
+                        <!-- <p class="session-feedback" *ngIf="session?.sessionFeedback?.length > 0">
+                          <strong>Session Feedback:</strong>
+                        </p> -->
+
+                        <!-- <div *ngFor="let feedback of session.sessionFeedback">
+                          <ul class="ques-ans">
+                            <li>{{ feedback?.question }}</li>
+                            <p>{{ feedback?.answer }}</p>
+                          </ul>
+                        </div> -->
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="total-duration">
+                <h4>Total Time Spent on Games:</h4>
+                <span>{{ getTotalDuration(patientLog) || '00:00:00' }}</span>
+              </div>
+              <div class="modal-actions">
+                <button class="close-btn" (click)="closeModal()">Close</button>
+                <button (click)="copyToClipboard()" title="copy" class="copy-btn">Copy</button>
+              </div>
+            </div>
           </div>
+
           <div *ngIf="isCopiedToClipboard" class="erase-log-modal">
             <p>Text was copied</p>
             <p>Do you want to erase log?</p>
-            <button class="close-btn top-up" (click)="closeEraseLogModal()">No</button>
-            <button class="copy-btn top-up" (click)="deletePatientLog()">Yes</button>
+            <div class="modal-btns">
+              <button class="close-btn top-up" (click)="closeEraseLogModal()">No</button>
+              <button class="copy-btn top-up" (click)="deletePatientLog()">Yes</button>
+            </div>
           </div>
         </div>
         <div class="phone">
@@ -130,6 +222,15 @@
               <img [title]="showContactDetails(contact)" src="../../../../assets/skel/info_black_24dp.svg" />
             </div>
           </div>
+        </div>
+        <!--  Session Feedback -->
+        <div class="feeds" *ngIf="patient.log">
+          <img
+            src="../../../../assets/skel/conversation.png"
+            alt="Feedback Icon"
+            class="feedback-icon"
+            [title]="getFeedbackTooltipText(patient)"
+          />
         </div>
         <div class="last-week-activity-content" [ngClass]="{ opened: patient.settingMenuOpen }">
           <div *ngFor="let activity of patient.lastWeekActivity" class="patient-activity-image">

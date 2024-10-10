@@ -1,0 +1,124 @@
+.custom-modal {
+  max-width: 100%;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  margin: auto;
+}
+
+.custom-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #dee2e6;
+  padding-bottom: 15px;
+}
+
+.custom-modal-header h2 {
+  margin: 0;
+  font-size: 24px;
+  color: #333;
+}
+
+.custom-modal-body {
+  padding: 20px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.question-container {
+  margin-bottom: 10px;
+}
+
+.question-container:last-child {
+  margin-bottom: 0px;
+}
+
+.question-text {
+  font-weight: 600;
+  // font-size: 20px;
+  color: #555;
+  // margin-bottom: 10px;
+}
+
+.rating-emojis {
+  display: flex;
+  padding: 10px 0;
+  margin-left: 15px;
+  justify-content: left;
+}
+
+.emoji-option {
+  margin: 0 8px;
+  // margin: 0;
+  cursor: pointer;
+  display: inline-block;
+  transition: transform 0.2s ease-in-out;
+}
+
+.emoji {
+  font-size: 26px;
+  padding: 10px;
+  transition: transform 0.3s ease-in-out, color 0.3s ease-in-out, opacity 0.3s ease-in-out;
+}
+
+.emoji.selected {
+  transform: scale(1.4);
+  color: #ff9800;
+}
+
+.emoji.hovered {
+  transform: scale(1.2);
+  color: #ff5722;
+}
+
+.emoji-option .emoji:not(.selected):not(.hovered) {
+  opacity: 0.6;
+}
+
+.custom-modal-footer {
+  display: flex;
+  justify-content: center;
+  padding-top: 20px;
+  border-top: 2px solid #dee2e6;
+}
+
+button[mat-raised-button] {
+  min-width: 120px;
+}
+
+button[mat-raised-button]:focus {
+  outline: none;
+  box-shadow: 0 0 5px 2px rgba(0, 0, 0, 0.2);
+}
+
+button[mat-raised-button]:hover {
+  background-color: #ff3d65;
+}
+
+button[mat-raised-button]:disabled {
+  background-color: #cccccc;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.hidden-radio {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .custom-modal {
+    padding: 15px;
+  }
+
+  .question-text {
+    font-size: 18px;
+  }
+
+  .emoji {
+    font-size: 20px;
+  }
+}
