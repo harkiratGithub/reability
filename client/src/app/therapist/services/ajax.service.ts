@@ -154,6 +154,10 @@ export class AjaxService {
     return this.http.get<any[]>(`${this.baseUrl}/therapist/games`);
   }
 
+  getAllEndGames() {
+    return this.http.get<any[]>(`${this.baseUrl}/patient/games`);
+  }
+
   addGameToPatient = (patientId, gameId) => {
     try {
       this.http
@@ -216,6 +220,17 @@ export class AjaxService {
   getPatientActivities = (startTime, endTime) => {
     try {
       return this.http.post<any>(`${this.baseUrl}/therapist/getPatientList`, {
+        startTime,
+        endTime,
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  getPatientEndActivities = (startTime, endTime) => {
+    try {
+      return this.http.post<any>(`${this.baseUrl}/patient/getPatientDataList`, {
         startTime,
         endTime,
       });

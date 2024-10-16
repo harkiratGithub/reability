@@ -58,16 +58,17 @@ export class FeedbackFormComponent implements OnInit {
   }
 
   saveFeedback(feedbackData: any): void {
-    this.ajax.updateGameFeedback(feedbackData).subscribe(
-      (res) => {
+    this.ajax.updateGameFeedback(feedbackData).subscribe({
+      next: (res) => {
         this.closeDialog();
       },
-      (err) => {
+      error: (err) => {
         console.error('Error submitting feedback', err);
         this.closeDialog();
       }
-    );
+    });
   }
+  
 
   closeDialog(): void {
     this.dialogRef.close();

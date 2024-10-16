@@ -72,7 +72,6 @@ export const routes = [
 ];
 
 export const roleMainRoute = (role) => {
-  console.log(`Role ${role}`)
   switch (role) {
     case Role.Admin:
       return ROUTES.ADMIN_HOME_PAGE;

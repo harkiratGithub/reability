@@ -154,7 +154,7 @@ export class AppComponent implements OnInit, OnDestroy {
           this.authenticationService.updateUser(userDataResult);
           if (
             (!localStorage.getItem('verified2FA') || localStorage.getItem('verified2FA') == 'false') &&
-            ['therapist', 'admin'].includes(userDataResult.role)
+            ['admin'].includes(userDataResult.role)
           ) {
             if (userDataResult.is_two_factor_enabled) {
               this.router.navigate([`/${ROUTES.VERIFY_2FA.split(':id')[0]}${userDataResult.peerId}`], {

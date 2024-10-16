@@ -357,8 +357,8 @@ export const getUserById = async (userId) => {
 export const enable2FAForUser = async (userId) => {
 	let user = await UserModel.findById(userId);
 	user = EncryptHelper.decryptJson(user[0]);
-	if (user.role !== ROLE.ADMIN && user.role !== ROLE.THERAPIST) {
-		throw new Error('2FA can only be enabled for Admin and Therapist roles.');
+	if (user.role !== ROLE.ADMIN) {
+		throw new Error('2FA can only be enabled for Admin roles.');
 	}
 	const secret = speakeasy.generateSecret({ name: 'ReAbility Online Auth' });
 	user.two_factor_secret = secret.base32;

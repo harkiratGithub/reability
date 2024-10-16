@@ -156,6 +156,16 @@ export const getPatientListActivities = (req, res, next) => {
 		});
 };
 
+export const getPatientListDataActivities = (req, res, next) => {
+	const { startTime, endTime } = req.body;
+	const patientId = req.user.patientId;
+	PatientHelper.getPatientActivities(patientId, startTime, endTime)
+		.then((patientListActivities) => res.json(patientListActivities))
+		.catch((err) => {
+			next(err);
+		});
+};
+
 export const getAllActive = (req, res, next) => {
 	PatientHelper.getAllActive()
 		.then((activePatients) => res.json(activePatients))

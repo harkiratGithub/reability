@@ -4,6 +4,8 @@ import * as PatientController from '../controllers/patient.controller';
 import * as GameActivitiesController from '../controllers/game-activities.controller';
 import * as UserGameDataController from '../controllers/user-game-data.controller';
 import * as ServerLogController from '../controllers/server-log.controller';
+import * as GameDataController from '../controllers/game-data.controller';
+
 
 import express from 'express';
 import multer from 'multer';
@@ -31,5 +33,7 @@ router.put('/userGameData/delete', UserGameDataController.deleteUserGameData);
 
 router.post('/addServerLog', ServerLogController.sendLogToServer);
 router.get('/feedback/questions', PatientController.getFeedbackQuestions);
+router.get('/games', GameDataController.getAllEndGames);
+router.post('/getPatientDataList', PatientController.getPatientListDataActivities);
 
 export default router;

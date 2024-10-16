@@ -132,6 +132,7 @@ import { ExportToExcelComponent } from './backoffice/export-to-excel/export-to-e
 import { PatientGeneralModalComponent } from './common/patient-general-modal/patient_general_modal.component';
 import { TwoFactorAuthVerifyComponent } from './common/password-routes/two-factor-auth-verify/two-factor-auth-verify.component';
 import { FeedbackFormComponent } from './patient/components/feedback-form/feedback-form.component';
+import { GameHistorySessionComponent } from './patient/components/game-history-session/game-history-session.component';
 
 export const CUSTOM_MOMENT_FORMATS = {
   parse: {
@@ -221,6 +222,7 @@ export const CUSTOM_MOMENT_FORMATS = {
     PatientGeneralModalComponent,
     TwoFactorAuthVerifyComponent,
     FeedbackFormComponent,
+    GameHistorySessionComponent,
   ],
   imports: [
     RouterModule.forRoot(routes, { useHash: true }),
