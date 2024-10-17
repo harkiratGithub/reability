@@ -9,7 +9,7 @@ exports.config = {
   /**
    * Array of application names.
    */
-  app_name: ['Reability'],
+  app_name: ['Spectory Reability Server'],
   /**
    * Your New Relic license key.
    */
