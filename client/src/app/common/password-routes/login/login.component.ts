@@ -102,7 +102,8 @@ export class LoginPageComponent implements OnInit, OnDestroy {
             this.router.navigate([`/${ROUTES.VERIFY_2FA.split(':id')[0]}${user.peerId}`], {
               queryParams: { enable2FA: true },
             });
-          } else {
+          }
+           else {
             this.router.navigate([`/${ROUTES.VERIFY_2FA.split(':id')[0]}${user.peerId}`], {
               queryParams: { enable2FA: false },
             });

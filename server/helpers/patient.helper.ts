@@ -237,11 +237,10 @@ export const getActivities = async (therapistId, startTime, endTime) => {
 export const getPatientActivities = async (patientId, startTime, endTime) => {
 	try {
 		const res = await Promise.all([
-			PatientModel.getPatientsActivities(patientId, startTime, endTime),
+			PatientModel.getPatientsActivitiesData(patientId, startTime, endTime),
 			UserHelper.getOpenPeers(patientId),
 		]);
 		const patientIds = res[0].map((patient) => patient.id);
-		console.log(patientIds, "patientIds");
 		const sessions = await PatientModel.getPatientRelevantSessions(patientIds, startTime, endTime);
 		let allPatients = [];
 		let patientsIdsWithSessions = [];
@@ -284,8 +283,10 @@ export const getPatientActivities = async (patientId, startTime, endTime) => {
 				  }
 				: { ...newPatient };
 		});
+		console.log("patient activities ", newActivities)
 		return newActivities;
 	} catch (err) {
+		console.log(err, "getPatientActivities catch error");
 		throw new Error(`${err}`);
 	}
 };

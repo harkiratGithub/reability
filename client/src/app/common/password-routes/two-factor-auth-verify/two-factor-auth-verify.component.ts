@@ -14,7 +14,7 @@ export class TwoFactorAuthVerifyComponent implements OnInit {
   user = null;
   dialogRef: null;
   is2faEnabled = false;
-  viewTab = 'enable2FA';
+  viewTab = 'generatedQR';
   userId: number = null;
   qrCodeUrl: string = '';
   verificationCode: string = '';
@@ -27,10 +27,15 @@ export class TwoFactorAuthVerifyComponent implements OnInit {
   ) {}
 
   async ngOnInit() {
-    this.is2faEnabled = this.activatedRoute.snapshot?.queryParams?.enable2FA == 'true';
-    this.viewTab = this.is2faEnabled ? 'verifyOtp' : 'enable2FA';
+    this.is2faEnabled = this.activatedRoute.snapshot?.queryParams?.enable2FA == 'true'; 
+    this.viewTab = this.is2faEnabled ? 'verifyOtp' : 'generatedQR';
     this.userId = this.activatedRoute.snapshot?.params?.id;
     this.user = await this.ajax.getUserData().toPromise();
+    if (!this.is2faEnabled) {
+      this.enable2FA();
+    } else {
+      this.viewTab = 'verifyOtp';
+    }
   }
 
   isNumberKey(event: KeyboardEvent): boolean {
@@ -45,12 +50,8 @@ export class TwoFactorAuthVerifyComponent implements OnInit {
   enable2FA() {
     this.ajax.enable2FA(this.userId, { enable2FA: true })?.subscribe({
       next: (response) => {
-        console.log(response,  "response: ");
         this.viewTab = 'generatedQR';
         this.qrCodeUrl = response?.qrCodeData;
-        // setTimeout(() => {
-        //   this.viewTab = 'verifyOtp';
-        // }, 5000);
       },
       error: (error) => {
         this.verificationCode = '';
@@ -67,11 +68,7 @@ export class TwoFactorAuthVerifyComponent implements OnInit {
     });
   }
 
-  skip() {
-    this.viewTab = 'enable2FA';
-    this.router.navigate([`${roleMainRoute(this.user.role)}`]);
-    localStorage.setItem('verified2FA', 'true');
-  }
+ 
 
   verifyCode() {
     this.ajax.verify2FA(this.userId, this.verificationCode)?.subscribe({
@@ -79,7 +76,7 @@ export class TwoFactorAuthVerifyComponent implements OnInit {
         if (response?.success) {
           this.viewTab = 'verified';
           if (this.user?.role) {
-            this.snackBar.open('User 2FA verified successfully', 'Hurray !!!', {
+            this.snackBar.open('Admin 2FA verified successfully', 'Hurray !!!', {
               duration: 1000,
               verticalPosition: 'top',
               horizontalPosition: 'right',
@@ -105,17 +102,11 @@ export class TwoFactorAuthVerifyComponent implements OnInit {
     });
   }
 
-  resendOTP() {; 
-    // this.enable2FA();
+  resendOTP() {
     this.ajax.reVerify2FA(this.userId)?.subscribe({
       next: (response) => {
-        console.log(response,  "response: ");
         this.viewTab = 'generatedQR';
         this.qrCodeUrl = response?.qrCodeData;
-        // this.viewTab = 'reverified';
-        // setTimeout(() => {
-        //   this.viewTab = 'verifyOtp';
-        // }, 5000);
       },
       error: (error) => {
         this.verificationCode = '';
@@ -132,4 +123,10 @@ export class TwoFactorAuthVerifyComponent implements OnInit {
     });
     
   }
+  onEnter(event: KeyboardEvent): void {
+    if (event.key === 'Enter') {
+      this.verifyCode();
+    }
+  }
+
 }

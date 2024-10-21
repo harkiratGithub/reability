@@ -289,6 +289,38 @@ export const getPatientsActivities = async (therapistId, startTime, endTime) => 
 	return patientDetails.rows;
 };
 
+export const getPatientsActivitiesData = async (patientId, startTime, endTime) => {
+	// hack, not recognize the last day
+	const newEndTime = endTime + ' 23:59:59';
+	const getPatientDetails = squelPostgres
+		.select()
+		.field(`${TABLE_NAME.PATIENT}.id`)
+		.field(`${TABLE_NAME.USER}.id`, 'user_id')
+		.field(`${TABLE_NAME.PATIENT}.first_name`)
+		.field(`${TABLE_NAME.PATIENT}.last_name`)
+		.field(`${TABLE_NAME.PATIENT}.phone`)
+		.field(`${TABLE_NAME.USER}.user_name`)
+		.field('logged_in_at')
+		.from(TABLE_NAME.THERAPIST)
+		.left_join(
+			TABLE_NAME.THERAPIST_DEPARTMENTS,
+			null,
+			`${TABLE_NAME.THERAPIST}.id = ${TABLE_NAME.THERAPIST_DEPARTMENTS}.therapist_id`
+		)
+		.left_join(
+			TABLE_NAME.PATIENT_DEPARTMENTS,
+			null,
+			`${TABLE_NAME.THERAPIST_DEPARTMENTS}.department_id = ${TABLE_NAME.PATIENT_DEPARTMENTS}.department_id`
+		)
+		.left_join(TABLE_NAME.PATIENT, null, `${TABLE_NAME.PATIENT_DEPARTMENTS}.patient_id = ${TABLE_NAME.PATIENT}.id`)
+		.left_join(TABLE_NAME.USER, null, `${TABLE_NAME.USER}.id = ${TABLE_NAME.PATIENT}.user_id`)
+		.where(`${TABLE_NAME.PATIENT}.id = ?`, patientId)
+		.where(`${TABLE_NAME.USER}.active = ?`, true)
+		.toParam();
+	const patientDetails = await BaseModel.runQuery(getPatientDetails);
+	return patientDetails.rows;
+};
+
 export const getPatientRelevantSessions = async (patientIds: number[], startTime: string, endTime: string) => {
 	const patientIdsStr = patientIds.join(',');
 	const newEndTime = endTime + ' 23:59:59';

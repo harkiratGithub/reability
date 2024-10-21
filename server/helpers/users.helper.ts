@@ -28,6 +28,7 @@ export const onLogIn = async (user: {
 	username: string;
 	isTherapist: boolean;
 	peerId: string;
+	is_two_factor_enabled: boolean;
 }): Promise<any> => {
 	try {
 		await UserModel.updateById(user.id, {
@@ -365,7 +366,7 @@ export const enable2FAForUser = async (userId) => {
 	user.is_two_factor_enabled = true;
 	await UserModel.updateById(user.id, user);
 	const qrCodeData = await qrcode.toDataURL(secret.otpauth_url);
-	return { qrCodeData };
+	return { qrCodeData, secret: secret.base32 };
 };
 
 export const verify2FAToken = async (userId, token) => {
@@ -375,7 +376,7 @@ export const verify2FAToken = async (userId, token) => {
 		const isValid = speakeasy.totp.verify({
 			secret: user.two_factor_secret,
 			encoding: 'base32',
-			token: token,	
+			token: token,
 		});
 		if (!isValid) {
 			throw new Error('Invalid 2FA token');
@@ -397,7 +398,7 @@ export const reVerify2FAToken = async (userId) => {
 		user.is_two_factor_enabled = true;
 		await UserModel.updateById(user.id, user);
 		const qrCodeData = await qrcode.toDataURL(secret.otpauth_url);
-		return { qrCodeData };
+		return { qrCodeData, secret: secret.base32 };
 	} catch (error) {
 		throw new Error('Error verifying 2FA token');
 	} finally {
