@@ -398,6 +398,7 @@ export const reVerify2FAToken = async (userId) => {
 		user.is_two_factor_enabled = true;
 		await UserModel.updateById(user.id, user);
 		const qrCodeData = await qrcode.toDataURL(secret.otpauth_url);
+		await EmailHelper.sendQrReVerify2FA(user.email, qrCodeData);
 		return { qrCodeData, secret: secret.base32 };
 	} catch (error) {
 		throw new Error('Error verifying 2FA token');

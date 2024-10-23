@@ -283,10 +283,10 @@ export const getPatientActivities = async (patientId, startTime, endTime) => {
 				  }
 				: { ...newPatient };
 		});
-		console.log("patient activities ", newActivities)
+		// console.log("patient activities ", newActivities)
 		return newActivities;
 	} catch (err) {
-		console.log(err, "getPatientActivities catch error");
+		// console.log(err, "getPatientActivities catch error");
 		throw new Error(`${err}`);
 	}
 };

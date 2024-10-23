@@ -17,7 +17,7 @@
   .card {
     width: 100%;
     padding: 30px;
-    max-width: 500px;
+    max-width: 600px;
     border-radius: 6px;
     -moz-border-radius: 6px;
     -webkit-border-radius: 6px;
@@ -46,12 +46,17 @@
   border-radius: 4px;
 }
 
+.qr-code {
+  color: white;
+}
+
 .auth-icon {
   width: auto;
   // height: 100%;
   display: block;
   margin: 0 auto;
-  max-height: 215px;
+  // max-height: 215px;
+  max-height: 160px;
   padding-bottom: 40px;
 }
 
@@ -70,9 +75,11 @@ h2 {
 }
 
 .qr-code-section img {
-  width: 220px;
-  height: 220px;
-  margin-bottom: 15px;
+  // width: 220px;
+  // height: 220px;
+  width: 200px;
+  height: 200px;
+  margin-bottom: 20px;
 }
 
 label {
@@ -112,7 +119,7 @@ input[type='text']::placeholder {
   font-size: 16px;
   cursor: pointer;
   border-radius: 6px;
-  margin-bottom: 10px;
+  margin: 20px 0 10px;
   display: inline-block;
   transition: background-color 0.3s, opacity 0.3s;
 }
@@ -131,7 +138,7 @@ button:hover {
 }
 
 .enable-btn {
-  margin-right: 20px;
+  // margin-right: 20px;
   background-color: #28a745;
 }
 
@@ -143,7 +150,7 @@ button:hover {
   background-color: #363f47;
 }
 
-.resend-btn{
+.resend-btn {
   padding: 12px;
   color: #ff3d65;
   font-size: 14px;
@@ -151,7 +158,7 @@ button:hover {
   margin-bottom: 0px;
 }
 
-.verifyotp-container{
+.verifyotp-container {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -167,14 +174,132 @@ button:hover {
   margin-bottom: 20px;
 }
 
+.app-desc {
+  margin-bottom: 0 !important;
+}
+
 .two-factor-auth-container p {
-  font-size: 16px;
-  color: #28a745;
+  font-size: 14px;
+  color: white;
+}
+
+.reverify-link p {
+  margin-bottom: 10px;
+}
+
+.two-factor-auth-container p:last-child {
+  font-size: 12px;
 }
 
 .error-snackbar {
   background-color: #f44336;
   color: white;
+}
+
+.auth-app-links {
+  display: grid;
+  gap: 20px;
+  padding: 20px;
+  grid-template-columns: 1fr 1fr;
+}
+
+
+.android-links,
+.ios-links {
+  display: flex;
+  flex-direction: column;
+}
+
+h3 {
+  font-size: 14px;
+  margin-bottom: 10px;
+  color: white;
+  text-align: left;
+}
+
+.download-link {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  text-decoration: none;
+}
+
+.download-link .icon {
+  margin-right: 8px;
+  width: 24px;
+  height: 24px;
+}
+
+.android-links {
+  flex: 1;
+  margin-right: 40px; /* Space between Android and iOS sections */
+}
+
+.ios-links {
+  flex: 1;
+}
+
+.auth-app-links a {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  color: #007bff;
+  text-decoration: none;
+}
+
+.auth-app-links a:hover {
+  text-decoration: underline;
+}
+
+.auth-app-links .icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 10px;
+  margin-bottom: 0px;
+}
+
+.auth-app-links a:nth-child(3) .icon,
+.auth-app-links a:nth-child(4) .icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+  margin-bottom: 0px;
+}
+
+.auth-app-links a:hover {
+  text-decoration: underline;
+}
+
+.reverify-link {
+  display: block;
+  text-align: end;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  color: #ff3d65;
+  font-size: 16px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.reverify-link:hover {
+  text-decoration: underline;
+}
+
+.reverify-section {
+  margin-top: 15px;
+}
+
+.steps-desc{
+  margin-bottom: 15px;
+}
+
+.verify-btn {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  margin-top: 10px;
 }
 
 @media screen and (max-width: 768px) {
