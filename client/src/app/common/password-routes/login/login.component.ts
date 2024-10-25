@@ -102,16 +102,19 @@ export class LoginPageComponent implements OnInit, OnDestroy {
             this.router.navigate([`/${ROUTES.VERIFY_2FA.split(':id')[0]}${user.peerId}`], {
               queryParams: { enable2FA: true },
             });
-          }
-           else {
+          } else {
             this.router.navigate([`/${ROUTES.VERIFY_2FA.split(':id')[0]}${user.peerId}`], {
               queryParams: { enable2FA: false },
             });
           }
-        } else{
+        } else {
           localStorage.setItem('verified2FA', 'true');
-          this.router.navigate([`${roleMainRoute(user.role)}`]);
-        } 
+          if (user?.role === 'patient' && user?.isPainModelOpen) {
+            this.router.navigate([`${roleMainRoute('RTM')}`]);
+          } else {
+            this.router.navigate([`${roleMainRoute(user.role)}`]);
+          }
+        }
       }
     } catch (error) {
       console.log('login errors !:', error);
@@ -121,7 +124,7 @@ export class LoginPageComponent implements OnInit, OnDestroy {
           errorMessage: error.message || 'Unknown error',
         });
       }
-      
+
       this.alertService.error(error);
       if (error && _.includes(error, 'already connected')) {
         this.f.username.setErrors({ errorName: 'already_connected' });

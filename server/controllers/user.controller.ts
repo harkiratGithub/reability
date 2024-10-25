@@ -6,6 +6,7 @@ export const authenticate = async (req, res, next) => {
 	try {
 		const user = req.user;
 		const userDetails = await UserHelper.onLogIn(user);
+		// console.log(userDetails, "user controller")
 		res.json(userDetails);
 	} catch (err) {
 		next(err);

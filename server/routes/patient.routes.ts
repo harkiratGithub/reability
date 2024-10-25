@@ -35,5 +35,7 @@ router.post('/addServerLog', ServerLogController.sendLogToServer);
 router.get('/feedback/questions', PatientController.getFeedbackQuestions);
 router.get('/games', GameDataController.getAllEndGames);
 router.post('/getPatientDataList', PatientController.getPatientListDataActivities);
+router.post('/painSession', PatientController.createPainSession);
+// router.put('/painSession', PatientController.createPainSession);
 
 export default router;

@@ -76,6 +76,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatSliderModule } from '@angular/material/slider';
 
 
 import {
@@ -133,6 +134,7 @@ import { PatientGeneralModalComponent } from './common/patient-general-modal/pat
 import { TwoFactorAuthVerifyComponent } from './common/password-routes/two-factor-auth-verify/two-factor-auth-verify.component';
 import { FeedbackFormComponent } from './patient/components/feedback-form/feedback-form.component';
 import { GameHistorySessionComponent } from './patient/components/game-history-session/game-history-session.component';
+import { PainScaleComponent } from './patient/components/pain-scale/pain-scale.component';
 
 export const CUSTOM_MOMENT_FORMATS = {
   parse: {
@@ -223,6 +225,7 @@ export const CUSTOM_MOMENT_FORMATS = {
     TwoFactorAuthVerifyComponent,
     FeedbackFormComponent,
     GameHistorySessionComponent,
+    PainScaleComponent,
   ],
   imports: [
     RouterModule.forRoot(routes, { useHash: true }),
@@ -247,6 +250,7 @@ export const CUSTOM_MOMENT_FORMATS = {
     MatButtonModule,
     MatRadioModule,
     MatTooltipModule,
+    MatSliderModule,
     NgxMatMomentModule,
     NgxMatDatetimePickerModule,
     NgxMatTimepickerModule,

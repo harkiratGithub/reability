@@ -45,8 +45,18 @@ const patientValidationObject = [
 	{ key: 'user_id', type: 'number', required: true },
 ];
 
+const rtmValidationObject = [
+	{ key: 'patient_id', type: 'number', required: true },
+	{ key: 'timestamp', type: 'string', required: false },
+	{ key: 'event', type: 'string', required: true },
+];
+
 const patientValidator = (patientObject) => {
 	return UtilModel.modelValidator(patientValidationObject, patientObject, 'patientValidator');
+};
+
+const rtmValidator = (rtmObject) => {
+	return UtilModel.modelValidator(rtmValidationObject, rtmObject, 'rtmValidator');
 };
 
 export const create = (patient, client = null) => {
@@ -330,8 +340,8 @@ export const getPatientRelevantSessions = async (patientIds: number[], startTime
 		.field('start_time')
 		.field(`(${TABLE_NAME.GAME_SESSION}.end_time - ${TABLE_NAME.GAME_SESSION}.start_time) as duration`)
 		.field(`${TABLE_NAME.GAME_SESSION}.game_id`)
-		.field(`${TABLE_NAME.GAME_SESSION}.game_summary`) 
-        .field(`${TABLE_NAME.GAME_SESSION}.session_feedback`)
+		.field(`${TABLE_NAME.GAME_SESSION}.game_summary`)
+		.field(`${TABLE_NAME.GAME_SESSION}.session_feedback`)
 		.field('therapist_session_id')
 		.from(TABLE_NAME.GAME_SESSION)
 		.where(
@@ -492,4 +502,21 @@ export const getPatientUserId = async (patientId: number): Promise<number> => {
 		.toParam();
 	const result = await BaseModel.runQuery(query);
 	return result.rows[0].user_id;
+};
+
+export const addPatientRTM = (patient_id, painSession, client = null) => {
+	console.log('addPatientRTM: ', patient_id, typeof new Date() );
+	return BaseModel.createRow(
+		TABLE_NAME.RTM,
+		{ patient_id, event: JSON.stringify({
+			"note": null,
+			"pain_level": painSession,
+			"therapist_id": null,
+			"minutes_spent": null,
+			"review_activity": null,
+			"reminder_to_exercise": null
+		  }), timestamp: new Date().toDateString() },
+		rtmValidator,
+		client
+	);
 };

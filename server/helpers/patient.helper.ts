@@ -50,6 +50,28 @@ export const createPatient = async (patientData, patientContacts) => {
 	return BaseModel.runAsTransaction(patientCreationFunc);
 };
 
+export const createPainSession = async (patient_id, painValue) => {
+	const patientCreationFunc = async (client = null) => {
+		try {
+			// const painSessionData = {
+			// 	patient_id: patient_id,
+			// 	painSession: painValue,
+			// };
+			const createdPainSession = await PatientModel.addPatientRTM(patient_id, painValue);
+			console.log(createdPainSession, "createdPainSession");
+			// const activityLogData = {
+			// 	patient_id,
+			// 	description: `Created pain session: ${createdPainSession.id}`,
+			// };
+			// await ActivityLogModel.logToDb(activityLogData);
+			return createdPainSession;
+		} catch (err) {
+			throw err;
+		}
+	};
+	return BaseModel.runAsTransaction(patientCreationFunc);
+};
+
 export const editPatient = async (patientDataToUpdate, userDataToUpdate, patientContacts) => {
 	const { departmentsIds } = patientDataToUpdate;
 	const patientEditFunc = async (client = null) => {
@@ -283,10 +305,10 @@ export const getPatientActivities = async (patientId, startTime, endTime) => {
 				  }
 				: { ...newPatient };
 		});
-		console.log("patient activities ", newActivities)
+		console.log('patient activities ', newActivities);
 		return newActivities;
 	} catch (err) {
-		console.log(err, "getPatientActivities catch error");
+		console.log(err, 'getPatientActivities catch error');
 		throw new Error(`${err}`);
 	}
 };

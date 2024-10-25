@@ -166,8 +166,9 @@ export class AppComponent implements OnInit, OnDestroy {
               });
             }
             return;
-          }
-          this.router.navigate([`${roleMainRoute(userDataResult.role)}`]);
+          } else if (userDataResult?.role === 'patient' && userDataResult?.isPainModelOpen) {
+            this.router.navigate([`${roleMainRoute('RTM')}`]);
+          } else this.router.navigate([`${roleMainRoute(userDataResult.role)}`]);
         }
       }
     } catch (err) {

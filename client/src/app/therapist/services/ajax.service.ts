@@ -39,7 +39,7 @@ export class AjaxService {
     }
   };
 
-  enable2FA = (id,data) => {
+  enable2FA = (id, data) => {
     try {
       return this.http.post<any>(`${this.baseUrl}/enable-2fa/${id}`, {
         data,
@@ -49,7 +49,7 @@ export class AjaxService {
     }
   };
 
-  verify2FA = (id,code) => {
+  verify2FA = (id, code) => {
     try {
       return this.http.post<any>(`${this.baseUrl}/verify-2fa/${id}`, {
         token: code,
@@ -61,7 +61,7 @@ export class AjaxService {
 
   reVerify2FA = (id) => {
     try {
-      return this.http.put<any>(`${this.baseUrl}/re-verify-2fa/${id}` , null);
+      return this.http.put<any>(`${this.baseUrl}/re-verify-2fa/${id}`, null);
     } catch (err) {
       console.error(err);
     }
@@ -291,6 +291,16 @@ export class AjaxService {
         gameId,
         patientId,
       });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // patient RTM routes
+  sendPainScale = (patientId, painValue) => {
+    console.log("sendPainScale" , patientId , painValue);
+    try {
+      return this.http.post<any>(`${this.baseUrl}/patient/painSession`, { patientId, painValue });
     } catch (err) {
       console.error(err);
     }
@@ -573,7 +583,7 @@ export class AjaxService {
       console.error(error);
     }
   };
-  
+
   getFeedbackQuestions(): Observable<FeedbackQuestion[]> {
     return this.http.get<FeedbackQuestion[]>(`${this.baseUrl}/patient/feedback/questions`);
   }

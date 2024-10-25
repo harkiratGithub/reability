@@ -46,6 +46,7 @@ export const onLogIn = async (user: {
 					first_name: firstName,
 					last_name: lastName,
 					is_two_factor_enabled: is_two_factor_enabled,
+					// department_id: department_id
 				} = EncryptHelper.decryptJson(userDetails[0]);
 				return { ...user, id, firstName, lastName, is_two_factor_enabled };
 			case ROLE.PATIENT:
@@ -55,18 +56,34 @@ export const onLogIn = async (user: {
 					first_name: firstNameDetails,
 					last_name: lastNameDetails,
 					fast_login_link: fast_login_link,
+					// department_id: department_id
+					pain_level: pain_level,
+					timestamp: timestamp,
 				} = EncryptHelper.decryptJson(details[0]);
+				const RTM =
+					details?.filter((ele: { department_id: number }) => ele.department_id === 3)?.length > 0 ? true : false;
+				const isPainModelOpen =
+					RTM &&
+					!isNaN(pain_level) &&
+					new Date(new Date(timestamp).setDate(new Date(timestamp).getDate() + 1)) <= new Date()
+						? true
+						: false;
 				const validGames = await GameModel.getValidGameForPatient(patientId);
 				const patient = await PatientModel.findPatientByUserId(user.id);
 				const disabledSkeleton = patient.disabled_skeleton;
 				return {
 					...user,
+					// department_id,
+					// RTM,
+					// pain_level,
+					// timestamp ,
 					id: patientId,
 					firstName: firstNameDetails,
 					lastName: lastNameDetails,
 					validGames,
 					disabledSkeleton,
 					fast_login_link,
+					isPainModelOpen,
 				};
 		}
 	} catch (error) {
@@ -74,7 +91,7 @@ export const onLogIn = async (user: {
 	}
 };
 
-export const getPatientsByTherapist = async (therapistId) => {
+export const getPatientsByTherapist = async (therapistId: any) => {
 	const patients = await UserModel.getPatientsByTherapistId(therapistId);
 	return map(patients, (patient) => {
 		const decryptPatient = EncryptHelper.decryptJson(patient);
@@ -94,11 +111,11 @@ export const getPatientsByTherapist = async (therapistId) => {
 	});
 };
 
-export const updateUserUsage = async (userId) => {
+export const updateUserUsage = async (userId: number) => {
 	return UserModel.updateUserUsage(userId);
 };
 
-export const updateHeartBeat = async (userId, onTherapistSession = undefined, onGameSession = undefined) => {
+export const updateHeartBeat = async (userId: any, onTherapistSession = undefined, onGameSession = undefined) => {
 	try {
 		const promiseArray = [];
 		promiseArray.push(updateUserUsage(Number(userId)));
@@ -115,35 +132,37 @@ export const updateHeartBeat = async (userId, onTherapistSession = undefined, on
 	}
 };
 
-export const getOpenPeers = async (therapistId) => {
+export const getOpenPeers = async (therapistId: any) => {
 	try {
 		const openPeers = await UserModel.getPeersByTherapistId(therapistId);
 		const busyPeers = await TherapistSessionModel.getBusyPeers();
-		const peersStatus = openPeers.map((peer) => {
-			let userStatus;
-			userStatus = peer.active ? PEERS_STATUS.LOGGED_OUT : PEERS_STATUS.DISABLED;
-			const openPeer = peer.logged_out_at
-				? !Helper.checkIfPassedAmountOfMs(peer.logged_out_at, delayedHeartbeat)
-				: false;
-			userStatus = openPeer ? PEERS_STATUS.AVAILABLE : PEERS_STATUS.LOGGED_OUT;
-			const therapistLastSession = findLast(busyPeers, (b) => b.patient_id === peer.patient_id);
-			if (userStatus === PEERS_STATUS.AVAILABLE && therapistLastSession) {
-				userStatus = therapistLastSession.therapist_id === therapistId ? PEERS_STATUS.CONNECTED : PEERS_STATUS.BUSY;
+		const peersStatus = openPeers.map(
+			(peer: { [x: string]: any; active: any; logged_out_at: any; patient_id: any }) => {
+				let userStatus: string;
+				userStatus = peer.active ? PEERS_STATUS.LOGGED_OUT : PEERS_STATUS.DISABLED;
+				const openPeer = peer.logged_out_at
+					? !Helper.checkIfPassedAmountOfMs(peer.logged_out_at, delayedHeartbeat)
+					: false;
+				userStatus = openPeer ? PEERS_STATUS.AVAILABLE : PEERS_STATUS.LOGGED_OUT;
+				const therapistLastSession = findLast(busyPeers, (b) => b.patient_id === peer.patient_id);
+				if (userStatus === PEERS_STATUS.AVAILABLE && therapistLastSession) {
+					userStatus = therapistLastSession.therapist_id === therapistId ? PEERS_STATUS.CONNECTED : PEERS_STATUS.BUSY;
+				}
+				delete peer['patient_id'];
+				delete peer['active'];
+				return {
+					...peer,
+					peerStatus: userStatus,
+				};
 			}
-			delete peer['patient_id'];
-			delete peer['active'];
-			return {
-				...peer,
-				peerStatus: userStatus,
-			};
-		});
+		);
 		return peersStatus;
 	} catch (err) {
 		throw err;
 	}
 };
 
-export const create = async (user, client = null) => {
+export const create = async (user: { email: any; role: any }, client = null) => {
 	const defaultPassword = 'Aa123456';
 	try {
 		const user_name = await generateUniqUsername();
@@ -181,7 +200,7 @@ export const create = async (user, client = null) => {
 	}
 };
 
-export const checkEmailToken = async (token) => {
+export const checkEmailToken = async (token: any) => {
 	try {
 		const users = await UserModel.findByToken(token);
 		if (users.length !== 1) {
@@ -197,7 +216,7 @@ export const checkEmailToken = async (token) => {
 	}
 };
 
-export const changePassword = async (token, password) => {
+export const changePassword = async (token: any, password: any) => {
 	try {
 		if (Helper.checkPasswordStrength(password)) {
 			throw new Error('password not strength');
@@ -214,7 +233,7 @@ export const changePassword = async (token, password) => {
 	}
 };
 
-export const forgotPassword = async (username) => {
+export const forgotPassword = async (username: any) => {
 	const defaultPassword = 'Aa123456';
 	try {
 		const users = await UserModel.findByUsername(username);
@@ -280,7 +299,7 @@ export const createFastLoginToken = async (
 	}
 };
 
-export const sendSMSOrEmail = async (user, emailOrPhone, link_type) => {
+export const sendSMSOrEmail = async (user: { id: any }, emailOrPhone: string | string[], link_type: string) => {
 	const fast_login_token = Helper.generateSecureRandomString();
 	const fast_login_token_timestamp = Helper.createTimeForDb();
 	const fast_login_link = link_type;
@@ -295,7 +314,7 @@ export const sendSMSOrEmail = async (user, emailOrPhone, link_type) => {
 	}
 };
 
-export const checkFastLoginToken = async (token) => {
+export const checkFastLoginToken = async (token: any) => {
 	try {
 		const users = await UserModel.findByFastLoginToken(token);
 		if (users.length !== 1) {
@@ -311,7 +330,7 @@ export const checkFastLoginToken = async (token) => {
 	}
 };
 
-export const getUserContactData = async (patientId) => {
+export const getUserContactData = async (patientId: any) => {
 	try {
 		const userDetails = await UserModel.getUserDetails(patientId);
 		const { id, phone, email } = EncryptHelper.decryptJson(userDetails[0]);
@@ -325,7 +344,10 @@ export const getUserContactData = async (patientId) => {
 	}
 };
 
-export const resetPassword = async (user, setDefaultPassword) => {
+export const resetPassword = async (
+	user: { id: any; user_name: any; email: any; role: any },
+	setDefaultPassword: any
+) => {
 	const defaultPassword = 'Aa123456';
 	const { id: userId, user_name: username, email, role } = user;
 	try {
@@ -350,12 +372,12 @@ export const resetPassword = async (user, setDefaultPassword) => {
 	}
 };
 
-export const getUserById = async (userId) => {
+export const getUserById = async (userId: any) => {
 	const results = await UserModel.findById(userId);
 	return results[0];
 };
 
-export const enable2FAForUser = async (userId) => {
+export const enable2FAForUser = async (userId: any) => {
 	let user = await UserModel.findById(userId);
 	user = EncryptHelper.decryptJson(user[0]);
 	if (user.role !== ROLE.ADMIN) {
@@ -369,7 +391,7 @@ export const enable2FAForUser = async (userId) => {
 	return { qrCodeData, secret: secret.base32 };
 };
 
-export const verify2FAToken = async (userId, token) => {
+export const verify2FAToken = async (userId: any, token: any) => {
 	try {
 		let user = await UserModel.findById(userId);
 		user = EncryptHelper.decryptJson(user[0]);
@@ -389,7 +411,7 @@ export const verify2FAToken = async (userId, token) => {
 	}
 };
 
-export const reVerify2FAToken = async (userId) => {
+export const reVerify2FAToken = async (userId: any) => {
 	try {
 		let user = await UserModel.findById(userId);
 		user = EncryptHelper.decryptJson(user[0]);
