@@ -109,7 +109,7 @@
               1
             </button>
           </div>
-         
+
           <div
             *ngIf="isLogModalOpen && patientLog?.length && selectedPatientId == patient.userId"
             class="patient-log-modal"
@@ -262,9 +262,15 @@
               />
               {{ game.name }}
             </div>
-            <div class="send-invitation">
-              <div class="settings-icons send" (click)="sendFastLoginLink(patient)"></div>
-              <div class="label">Send Invitation</div>
+            <div class="action-wrapper">
+              <div class="send-rtm-invitation" *ngIf="patient.isRTM">
+                <div class="settings-icons send-rtm" (click)="addRTMMinutes(patient)"></div>
+                <div class="sub-label">Add to RTM(minutes)</div>
+              </div>
+              <div class="send-invitation">
+                <div class="settings-icons send" (click)="sendFastLoginLink(patient)"></div>
+                <div class="label">Send Invitation</div>
+              </div>
             </div>
           </div>
         </div>

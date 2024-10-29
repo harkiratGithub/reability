@@ -78,6 +78,7 @@ const extractBodyParams = (body, patientId = null) => {
 
 	return { patientData, userData, patientContacts };
 };
+
 export const createPatient = (req, res, next) => {
 	const { lead_id } = req.body.patient;
 	const { patientData, patientContacts } = extractBodyParams(req.body.patient);
@@ -115,24 +116,6 @@ export const createPatient = (req, res, next) => {
 				console.error('error in creating activity log', error);
 			}
 			res.json(createdPatient);
-		})
-		.catch((err) => next(err));
-};
-
-export const createPainSession = (req, res, next) => {
-	const { patientId, painValue } = req.body;
-	PatientHelper.createPainSession(patientId, painValue)
-		.then((createdPainSession) => {
-			// ActivityLogHelper.createLog(
-			// 	patientId,
-			// 	createdPainSession.patientId,
-			// 	TABLE_NAME.RTM,
-			// 	LogAction.Create,
-			// 	createdPainSession.id,
-			// 	null,
-			// 	createdPainSession
-			// );
-			res.json(createdPainSession);
 		})
 		.catch((err) => next(err));
 };

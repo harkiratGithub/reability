@@ -620,6 +620,11 @@
                 height: 65px;
               }
             }
+            .action-wrapper {
+              display: flex;
+              align-self: center;
+              margin-left: auto;
+            }
 
             .send-invitation {
               width: 150px;
@@ -640,8 +645,47 @@
                 background-repeat: no-repeat;
                 background-size: contain;
               }
-
               .label {
+                font-size: 14px;
+                text-align: center;
+                opacity: 0.8;
+                color: rgba(56, 95, 124, 0.8);
+                text-transform: capitalize;
+              }
+              .sub-label {
+                font-size: 14px;
+                text-align: center;
+                opacity: 0.8;
+                color: rgba(56, 95, 124, 0.8);
+                text-transform: capitalize;
+              }
+            }
+            .send-rtm-invitation {
+              width: 150px;
+              cursor: pointer;
+              margin-left: auto;
+              border-left: 1px solid #e4e9ff;
+              padding: 20px;
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              align-items: end;
+              .send-rtm {
+                width: 25px;
+                height: 50px;
+                background-image: url('../../../../assets/therapist/schedule.svg');
+                background-position: center;
+                background-repeat: no-repeat;
+                background-size: contain;
+              }
+              .label {
+                font-size: 14px;
+                text-align: center;
+                opacity: 0.8;
+                color: rgba(56, 95, 124, 0.8);
+                text-transform: capitalize;
+              }
+              .sub-label {
                 font-size: 14px;
                 text-align: center;
                 opacity: 0.8;
@@ -732,21 +776,21 @@
     white-space: pre-wrap; /* Enables newlines in tooltip */
     max-width: 300px; /* Optional, adjusts tooltip width */
   }
-  
+
   .feedback-icon-container {
     position: relative;
   }
-  
+
   .feedback-icon {
     width: 20px;
     height: 20px;
     cursor: pointer;
   }
-  
+
   .feedback-icon-container:hover .tooltip {
     display: block;
   }
-  
+
   .tooltip {
     display: none;
     position: absolute;
@@ -760,7 +804,6 @@
     white-space: pre-wrap;
     z-index: 10;
   }
-
 
   .total-duration {
     // margin-top: 20px;

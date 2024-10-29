@@ -1,6 +1,7 @@
 import * as GameSessionController from '../controllers/game-session.controller';
 import * as GameSettingsController from '../controllers/game-settings.controller';
 import * as PatientController from '../controllers/patient.controller';
+import * as RtmController from '../controllers/rtm.controller';
 import * as GameActivitiesController from '../controllers/game-activities.controller';
 import * as UserGameDataController from '../controllers/user-game-data.controller';
 import * as ServerLogController from '../controllers/server-log.controller';
@@ -35,7 +36,6 @@ router.post('/addServerLog', ServerLogController.sendLogToServer);
 router.get('/feedback/questions', PatientController.getFeedbackQuestions);
 router.get('/games', GameDataController.getAllEndGames);
 router.post('/getPatientDataList', PatientController.getPatientListDataActivities);
-router.post('/painSession', PatientController.createPainSession);
-// router.put('/painSession', PatientController.createPainSession);
+router.post('/rtmSession', RtmController.updatePatientRTMSession);
 
 export default router;

@@ -77,7 +77,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSliderModule } from '@angular/material/slider';
-
+import { MatSelectModule } from '@angular/material/select';
 
 import {
   NgxMatMomentModule,
@@ -91,7 +91,9 @@ import {
   NgxMatDateAdapter,
 } from '@angular-material-components/datetime-picker';
 import { GeneralModalComponent } from './common/general-modal/general-modal.component';
+import { RTMModalComponent } from './common/rtm-modal/rtm-modal.component';
 import { SendFastLoginModalComponent } from './common/general-modals/send-fast-login-modal/send-fast-login-modal.component';
+import { SendRTMModalComponent } from './common/rtm-modal/send-rtm-modal/send-rtm-modal.component';
 import { FastLoginComponent } from './common/password-routes/fast-login/fast-login.component';
 import { DurationPipe } from '../app/pipes/duration.pipe';
 import { AddEditFollowupComponent } from './backoffice/add-edit/add-edit-followup/add-edit-followup.component';
@@ -186,7 +188,9 @@ export const CUSTOM_MOMENT_FORMATS = {
     CountDownAnimationComponent,
     ConfiguratorModalComponent,
     GeneralModalComponent,
+    RTMModalComponent,
     SendFastLoginModalComponent,
+    SendRTMModalComponent,
     FastLoginComponent,
     DurationPipe,
     AddEditFollowupComponent,
@@ -236,6 +240,7 @@ export const CUSTOM_MOMENT_FORMATS = {
     MatIconModule,
     MatTabsModule,
     MatSlideToggleModule,
+
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
@@ -251,6 +256,7 @@ export const CUSTOM_MOMENT_FORMATS = {
     MatRadioModule,
     MatTooltipModule,
     MatSliderModule,
+    MatSelectModule,
     NgxMatMomentModule,
     NgxMatDatetimePickerModule,
     NgxMatTimepickerModule,

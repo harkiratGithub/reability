@@ -1,6 +1,7 @@
 import * as UserController from '../controllers/user.controller';
 import * as therapistSessionController from '../controllers/therapist-session.controller';
 import * as PatientController from '../controllers/patient.controller';
+import * as RtmController from '../controllers/rtm.controller';
 import * as GameSettingsController from '../controllers/game-settings.controller';
 import * as AvailabilityController from '../controllers/availability.controller';
 import { permitTherapistAccessToPatient } from '../services/middleware';
@@ -65,5 +66,6 @@ router.post('/gameData/getbyids', GameDataController.getGameDataByIds);
 router.get('/games', GameDataController.getAllGames);
 
 router.post('/addServerLog', ServerLogController.sendLogToServer);
+router.post('/rtmSession', RtmController.updateTherapistRTMSession);
 
 export default router;

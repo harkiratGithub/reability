@@ -18,6 +18,12 @@ import { ConfiguratorModalComponent } from '../configurator-modal/configurator-m
 import { ReCaptchaV3Service } from 'ng-recaptcha';
 import { setAudioStreamsToComponent } from '../../../common/utils';
 import { IGame, IPatientLog } from '../../../../types';
+import {
+  RTM_MODAL_CONTENT,
+  RTM_MODAL_STYLE,
+  RTMModalComponent,
+  RTMModalData,
+} from 'src/app/common/rtm-modal/rtm-modal.component';
 
 @Component({
   selector: 'app-patient-patient-list-component',
@@ -73,7 +79,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
     clearInterval(this.intervalId);
   }
 
-  toggleGame(game: { id: number; }, patient: { allGames: { isValid: any; }[]; id: any; }) {
+  toggleGame(game: { id: number }, patient: { allGames: { isValid: any }[]; id: any }) {
     const gameIndex = this.allGames.findIndex((obj) => obj.id == game.id);
     patient.allGames[gameIndex].isValid = !patient.allGames[gameIndex].isValid;
     if (!patient.allGames[gameIndex].isValid) {
@@ -88,7 +94,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
       .getPatientActivities(this.lastWeekActivityArray[0], this.lastWeekActivityArray[6])
       .subscribe((patients) => {
         this.ajax.getConnectedPeers().subscribe((peerUsers) => {
-          patients.map((patient: { status: string; user_id: { toString: () => any; }; }) => {
+          patients.map((patient: { status: string; user_id: { toString: () => any } }) => {
             if (
               patient.status === this.peersStatusConst.AVAILABLE &&
               !peerUsers.find((peerUser) => peerUser.id === patient.user_id.toString())
@@ -107,7 +113,6 @@ export class PatientListComponent implements OnInit, OnDestroy {
             }
           });
           this.patientListGrouped = groupBy(this.patientList, (p) => p.status);
-          console.log('the filtered list::', this.patientList);
           this.patientListFiltered = this.patientList;
         });
       });
@@ -134,7 +139,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
     this.setFilteredData(filteredData);
   };
 
-  checkIfSettingModalOpened = (patient: { id: any; }) => {
+  checkIfSettingModalOpened = (patient: { id: any }) => {
     if (this.patientList.length > 0) {
       const patientFound = this.patientList.find((currPatient) => currPatient.id === patient.id);
       return patientFound ? patientFound.settingMenuOpen || false : false;
@@ -171,6 +176,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
         phone: items[0].phone,
         contacts: items[0].contacts,
         therapistSessionId: items[0].therapist_session_id,
+        isRTM: items[0].isRTM,
       }))
       .values()
       .uniqBy('id')
@@ -285,17 +291,33 @@ export class PatientListComponent implements OnInit, OnDestroy {
     return url + 'index.html';
   }
 
-  getPatientRecentGameActivity = (patient: { id: any; fullName?: any; userName?: any; status?: any; lastLogin?: any; gameSummary?: any; lastWeekActivity: any; settingMenuOpen?: any; userId?: any; phone?: any; contacts?: any; therapistSessionId?: any; games?: any; allGames?: any; gameIds?: any; }) => {
+  getPatientRecentGameActivity = (patient: {
+    id: any;
+    fullName?: any;
+    userName?: any;
+    status?: any;
+    lastLogin?: any;
+    gameSummary?: any;
+    lastWeekActivity: any;
+    settingMenuOpen?: any;
+    userId?: any;
+    phone?: any;
+    contacts?: any;
+    therapistSessionId?: any;
+    games?: any;
+    allGames?: any;
+    gameIds?: any;
+  }) => {
     this.ajax.getValidGames(patient.id).subscribe((games) => {
       patient.games = games;
-      const validGameIds = games.map((game: { id: any; }) => game.id);
+      const validGameIds = games.map((game: { id: any }) => game.id);
       patient.allGames = this.allGames.map((game) => {
         const isValid = validGameIds.includes(game.id);
         return { ...game, isValid };
       });
       patient.gameIds = [];
-      patient.lastWeekActivity.map((activity: { game_id: any; }) => {
-        if (activity.game_id && !patient.gameIds.find((game: { id: any; }) => game.id === activity.game_id)) {
+      patient.lastWeekActivity.map((activity: { game_id: any }) => {
+        if (activity.game_id && !patient.gameIds.find((game: { id: any }) => game.id === activity.game_id)) {
           patient.gameIds.push({
             id: activity.game_id,
           });
@@ -308,7 +330,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
     });
   };
 
-  togglePatientSettingMenu = (patient: { settingMenuOpen: boolean; }) => {
+  togglePatientSettingMenu = (patient: { settingMenuOpen: boolean }) => {
     patient.settingMenuOpen = !patient.settingMenuOpen;
   };
 
@@ -321,7 +343,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
     });
   };
 
-  sendFastLoginLink = (patient: { id: any; userId: number; }) => {
+  sendFastLoginLink = (patient: { id: any; userId: number }) => {
     const modalData: GeneralModalData = {
       modalStyle: GENERAL_MODAL_STYLE.WHITE,
       content: GENERAL_MODAL_CONTENT.SEND_FAST_LOGIN,
@@ -359,7 +381,44 @@ export class PatientListComponent implements OnInit, OnDestroy {
     this.appActions.openGeneralModal(modalData);
   };
 
-  getActivityTooltipText = (activity: { duration: string; gamesDuration: any; }) => {
+  addRTMMinutes = (patient: { id: any; userId: number }) => {
+    const modalData: RTMModalData = {
+      modalStyle: RTM_MODAL_STYLE.WHITE,
+      content: RTM_MODAL_CONTENT.SEND_FAST_LOGIN,
+      patient,
+      approveCallback: async (modalValues: OuterModalInterface) => {
+        await this.ajax
+          .sendRtmTherapistSession(patient.id, modalValues.dataFromInnerForm.innerModalValue.timestamp, {
+            therapist_id: this.therapistId,
+            note: modalValues.dataFromInnerForm.innerModalValue.note,
+            minutes_spent: modalValues.dataFromInnerForm.innerModalValue.minutes_spent,
+            review_activity: modalValues.dataFromInnerForm.innerModalValue.review_activity,
+            reminder_to_exercise: null,
+            therapist_session_minutes: null,
+          })
+          .toPromise()
+          .then((res) => {
+            console.log(res)
+            modalValues.dataFromInnerForm.innerModalValue.date_time 
+              ? this.appActions.setMessageRTMModal(
+                  'Manual Time track has been recorded' +
+                    moment
+                      .unix(Number.parseInt(modalValues.dataFromInnerForm.innerModalValue.date_time))
+                      .format('DD/MM/YYYY HH:mm')
+                )
+              : this.appActions.setMessageRTMModal('Manual Time track has been recorded');
+          })
+          .catch((err) => {
+            this.appActions.setMessageRTMModal('Error occurred. Please try again later');
+            console.log('error', err);
+          });
+      },
+      header: 'Add Manual Time Track',
+    };
+    this.appActions.openRTMModal(modalData);
+  };
+
+  getActivityTooltipText = (activity: { duration: string; gamesDuration: any }) => {
     if (!activity.duration) {
       return '';
     }
@@ -398,17 +457,19 @@ export class PatientListComponent implements OnInit, OnDestroy {
     const gameMap = new Map<string, any[]>();
 
     if (selectedPatient && selectedPatient.lastWeekActivity) {
-      selectedPatient.lastWeekActivity.forEach((activity: { gamesDuration: any[]; }) => {
-        activity.gamesDuration.forEach((game: { gameName: string; duration: any; gameSummary: any; sessionFeedback: { questions: any; }; }) => {
-          if (!gameMap.has(game.gameName)) {
-            gameMap.set(game.gameName, []);
+      selectedPatient.lastWeekActivity.forEach((activity: { gamesDuration: any[] }) => {
+        activity.gamesDuration.forEach(
+          (game: { gameName: string; duration: any; gameSummary: any; sessionFeedback: { questions: any } }) => {
+            if (!gameMap.has(game.gameName)) {
+              gameMap.set(game.gameName, []);
+            }
+            gameMap.get(game?.gameName)?.push({
+              duration: game?.duration,
+              gameSummary: game?.gameSummary,
+              sessionFeedback: game?.sessionFeedback?.questions,
+            });
           }
-          gameMap.get(game?.gameName)?.push({
-            duration: game?.duration,
-            gameSummary: game?.gameSummary,
-            sessionFeedback: game?.sessionFeedback?.questions,
-          });
-        });
+        );
       });
     }
 
@@ -549,8 +610,14 @@ export class PatientListComponent implements OnInit, OnDestroy {
   //   return quesfeedbacks;
   // };
 
-  getFeedbackTooltipText = (feedbacks: { lastWeekActivity: any[]; }) => {
-    const convertToSeconds = (timeStr: { split: (arg0: string) => { (): any; new(): any; map: { (arg0: NumberConstructor): [any, any, any]; new(): any; }; }; }) => {
+  getFeedbackTooltipText = (feedbacks: { lastWeekActivity: any[] }) => {
+    const convertToSeconds = (timeStr: {
+      split: (arg0: string) => {
+        (): any;
+        new (): any;
+        map: { (arg0: NumberConstructor): [any, any, any]; new (): any };
+      };
+    }) => {
       const [hours, minutes, seconds] = timeStr.split(':').map(Number);
       return (hours || 0) * 3600 + (minutes || 0) * 60 + (seconds || 0);
     };
@@ -564,26 +631,28 @@ export class PatientListComponent implements OnInit, OnDestroy {
       )}`;
     };
     const options = [
-      { "value": "Very Poor", "label": "😡", "tooltip": "Angry" },
-      { "value": "Unsatisfied", "label": "🙁", "tooltip": "Slightly Frowning" },
-      { "value": "Neutral", "label": "😐", "tooltip": "Neutral" },
-      { "value": "Somewhat Satisfied", "label": "😊", "tooltip": "Smiling with Eyes" },
-      { "value": "Satisfied", "label": "😁", "tooltip": "Beaming with Smiling Eyes" }
+      { value: 'Very Poor', label: '😡', tooltip: 'Angry' },
+      { value: 'Unsatisfied', label: '🙁', tooltip: 'Slightly Frowning' },
+      { value: 'Neutral', label: '😐', tooltip: 'Neutral' },
+      { value: 'Somewhat Satisfied', label: '😊', tooltip: 'Smiling with Eyes' },
+      { value: 'Satisfied', label: '😁', tooltip: 'Beaming with Smiling Eyes' },
     ];
     let totalTimeInSeconds = 0;
     const quesfeedbacks = feedbacks?.lastWeekActivity
-      .map((activity: { duration: any; gamesDuration: any[]; }) => {
+      .map((activity: { duration: any; gamesDuration: any[] }) => {
         if (activity.duration) {
           totalTimeInSeconds += convertToSeconds(activity.duration);
         }
         const gameFeedbacks = activity.gamesDuration
-          ?.map((gameDuration: { sessionFeedback: any; duration: any; gameName: string; }) => {
+          ?.map((gameDuration: { sessionFeedback: any; duration: any; gameName: string }) => {
             const feedback = gameDuration.sessionFeedback;
             const gameDurationText = gameDuration.duration ? ` (${gameDuration.duration})` : '';
             if (feedback && feedback.questions) {
               const feedbackText = feedback.questions
-                .map((q: { question: any; answer: string; }) => {
-                  return `* ${q.question}: ${options?.find((o)=>o?.value ==q.answer)?.label || 'No answer provided'}`;
+                .map((q: { question: any; answer: string }) => {
+                  return `* ${q.question}: ${
+                    options?.find((o) => o?.value == q.answer)?.label || 'No answer provided'
+                  }`;
                 })
                 .join('\n');
 

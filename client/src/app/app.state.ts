@@ -8,6 +8,7 @@ import {
 import { IGame, IOrganAngle, IScore } from '../types';
 import { IBackOfficeState, INITIAL_BACK_OFFICE_STATE } from './backoffice/backoffice-schema';
 import { ScoreType } from 'src/constants';
+import { RTM_MODAL_CONTENT, RTM_MODAL_STYLE, RTMModalData } from './common/rtm-modal/rtm-modal.component';
 
 export interface ISessionState {
   playerId: number;
@@ -30,7 +31,9 @@ export interface IGlobalState {
   isUserLoggedIn: boolean;
   callModal: { open: boolean; data: any };
   generalModal: { open: boolean; data?: GeneralModalData };
+  rtmModal: { open: boolean; data?: RTMModalData };
   generalModalMsg: string;
+  rtmModalMsg: string;
   disconnectionModal: { open: boolean; data: any };
   mutedMicModal: { open: boolean; data: any };
   currentGameUrl: string;
@@ -87,7 +90,24 @@ export const INITIAL_STATE_GLOBAL = {
       patient: null,
     },
   },
+  rtmModal: {
+    open: false,
+    data: {
+      approveCallback: () => {},
+      declineCallback: () => {},
+      acceptBtnImg: '../assets/buttons/btn_accept.png',
+      acceptBtnImgHover: '../assets/buttons/btn_accept_hover.png',
+      declineBtnImg: '../assets/buttons/btn_decline.png',
+      declineBtnImgHover: '../assets/buttons/btn_decline_hover.png',
+      header: '',
+      content: RTM_MODAL_CONTENT.NONE,
+      isTherapist: false,
+      modalStyle: RTM_MODAL_STYLE.WHITE,
+      patient: null,
+    },
+  },
   generalModalMsg: '',
+  rtmModalMsg: '',
   disconnectionModal: {
     open: false,
     data: {},

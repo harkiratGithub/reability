@@ -167,6 +167,24 @@ const appReducer = (lastState: IGlobalState, action: IAppAction) => {
         ...lastState,
         generalModal: INITIAL_STATE_GLOBAL.generalModal,
       };
+
+    case AppActions.OPEN_RTM_MODAL:
+      return {
+        ...lastState,
+        rtmModal: {
+          ...lastState.rtmModal,
+          open: true,
+          data: {
+            ...lastState.rtmModal.data,
+            ...action.payload,
+          },
+        },
+      };
+    case AppActions.CLOSE_RTM_MODAL:
+      return {
+        ...lastState,
+        rtmModal: INITIAL_STATE_GLOBAL.rtmModal,
+      };
     case AppActions.OPEN_PATIENT_GENERAL_MODAL:
       return {
         ...lastState,
@@ -180,6 +198,11 @@ const appReducer = (lastState: IGlobalState, action: IAppAction) => {
       return {
         ...lastState,
         generalModalMsg: action.payload,
+      };
+    case AppActions.SET_MESSAGE_RTM_MODAL:
+      return {
+        ...lastState,
+        rtmModalMsg: action.payload,
       };
     case AppActions.TOGGLE_BODY_TRACKING:
       return {

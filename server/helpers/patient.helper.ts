@@ -14,6 +14,7 @@ import * as EncryptHelper from '../services/encrypt.helper';
 import * as Helper from '../services/util.helper';
 
 import { ROLE, TABLE_NAME } from '../const';
+import { updateRTM } from '../models/rtm.model';
 
 export const createPatient = async (patientData, patientContacts) => {
 	const { departmentsIds } = patientData;
@@ -43,28 +44,6 @@ export const createPatient = async (patientData, patientContacts) => {
 			const departmentNames = await getDepartmentNamesById(departmentsIds, client);
 			const decryptedResult = EncryptHelper.decryptJson(createdPatient);
 			return { ...decryptedResult, departmentNames };
-		} catch (err) {
-			throw err;
-		}
-	};
-	return BaseModel.runAsTransaction(patientCreationFunc);
-};
-
-export const createPainSession = async (patient_id, painValue) => {
-	const patientCreationFunc = async (client = null) => {
-		try {
-			// const painSessionData = {
-			// 	patient_id: patient_id,
-			// 	painSession: painValue,
-			// };
-			const createdPainSession = await PatientModel.addPatientRTM(patient_id, painValue);
-			console.log(createdPainSession, "createdPainSession");
-			// const activityLogData = {
-			// 	patient_id,
-			// 	description: `Created pain session: ${createdPainSession.id}`,
-			// };
-			// await ActivityLogModel.logToDb(activityLogData);
-			return createdPainSession;
 		} catch (err) {
 			throw err;
 		}
@@ -227,6 +206,11 @@ export const getActivities = async (therapistId, startTime, endTime) => {
 		}
 		const contacts = await BaseModel.findByIds(TABLE_NAME.PATIENT_CONTACTS, 'patient_id', patientIds);
 		const contactsByPatientId = groupBy(contacts, 'patient_id');
+
+		const rtmList = await  BaseModel.itemsBySeveralFields(TABLE_NAME.PATIENT_DEPARTMENTS, {
+			department_id: "3",
+		});
+
 		const newActivities = allPatients.map((patient) => {
 			const patientPeer = res[1].find((x) => patient.user_id === x.user_id);
 			const { duration, ...restPatient } = patient;
@@ -242,11 +226,15 @@ export const getActivities = async (therapistId, startTime, endTime) => {
 				full_name: `${decryptedPatient.first_name} ${decryptedPatient.last_name}`,
 			};
 
+			const isRTM = rtmList?.find((rtm) => rtm.patient_id == patient.id) ? true : false
+			
+
 			return patientPeer
 				? {
 						...newPatient,
 						status: patientPeer.peerStatus,
 						contacts: decryptedContacts,
+						isRTM
 				  }
 				: { ...newPatient };
 		});

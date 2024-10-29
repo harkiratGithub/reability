@@ -297,10 +297,17 @@ export class AjaxService {
   };
 
   // patient RTM routes
-  sendPainScale = (patientId, painValue) => {
-    console.log("sendPainScale" , patientId , painValue);
+  sendPatientPainScale = (patientId, painValue) => {
     try {
-      return this.http.post<any>(`${this.baseUrl}/patient/painSession`, { patientId, painValue });
+      return this.http.post<any>(`${this.baseUrl}/patient/rtmSession`, { patientId, painValue });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  sendRtmTherapistSession = (patientId,timestamp, data) => {
+    try {
+      return this.http.post<any>(`${this.baseUrl}/therapist/rtmSession`, { patientId,timestamp, data });
     } catch (err) {
       console.error(err);
     }

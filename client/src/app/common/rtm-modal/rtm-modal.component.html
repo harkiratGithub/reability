@@ -1,0 +1,66 @@
+<div class="general-modal-container-blue" *ngIf="isRtmModelStyle(generalModelStyle.BLUE)">
+  <div class="header-section">
+    {{ header }}
+  </div>
+
+  <div class="main-section">
+    <div *ngIf="isRtmModel(rtmModelContent.SEND_FAST_LOGIN)">
+      <app-send-rtm-modal [patient]="patient" (returnedData)="getDataFromModal($event)">
+      </app-send-rtm-modal>
+    </div>
+    <div class="general-message" *ngIf="isRtmModel(rtmModelContent.MSG)">
+      {{ generalMsg }}
+    </div>
+  </div>
+
+  <div class="actions-section" *ngIf="!isRtmModel(rtmModelContent.MSG)">
+    <div appHand [hoverClass]="'timer'" [selectable]="true" [timeToWait]="2000" (click)="handleApprove()"
+      (outputFunc)="handleApprove()" [class]="getActionButtonClass()" [activeOnStartHover]="clearPopupTimeut"
+      [activeOnOutHover]="createPopupTimeut">
+      <img class="img-hover" [src]="acceptBtnImgHover" alt="accept hover" />
+      <img [src]="acceptBtnImg" alt="accept" />
+
+      <svg viewBox="0 0 36 36" class="loader">
+        <path class="circle" stroke-dasharray="100, 100" d="M18 2.0845
+          a 15.9155 15.9155 0 0 1 0 31.831
+          a 15.9155 15.9155 0 0 1 0 -31.831" />
+      </svg>
+    </div>
+
+    <div appHand [hoverClass]="'timer'" [selectable]="true" [timeToWait]="2000" (click)="handleDecline()"
+      (outputFunc)="handleDecline()" [class]="getActionButtonClass()" [activeOnStartHover]="clearPopupTimeut"
+      [activeOnOutHover]="createPopupTimeut">
+      <img class="img-hover" [src]="declineBtnImgHover" alt="decline hover" />
+      <img [src]="declineBtnImg" alt="decline" />
+
+      <svg viewBox="0 0 36 36" class="loader">
+        <path class="circle" stroke-dasharray="100, 100" d="M18 2.0845
+          a 15.9155 15.9155 0 0 1 0 31.831
+          a 15.9155 15.9155 0 0 1 0 -31.831" />
+      </svg>
+    </div>
+  </div>
+</div>
+
+<div class="general-modal-container-white" *ngIf="isRtmModelStyle(generalModelStyle.WHITE)">
+  <div class="header-section">
+    <div class="text">{{ header }}</div>
+    <mat-icon (click)="handleDecline()">close</mat-icon>
+  </div>
+
+  <div class="main-section">
+    <div *ngIf="isRtmModel(rtmModelContent.SEND_FAST_LOGIN)">
+      <app-send-rtm-modal [patient]="patient" (returnedData)="getDataFromModal($event)"></app-send-rtm-modal>
+    </div>
+    <div *ngIf="isRtmModel(rtmModelContent.MSG)">
+      {{ generalMsg }}
+    </div>
+  </div>
+
+  <div class="actions-section" *ngIf="!isRtmModel(rtmModelContent.MSG)">
+    <div class="buttons" *ngIf="isRtmModel(rtmModelContent.SEND_FAST_LOGIN)">
+      <!-- <div class="cancel" (click)="handleDecline()">Cancel</div> -->
+      <div class="send-invitation" (click)="handleApprove()">Add Record</div>
+    </div>
+  </div>
+</div>

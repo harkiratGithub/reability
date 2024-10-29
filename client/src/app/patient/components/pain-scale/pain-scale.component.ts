@@ -41,7 +41,7 @@ export class PainScaleComponent implements OnInit {
   savePainValue(): void {
     if (!this.hasPainValueChanged) return; 
     try {
-      this.ajax.sendPainScale(this.patientId, this.painValue).subscribe((response) => {
+      this.ajax.sendPatientPainScale(this.patientId, this.painValue).subscribe((response) => {
         console.log('Pain level saved:', response);
         this.isPainModelOpen = false;
         this.router.navigate(['/games_lobby']);
