@@ -8,6 +8,8 @@ import * as UtilModel from './util.model';
 import * as EncryptHelper from '../services/encrypt.helper';
 import * as Helper from '../services/util.helper';
 import { weekNumberFromDate } from '../services/week-number.helper';
+import { sgMail } from '../services/email.service';
+import * as ExcelJS from 'exceljs';
 
 export interface IPatientModel {
 	id: number;
@@ -520,3 +522,110 @@ export const addPatientRTM = (patient_id, painSession, client = null) => {
 		client
 	);
 };
+
+export const getAllPatientRTMDetails = async ( startDate: any, endDate: any, sendMail: boolean = false) => {
+    const query = squelPostgres
+        .select()
+        .field(`${TABLE_NAME.PATIENT}.first_name`)
+        .field(`${TABLE_NAME.PATIENT}.last_name`)
+        .field(`${TABLE_NAME.PATIENT}.phone`)
+        .field(`${TABLE_NAME.USER}.email`)
+        .field(`rtm.patient_id`)
+        .field(`rtm.line`)
+        .field(`rtm.event`)
+        .field(`rtm.timestamp`)
+        .from(TABLE_NAME.RTM, 'rtm')
+        .join(TABLE_NAME.PATIENT, null, `rtm.patient_id = ${TABLE_NAME.PATIENT}.id`)
+        .join(TABLE_NAME.USER, null, `${TABLE_NAME.PATIENT}.user_id = ${TABLE_NAME.USER}.id`);
+
+    if (startDate) {
+        const parsedStartDate = new Date(startDate);
+        if (isNaN(parsedStartDate.getTime())) {
+            throw new Error(`Invalid start date: ${startDate}`);
+        }
+        query.where(`rtm.timestamp >= ?`, parsedStartDate);
+    }
+
+    if (endDate) {
+        const parsedEndDate = new Date(endDate);
+        if (isNaN(parsedEndDate.getTime())) {
+            throw new Error(`Invalid end date: ${endDate}`);
+        }
+        query.where(`rtm.timestamp <= ?`, parsedEndDate);
+    }
+
+    const result = await BaseModel.runQuery(query.toParam());
+
+    if (!result.rows.length) {
+        throw new Error(`No data found for the specified date range.`);
+    }
+
+    const decryptedRows = result.rows.map(row => EncryptHelper.decryptJson(row));
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Patient RTM Data');
+
+    worksheet.columns = [
+        { header: 'Patient ID', key: 'patient_id' },
+        { header: 'First Name', key: 'first_name' },
+        { header: 'Last Name', key: 'last_name' },
+        { header: 'Phone', key: 'phone' },
+        { header: 'Therapist Session Minutes', key: 'therapist_session_minutes' },
+        { header: 'Email', key: 'email' },
+        { header: 'Line', key: 'line' },
+        { header: 'Event Note', key: 'event_note' },
+        { header: 'Pain Level', key: 'pain_level' },
+        { header: 'Therapist ID', key: 'therapist_id' },
+        { header: 'Minutes Spent', key: 'minutes_spent' },
+        { header: 'Review Activity', key: 'review_activity' },
+        { header: 'Reminder to Exercise', key: 'reminder_to_exercise' },
+    ];
+
+    if (!sendMail) {
+        return { data: decryptedRows };
+    }
+
+    decryptedRows.forEach(entry => {
+        worksheet.addRow({
+            patient_id: entry.patient_id,
+            first_name: entry.first_name,
+            last_name: entry.last_name,
+            phone: entry.phone,
+            therapist_session_minutes: entry.event.therapist_session_minutes,
+            email: entry.email,
+            line: entry.line,
+            event_note: entry.event.note,
+            pain_level: entry.event.pain_level,
+            therapist_id: entry.event.therapist_id,
+            minutes_spent: entry.event.minutes_spent,
+            review_activity: entry.event.review_activity,
+            reminder_to_exercise: entry.event.reminder_to_exercise,
+        });
+    });
+
+    const buffer = await workbook.xlsx.writeBuffer();
+
+    const msg = {
+        to: 'gatasi9293@anypng.com',
+        from: process.env.SENGRID_FROM_EMAIL ? process.env.SENGRID_FROM_EMAIL : 'yoramfeld@gmail.com',
+        subject: `Patient RTM Data Export - ${decryptedRows.length} Records Found`,
+        text: 'Please find the attached Excel file with the patients RTM data.',
+        attachments: [
+            {
+                content: Buffer.from(buffer).toString('base64'),
+                filename: `PatientData_${new Date().toISOString().split('T')[0]}.xlsx`,
+                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                disposition: 'attachment',
+            },
+        ],
+    };
+
+    try {
+        await sgMail.send(msg);
+        return { message: 'Patient data successfully sent via email.' };
+    } catch (error) {
+        console.error("Error sending email:", error);
+        throw new Error("Could not send email. Please try again later.");
+    }
+};
+

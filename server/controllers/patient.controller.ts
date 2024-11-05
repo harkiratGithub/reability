@@ -12,6 +12,7 @@ import * as PatientTreatmentHelper from '../helpers/patient-treatment.helper';
 import * as BookingHelper from '../helpers/booking.helper';
 import * as UserHelper from '../helpers/users.helper';
 import * as FeedbackHelper from '../helpers/feedback.helper';
+import { getAllPatientRTMDetails } from '../models/patient.model';
 
 export interface IPatientContact {
 	patient_id: number;
@@ -170,6 +171,20 @@ export const getPatientListDataActivities = (req, res, next) => {
 export const getAllActive = (req, res, next) => {
 	PatientHelper.getAllActive()
 		.then((activePatients) => res.json(activePatients))
+		.catch((err) => next(err));
+};
+
+export const getAllRTMDetails = (req, res, next) => {
+	const { startDate, endDate } = req.body;
+	getAllPatientRTMDetails(startDate || null, endDate || null, false)
+		.then((rtmData) => res.json(rtmData))
+		.catch((err) => next(err));
+};
+
+export const sendAllRTMDetails = (req, res, next) => {
+	const { startDate, endDate } = req.body;
+	getAllPatientRTMDetails(startDate || null, endDate || null, true)
+		.then((response) => res.json(response))
 		.catch((err) => next(err));
 };
 

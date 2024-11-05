@@ -1,7 +1,8 @@
 import sgMail from '@sendgrid/mail';
 
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
 export const sendMail = async (to, subject, html, cc?) => {
-	sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 	const emailFrom = process.env.SENGRID_FROM_EMAIL ? process.env.SENGRID_FROM_EMAIL : 'yoramfeld@gmail.com';
 	const msg = {
 		to,
@@ -20,3 +21,5 @@ export const sendMail = async (to, subject, html, cc?) => {
 		await sgMail.send(msg);
 	}
 };
+
+export { sgMail };

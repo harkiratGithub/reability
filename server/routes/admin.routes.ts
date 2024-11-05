@@ -52,6 +52,8 @@ router.post('/patient/edit', PatientController.editPatient);
 router.post('/patient/update', PatientController.updatePatient);
 router.delete('/patient/:id', PatientController.deletePatient);
 router.get('/patient/active', PatientController.getAllActive);
+router.get('/patient/rtm-details', PatientController.getAllRTMDetails);
+router.get('/patient/rtm-details-send', PatientController.sendAllRTMDetails);
 router.post('/patient/resetpassword', PatientController.resetPassword);
 router.get('/patient/inactive', PatientController.getAllInactive);
 router.post('/patient/activate', PatientController.activatePatient);
