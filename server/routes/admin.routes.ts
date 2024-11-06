@@ -52,8 +52,6 @@ router.post('/patient/edit', PatientController.editPatient);
 router.post('/patient/update', PatientController.updatePatient);
 router.delete('/patient/:id', PatientController.deletePatient);
 router.get('/patient/active', PatientController.getAllActive);
-router.get('/patient/rtm-details', PatientController.getAllRTMDetails);
-router.get('/patient/rtm-details-send', PatientController.sendAllRTMDetails);
 router.post('/patient/resetpassword', PatientController.resetPassword);
 router.get('/patient/inactive', PatientController.getAllInactive);
 router.post('/patient/activate', PatientController.activatePatient);
@@ -108,6 +106,10 @@ router.post('/lead/reminder/create', LeadController.createReminder);
 router.post('/lead/edit', LeadController.editLead);
 router.get('/lead/active', LeadController.getAll);
 router.get('/lead/reminders/:leadId', LeadController.getRemindersById);
+
+// rtm routes
+router.get('/rtm-details', PatientController.getAllRTMDetails);
+router.get('/rtm-details-send', PatientController.sendAllRTMDetails);
 
 // user filters route
 router.post('/userfilters/set', UserFiltersController.setUserFilter);

@@ -531,12 +531,14 @@ export const getAllPatientRTMDetails = async ( startDate: any, endDate: any, sen
         .field(`${TABLE_NAME.PATIENT}.phone`)
         .field(`${TABLE_NAME.USER}.email`)
         .field(`rtm.patient_id`)
-        .field(`rtm.line`)
         .field(`rtm.event`)
         .field(`rtm.timestamp`)
+        .field(`${TABLE_NAME.THERAPIST}.first_name`, 'therapist_first_name')
+        .field(`${TABLE_NAME.THERAPIST}.last_name`, 'therapist_last_name')
         .from(TABLE_NAME.RTM, 'rtm')
         .join(TABLE_NAME.PATIENT, null, `rtm.patient_id = ${TABLE_NAME.PATIENT}.id`)
-        .join(TABLE_NAME.USER, null, `${TABLE_NAME.PATIENT}.user_id = ${TABLE_NAME.USER}.id`);
+        .join(TABLE_NAME.USER, null, `${TABLE_NAME.PATIENT}.user_id = ${TABLE_NAME.USER}.id`)
+        .join(TABLE_NAME.THERAPIST, null, `(rtm.event->>'therapist_id')::int = ${TABLE_NAME.THERAPIST}.id`);
 
     if (startDate) {
         const parsedStartDate = new Date(startDate);
@@ -560,30 +562,33 @@ export const getAllPatientRTMDetails = async ( startDate: any, endDate: any, sen
         throw new Error(`No data found for the specified date range.`);
     }
 
-    const decryptedRows = result.rows.map(row => EncryptHelper.decryptJson(row));
+    const decryptedRows = result.rows.map((row : any) => EncryptHelper.decryptJson(row));
+
+	if (!sendMail) {
+        return { data: decryptedRows };
+    }
 
     const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet('Patient RTM Data');
+    const worksheet = workbook.addWorksheet('Patients RTM Data');
 
     worksheet.columns = [
         { header: 'Patient ID', key: 'patient_id' },
+        // { header: 'Patient Username', key: 'patient_username' },
         { header: 'First Name', key: 'first_name' },
         { header: 'Last Name', key: 'last_name' },
         { header: 'Phone', key: 'phone' },
-        { header: 'Therapist Session Minutes', key: 'therapist_session_minutes' },
         { header: 'Email', key: 'email' },
-        { header: 'Line', key: 'line' },
-        { header: 'Event Note', key: 'event_note' },
         { header: 'Pain Level', key: 'pain_level' },
-        { header: 'Therapist ID', key: 'therapist_id' },
-        { header: 'Minutes Spent', key: 'minutes_spent' },
         { header: 'Review Activity', key: 'review_activity' },
         { header: 'Reminder to Exercise', key: 'reminder_to_exercise' },
+        { header: 'Therapist ID', key: 'therapist_id' },
+        // { header: 'Therapist Username', key: 'therapist_username' },
+		{ header: 'Therapist First Name', key: 'therapist_first_name' },
+        { header: 'Therapist Last Name', key: 'therapist_last_name' },
+        { header: 'Therapist Note', key: 'event_note' },
+        { header: 'Therapist Manual Minutes', key: 'minutes_spent' },
+        { header: 'Therapist Session Minutes', key: 'therapist_session_minutes' },
     ];
-
-    if (!sendMail) {
-        return { data: decryptedRows };
-    }
 
     decryptedRows.forEach(entry => {
         worksheet.addRow({
@@ -591,22 +596,23 @@ export const getAllPatientRTMDetails = async ( startDate: any, endDate: any, sen
             first_name: entry.first_name,
             last_name: entry.last_name,
             phone: entry.phone,
-            therapist_session_minutes: entry.event.therapist_session_minutes,
             email: entry.email,
-            line: entry.line,
-            event_note: entry.event.note,
             pain_level: entry.event.pain_level,
-            therapist_id: entry.event.therapist_id,
-            minutes_spent: entry.event.minutes_spent,
             review_activity: entry.event.review_activity,
             reminder_to_exercise: entry.event.reminder_to_exercise,
+            therapist_id: entry.event.therapist_id,
+            therapist_first_name: entry.therapist_first_name,
+            therapist_last_name: entry.therapist_last_name,
+            event_note: entry.event.note,
+            minutes_spent: entry.event.minutes_spent,
+            therapist_session_minutes: entry.event.therapist_session_minutes,
         });
     });
 
     const buffer = await workbook.xlsx.writeBuffer();
 
     const msg = {
-        to: 'gatasi9293@anypng.com',
+        to: 'yoramfeld@gmail.com',
         from: process.env.SENGRID_FROM_EMAIL ? process.env.SENGRID_FROM_EMAIL : 'yoramfeld@gmail.com',
         subject: `Patient RTM Data Export - ${decryptedRows.length} Records Found`,
         text: 'Please find the attached Excel file with the patients RTM data.',
