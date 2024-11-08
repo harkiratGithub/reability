@@ -23,6 +23,29 @@ $BORDER_RADIUS: 26px;
     width: 16px;
     margin-left: 6px;
   }
+  .date-picker {
+    margin-top: -24px !important;
+
+    .date-picker-field {
+      width: 290px !important;
+      mat-label {
+        color: #b6c5cf;
+      }
+    }
+
+    .mat-date-range-input-inner {
+      color: #385f7c;
+    }
+    // .cross-icon {
+    //   color: black !important;
+    // }
+    
+    .mat-form-field-infix {
+      display: flex !important;
+      justify-content: center !important;
+      align-items: center !important;
+    }
+  }
   .active {
     color: #c7b066;
     &:hover {
@@ -67,4 +90,8 @@ $BORDER_RADIUS: 26px;
       top: 10px;
     }
   }
+}
+
+::ng-deep .mat-form-field-appearance-fill .mat-form-field-flex {
+  background-color: #ffffff; /* White background */
 }

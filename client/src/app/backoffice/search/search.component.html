@@ -1,5 +1,5 @@
 <div class="container">
-  <div class="search-bar">
+  <div class="search-bar" *ngIf="currentTabIndex != rtmTab">
     <input
       type="text"
       [disabled]="disabled"
@@ -43,4 +43,51 @@
       </app-multi-select>
     </div>
   </ng-container>
+
+  <!-- Date Range -->
+  <!-- <ng-container *ngIf="currentTabIndex == rtmTab">
+    <div class="date-picker">
+      <mat-form-field appearance="fill" class="date-picker-field">
+        <mat-label>MM/DD/YYYY – MM/DD/YYYY</mat-label>
+        <mat-date-range-input [formGroup]="dateRangeForm" [rangePicker]="picker">
+          <input matStartDate formControlName="startDate" placeholder="Start date" />
+          <input matEndDate formControlName="endDate" placeholder="End date" />
+        </mat-date-range-input>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker></mat-date-range-picker>
+        <mat-error *ngIf="dateRangeForm.hasError('required')"> Start date & End date are required </mat-error>
+        <mat-error *ngIf="dateRangeForm.hasError('invalidDateRange')"> Start date cannot be after end date </mat-error>
+      </mat-form-field>
+    </div>
+  </ng-container> -->
+
+  <!-- Date Range Picker -->
+  <!-- <ng-container *ngIf="currentTabIndex == rtmTab">
+    <div class="date-picker">
+      <mat-form-field appearance="fill" class="date-picker-field">
+        <mat-label>MM/DD/YYYY – MM/DD/YYYY</mat-label>
+        <mat-date-range-input [formGroup]="dateRangeForm" [rangePicker]="picker">
+          <input matStartDate formControlName="startDate" placeholder="Start date" />
+          <input matEndDate formControlName="endDate" placeholder="End date" />
+        </mat-date-range-input>
+  
+        <ng-container *ngIf="dateRangeForm.get('startDate')?.value && dateRangeForm.get('endDate')?.value; else datepickerToggle">
+          <button class="cross-icon" mat-icon-button matSuffix (click)="clearDateRange()">
+            <mat-icon>clear</mat-icon>
+          </button>
+        </ng-container>
+  
+        <ng-template #datepickerToggle>
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        </ng-template>
+  
+        <mat-date-range-picker #picker></mat-date-range-picker>
+  
+        <mat-error *ngIf="dateRangeForm.hasError('invalidDateRange')">
+          Start date cannot be after end date
+        </mat-error>
+      </mat-form-field>
+    </div>
+  </ng-container>
+   -->
 </div>
