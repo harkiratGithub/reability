@@ -9,7 +9,7 @@ import { AjaxService } from 'src/app/therapist/services/ajax.service';
 })
 export class PainScaleComponent implements OnInit {
   constructor(private ajax: AjaxService, private router: Router) {}
-  painValue: number = 5;
+  painValue: number = 0;
   patientId: number = -1;
   isPainModelOpen: boolean = false;
   hasPainValueChanged: boolean = false;
@@ -35,14 +35,12 @@ export class PainScaleComponent implements OnInit {
   onSliderChange(event: any): void {
     this.painValue = +event.target.value;
     this.hasPainValueChanged = true;
-    console.log('Pain level changed:', this.painValue);
   }
 
   savePainValue(): void {
     if (!this.hasPainValueChanged) return; 
     try {
       this.ajax.sendPatientPainScale(this.patientId, this.painValue).subscribe((response) => {
-        console.log('Pain level saved:', response);
         this.isPainModelOpen = false;
         this.router.navigate(['/games_lobby']);
       });
