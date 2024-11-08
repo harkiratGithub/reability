@@ -60,8 +60,9 @@ export const onLogIn = async (user: {
 					pain_level: pain_level,
 					timestamp: timestamp,
 				} = EncryptHelper.decryptJson(details[0]);
-				const RTM =
-					details?.filter((ele: { department_id: number }) => ele.department_id === 3)?.length > 0 ? true : false;
+				// const RTM =
+				// 	details?.filter((ele: { department_id: number }) => ele.department_id === 3)?.length > 0 ? true : false;
+				const RTM = details?.some((ele: { department_name: string }) => ele.department_name.toLowerCase() === 'rtm');
 				const isPainModelOpen =
 					RTM &&
 					!isNaN(pain_level) &&
