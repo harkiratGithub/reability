@@ -562,9 +562,8 @@ export const getAllPatientRTMDetails = async ( startDate: any, endDate: any, sen
     const result = await BaseModel.runQuery(query.toParam());
 
     if (!result.rows.length) {
-        throw new Error(`No data found for the specified date range.`);
+        return [];
     }
-
     const decryptedRows = result.rows.map(row => {
 		const decryptedRow = EncryptHelper.decryptJson(row);
 		const daysDataTransmittedInMonth = parseInt(decryptedRow.event.daysDataTransmittedInMonth) || 0;

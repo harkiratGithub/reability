@@ -63,12 +63,20 @@ export const onLogIn = async (user: {
 				// const RTM =
 				// 	details?.filter((ele: { department_id: number }) => ele.department_id === 3)?.length > 0 ? true : false;
 				const RTM = details?.some((ele: { department_name: string }) => ele.department_name.toLowerCase() === 'rtm');
+				
 				const isPainModelOpen =
 					RTM &&
 					!isNaN(pain_level) &&
 					new Date(new Date(timestamp).setDate(new Date(timestamp).getDate() + 1)) <= new Date()
 						? true
 						: false;
+				console.log(
+					'RTM Modal Condition: ',
+					isPainModelOpen,
+					RTM,
+					!isNaN(pain_level),
+					new Date(new Date(timestamp).setDate(new Date(timestamp).getDate() + 1)) <= new Date()
+				);
 				const validGames = await GameModel.getValidGameForPatient(patientId);
 				const patient = await PatientModel.findPatientByUserId(user.id);
 				const disabledSkeleton = patient.disabled_skeleton;
