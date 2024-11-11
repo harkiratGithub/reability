@@ -19,9 +19,7 @@
     <div class="save-button-container">
       <button 
         class="save-button" 
-        (click)="savePainValue()" 
-        [disabled]="!hasPainValueChanged" 
-        [ngClass]="{'disabled-button': !hasPainValueChanged}"
+        (click)="savePainValue()"
       >
         <img class="file-icon" width="25" height="25" src="../../../../assets/login/save.png" />
         Save

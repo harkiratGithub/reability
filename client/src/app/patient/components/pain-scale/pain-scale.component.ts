@@ -12,17 +12,14 @@ export class PainScaleComponent implements OnInit {
   painValue: number = 0;
   patientId: number = -1;
   isPainModelOpen: boolean = false;
-  hasPainValueChanged: boolean = false;
 
 
   async ngOnInit() {
     try {
       const userData = await this.ajax.getUserData().toPromise();
-      console.log(userData, 'userData');
       if (userData?.isPainModelOpen) {
         this.isPainModelOpen = userData.isPainModelOpen;
         this.patientId = userData.patientId;
-        console.log('user RTM:', this.isPainModelOpen, this.patientId);
         this.router.navigate(['/pain_scale']);
       } else {
         this.router.navigate(['/games_lobby']);
@@ -34,11 +31,9 @@ export class PainScaleComponent implements OnInit {
 
   onSliderChange(event: any): void {
     this.painValue = +event.target.value;
-    this.hasPainValueChanged = true;
   }
 
   savePainValue(): void {
-    if (!this.hasPainValueChanged) return; 
     try {
       this.ajax.sendPatientPainScale(this.patientId, this.painValue).subscribe((response) => {
         this.isPainModelOpen = false;
