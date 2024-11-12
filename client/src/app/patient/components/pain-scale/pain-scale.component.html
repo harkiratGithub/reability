@@ -1,5 +1,9 @@
 <div class="pain-scale-wrapper" *ngIf="isPainModelOpen">
   <div class="pain-scale-container">
+    <div class="logout-container" (click)="logout()">
+      <img class="log-out-image" src="assets/main-menu/svg-cards/log_out_black.svg" />
+      Log out
+    </div>
     <h2 class="heading">PAIN MEASUREMENT SCALE</h2>
     <div class="gradient-bar">
       <input 

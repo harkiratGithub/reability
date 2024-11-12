@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AjaxService } from 'src/app/therapist/services/ajax.service';
+import { AuthenticationService } from '../../../common/services/authentication.service';
 
 @Component({
   selector: 'app-pain-scale',
@@ -8,11 +9,14 @@ import { AjaxService } from 'src/app/therapist/services/ajax.service';
   styleUrls: ['./pain-scale.component.scss'],
 })
 export class PainScaleComponent implements OnInit {
-  constructor(private ajax: AjaxService, private router: Router) {}
+  constructor(
+    private ajax: AjaxService,
+    private router: Router,
+    private authenticationService: AuthenticationService
+  ) {}
   painValue: number = 0;
   patientId: number = -1;
   isPainModelOpen: boolean = false;
-
 
   async ngOnInit() {
     try {
@@ -42,5 +46,9 @@ export class PainScaleComponent implements OnInit {
     } catch (error) {
       console.log('Pain level error:', error);
     }
+  }
+
+  async logout() {
+    await this.authenticationService.logout();
   }
 }
