@@ -1,37 +1,23 @@
-# Name the node stage "build"
+# Use an official Node.js 12.18.2 image with Alpine Linux
 FROM node:12.18.2
-# AS build
-# Set working directory
-WORKDIR /app
 
+# Set the working directory
+WORKDIR /usr/src/app
 
-#EXPOSE 3000
-# Copy all files from current directory to working dir in image
-COPY . .
-# install node modules and build assets
+# Copy package.json and package-lock.json to the working directory
+COPY package*.json ./
 
 # Install dependencies
-#RUN npm install
-#RUN cd client
-#RUN npm install
-#RUN cd ..
+RUN npm install
 
-# Copy the rest of the application code
+# Copy the entire application to the working directory
+COPY . .
 
+# Run the heroku-postbuild script, including Angular build
+RUN npm run heroku-postbuild
 
-# Build the React app
-#RUN npm run start:development
+# Expose the port your app runs on
+EXPOSE 3000
 
-# Stage 2: Serve the app using Nginx
-#FROM nginx:alpine
-
-#COPY nginx.conf /etc/nginx/conf.d/default.conf
-# Copy the build output from Stage 1 to Nginx's web root directory
-#COPY --from=builder /app/build /usr/share/nginx/html
-
-# Expose port 80
-EXPOSE 80
-
-# Start Nginx
-#CMD ["nginx", "-g", "daemon off;"]
-ENTRYPOINT [ "/bin/sh", "/app/script.sh" ]
+# Define the command to run your application
+CMD ["npm", "start"]
