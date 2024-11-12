@@ -83,7 +83,7 @@ export class GameHistorySessionComponent implements OnInit {
           });
           this.patientListGrouped = groupBy(this.patientList, (p) => p.status);
           this.patientListFiltered = this.patientList;
-          this.openLogModal(this.patient?.peerId);
+          this.openLogModal(this.patient?.peerId, this.gameId );
         });
       });
   };
@@ -158,7 +158,7 @@ export class GameHistorySessionComponent implements OnInit {
               return acc;
             }
 
-            if (!this.allGames || this.allGames.length === 0) {
+            if (!this?.allGames || this?.allGames?.length === 0) {
               console.error('No games available in this allGames');
               return acc;
             }
@@ -265,26 +265,64 @@ export class GameHistorySessionComponent implements OnInit {
     });
   };
 
-  openLogModal = (patientId: any) => {
+  // openLogModal = (patientId: any) => {
+  //   this.isLogModalOpen = true;
+  //   const selectedPatient = this.patientListFiltered.find((patient) => patient.userId == patientId);
+  //   const gameMap = new Map<string, any[]>();
+  //   if (selectedPatient && selectedPatient.lastWeekActivity) {
+  //     selectedPatient.lastWeekActivity.forEach((activity: { gamesDuration: any[] }) => {
+  //       activity.gamesDuration.forEach(
+  //         (game: { gameName: string; duration: any; gameSummary: any; sessionFeedback: { questions: any } }) => {
+  //           if (!gameMap.has(game.gameName)) {
+  //             gameMap.set(game.gameName, []);
+  //           }
+  //           gameMap.get(game?.gameName)?.push({
+  //             duration: game?.duration,
+  //             gameSummary: game?.gameSummary,
+  //             sessionFeedback: game?.sessionFeedback?.questions,
+  //           });
+  //         }
+  //       );
+  //     });
+  //   }
+  //   this.patientLog = Array.from(gameMap.entries()).map(([gameName, sessions]) => {
+  //     sessions?.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  //     const latestSession = sessions[0];
+  //     const remainingSessions = sessions.slice(1);
+  //     return {
+  //       gameName,
+  //       latestSession,
+  //       remainingSessions,
+  //       showMore: false,
+  //     };
+  //   });
+  // };
+
+  openLogModal = (patientId: any, gameId: string) => {
     this.isLogModalOpen = true;
     const selectedPatient = this.patientListFiltered.find((patient) => patient.userId == patientId);
     const gameMap = new Map<string, any[]>();
-    if (selectedPatient && selectedPatient.lastWeekActivity) {
+    const matchingGame = this.allGames?.find((game) => game?.id === parseInt(gameId));
+    if (selectedPatient && selectedPatient.lastWeekActivity && matchingGame) {
       selectedPatient.lastWeekActivity.forEach((activity: { gamesDuration: any[] }) => {
         activity.gamesDuration.forEach(
           (game: { gameName: string; duration: any; gameSummary: any; sessionFeedback: { questions: any } }) => {
-            if (!gameMap.has(game.gameName)) {
-              gameMap.set(game.gameName, []);
+            if (game?.gameName === matchingGame?.name) {
+              if (!gameMap.has(game?.gameName)) {
+                gameMap.set(game?.gameName, []);
+              }
+              gameMap.get(game.gameName)?.push({
+                duration: game?.duration,
+                gameSummary: game?.gameSummary,
+                sessionFeedback: game?.sessionFeedback?.questions,
+              });
             }
-            gameMap.get(game?.gameName)?.push({
-              duration: game?.duration,
-              gameSummary: game?.gameSummary,
-              sessionFeedback: game?.sessionFeedback?.questions,
-            });
           }
         );
       });
     }
+  
+    // Transform the gameMap into the expected structure
     this.patientLog = Array.from(gameMap.entries()).map(([gameName, sessions]) => {
       sessions?.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
       const latestSession = sessions[0];
@@ -296,8 +334,9 @@ export class GameHistorySessionComponent implements OnInit {
         showMore: false,
       };
     });
-  };
+};
 
+  
   objectKeys = Object.keys;
 
   isArray(value: any): boolean {

@@ -700,17 +700,24 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
       this.dialogRef = null;
     }
   
+    if (!this.isTherapist && !this.inTherapistSession) {
+      this.dialogRef = this.dialog.open(GameHistorySessionComponent, {
+        hasBackdrop: true,
+        data: {
+          has_backdrop: false,
+          gameId: this.gameId,
+          iframeEl: this.iframeEl,
+        },
+      });
+    }
+
+    setTimeout(() => {
+      if (this.dialogRef) {
+        this.dialogRef.close();
+      }
+    }, 5000); 
+    
     // let newdialogRef;
-    // if (!this.isTherapist && !this.inTherapistSession) {
-    //    this.dialogRef = this.dialog.open(GameHistorySessionComponent, {
-    //     hasBackdrop: true,
-    //     data: {
-    //       has_backdrop: false,
-    //       gameId: this.gameId,
-    //       iframeEl: this.iframeEl,
-    //     },
-    //   });
-  
       // newdialogRef.afterClosed().subscribe(() => {  
       //   if (!this.isTherapist && !this.inTherapistSession) {
       //     if (!this.dialogRef) {
@@ -726,7 +733,7 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
       //     }
       //   }
       // });
-    // }
+   
   }
   
 

@@ -39,7 +39,7 @@
           </li>
         </ul> -->
 
-          <div class="button-container">
+          <!-- <div class="button-container">
             <button
               class="submit-button"
               *ngIf="log.remainingSessions.length > 0"
@@ -47,7 +47,7 @@
             >
               {{ log.showMore ? 'Show Less' : 'Show More' }}
             </button>
-          </div>
+          </div> -->
 
           <div *ngIf="log.showMore">
             <div *ngFor="let session of log.remainingSessions">
