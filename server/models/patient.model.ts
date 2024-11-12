@@ -507,7 +507,6 @@ export const getPatientUserId = async (patientId: number): Promise<number> => {
 };
 
 export const addPatientRTM = (patient_id, painSession, client = null) => {
-	console.log('addPatientRTM: ', patient_id, typeof new Date() );
 	return BaseModel.createRow(
 		TABLE_NAME.RTM,
 		{ patient_id, event: JSON.stringify({

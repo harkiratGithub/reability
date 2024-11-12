@@ -5,7 +5,6 @@ export const updatePatientSession = async (patient_id, painValue) => {
 	const rtmCreationFunc = async (client = null) => {
 		try {
 			const updatePatientSession = await updateRTM(patient_id, { painValue }, 'patient');
-			console.log(updatePatientSession, 'updatePatientSession');
 			return updatePatientSession;
 		} catch (err) {
 			throw err;
@@ -19,7 +18,6 @@ export const updateTherapistSession = async (patient_id, data, timestamp) => {
 	const rtmCreationFunc = async (client = null) => {
 		try {
 			const updatePatientSession = await updateRTM(patient_id, data, 'therapist', null, timestamp);
-			console.log(updatePatientSession, 'updateTherapistSession');
 			return updatePatientSession;
 		} catch (err) {
 			throw err;
