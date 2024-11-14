@@ -44,6 +44,21 @@ const rtmValidator = (rtmObject) => {
 };
 
 export const updateRTM = async (patient_id, data, type = 'patient', client = null, timestamp = null) => {
+	const currentTimestamp = timestamp ? new Date(timestamp) : new Date();
+    const currentMonth = currentTimestamp.getMonth() + 1;
+    const currentYear = currentTimestamp.getFullYear();
+
+	const daysTransmittedQuery = squelPostgres
+        .select()
+        .field('COUNT(DISTINCT DATE(timestamp))', 'daysDataTransmittedInMonth')
+        .from(TABLE_NAME.RTM)
+        .where('patient_id = ?', patient_id)
+        .where('EXTRACT(MONTH FROM timestamp) = ?', currentMonth)
+        .where('EXTRACT(YEAR FROM timestamp) = ?', currentYear)
+        .toParam();
+
+    const daysTransmittedResult = await BaseModel.runQuery(daysTransmittedQuery);
+    const daysDataTransmittedInMonth = daysTransmittedResult?.rows?.[0]?.daysDataTransmittedInMonth || 0;
 	const query = squelPostgres
 		.select()
 		.from(TABLE_NAME.RTM)
@@ -70,6 +85,7 @@ export const updateRTM = async (patient_id, data, type = 'patient', client = nul
 						reminder_to_exercise: null,
 						therapist_session_minutes: null,
 						pain_level: data?.painValue,
+						daysDataTransmittedInMonth
 					}),
 					timestamp: timestamp ? new Date(timestamp).toDateString() : new Date().toDateString(),
 				},
@@ -84,6 +100,7 @@ export const updateRTM = async (patient_id, data, type = 'patient', client = nul
 					event: JSON.stringify({
 						...isRTMExist?.event,
 						pain_level: data?.painValue,
+						daysDataTransmittedInMonth
 					}),
 				},
 				'line',
@@ -99,6 +116,7 @@ export const updateRTM = async (patient_id, data, type = 'patient', client = nul
 					event: JSON.stringify({
 						pain_level: null,
 						...data,
+						daysDataTransmittedInMonth
 					}),
 					timestamp: new Date().toDateString(),
 				},
@@ -113,6 +131,7 @@ export const updateRTM = async (patient_id, data, type = 'patient', client = nul
 					event: JSON.stringify({
 						...isRTMExist?.event,
 						...data,
+						daysDataTransmittedInMonth
 					}),
 				},
 				'line',
