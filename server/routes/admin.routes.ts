@@ -107,6 +107,10 @@ router.post('/lead/edit', LeadController.editLead);
 router.get('/lead/active', LeadController.getAll);
 router.get('/lead/reminders/:leadId', LeadController.getRemindersById);
 
+// rtm routes
+router.get('/rtm-details', PatientController.getAllRTMDetails);
+router.get('/rtm-details-send', PatientController.sendAllRTMDetails);
+
 // user filters route
 router.post('/userfilters/set', UserFiltersController.setUserFilter);
 router.get('/userfilters/:userId', UserFiltersController.getUserFilters);

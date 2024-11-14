@@ -13,6 +13,22 @@ router.post(
 	removeOldSessionAndPeers(),
 	UserController.authenticate
 );
+
+router.post(
+	'/enable-2fa/:id',
+	UserController.enable2FA
+);
+
+router.post(
+	'/verify-2fa/:id',
+	UserController.verify2FA
+);
+
+router.put(
+	'/re-verify-2fa/:id',
+	UserController.reVerify2FA
+);
+
 router.get('/users/getUserData', permitAccess(), UserController.authenticate);
 router.post('/logout', (req: any, res, next) => {
 	try {

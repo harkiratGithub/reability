@@ -43,6 +43,7 @@ export class CommonComponent implements OnInit {
   allExpertises = [];
   allFollowups = [];
   allTherapists = [];
+  allRtmReport = [];
   filterFunc: (data: any[], text?: string) => void;
   isLoading = true;
   editedEntity;
@@ -70,6 +71,7 @@ export class CommonComponent implements OnInit {
     followups: this.http.getAllFollowups(),
     professions: this.http.getAllProfessions(),
     leads: this.http.getAllLeads(),
+    rtm: this.http.getAllRtmReport(),
   };
   currentSearchText = '';
 
@@ -404,7 +406,8 @@ export class CommonComponent implements OnInit {
 
   get showAddButton(): boolean {
     const FollowupTab = [consts.Tabs.followups];
-    return !includes(FollowupTab, this.currentTabIndex);
+    const rtmTab = [consts.Tabs.rtm];
+    return !includes(FollowupTab, this.currentTabIndex) && !includes(rtmTab, this.currentTabIndex);
   }
 
   get showActiveInactiveFilter(): boolean {
@@ -470,6 +473,9 @@ export class CommonComponent implements OnInit {
         break;
       case consts.Tabs.leads:
         this.fetchLeads();
+        break;
+      case consts.Tabs.rtm:
+        this.fetchRtmReport();
         break;
       default:
         this.setLoading(false);
@@ -605,6 +611,24 @@ export class CommonComponent implements OnInit {
     this.http.getAllInstitutes().subscribe((data) => {
       const rows = util.transformInstitutes(data);
       this.setTable(consts.tableColumns.institutes, rows);
+      this.setLoading(false);
+    });
+  }
+
+  fetchRtmReport() {
+    this.http.getAllRtmReport().subscribe((response) => {
+      const { data } = response;
+      const rows = util.transformRtm(data);
+      this.setTable(consts.tableColumns.rtm, rows);
+      this.setLoading(false);
+    });
+  }
+
+  filterRtmReport(params: { startDate: string; endDate: string }) {
+    this.http.getAllRtmReport(params).subscribe((response) => {
+      const { data } = response;
+      const rows = util.transformRtm(data);
+      this.setTable(consts.tableColumns.rtm, rows);
       this.setLoading(false);
     });
   }
@@ -1053,6 +1077,8 @@ export class CommonComponent implements OnInit {
         return this.filterPatientTable;
       case consts.Tabs.therapists:
         return this.filterTherapistTable;
+      case consts.Tabs.rtm:
+        this.filterRtmReport;
       default:
         return this.filterTableByText;
     }
@@ -1337,10 +1363,17 @@ export class CommonComponent implements OnInit {
 
   exportTableToExcel() {
     const tabName = this.getCurrentTab().name;
-    this.helperMethodsForExcelExport[tabName].subscribe((data) => {
-      const formattedData = this.formatReportData(data);
-      this.downloadExcel(formattedData, tabName);
-    });
+    if (tabName == 'rtm') {
+      this.helperMethodsForExcelExport[tabName].subscribe((response) => {
+        const { data } = response;
+        const formattedData = this.formatReportData(data, tabName);
+        this.downloadExcel(formattedData, tabName);
+      });
+    } else
+      this.helperMethodsForExcelExport[tabName].subscribe((data) => {
+        const formattedData = this.formatReportData(data, tabName);
+        this.downloadExcel(formattedData, tabName);
+      });
   }
 
   exportSessions() {
@@ -1370,8 +1403,28 @@ export class CommonComponent implements OnInit {
     return date.split(' ')[0];
   }
 
-  formatReportData(data) {
+  formatReportData(data, tabName) {
     const formattedData = data.map((item) => {
+      if (tabName === 'rtm') {
+        delete item?.therapist_first_name;
+        delete item?.therapist_last_name;
+        delete item?.therapist_username;
+        delete item?.event;
+        delete item?.email;
+        return {
+          patient_id: item.patient_id || '',
+          first_name: item.first_name || '',
+          last_name: item.last_name || '',
+          phone: item.phone || '',
+          since: item.since || '',
+          remote_monitoring: item?.event?.minutes_spent || '',
+          data_transmitted: item?.event?.therapist_session_minutes || '',
+          M_98975: item['98975'] || 0,
+          M_98977: item['98977'] || 0,
+          M_98980: item['98980'] || 0,
+          M_98981: item['98981'] || 0,
+        };
+      }
       if (item.created_at) {
         item.created_at = this.splitDateFromTime(item.created_at);
       }
@@ -1379,6 +1432,7 @@ export class CommonComponent implements OnInit {
         item.updated_at = this.splitDateFromTime(item.updated_at);
       }
       for (const key in item) {
+        console.log("order of keys: " ,key);
         if (Array.isArray(item[key])) {
           item[key] = JSON.stringify(item[key]).replace(/[\[\]"\']/g, '');
         }

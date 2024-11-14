@@ -14,6 +14,7 @@ import { AdminComponent } from './therapist/adminPage/therapist.component';
 import { LoginPageComponent } from './common/password-routes/login/login.component';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
@@ -74,6 +75,10 @@ import { MatNativeDateModule, MAT_DATE_FORMATS, DateAdapter } from '@angular/mat
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatRadioModule } from '@angular/material/radio';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatSliderModule } from '@angular/material/slider';
+import { MatSelectModule } from '@angular/material/select';
+
 import {
   NgxMatMomentModule,
   NgxMatMomentAdapter,
@@ -86,7 +91,9 @@ import {
   NgxMatDateAdapter,
 } from '@angular-material-components/datetime-picker';
 import { GeneralModalComponent } from './common/general-modal/general-modal.component';
+import { RTMModalComponent } from './common/rtm-modal/rtm-modal.component';
 import { SendFastLoginModalComponent } from './common/general-modals/send-fast-login-modal/send-fast-login-modal.component';
+import { SendRTMModalComponent } from './common/rtm-modal/send-rtm-modal/send-rtm-modal.component';
 import { FastLoginComponent } from './common/password-routes/fast-login/fast-login.component';
 import { DurationPipe } from '../app/pipes/duration.pipe';
 import { AddEditFollowupComponent } from './backoffice/add-edit/add-edit-followup/add-edit-followup.component';
@@ -126,6 +133,10 @@ import { FileUploaderComponent } from './backoffice/file-uploader/file-uploader.
 import { GameLogsComponent } from './patient/components/game-logs/game-logs.component';
 import { ExportToExcelComponent } from './backoffice/export-to-excel/export-to-excel.component';
 import { PatientGeneralModalComponent } from './common/patient-general-modal/patient_general_modal.component';
+import { TwoFactorAuthVerifyComponent } from './common/password-routes/two-factor-auth-verify/two-factor-auth-verify.component';
+import { FeedbackFormComponent } from './patient/components/feedback-form/feedback-form.component';
+import { GameHistorySessionComponent } from './patient/components/game-history-session/game-history-session.component';
+import { PainScaleComponent } from './patient/components/pain-scale/pain-scale.component';
 
 export const CUSTOM_MOMENT_FORMATS = {
   parse: {
@@ -177,7 +188,9 @@ export const CUSTOM_MOMENT_FORMATS = {
     CountDownAnimationComponent,
     ConfiguratorModalComponent,
     GeneralModalComponent,
+    RTMModalComponent,
     SendFastLoginModalComponent,
+    SendRTMModalComponent,
     FastLoginComponent,
     DurationPipe,
     AddEditFollowupComponent,
@@ -213,6 +226,10 @@ export const CUSTOM_MOMENT_FORMATS = {
     GameLogsComponent,
     ExportToExcelComponent,
     PatientGeneralModalComponent,
+    TwoFactorAuthVerifyComponent,
+    FeedbackFormComponent,
+    GameHistorySessionComponent,
+    PainScaleComponent,
   ],
   imports: [
     RouterModule.forRoot(routes, { useHash: true }),
@@ -220,8 +237,10 @@ export const CUSTOM_MOMENT_FORMATS = {
     NgReduxModule,
     NgReduxRouterModule.forRoot(),
     MatDialogModule,
+    MatIconModule,
     MatTabsModule,
     MatSlideToggleModule,
+
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
@@ -235,6 +254,9 @@ export const CUSTOM_MOMENT_FORMATS = {
     MatInputModule,
     MatButtonModule,
     MatRadioModule,
+    MatTooltipModule,
+    MatSliderModule,
+    MatSelectModule,
     NgxMatMomentModule,
     NgxMatDatetimePickerModule,
     NgxMatTimepickerModule,
@@ -273,6 +295,7 @@ export const CUSTOM_MOMENT_FORMATS = {
     ModalComponent,
     ConfiguratorModalComponent,
     PatientGeneralModalComponent,
+    FeedbackFormComponent,
   ],
 })
 export class AppModule {

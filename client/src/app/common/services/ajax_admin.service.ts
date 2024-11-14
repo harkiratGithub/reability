@@ -124,7 +124,6 @@ export class AjaxAdmin {
   getAllInstitutes() {
     return this.http.get<any[]>(`${this.baseUrl}/institute`);
   }
-
   createInstitute(formData) {
     return this.http.post<any>(`${this.baseUrl}/institute/create`, formData);
   }
@@ -254,6 +253,15 @@ export class AjaxAdmin {
   createLead(lead) {
     return this.http.post<any>(`${this.baseUrl}/lead/create`, lead);
   }
+
+  getAllRtmReport(params: { startDate?: string; endDate?: string } = {}) {
+    const queryString = Object.keys(params)
+      .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
+      .join('&');
+    const url = `${this.baseUrl}/rtm-details${queryString ? `?${queryString}` : ''}`;
+    return this.http.get<any>(url);
+}
+
 
   createReminder(reminder) {
     return this.http.post<any>(`${this.baseUrl}/lead/reminder/create`, reminder);

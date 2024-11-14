@@ -22,6 +22,58 @@ export const usersValidator = (usersObject) => {
 	return UserHelper.modelValidator(usersValidationObject, usersObject, 'usersValidator');
 };
 
+// export const getUserDetails = async (userId) => {
+// 	const query = squelPostgres
+// 		.select()
+// 		.field(`${TABLE_NAME.PATIENT}.id`, 'id')
+// 		.field('first_name')
+// 		.field('last_name')
+// 		.field(`${TABLE_NAME.USER}.email`)
+// 		.field(`${TABLE_NAME.USER}.is_two_factor_enabled`)
+// 		.field(`${TABLE_NAME.USER}.fast_login_link`)
+// 		.field(`${TABLE_NAME.DEPARTMENT}.id`, 'department_id')
+// 		.from(TABLE_NAME.PATIENT)
+// 		.left_join(TABLE_NAME.USER, null, `${TABLE_NAME.PATIENT}.user_id = ${TABLE_NAME.USER}.id`)
+// 		.left_join(
+// 			TABLE_NAME.PATIENT_DEPARTMENTS,
+// 			null,
+// 			`${TABLE_NAME.PATIENT}.id = ${TABLE_NAME.PATIENT_DEPARTMENTS}.patient_id`
+// 		)
+// 		.left_join(
+// 			TABLE_NAME.DEPARTMENT,
+// 			null,
+// 			`${TABLE_NAME.PATIENT_DEPARTMENTS}.department_id = ${TABLE_NAME.DEPARTMENT}.id`
+// 		)
+// 		.where(`user_id = ?`, userId)
+// 		.union(
+// 			squelPostgres
+// 				.select()
+// 				.field(`${TABLE_NAME.THERAPIST}.id`, 'id')
+// 				.field('first_name')
+// 				.field('last_name')
+// 				.field(`${TABLE_NAME.USER}.email`)
+// 				.field(`${TABLE_NAME.USER}.is_two_factor_enabled`)
+// 				.field(`${TABLE_NAME.USER}.fast_login_link`)
+// 				.field(`${TABLE_NAME.DEPARTMENT}.id`, 'department_id')
+// 				.from(TABLE_NAME.THERAPIST)
+// 				.left_join(TABLE_NAME.USER, null, `${TABLE_NAME.THERAPIST}.user_id = ${TABLE_NAME.USER}.id`)
+// 				.left_join(
+// 					TABLE_NAME.THERAPIST_DEPARTMENTS,
+// 					null,
+// 					`${TABLE_NAME.THERAPIST}.id = ${TABLE_NAME.THERAPIST_DEPARTMENTS}.therapist_id`
+// 				)
+// 				.left_join(
+// 					TABLE_NAME.DEPARTMENT,
+// 					null,
+// 					`${TABLE_NAME.THERAPIST_DEPARTMENTS}.department_id = ${TABLE_NAME.DEPARTMENT}.id`
+// 				)
+// 				.where(`user_id = ?`, userId)
+// 		)
+// 		.toParam();
+// 	const result = await BaseModel.runQuery(query);
+// 	return result.rows;
+// };
+
 export const getUserDetails = async (userId) => {
 	const query = squelPostgres
 		.select()
@@ -29,8 +81,12 @@ export const getUserDetails = async (userId) => {
 		.field('first_name')
 		.field('last_name')
 		.field(`${TABLE_NAME.USER}.email`)
+		.field(`${TABLE_NAME.USER}.is_two_factor_enabled`)
 		.field(`${TABLE_NAME.USER}.fast_login_link`)
 		.field(`${TABLE_NAME.DEPARTMENT}.id`, 'department_id')
+		.field(`${TABLE_NAME.DEPARTMENT}.name`, 'department_name')
+		.field(`${TABLE_NAME.RTM}.event->>'pain_level'`, 'pain_level') 
+		.field(`${TABLE_NAME.RTM}.timestamp`, 'timestamp')  
 		.from(TABLE_NAME.PATIENT)
 		.left_join(TABLE_NAME.USER, null, `${TABLE_NAME.PATIENT}.user_id = ${TABLE_NAME.USER}.id`)
 		.left_join(
@@ -43,6 +99,11 @@ export const getUserDetails = async (userId) => {
 			null,
 			`${TABLE_NAME.PATIENT_DEPARTMENTS}.department_id = ${TABLE_NAME.DEPARTMENT}.id`
 		)
+		.left_join(
+			TABLE_NAME.RTM,
+			null,
+			`${TABLE_NAME.PATIENT}.id = ${TABLE_NAME.RTM}.patient_id`
+		)
 		.where(`user_id = ?`, userId)
 		.union(
 			squelPostgres
@@ -51,8 +112,12 @@ export const getUserDetails = async (userId) => {
 				.field('first_name')
 				.field('last_name')
 				.field(`${TABLE_NAME.USER}.email`)
+				.field(`${TABLE_NAME.USER}.is_two_factor_enabled`)
 				.field(`${TABLE_NAME.USER}.fast_login_link`)
 				.field(`${TABLE_NAME.DEPARTMENT}.id`, 'department_id')
+				.field(`${TABLE_NAME.DEPARTMENT}.name`, 'department_name')
+				.field(`NULL`, 'pain_level') 
+				.field(`NULL`, 'timestamp')
 				.from(TABLE_NAME.THERAPIST)
 				.left_join(TABLE_NAME.USER, null, `${TABLE_NAME.THERAPIST}.user_id = ${TABLE_NAME.USER}.id`)
 				.left_join(
@@ -71,6 +136,7 @@ export const getUserDetails = async (userId) => {
 	const result = await BaseModel.runQuery(query);
 	return result.rows;
 };
+
 
 export const getPatientsByTherapistId = async (therapistId) => {
 	const query = squelPostgres

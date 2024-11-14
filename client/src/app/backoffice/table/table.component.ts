@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { isEmpty, upperFirst } from 'lodash';
-
+import * as consts from '../backoffice-constants';
 import { IBackOfficeTabAction } from '../../../types';
 import { FIELDS_NOT_TO_CAPITALIZE } from '../backoffice-constants';
 
@@ -56,4 +56,9 @@ export class TableComponent {
     event.preventDefault();
     navigator.clipboard.writeText(data);
   }
+
+  get rtmTab(): any {
+    return consts.Tabs.rtm;
+  }
+
 }

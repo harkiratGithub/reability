@@ -6,7 +6,7 @@ import _ from 'lodash';
 
 import { environment } from '../../../environments/environment';
 import { User } from '../../common/models/user';
-import { IPatient, ITherapistAvailability, ITreatmentListItem } from '../../../types';
+import { FeedbackQuestion, IPatient, ITherapistAvailability, ITreatmentListItem } from '../../../types';
 
 @Injectable()
 export class AjaxService {
@@ -39,6 +39,34 @@ export class AjaxService {
     }
   };
 
+  enable2FA = (id, data) => {
+    try {
+      return this.http.post<any>(`${this.baseUrl}/enable-2fa/${id}`, {
+        data,
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  verify2FA = (id, code) => {
+    try {
+      return this.http.post<any>(`${this.baseUrl}/verify-2fa/${id}`, {
+        token: code,
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  reVerify2FA = (id) => {
+    try {
+      return this.http.put<any>(`${this.baseUrl}/re-verify-2fa/${id}`, null);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   logout = () => {
     return this.http.post<any>(`${this.baseUrl}/logout`, {});
   };
@@ -58,7 +86,7 @@ export class AjaxService {
           onTherapistSession,
           onGameSession,
         })
-        .subscribe(() => { });
+        .subscribe(() => {});
     } catch (err) {
       console.error(err);
     }
@@ -126,6 +154,10 @@ export class AjaxService {
     return this.http.get<any[]>(`${this.baseUrl}/therapist/games`);
   }
 
+  getAllEndGames() {
+    return this.http.get<any[]>(`${this.baseUrl}/patient/games`);
+  }
+
   addGameToPatient = (patientId, gameId) => {
     try {
       this.http
@@ -133,7 +165,7 @@ export class AjaxService {
           patientId,
           gameId,
         })
-        .subscribe(() => { });
+        .subscribe(() => {});
     } catch (err) {
       console.error(err);
     }
@@ -146,7 +178,7 @@ export class AjaxService {
           patientId,
           gameId,
         })
-        .subscribe(() => { });
+        .subscribe(() => {});
     } catch (err) {
       console.error(err);
     }
@@ -163,7 +195,7 @@ export class AjaxService {
         .post<any>(`${this.baseUrl}/therapist/sessions/therapistStartTime`, {
           userId,
         })
-        .subscribe(() => { });
+        .subscribe(() => {});
     } catch (err) {
       console.error(err);
     }
@@ -188,6 +220,17 @@ export class AjaxService {
   getPatientActivities = (startTime, endTime) => {
     try {
       return this.http.post<any>(`${this.baseUrl}/therapist/getPatientList`, {
+        startTime,
+        endTime,
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  getPatientEndActivities = (startTime, endTime) => {
+    try {
+      return this.http.post<any>(`${this.baseUrl}/patient/getPatientDataList`, {
         startTime,
         endTime,
       });
@@ -253,6 +296,23 @@ export class AjaxService {
     }
   };
 
+  // patient RTM routes
+  sendPatientPainScale = (patientId, painValue) => {
+    try {
+      return this.http.post<any>(`${this.baseUrl}/patient/rtmSession`, { patientId, painValue });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  sendRtmTherapistSession = (patientId,timestamp, data) => {
+    try {
+      return this.http.post<any>(`${this.baseUrl}/therapist/rtmSession`, { patientId,timestamp, data });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   // patient routes
   startGameSession = (gameId) => {
     try {
@@ -274,6 +334,16 @@ export class AjaxService {
     }
   };
 
+  updateGameFeedback = (gameFeedback) => {
+    try {
+      return this.http.post<any>(`${this.baseUrl}/patient/gameSession/updateSession`, {
+        gameFeedback,
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   saveGameSettings = (gameId, settings) => {
     try {
       this.http
@@ -281,7 +351,7 @@ export class AjaxService {
           gameId,
           settings,
         })
-        .subscribe(() => { });
+        .subscribe(() => {});
     } catch (err) {
       console.error(err);
     }
@@ -295,7 +365,7 @@ export class AjaxService {
           gameId,
           settings,
         })
-        .subscribe(() => { });
+        .subscribe(() => {});
     } catch (err) {
       console.error(err);
     }
@@ -337,7 +407,7 @@ export class AjaxService {
           patientId,
           hasCamera,
         })
-        .subscribe(() => { });
+        .subscribe(() => {});
     } catch (err) {
       console.error(err);
     }
@@ -350,6 +420,7 @@ export class AjaxService {
       console.error(err);
     }
   };
+
   deleteBookingById = (bookingId: number) => {
     try {
       return this.http.delete<any>(`${this.baseUrl}/therapist/booking/${bookingId}`);
@@ -357,6 +428,7 @@ export class AjaxService {
       console.error(err);
     }
   };
+
   editBookingById = (booking: Partial<ITreatmentListItem>) => {
     try {
       return this.http.post<any>(`${this.baseUrl}/therapist/booking/`, booking);
@@ -518,4 +590,8 @@ export class AjaxService {
       console.error(error);
     }
   };
+
+  getFeedbackQuestions(): Observable<FeedbackQuestion[]> {
+    return this.http.get<FeedbackQuestion[]>(`${this.baseUrl}/patient/feedback/questions`);
+  }
 }

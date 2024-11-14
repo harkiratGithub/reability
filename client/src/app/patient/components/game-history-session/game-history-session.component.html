@@ -1,0 +1,94 @@
+<div *ngIf="isLogModalOpen && patientLog?.length" class="patient-log-modal">
+  <div class="patient-log-content">
+    <div class="game-heading-container">
+      <h3 class="game-heading">Game Information</h3>
+      <button mat-icon-button (click)="closeModal()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <div class="logs-container">
+      <div *ngFor="let log of patientLog">
+        <div class="game-log">
+          <h3>Game Name: {{ log.gameName | titlecase }}</h3>
+          <div class="duration">
+            <p><strong>Duration:</strong></p>
+            <p>{{ log.latestSession.duration }}</p>
+          </div>
+          <div class="game-summary">
+            <p><strong>Game Summary:</strong></p>
+            <div>
+              <p *ngIf="log.latestSession.gameSummary.totalSquats !== undefined">
+                Total Squats: {{ log.latestSession.gameSummary.totalSquats }}
+              </p>
+              <p *ngIf="log.latestSession.gameSummary.gameTimeSeconds !== undefined">
+                Game Time (seconds): {{ log.latestSession.gameSummary.gameTimeSeconds }}
+              </p>
+              <p *ngIf="log.latestSession.gameSummary.difficult !== undefined">
+                Difficulty: {{ log.latestSession.gameSummary.difficult }}
+              </p>
+              <p *ngIf="log.latestSession.gameSummary.gameScore !== undefined">
+                Game Score: {{ log.latestSession.gameSummary.gameScore.join(', ') }}
+              </p>
+            </div>
+          </div>
+
+          <!-- <p class="session-feedback"><strong>Session Feedback</strong></p>
+        <ul>
+          <li *ngFor="let feedback of log.latestSession.sessionFeedback">
+            {{ feedback.question }} - {{ feedback.answer }}
+          </li>
+        </ul> -->
+
+          <!-- <div class="button-container">
+            <button
+              class="submit-button"
+              *ngIf="log.remainingSessions.length > 0"
+              (click)="log.showMore = !log.showMore"
+            >
+              {{ log.showMore ? 'Show Less' : 'Show More' }}
+            </button>
+          </div> -->
+
+          <div *ngIf="log.showMore">
+            <div *ngFor="let session of log.remainingSessions">
+              <p><strong>Additional Session - Duration:</strong> {{ session.duration }}</p>
+              <hr />
+              <div class="additional-session">
+                <p *ngIf="session.gameSummary.totalSquats !== undefined">
+                  Total Squats: {{ session.gameSummary.totalSquats }}
+                </p>
+                <p *ngIf="session.gameSummary.gameTimeSeconds !== undefined">
+                  Game Time (seconds): {{ session.gameSummary.gameTimeSeconds }}
+                </p>
+                <p *ngIf="session.gameSummary.difficult !== undefined">
+                  Difficulty: {{ session.gameSummary.difficult }}
+                </p>
+                <p *ngIf="session.gameSummary.gameScore !== undefined">
+                  Game Score: {{ session.gameSummary.gameScore.join(', ') }}
+                </p>
+              </div>
+
+              <!-- <p class="session-feedback" *ngIf="session?.sessionFeedback?.length > 0">
+              <strong>Session Feedback:</strong>
+            </p> -->
+
+              <!-- <div *ngFor="let feedback of session.sessionFeedback">
+              <ul class="ques-ans">
+                <li>{{ feedback?.question }}</li>
+                <p>{{ feedback?.answer }}</p>
+              </ul>
+            </div> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="total-duration">
+      <h4>Total Time Spent on Games:</h4>
+      <span>{{ getTotalDuration(patientLog) || '00:00:00' }}</span>
+    </div>
+    <div class="modal-actions">
+      <button class="close-btn" (click)="closeModal()">Close</button>
+    </div>
+  </div>
+</div>

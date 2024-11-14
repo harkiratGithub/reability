@@ -50,3 +50,23 @@ export const sendUserConnectedEmail = async (patient, therapist) => {
 	const html = `<div>Patient ${patient.username} started a session with ${therapist.firstName} ${therapist.lastName} </div>`;
 	await EmailHelper.sendMail(patient.notification_email, subject, html);
 };
+
+export const sendQrReVerify2FA = async (userEmail, qrLink) => {
+	const subject = 'ReAbility Online Re-Auth';
+	const html = `
+	<div style="font-family: Arial, sans-serif; text-align: center;">
+	  <h2>ReAbility Online Re-Auth</h2>
+	  <p>Welcome to ReAbility system.</p>
+	  <p>Re-Scan the QR code using your authentication app to verify your identity.</p>
+	  <div>
+		<img 
+		  src="${qrLink}" 
+		  alt="QR Code" 
+		  style="width: 200px; height: 200px; margin: 10px 0; border: 1px solid #ddd;"
+		/>
+	  </div>
+
+	</div>
+	`;
+	await EmailHelper.sendMail(userEmail, subject, html);
+};

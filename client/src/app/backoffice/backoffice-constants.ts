@@ -103,6 +103,19 @@ export const tableColumns: Record<string, ITableColumn[]> = {
     { fieldName: 'max_patients', displayName: 'Max Patients', flex: 1 },
     { fieldName: 'duration', displayName: 'Duration', flex: 1 },
   ],
+  rtm: [
+    { fieldName: 'patient_id', displayName: 'Patient Unique ID', flex: 1 },
+    { fieldName: 'first_name', displayName: 'First Name', flex: 1 },
+    { fieldName: 'last_name', displayName: 'Last Name', flex: 1 },
+    { fieldName: 'phone', displayName: 'Phone', flex: 1 },
+    { fieldName: 'since', displayName: 'Since', flex: 1.2, datePipe: true  },
+    { fieldName: 'remote_monitoring', displayName: 'Minutes of Remote Monitoring', flex: 2 },
+    { fieldName: 'data_transmitted', displayName: 'Days of Data Transmitted', flex: 2 },
+    { fieldName: '98975', displayName: '98975(1,0)', flex: 1 },
+    { fieldName: '98977', displayName: '98977(1,0)', flex: 1 },
+    { fieldName: '98980', displayName: '98980(1,0)', flex: 1 },
+    { fieldName: '98981', displayName: '98981(1,0)', flex: 1 },
+  ],
 };
 
 export enum Tabs {
@@ -114,6 +127,7 @@ export enum Tabs {
   followups,
   professions,
   leads,
+  rtm,
 }
 
 export enum PatientFilterOrder {
@@ -130,6 +144,7 @@ export const FILTERS_ORDER: Record<Tabs, any> = {
   [Tabs.followups]: [],
   [Tabs.professions]: [],
   [Tabs.leads]: [],
+  [Tabs.rtm]: [],
 };
 
 interface ITabData {
@@ -218,6 +233,15 @@ export const tabsData: ITabData[] = [
     backButtonText: 'ADD NEW LEAD',
     editButtonText: 'EDIT LEAD',
     newButtonText: 'NEW LEAD',
+  },
+  {
+    name: Tabs[Tabs.rtm],
+    displayName: 'RTM REPORT',
+    messageDisplayName: 'rtm',
+    nameField: '',
+    backButtonText: '',
+    editButtonText: '',
+    newButtonText: '',
   },
 ];
 

@@ -308,6 +308,7 @@ type ExcludeFunctionPropertyNames<T extends object> = MarkFunctionPropertyNames<
 type ExcludeFunctions<T extends object> = Pick<T, ExcludeFunctionPropertyNames<T>>;
 
 export interface IGame {
+  path?: string;
   id: number;
   name: string;
   url: string;
@@ -323,4 +324,39 @@ export interface IGameData {
   data: object;
   active: boolean;
   target_answer: any;
+}
+
+export interface FeedbackOption {
+  value: string;
+  label: string;
+  tooltip: string;
+}
+
+export interface FeedbackQuestion {
+  id: number;
+  created_at: string;
+  question: string;
+  question_type?: string;
+  type: 'checkbox' | 'text' | 'radio' | 'rating';
+  options?: FeedbackOption[];
+}
+
+export interface IPatientLog {
+  gameName: string;
+  latestSession: {
+    duration: string;
+    gameSummary: {
+      totalSquats: number;
+      squatsPerSet: number[];
+      gameTimeSeconds: number;
+    };
+    sessionFeedback: {
+      questions: {
+        question: string;
+        answer: string;
+      }[];
+    };
+  };
+  remainingSessions: any[];
+  showMore: boolean;
 }

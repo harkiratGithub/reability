@@ -36,6 +36,7 @@ const passportConfig = (passport: any) => {
 					username: user.user_name,
 					isTherapist: user.role === ROLE.THERAPIST,
 					peerId: user.id.toString(),
+					is_two_factor_enabled: user.is_two_factor_enabled
 				};
 				if (user.role === ROLE.ADMIN) {
 					return done(null, userObject);

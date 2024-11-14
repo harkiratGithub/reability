@@ -29,7 +29,8 @@
             [class.hyper]="col.onClick"
             (click)="col.onClick && col.onClick(row)"
           >
-            {{ col.datePipe ? (getCell(row, col) | date: 'd MMM y') : getCell(row, col) }}
+            <!-- {{ col.datePipe ? (getCell(row, col) | date: 'd MMM y') : getCell(row, col) }} -->
+            {{ col.datePipe ? (getCell(row, col) | date: 'd MMM y':'UTC') : getCell(row, col) }}
           </div>
           <div *ngSwitchCase="cellType.email" class="cell ellipsis hyper" title="Click to send mail">
             <a href="mailto:{{ getCell(row, col) }}">
@@ -42,7 +43,7 @@
             </a>
           </div>
         </div>
-        <div class="tools">
+        <div class="tools" *ngIf="currentTabIndex != rtmTab" >
           <button
             mat-button
             [matMenuTriggerFor]="menu"

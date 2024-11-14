@@ -35,9 +35,11 @@
             [disabled]="table.rows && table.rows.length === 0"
             [filterFunc]="filterFunc"
             [additionalFilters]="tabsAdditionalFilters[currentTabIndex]"
+            [currentTabIndex]="currentTabIndex"
             [sharedFilters]="getSharedFilters(currentTabIndex)"
             [filterBy]="currentSearchText"
             (filterTextChanged)="setCurrentSearchText($event)"
+            (dateRangeChanged)="filterRtmReport($event)"
           >
           </app-backoffice-search>
         </div>
@@ -86,6 +88,7 @@
         [allExpertises]="allExpertises"
         [allTherapists]="allTherapists"
         [allFollowups]="allFollowups"
+        [allRtmReport]="allRtmReport"
         (goBack)="onReturnFromAddEdit($event)"
         (refreshPatientDetails)="onRefreshPatientDetails($event)"
         (openTherapistScheduler)="openTherapistScheduler($event)"

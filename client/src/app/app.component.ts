@@ -3,6 +3,11 @@ import {
   GeneralModalData,
   OuterModalInterface,
 } from './common/general-modal/general-modal.component';
+import {
+  RTMModalComponent,
+  RTMModalData,
+  RTMOuterModalInterface,
+} from './common/rtm-modal/rtm-modal.component';
 import { Component, OnInit, OnDestroy, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthenticationService } from './common/services/authentication.service';
@@ -14,7 +19,7 @@ import { CallModalComponent } from './common/call-modal/call_modal.component';
 import { AppActions } from '../app/app.actions';
 import { AudioContext } from 'standardized-audio-context';
 import { DisconnectedVideoSessionComponent } from './common/video-session-disconneted-modal/video_session_disconneted_modal.component';
-import { roleMainRoute } from './routes';
+import { roleMainRoute, ROUTES } from './routes';
 import { AjaxService } from './therapist/services/ajax.service';
 import { PatientGeneralModalComponent } from './common/patient-general-modal/patient_general_modal.component';
 import { MOBILE_OR_SMALL_RESOLUTION } from './common/utils';
@@ -31,10 +36,12 @@ export class AppComponent implements OnInit, OnDestroy {
   @select((state) => state.global.disconnectionModal) readonly disconnectionModal$: Observable<boolean>;
   @select((state) => state.global.mutedMicModal) readonly mutedMicModal$: Observable<boolean>;
   @select((state) => state.global.generalModal) readonly generalModal$: Observable<boolean>;
+  @select((state) => state.global.rtmModal) readonly rtmModal$: Observable<boolean>;
   @select((state) => state.global.patientGeneralModal) readonly patientGeneralModal$: Observable<boolean>;
 
   dialogRef: any;
   globalDialogRef: any;
+  rtmDialogRef: any;
   subscription: Subscription = new Subscription();
   audioContext;
   callAudio;
@@ -125,6 +132,17 @@ export class AppComponent implements OnInit, OnDestroy {
     );
 
     this.subscription.add(
+      this.rtmModal$.subscribe((modalData: any) => {
+        if (modalData.open && !this.rtmDialogRef) {
+          this.openRTMModal(modalData.data);
+        }
+        if (!modalData.open && this.rtmDialogRef) {
+          this.closeGlobalModal();
+        }
+      })
+    );
+
+    this.subscription.add(
       this.patientGeneralModal$.subscribe((modalData: any) => {
         this.ngZone.run(() => {
           if (modalData.open && !this.dialogRef) {
@@ -152,7 +170,23 @@ export class AppComponent implements OnInit, OnDestroy {
           return;
         } else {
           this.authenticationService.updateUser(userDataResult);
-          this.router.navigate([`${roleMainRoute(userDataResult.role)}`]);
+          if (
+            (!localStorage.getItem('verified2FA') || localStorage.getItem('verified2FA') == 'false') &&
+            ['admin'].includes(userDataResult.role)
+          ) {
+            if (userDataResult.is_two_factor_enabled) {
+              this.router.navigate([`/${ROUTES.VERIFY_2FA.split(':id')[0]}${userDataResult.peerId}`], {
+                queryParams: { enable2FA: true },
+              });
+            } else {
+              this.router.navigate([`/${ROUTES.VERIFY_2FA.split(':id')[0]}${userDataResult.peerId}`], {
+                queryParams: { enable2FA: false },
+              });
+            }
+            return;
+          } else if (userDataResult?.role === 'patient' && userDataResult?.isPainModelOpen) {
+            this.router.navigate([`${roleMainRoute('RTM')}`]);
+          } else this.router.navigate([`${roleMainRoute(userDataResult.role)}`]);
         }
       }
     } catch (err) {
@@ -352,6 +386,58 @@ export class AppComponent implements OnInit, OnDestroy {
     if (this.globalDialogRef) {
       this.globalDialogRef.close();
       this.globalDialogRef = null;
+    }
+  }
+
+  openRTMModal(modalData: RTMModalData) {
+    const wrapperEl = document.getElementById('main-app');
+    const {
+      header,
+      content,
+      approveCallback,
+      declineCallback,
+      isTherapist,
+      modalStyle,
+      patient,
+      acceptBtnImg = '',
+      acceptBtnImgHover = '',
+      declineBtnImg = '',
+      declineBtnImgHover = '',
+    } = modalData;
+    this.rtmDialogRef = this.dialog.open(RTMModalComponent, {
+      data: {
+        header,
+        content,
+        acceptBtnImg,
+        acceptBtnImgHover,
+        declineBtnImg,
+        declineBtnImgHover,
+        approveCallback,
+        declineCallback,
+        positionRelativeToElement: wrapperEl,
+        isTherapist,
+        modalStyle,
+        patient,
+      },
+    });
+
+    this.subscription.add(
+      this.rtmDialogRef.componentInstance['isApprove'].subscribe((modalData: RTMOuterModalInterface) => {
+        if (modalData.isApproveClicked) {
+          approveCallback(modalData);
+        } else {
+          declineCallback();
+          this.closeRTMModal();
+        }
+      })
+    );
+  }
+
+  closeRTMModal() {
+    this.appActions.setMessageRTMModal('');
+    if (this.rtmDialogRef) {
+      this.rtmDialogRef.close();
+      this.rtmDialogRef = null;
     }
   }
 

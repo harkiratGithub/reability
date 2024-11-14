@@ -11,6 +11,8 @@ import * as LeadHelper from '../helpers/lead.helper';
 import * as PatientTreatmentHelper from '../helpers/patient-treatment.helper';
 import * as BookingHelper from '../helpers/booking.helper';
 import * as UserHelper from '../helpers/users.helper';
+import * as FeedbackHelper from '../helpers/feedback.helper';
+import { getAllPatientRTMDetails } from '../models/patient.model';
 
 export interface IPatientContact {
 	patient_id: number;
@@ -77,6 +79,7 @@ const extractBodyParams = (body, patientId = null) => {
 
 	return { patientData, userData, patientContacts };
 };
+
 export const createPatient = (req, res, next) => {
 	const { lead_id } = req.body.patient;
 	const { patientData, patientContacts } = extractBodyParams(req.body.patient);
@@ -155,9 +158,33 @@ export const getPatientListActivities = (req, res, next) => {
 		});
 };
 
+export const getPatientListDataActivities = (req, res, next) => {
+	const { startTime, endTime } = req.body;
+	const patientId = req.user.patientId;
+	PatientHelper.getPatientActivities(patientId, startTime, endTime)
+		.then((patientListActivities) => res.json(patientListActivities))
+		.catch((err) => {
+			next(err);
+		});
+};
+
 export const getAllActive = (req, res, next) => {
 	PatientHelper.getAllActive()
 		.then((activePatients) => res.json(activePatients))
+		.catch((err) => next(err));
+};
+
+export const getAllRTMDetails = (req, res, next) => {
+	const { startDate, endDate } = req.query;
+	getAllPatientRTMDetails(startDate || null, endDate || null, false)
+		.then((rtmData) => res.json(rtmData))
+		.catch((err) => next(err));
+};
+
+export const sendAllRTMDetails = (req, res, next) => {
+	const { startDate, endDate } = req.query;
+	getAllPatientRTMDetails(startDate || null, endDate || null, true)
+		.then((response) => res.json(response))
 		.catch((err) => next(err));
 };
 
@@ -230,5 +257,16 @@ export const activatePatient = (req, res, next) => {
 	const { patientId } = req.body;
 	PatientHelper.activatePatient(patientId)
 		.then((patient) => res.json(patient))
+		.catch((err) => next(err));
+};
+
+export const getFeedbackQuestions = (req: Request, res: Response, next: NextFunction) => {
+	FeedbackHelper.getFeedbackQuestions()
+		.then((questions) => {
+			if (!questions || questions.length === 0) {
+				return res.status(404).json({ message: 'No feedback questions found.' });
+			}
+			res.json(questions);
+		})
 		.catch((err) => next(err));
 };

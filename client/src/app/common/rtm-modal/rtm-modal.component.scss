@@ -1,0 +1,166 @@
+.general-modal-container-blue {
+  position: relative;
+  background-image: url('../../../assets/textures/main_bg.jpg');
+  background-size: cover;
+  border-radius: 65px;
+  padding-bottom: 50px;
+  min-width: 750px;
+  border: 5px solid #093235;
+  box-shadow: 0 11px 15px -7px rgba(0, 0, 0, 0.2), 0 24px 38px 3px rgba(0, 0, 0, 0.14),
+    0 9px 46px 8px rgba(0, 0, 0, 0.12);
+  color: #f9f8f3;
+
+  .header-section {
+    width: 100%;
+    height: 100px;
+    text-align: center;
+    background-image: url('../../../assets/textures/modal_header_bg.jpg');
+    background-size: cover;
+    box-shadow: inset 0 -11px 10px rgba(55, 141, 149, 0.644), inset 0 15px 8px #64cbd4, 0 2px 10px 0 #1f3d56;
+    line-height: 100px;
+    text-shadow: 2px 2px #3b9da5;
+    font-size: 40px;
+    text-transform: uppercase;
+    border-top-left-radius: 61px;
+    border-top-right-radius: 61px;
+  }
+  .main-section {
+    padding: 50px;
+    white-space: pre;
+    font-size: 30px;
+  }
+
+  .actions-section {
+    position: absolute;
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    bottom: -65px;
+    .action-btn {
+      position: relative;
+      height: 130px;
+      width: 130px;
+      .loader {
+        visibility: hidden;
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+      img {
+        height: 130px;
+      }
+      .img-hover {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 100;
+      }
+      &.patient.timer {
+        .img-hover {
+          display: inline;
+        }
+        .loader {
+          visibility: visible;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+          width: 134px;
+          z-index: 110;
+          .circle {
+            fill: none;
+            stroke-width: 1.5;
+            stroke-linecap: round;
+            animation: progress 2s ease-out forwards;
+            stroke: #00a4b5;
+          }
+          @keyframes progress {
+            0% {
+              stroke-dasharray: 0 100;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+.general-modal-container-white {
+  min-width: 750px;
+  // height: 600px;
+  position: relative;
+  border-radius: 20px;
+  background-color: #ffffff;
+  box-shadow: 0 5px 10px 0 rgba(25, 148, 192, 0.1);
+  padding: 30px;
+  .header-section {
+    display: flex;
+    align-items: center;
+    height: 58px;
+    width: 100%;
+    justify-content: space-between;
+    // border: 1px solid #e4e9ff;
+    border: 1px solid black;
+    border-radius: 10px;
+    background-color: rgba(237, 239, 247, 0.58);
+    padding: 16px;
+    .icon {
+      height: 20px;
+      width: 30px;
+      margin-right: 8px;
+      // background-image: url('../../../assets/therapist/send.svg');
+      // background-position: center;
+      // background-repeat: no-repeat;
+    }
+    .text {
+      // color: #385f7c;
+      color: black;
+      font-family: 'Roboto';
+      font-size: 16px;
+      font-weight: 500;
+    }
+  }
+  .main-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    
+  }
+  .actions-section {
+    .buttons {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      .cancel {
+        // color: #385f7c;
+        color: black;
+        font-family: 'Roboto';
+        font-size: 14px;
+        font-weight: bold;
+        text-align: center;
+        padding: 12px 17px;
+        border: 1px solid #e4e9ff;
+        border-radius: 20px;
+        background-color: white;
+        margin-right: 16px;
+        cursor: pointer;
+      }
+      .send-invitation {
+        color: #ffffff;
+        font-family: "Roboto";
+        font-size: 14px;
+        font-weight: bold;
+        text-align: center;
+        padding: 12px 17px;
+        border-radius: 20px;
+        background-color: #2d254c;
+        cursor: pointer;
+      }
+    }
+  }
+}
+.general-message {
+  margin-top: 10px;
+}

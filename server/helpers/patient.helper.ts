@@ -14,6 +14,7 @@ import * as EncryptHelper from '../services/encrypt.helper';
 import * as Helper from '../services/util.helper';
 
 import { ROLE, TABLE_NAME } from '../const';
+import { updateRTM } from '../models/rtm.model';
 
 export const createPatient = async (patientData, patientContacts) => {
 	const { departmentsIds } = patientData;
@@ -184,6 +185,69 @@ export const getActivities = async (therapistId, startTime, endTime) => {
 		const res = await Promise.all([
 			PatientModel.getPatientsActivities(therapistId, startTime, endTime),
 			UserHelper.getOpenPeers(therapistId),
+		]);
+		const patientIds = res[0].map((patient) => patient.id);
+		const sessions = await PatientModel.getPatientRelevantSessions(patientIds, startTime, endTime);
+		let allPatients = [];
+		let patientsIdsWithSessions = [];
+		for (let item of sessions) {
+			allPatients.push({
+				...item,
+				...res[0].find((patient) => patient['id'] == item['patient_id']),
+			});
+			if (!patientsIdsWithSessions.includes(item['patient_id'])) {
+				patientsIdsWithSessions.push(item['patient_id']);
+			}
+		}
+		const patientsIdsWithoutSessions = difference(patientIds, patientsIdsWithSessions);
+		for (let id of patientsIdsWithoutSessions) {
+			const user = res[0].find((patient) => patient['id'] == id);
+			allPatients.push(user);
+		}
+		const contacts = await BaseModel.findByIds(TABLE_NAME.PATIENT_CONTACTS, 'patient_id', patientIds);
+		const contactsByPatientId = groupBy(contacts, 'patient_id');
+		// const rtmList = await  BaseModel.itemsBySeveralFields(TABLE_NAME.PATIENT_DEPARTMENTS, {
+		// 	department_id: "3",
+		// });
+		const rtmList = await BaseModel.itemsInArray(TABLE_NAME.PATIENT_DEPARTMENTS, 'department_id', ['3', '172']);
+
+		const newActivities = allPatients.map((patient) => {
+			const patientPeer = res[1].find((x) => patient.user_id === x.user_id);
+			const { duration, ...restPatient } = patient;
+			const decryptedPatient = EncryptHelper.decryptJson(restPatient);
+			const decryptedContacts =
+				contactsByPatientId[patient.id.toString()] && contactsByPatientId[patient.id.toString()].length
+					? EncryptHelper.decryptArray(contactsByPatientId[patient.id.toString()])
+					: [];
+			const durationString = Helper.buildPostgresInterval(duration);
+			const newPatient = {
+				...decryptedPatient,
+				duration: durationString,
+				full_name: `${decryptedPatient.first_name} ${decryptedPatient.last_name}`,
+			};
+
+			const isRTM = rtmList?.find((rtm) => rtm.patient_id == patient.id) ? true : false;
+
+			return patientPeer
+				? {
+						...newPatient,
+						status: patientPeer.peerStatus,
+						contacts: decryptedContacts,
+						isRTM,
+				  }
+				: { ...newPatient };
+		});
+		return newActivities;
+	} catch (err) {
+		throw new Error(`${err}`);
+	}
+};
+
+export const getPatientActivities = async (patientId, startTime, endTime) => {
+	try {
+		const res = await Promise.all([
+			PatientModel.getPatientsActivitiesData(patientId, startTime, endTime),
+			UserHelper.getOpenPeers(patientId),
 		]);
 		const patientIds = res[0].map((patient) => patient.id);
 		const sessions = await PatientModel.getPatientRelevantSessions(patientIds, startTime, endTime);

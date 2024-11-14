@@ -16,6 +16,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { AppActions } from 'src/app/app.actions';
 import { ScoreType } from 'src/constants';
 import { MenuOptionsAppActions } from 'src/app/patient/components/menu-options/menu-options.actions';
+import { FeedbackFormComponent } from '../feedback-form/feedback-form.component';
+import { GameHistorySessionComponent } from '../game-history-session/game-history-session.component';
 
 @Component({
   selector: 'app-game-wrapper',
@@ -165,7 +167,14 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
     communicationUtil.registerToCallback(
       MESSAGES.SUMMARY,
       debounce((gameSummary) => {
-        this.ajax.updateGameSummary(gameSummary).subscribe(() => {});
+        this.ajax.updateGameSummary(gameSummary).subscribe((res) => {
+        });
+      }, 5000)
+    );
+    communicationUtil.registerToCallback(
+      MESSAGES.SESSION_FEEDBACK,
+      debounce((gameFeedback) => {
+        this.ajax.updateGameFeedback(gameFeedback).subscribe(() => {});
       }, 5000)
     );
     communicationUtil.registerToCallback(MESSAGES.QUIT_GAME, (e) => {
@@ -690,7 +699,43 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
       this.dialogRef.close();
       this.dialogRef = null;
     }
+  
+    if (!this.isTherapist && !this.inTherapistSession) {
+      this.dialogRef = this.dialog.open(GameHistorySessionComponent, {
+        hasBackdrop: true,
+        data: {
+          has_backdrop: false,
+          gameId: this.gameId,
+          iframeEl: this.iframeEl,
+        },
+      });
+    }
+
+    setTimeout(() => {
+      if (this.dialogRef) {
+        this.dialogRef.close();
+      }
+    }, 5000); 
+    
+    // let newdialogRef;
+      // newdialogRef.afterClosed().subscribe(() => {  
+      //   if (!this.isTherapist && !this.inTherapistSession) {
+      //     if (!this.dialogRef) {
+      //       this.dialogRef = this.dialog.open(FeedbackFormComponent, {
+      //         hasBackdrop: true,
+      //         id: this.peerId,
+      //         data: {
+      //           has_backdrop: false,
+      //           inTherapistSession: this.inTherapistSession,
+      //           isTherapist: this.isTherapist,
+      //         },
+      //       });
+      //     }
+      //   }
+      // });
+   
   }
+  
 
   handleMediaStreamToIFrameSettingsChange = (settings) => {
     if (!this.isInitialMediaStreamHandled) {

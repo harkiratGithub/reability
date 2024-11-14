@@ -76,6 +76,12 @@ export const getAllGames = async () => {
 	return result.rows;
 };
 
+export const getAllEndGames = async () => {
+	const query = squelPostgres.select().from(TABLE_NAME.GAME).toParam();
+	const result = await BaseModel.runQuery(query);
+	return result.rows;
+};
+
 export const clearGameData = async () => {
 	const query = squelPostgres.delete().from(TABLE_NAME.GAME_DATA).toParam();
 	const result = await BaseModel.runQuery(query);

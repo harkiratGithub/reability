@@ -1,0 +1,83 @@
+<div class="body-container">
+  <div class="card">
+    <img [src]="authIcon" (error)="reloadImage()" alt="2FA Icon" class="auth-icon" />
+
+    <div class="two-factor-auth-container">
+      <div *ngIf="viewTab == 'generatedQR'" class="qr-code-section">
+        <p>Scan the QR Code using your authentication app to verify !!</p>
+        <img [src]="qrCodeUrl" class="qr-code" alt="QR Code" />
+
+        <p class="app-desc">If you don't have an authenticator app, download one from the links below:</p>
+        <div class="auth-app-links">
+          <div class="android-links">
+            <h3>Android Links:-</h3>
+            <a
+              href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2"
+              target="_blank"
+              class="download-link"
+            >
+              <img src="./../../../assets/login/google-authenticator.svg" alt="Google Icon" class="icon" /> Google
+              Authenticator
+            </a>
+            <a
+              href="https://play.google.com/store/apps/details?id=com.azure.authenticator"
+              target="_blank"
+              class="download-link"
+            >
+              <img src="./../../../assets/login/microsoft-authenticator.svg" alt="Microsoft Icon" class="icon" />
+              Microsoft Authenticator
+            </a>
+          </div>
+          <div class="ios-links">
+            <h3>iOS Links:-</h3>
+            <a
+              href="https://apps.apple.com/us/app/google-authenticator/id388497605"
+              target="_blank"
+              class="download-link"
+            >
+              <img src="./../../../assets/login/google-authenticator.svg" alt="Apple Icon" class="icon" /> Google
+              Authenticator for iOS
+            </a>
+            <a
+              href="https://apps.apple.com/us/app/microsoft-authenticator/id983156458"
+              target="_blank"
+              class="download-link"
+            >
+              <img src="./../../../assets/login/microsoft-authenticator.svg" alt="Apple Icon" class="icon" /> Microsoft
+              Authenticator for iOS
+            </a>
+          </div>
+        </div>
+
+        <button class="btn enable-btn" (click)="viewTab = 'verifyOtp'">Verify Now</button>
+      </div>
+
+      <a
+        href="javascript:void(0)"
+        class="reverify-link"
+        *ngIf="viewTab != 'generatedQR' && !isReverifyClicked"
+        (click)="reverifyAccount()"
+        >Re-Verify your account</a
+      >
+
+      <div *ngIf="isReverifyClicked" class="reverify-section">
+        <p class="steps-desc">Steps have been sent over your email, please check your mail.</p>
+        <button class="btn verify-btn" (click)="enterOtp()">Enter OTP</button>
+      </div>
+
+      <div *ngIf="viewTab == 'verifyOtp' && !isReverifyClicked">
+        <input
+          type="text"
+          id="verificationCode"
+          [(ngModel)]="verificationCode"
+          placeholder="Enter verification code"
+          maxlength="6"
+          pattern="[0-9]*"
+          (keypress)="isNumberKey($event)"
+          (keydown)="onEnter($event)"
+        />
+        <button type="submit" class="btn submit-btn" (click)="verifyCode()">Submit</button>
+      </div>
+    </div>
+  </div>
+</div>

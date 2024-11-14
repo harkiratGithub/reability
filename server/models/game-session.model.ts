@@ -25,6 +25,7 @@ export const getLastGameSession = async (userId) => {
 		.field(`${TABLE_NAME.GAME_SESSION}.game_id`)
 		.field(`${TABLE_NAME.GAME_SESSION}.game_settings_id`)
 		.field(`${TABLE_NAME.GAME_SESSION}.game_summary`)
+		.field(`${TABLE_NAME.GAME_SESSION}.session_feedback`)
 		.field(`${TABLE_NAME.GAME_SESSION}.end_time`)
 		.from(TABLE_NAME.GAME_SESSION)
 		.left_join(

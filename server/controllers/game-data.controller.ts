@@ -13,6 +13,12 @@ export const getAllGames = (req, res, next) => {
 		.catch((err) => next(err));
 };
 
+export const getAllEndGames = (req, res, next) => {
+	GameDataModel.getAllEndGames()
+		.then((allGames) => res.json(allGames))
+		.catch((err) => next(err));
+};
+
 export const editGameData = (req, res, next) => {
 	const { gameData } = req.body;
 	GameDataModel.editGameData(gameData.id, gameData)
