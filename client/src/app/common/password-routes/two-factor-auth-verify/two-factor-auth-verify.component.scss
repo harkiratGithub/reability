@@ -285,6 +285,24 @@ h3 {
   text-decoration: underline;
 }
 
+.reverify-message {
+  font-size: 14px;
+  color: #333;
+  margin: 20px 0;
+}
+
+.reverify-message .contact-link {
+  color: #007bff; 
+  cursor: pointer;
+  margin-top: 10px;
+  text-decoration: underline;
+}
+
+.reverify-message .contact-link:hover {
+  color: #f44336; 
+  text-decoration: none;
+}
+
 .reverify-section {
   margin-top: 15px;
 }
