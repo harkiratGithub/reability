@@ -63,7 +63,7 @@ export const onLogIn = async (user: {
 				// const RTM =
 				// 	details?.filter((ele: { department_id: number }) => ele.department_id === 3)?.length > 0 ? true : false;
 				const RTM = details?.some((ele: { department_name: string }) => ele.department_name.toLowerCase() === 'rtm');
-				
+
 				const isPainModelOpen =
 					RTM &&
 					!isNaN(pain_level) &&
@@ -394,7 +394,7 @@ export const enable2FAForUser = async (userId: any) => {
 	}
 	const secret = speakeasy.generateSecret({ name: 'ReAbility Online Auth' });
 	user.two_factor_secret = secret.base32;
-	user.is_two_factor_enabled = true;
+	// user.is_two_factor_enabled = false;
 	await UserModel.updateById(user.id, user);
 	const qrCodeData = await qrcode.toDataURL(secret.otpauth_url);
 	return { qrCodeData, secret: secret.base32 };
@@ -411,8 +411,11 @@ export const verify2FAToken = async (userId: any, token: any) => {
 		});
 		if (!isValid) {
 			throw new Error('Invalid 2FA token');
+		} else {
+			user.is_two_factor_enabled = true;
+			await UserModel.updateById(user.id, user);
+			return { success: true, message: '2FA verified successfully' };
 		}
-		return { success: true, message: '2FA verified successfully' };
 	} catch (error) {
 		throw new Error('Error verifying 2FA token');
 	} finally {

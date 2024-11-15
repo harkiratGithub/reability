@@ -52,21 +52,22 @@ export const sendUserConnectedEmail = async (patient, therapist) => {
 };
 
 export const sendQrReVerify2FA = async (userEmail, qrLink) => {
+	const base64QrImage = qrLink.slice(22);
+	let attachments = [
+		{
+			content: base64QrImage,
+			filename: 'QR Code.png',
+			type: 'image/png',
+			disposition: 'attachment',
+		},
+	];
 	const subject = 'ReAbility Online Re-Auth';
 	const html = `
 	<div style="font-family: Arial, sans-serif; text-align: center;">
 	  <h2>ReAbility Online Re-Auth</h2>
 	  <p>Welcome to ReAbility system.</p>
-	  <p>Re-Scan the QR code using your authentication app to verify your identity.</p>
-	  <div>
-		<img 
-		  src="${qrLink}" 
-		  alt="QR Code" 
-		  style="width: 200px; height: 200px; margin: 10px 0; border: 1px solid #ddd;"
-		/>
-	  </div>
-
+	  <p>Re-Scan the attach QR code using your authentication app to verify your identity.</p>
 	</div>
 	`;
-	await EmailHelper.sendMail(userEmail, subject, html);
+	await EmailHelper.sendMail(userEmail, subject, html, null, attachments);
 };
