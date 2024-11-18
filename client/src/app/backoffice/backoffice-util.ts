@@ -106,7 +106,7 @@ export const transformRtm = (data) => {
       phone: ele?.phone,
       since: ele?.since,
       remote_monitoring: ele?.event?.minutes_spent ? String(ele?.event?.minutes_spent) : '-',
-      data_transmitted: ele?.event?.therapist_session_minutes ? String(ele?.event?.therapist_session_minutes) : '-',
+      data_transmitted: ele?.event?.daysDataTransmittedInMonth ? String(ele?.event?.daysDataTransmittedInMonth) : '-',
       98975: String(ele?.['98975']),
       98977: String(ele?.['98977']),
       98980: String(ele?.['98980']),

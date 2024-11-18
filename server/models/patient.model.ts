@@ -529,18 +529,18 @@ export const getAllPatientRTMDetails = async ( startDate: any, endDate: any, sen
         .field(`${TABLE_NAME.PATIENT}.last_name`)
         .field(`${TABLE_NAME.PATIENT}.phone`)
         .field(`patient_user.email`, 'email')
-    	.field(`patient_user.user_name`, 'patient_username')
+        .field(`patient_user.user_name`, 'patient_username')
         .field(`rtm.patient_id`)
         .field(`rtm.event`)
         .field(`rtm.timestamp`, 'since')
         .field(`${TABLE_NAME.THERAPIST}.first_name`, 'therapist_first_name')
         .field(`${TABLE_NAME.THERAPIST}.last_name`, 'therapist_last_name')
-		.field(`therapist_user.user_name`, 'therapist_username')
+        .field(`therapist_user.user_name`, 'therapist_username')
         .from(TABLE_NAME.RTM, 'rtm')
         .join(TABLE_NAME.PATIENT, null, `rtm.patient_id = ${TABLE_NAME.PATIENT}.id`)
         .join(TABLE_NAME.USER, 'patient_user', `${TABLE_NAME.PATIENT}.user_id = patient_user.id`)
-		.join(TABLE_NAME.THERAPIST, null, `(rtm.event->>'therapist_id')::int = ${TABLE_NAME.THERAPIST}.id`)
-		.join(TABLE_NAME.USER, 'therapist_user', `${TABLE_NAME.THERAPIST}.user_id = therapist_user.id`);
+        .join(TABLE_NAME.THERAPIST, null, `(rtm.event->>'therapist_id')::int = ${TABLE_NAME.THERAPIST}.id`)
+        .join(TABLE_NAME.USER, 'therapist_user', `${TABLE_NAME.THERAPIST}.user_id = therapist_user.id`);
 
     if (startDate) {
         const parsedStartDate = new Date(startDate);
@@ -561,32 +561,52 @@ export const getAllPatientRTMDetails = async ( startDate: any, endDate: any, sen
     const result = await BaseModel.runQuery(query.toParam());
 
     if (!result.rows.length) {
-        return [];
+        throw new Error(`No data found for the specified date range.`);
     }
-    const decryptedRows = result.rows.map(row => {
-		const decryptedRow = EncryptHelper.decryptJson(row);
-		const daysDataTransmittedInMonth = parseInt(decryptedRow.event.daysDataTransmittedInMonth) || 0;
-	
-		decryptedRow['98977'] = daysDataTransmittedInMonth >= 16 ? 1 : 0;
-		decryptedRow['98980'] = daysDataTransmittedInMonth >= 20 ? 1 : 0;
-		decryptedRow['98981'] = daysDataTransmittedInMonth >= 40 ? 1 : 0;
-		
-		return decryptedRow;
-	});
-	
-	let is98975Set = false;
-	for (const row of decryptedRows) {
-		const daysDataTransmittedInMonth = parseInt(row.event.daysDataTransmittedInMonth) || 0;
-		if (daysDataTransmittedInMonth >= 16 && !is98975Set) {
-			row['98975'] = 1;
-			is98975Set = true;
-		} else {
-			row['98975'] = 0;
-		}
-	}
+
+    const decryptedRows = result.rows.map(row => EncryptHelper.decryptJson(row));
+
+    const aggregatedData = new Map();
+    decryptedRows.forEach(row => {
+        const patientId = row.patient_id;
+        const daysData = parseInt(row.event.daysDataTransmittedInMonth) || 0;
+        const minutes = parseInt(row.event.therapist_session_minutes) || 0;
+
+        if (!aggregatedData.has(patientId)) {
+            aggregatedData.set(patientId, {
+                ...row,
+                event: {
+                    ...row.event,
+                    daysDataTransmittedInMonth: daysData,
+                    therapist_session_minutes: minutes,
+                }
+            });
+        } else {
+            const existing = aggregatedData.get(patientId);
+            existing.event.daysDataTransmittedInMonth += daysData;
+            existing.event.therapist_session_minutes += minutes;
+        }
+    });
+
+    const finalData = Array.from(aggregatedData.values()).map(row => {
+        const daysDataTransmittedInMonth = row.event.daysDataTransmittedInMonth;
+
+        row['98977'] = daysDataTransmittedInMonth >= 16 ? 1 : 0;
+        row['98980'] = daysDataTransmittedInMonth >= 20 ? 1 : 0;
+        row['98981'] = daysDataTransmittedInMonth >= 40 ? 1 : 0;
+
+        // Only set `98975` to 1 for the first eligible entry
+        if (!row['98975'] && daysDataTransmittedInMonth >= 16) {
+            row['98975'] = 1;
+        } else {
+            row['98975'] = 0;
+        }
+
+        return row;
+    });
 
 	if (!sendMail) {
-        return { data: decryptedRows };
+        return { data: finalData };
     }
 
     const workbook = new ExcelJS.Workbook();
@@ -618,14 +638,14 @@ export const getAllPatientRTMDetails = async ( startDate: any, endDate: any, sen
         // { header: 'Therapist Session Minutes', key: 'therapist_session_minutes' }, // below
     ];
 
-    decryptedRows.forEach(entry => {
+    finalData.forEach(entry => {
         worksheet.addRow({
             username: entry.patient_username,
             first_name: entry.first_name,
             last_name: entry.last_name,
             // phone: entry.phone,
             // email: entry.email,
-            since: entry.since,
+		since: entry.since,
             // pain_level: entry.event.pain_level,
             // review_activity: entry.event.review_activity,
             // reminder_to_exercise: entry.event.reminder_to_exercise,
@@ -648,7 +668,7 @@ export const getAllPatientRTMDetails = async ( startDate: any, endDate: any, sen
     const msg = {
         to: 'yoramfeld@gmail.com', // yoramfeld@gmail.com
         from: process.env.SENGRID_FROM_EMAIL ? process.env.SENGRID_FROM_EMAIL : 'yoramfeld@gmail.com',
-        subject: `Patient RTM Data Export - ${decryptedRows.length} Records Found`,
+        subject: `Patient RTM Data Export - ${finalData.length} Records Found`,
         text: 'Please find the attached Excel file with the patients RTM data.',
         attachments: [
             {

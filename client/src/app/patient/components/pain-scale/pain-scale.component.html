@@ -20,6 +20,18 @@
     <div class="pain-labels">
       <img src="../../../../assets/login/pain-scale.png" width="auto" height="100" />
     </div>
+
+    <div class="textarea-container">
+      <label for="patientNote" class="textarea-label">Additional Notes</label>
+      <textarea 
+        id="patientNote" 
+        [(ngModel)]="patient_note" 
+        rows="4" 
+        placeholder="Please enter any additional information about your pain..."
+        class="textarea"
+      ></textarea>
+    </div>
+
     <div class="save-button-container">
       <button 
         class="save-button" 

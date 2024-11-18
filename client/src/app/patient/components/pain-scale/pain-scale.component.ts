@@ -15,6 +15,7 @@ export class PainScaleComponent implements OnInit {
     private authenticationService: AuthenticationService
   ) {}
   painValue: number = 0;
+  patient_note: string = '';
   patientId: number = -1;
   isPainModelOpen: boolean = false;
 
@@ -39,7 +40,7 @@ export class PainScaleComponent implements OnInit {
 
   savePainValue(): void {
     try {
-      this.ajax.sendPatientPainScale(this.patientId, this.painValue).subscribe((response) => {
+      this.ajax.sendPatientPainScale(this.patientId, this.painValue, this.patient_note).subscribe((response) => {
         this.isPainModelOpen = false;
         this.router.navigate(['/games_lobby']);
       });
