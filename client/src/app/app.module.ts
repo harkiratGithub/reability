@@ -142,6 +142,8 @@ import { PainScaleComponent } from './patient/components/pain-scale/pain-scale.c
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { TermsConditionsComponent } from './patient/components/terms-conditions/terms-conditions.component';
 import { MobilePopupComponent } from './patient/components/mobile-popup/mobile-popup.component';
+import { PoseComparisonComponent } from './pose-detection/pose-comparison.component';
+import { CommonModule } from '@angular/common';
 
 export const CUSTOM_MOMENT_FORMATS = {
   parse: {
@@ -238,6 +240,7 @@ export const CUSTOM_MOMENT_FORMATS = {
     PainScaleComponent,
     TermsConditionsComponent,
     MobilePopupComponent,
+    PoseComparisonComponent
   ],
   imports: [
     RouterModule.forRoot(routes, { useHash: true }),

@@ -21,21 +21,18 @@
   <canvas #canvasElement2 width="640" height="480"></canvas>
 </div>
 <div class="pose-container">
-  <div class="angle-display">
-    <h2>Recorded Angles from Video</h2>
-    <div class="angle-card">
-      <h3>Left Wrist</h3>
-      <p>Left Current Angle: {{ videoAngle['leftWrist'] | number: '1.0-2' }}°</p>
-      <p>Minimum Angle: {{ minVideoAngle['leftWrist'] | number: '1.0-2' }}°</p>
-      <p>Maximum Angle: {{ maxVideoAngle['leftWrist'] | number: '1.0-2' }}°</p>
-    </div>
+  <div class="angle-card">
+    <h3>Left Wrist</h3>
+    <p>Left Current Angle: {{ videoAngle['leftWrist'] | number: '1.0-2' }}°</p>
+    <p>Minimum Angle: {{ minVideoAngle['leftWrist'] | number: '1.0-2' }}°</p>
+    <p>Maximum Angle: {{ maxVideoAngle['leftWrist'] | number: '1.0-2' }}°</p>
+  </div>
 
-    <div class="angle-card">
-      <h3>Right Wrist</h3>
-      <p>Right Current Angle: {{ videoAngle['rightWrist'] | number: '1.0-2' }}°</p>
-      <p>Minimum Angle: {{ minVideoAngle['rightWrist'] | number: '1.0-2' }}°</p>
-      <p>Maximum Angle: {{ maxVideoAngle['rightWrist'] | number: '1.0-2' }}°</p>
-    </div>
+  <div class="angle-card">
+    <h3>Right Wrist</h3>
+    <p>Right Current Angle: {{ videoAngle['rightWrist'] | number: '1.0-2' }}°</p>
+    <p>Minimum Angle: {{ minVideoAngle['rightWrist'] | number: '1.0-2' }}°</p>
+    <p>Maximum Angle: {{ maxVideoAngle['rightWrist'] | number: '1.0-2' }}°</p>
   </div>
   <div class="angle-display">
     <h2>Recorded Angles from Camera</h2>

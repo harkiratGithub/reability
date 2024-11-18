@@ -18,7 +18,6 @@ import Papa from 'papaparse';
 })
 export class PoseComparisonComponent implements OnInit, AfterViewInit {
   @ViewChild('videoElement') videoElement!: ElementRef;
-  @ViewChild('videoIframe', { static: true }) videoIframe!: ElementRef;
   @ViewChild('cameraElement') cameraElement!: ElementRef;
   @ViewChild('canvasElement1') canvasElement1!: ElementRef;
   @ViewChild('canvasElement2') canvasElement2!: ElementRef;
@@ -550,26 +549,6 @@ export class PoseComparisonComponent implements OnInit, AfterViewInit {
     this.videoElement.nativeElement.onloadeddata = () => {
       this.processVideoFrames();
     };
-    // const iframe = document.getElementById('videoIframe') as HTMLIFrameElement;
-    // const iframeDocument = iframe.contentDocument || iframe.contentWindow?.document;
-
-    // const iframe = this.videoIframe.nativeElement;
-    // const iframeDocument = iframe.contentDocument || iframe.contentWindow?.document;
-
-    // if (iframeDocument) {
-    //   console.log('iframeDocument', iframeDocument);
-
-    //   // const videoElement = iframeDocument.querySelector('video');
-    //   const videoElement = iframeDocument.getElementById('videoElement') as HTMLVideoElement;
-
-    //   console.log('videoElement', videoElement);
-    //   if (videoElement) {
-
-    //     videoElement.onloadeddata = () => {
-    //       this.processVideoFrames(videoElement);
-    //     };
-    //   }
-    // }
   }
 
   private async processVideoFrames() {
