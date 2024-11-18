@@ -9,6 +9,7 @@ import { VideoPatientComponent } from './patient/components/psychology_session/p
 import { Role } from 'src/constants';
 import { EmailChangeTokenPageComponent } from './common/password-routes/email-change-token/email-change-token.component';
 import { ForgotPasswordComponent } from './common/password-routes/forgot-password/forgot-password.component';
+import { PoseComparisonComponent } from './pose-detection/pose-comparison.component';
 
 export const ROUTES = {
   LOGIN: 'login',
@@ -34,6 +35,10 @@ export const routes = [
     component: FastLoginComponent,
   },
   { path: ROUTES.FORGET_PASSWORD, component: ForgotPasswordComponent },
+  {
+    path: 'pose-detection',
+    component: PoseComparisonComponent,
+  },
   {
     path: ROUTES.PATIENT_HOME_PAGE,
     component: MenuOptionsComponent,

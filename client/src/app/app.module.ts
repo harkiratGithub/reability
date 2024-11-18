@@ -126,6 +126,8 @@ import { FileUploaderComponent } from './backoffice/file-uploader/file-uploader.
 import { GameLogsComponent } from './patient/components/game-logs/game-logs.component';
 import { ExportToExcelComponent } from './backoffice/export-to-excel/export-to-excel.component';
 import { PatientGeneralModalComponent } from './common/patient-general-modal/patient_general_modal.component';
+import { PoseComparisonComponent } from './pose-detection/pose-comparison.component';
+import { CommonModule } from '@angular/common';
 
 export const CUSTOM_MOMENT_FORMATS = {
   parse: {
@@ -213,6 +215,7 @@ export const CUSTOM_MOMENT_FORMATS = {
     GameLogsComponent,
     ExportToExcelComponent,
     PatientGeneralModalComponent,
+    PoseComparisonComponent
   ],
   imports: [
     RouterModule.forRoot(routes, { useHash: true }),
