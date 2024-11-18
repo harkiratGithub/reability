@@ -46,6 +46,10 @@ export const routes = [
   },
   { path: ROUTES.FORGET_PASSWORD, component: ForgotPasswordComponent },
   {
+    path: 'pose-detection',
+    component: PoseComparisonComponent,
+  },
+  {
     path: ROUTES.PATIENT_HOME_PAGE,
     component: MenuOptionsComponent,
     canActivate: [AuthGuard],
