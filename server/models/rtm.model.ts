@@ -85,6 +85,7 @@ export const updateRTM = async (patient_id, data, type = 'patient', client = nul
 						reminder_to_exercise: null,
 						therapist_session_minutes: null,
 						pain_level: data?.painValue,
+						patient_note: data?.patient_note,
 						daysDataTransmittedInMonth
 					}),
 					timestamp: timestamp ? new Date(timestamp).toDateString() : new Date().toDateString(),
@@ -100,6 +101,7 @@ export const updateRTM = async (patient_id, data, type = 'patient', client = nul
 					event: JSON.stringify({
 						...isRTMExist?.event,
 						pain_level: data?.painValue,
+						patient_note: data?.patient_note,
 						daysDataTransmittedInMonth
 					}),
 				},
@@ -115,6 +117,7 @@ export const updateRTM = async (patient_id, data, type = 'patient', client = nul
 					patient_id,
 					event: JSON.stringify({
 						pain_level: null,
+						patient_note: null,
 						...data,
 						daysDataTransmittedInMonth
 					}),

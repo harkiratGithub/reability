@@ -297,9 +297,9 @@ export class AjaxService {
   };
 
   // patient RTM routes
-  sendPatientPainScale = (patientId, painValue) => {
+  sendPatientPainScale = (patientId, painValue, patient_note) => {
     try {
-      return this.http.post<any>(`${this.baseUrl}/patient/rtmSession`, { patientId, painValue });
+      return this.http.post<any>(`${this.baseUrl}/patient/rtmSession`, { patientId, painValue, patient_note });
     } catch (err) {
       console.error(err);
     }
