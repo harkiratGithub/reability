@@ -522,7 +522,7 @@ export const addPatientRTM = (patient_id, painSession, client = null) => {
 	);
 };
 
-export const getAllPatientRTMDetails = async ( startDate: any, endDate: any, sendMail: boolean = false) => {
+export const getAllPatientRTMDetails = async ( month: any, year: any, sendMail: boolean = false) => {
     const query = squelPostgres
         .select()
         .field(`${TABLE_NAME.PATIENT}.first_name`)
@@ -542,23 +542,14 @@ export const getAllPatientRTMDetails = async ( startDate: any, endDate: any, sen
         .join(TABLE_NAME.THERAPIST, null, `(rtm.event->>'therapist_id')::int = ${TABLE_NAME.THERAPIST}.id`)
         .join(TABLE_NAME.USER, 'therapist_user', `${TABLE_NAME.THERAPIST}.user_id = therapist_user.id`);
 
-    if (startDate) {
-        const parsedStartDate = new Date(startDate);
-        if (isNaN(parsedStartDate.getTime())) {
-            throw new Error(`Invalid start date: ${startDate}`);
-        }
-        query.where(`rtm.timestamp >= ?`, parsedStartDate);
-    }
+	const parsedMonth = parseInt(month, 10);
+	const parsedYear = parseInt(year, 10);
+	if (isNaN(parsedMonth) || isNaN(parsedYear) || parsedMonth < 1 || parsedMonth > 12) {
+		throw new Error(`Invalid month or year provided.`);
+	}
 
-    if (endDate) {
-        const parsedEndDate = new Date(endDate);
-        if (isNaN(parsedEndDate.getTime())) {
-            throw new Error(`Invalid end date: ${endDate}`);
-        }
-        query.where(`rtm.timestamp <= ?`, parsedEndDate);
-    }
-
-    const result = await BaseModel.runQuery(query.toParam());
+	query.where(`DATE_TRUNC('month', rtm.timestamp) = ?`, `${parsedYear}-${parsedMonth}-01`);
+	const result = await BaseModel.runQuery(query.toParam());
 
     if (!result.rows.length) {
         throw new Error(`No data found for the specified date range.`);

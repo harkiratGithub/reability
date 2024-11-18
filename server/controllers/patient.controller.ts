@@ -175,15 +175,15 @@ export const getAllActive = (req, res, next) => {
 };
 
 export const getAllRTMDetails = (req, res, next) => {
-	const { startDate, endDate } = req.query;
-	getAllPatientRTMDetails(startDate || null, endDate || null, false)
+	const { month, year, sendMail } = req.query;
+	getAllPatientRTMDetails(month || null, year || null, sendMail || false)
 		.then((rtmData) => res.json(rtmData))
 		.catch((err) => next(err));
 };
 
 export const sendAllRTMDetails = (req, res, next) => {
-	const { startDate, endDate } = req.query;
-	getAllPatientRTMDetails(startDate || null, endDate || null, true)
+	const { month, year, sendMail } = req.query;
+	getAllPatientRTMDetails(month || null, year || null, sendMail || true)
 		.then((response) => res.json(response))
 		.catch((err) => next(err));
 };
