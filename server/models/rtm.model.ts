@@ -78,7 +78,7 @@ export const updateRTM = async (patient_id, data, type = 'patient', client = nul
 				{
 					patient_id,
 					event: JSON.stringify({
-						note: null,
+						note: data?.patientNote,
 						therapist_id: null,
 						minutes_spent: null,
 						review_activity: null,

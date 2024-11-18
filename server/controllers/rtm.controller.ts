@@ -4,9 +4,9 @@ import { LogAction } from '../models/activity-log.model';
 import * as ActivityLogHelper from '../helpers/activity-log.helper';
 
 export const updatePatientRTMSession = (req, res, next) => {
-	const { patientId, painValue } = req.body;
+	const { patientId, painValue, patientNote } = req.body;
 	const user = req.user;
-	RtmHelper.updatePatientSession(patientId, painValue)
+	RtmHelper.updatePatientSession(patientId, painValue, patientNote)
 		.then(async (createdPainSession) => {
 			ActivityLogHelper.createLog(user.id, patientId, TABLE_NAME.RTM, LogAction.Update, null, null, null, null);
 			res.json(createdPainSession);

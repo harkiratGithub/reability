@@ -1,10 +1,10 @@
 import * as BaseModel from '../services/BaseModel.service';
 import { updateRTM } from '../models/rtm.model';
 
-export const updatePatientSession = async (patient_id, painValue) => {
+export const updatePatientSession = async (patient_id, painValue, patientNote) => {
 	const rtmCreationFunc = async (client = null) => {
 		try {
-			const updatePatientSession = await updateRTM(patient_id, { painValue }, 'patient');
+			const updatePatientSession = await updateRTM(patient_id, { painValue, patientNote }, 'patient');
 			return updatePatientSession;
 		} catch (err) {
 			throw err;
