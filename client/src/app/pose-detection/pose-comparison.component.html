@@ -18,21 +18,24 @@
 
 <div class="pose-container">
   <canvas #canvasElement1 width="640" height="480"></canvas>
-  <canvas #canvasElement2 width="640" height="480"></canvas>
+  <canvas #canvasElement2 width="640" height="480" style="transform: scaleX(-1);"></canvas>
 </div>
 <div class="pose-container">
-  <div class="angle-card">
-    <h3>Left Wrist</h3>
-    <p>Left Current Angle: {{ videoAngle['leftWrist'] | number: '1.0-2' }}°</p>
-    <p>Minimum Angle: {{ minVideoAngle['leftWrist'] | number: '1.0-2' }}°</p>
-    <p>Maximum Angle: {{ maxVideoAngle['leftWrist'] | number: '1.0-2' }}°</p>
-  </div>
+  <div class="angle-display">
+    <h2>Recorded Angles from Video</h2>
+    <div class="angle-card">
+      <h3>Left Wrist</h3>
+      <p>Left Current Angle: {{ videoAngle['leftWrist'] | number: '1.0-2' }}°</p>
+      <p>Minimum Angle: {{ minVideoAngle['leftWrist'] | number: '1.0-2' }}°</p>
+      <p>Maximum Angle: {{ maxVideoAngle['leftWrist'] | number: '1.0-2' }}°</p>
+    </div>
 
-  <div class="angle-card">
-    <h3>Right Wrist</h3>
-    <p>Right Current Angle: {{ videoAngle['rightWrist'] | number: '1.0-2' }}°</p>
-    <p>Minimum Angle: {{ minVideoAngle['rightWrist'] | number: '1.0-2' }}°</p>
-    <p>Maximum Angle: {{ maxVideoAngle['rightWrist'] | number: '1.0-2' }}°</p>
+    <div class="angle-card">
+      <h3>Right Wrist</h3>
+      <p>Right Current Angle: {{ videoAngle['rightWrist'] | number: '1.0-2' }}°</p>
+      <p>Minimum Angle: {{ minVideoAngle['rightWrist'] | number: '1.0-2' }}°</p>
+      <p>Maximum Angle: {{ maxVideoAngle['rightWrist'] | number: '1.0-2' }}°</p>
+    </div>
   </div>
   <div class="angle-display">
     <h2>Recorded Angles from Camera</h2>
@@ -57,7 +60,6 @@
       <p class="not-matching" *ngIf="!rightMatching">
         Right Match: Right Wrist is not matching the video angle
       </p>
-      <p [ngClass]="{'matching': rightMatching, 'not-matching': !rightMatching}">{{rightComment}}</p>
     </div>
   </div>
 
