@@ -25,22 +25,18 @@ $BORDER_RADIUS: 26px;
   }
   .date-picker {
     margin-top: -24px !important;
-
     .date-picker-field {
       width: 290px !important;
-      mat-label {
+      mat-label,
+      .mat-hint {
         color: #b6c5cf;
       }
     }
-
     .mat-date-range-input-inner {
       color: #385f7c;
     }
-    // .cross-icon {
-    //   color: black !important;
-    // }
-    
     .mat-form-field-infix {
+      color: #385f7c;
       display: flex !important;
       justify-content: center !important;
       align-items: center !important;
@@ -93,5 +89,13 @@ $BORDER_RADIUS: 26px;
 }
 
 ::ng-deep .mat-form-field-appearance-fill .mat-form-field-flex {
-  background-color: #ffffff; /* White background */
+  background-color: #ffffff !important;
+}
+
+.month-picker .mat-calendar-period-button {
+  pointer-events: none !important;
+}
+
+.month-picker .mat-calendar-arrow {
+  display: none !important;
 }

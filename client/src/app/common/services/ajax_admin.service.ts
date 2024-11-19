@@ -254,15 +254,18 @@ export class AjaxAdmin {
     return this.http.post<any>(`${this.baseUrl}/lead/create`, lead);
   }
 
-  getAllRtmReport(params: { startDate?: string; endDate?: string } = {}) {
+  // getAllRtm() {
+  //   return this.http.get<any>(`${this.baseUrl}/rtm-details`);
+  // }
+
+  getAllRtmReport(params: { month?: string; year?: string } = {}) {
+    console.log('ajax call: ', params, typeof params);
     const queryString = Object.keys(params)
-      .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
+      .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
       .join('&');
     const url = `${this.baseUrl}/rtm-details${queryString ? `?${queryString}` : ''}`;
     return this.http.get<any>(url);
-}
-
-
+  }
   createReminder(reminder) {
     return this.http.post<any>(`${this.baseUrl}/lead/reminder/create`, reminder);
   }

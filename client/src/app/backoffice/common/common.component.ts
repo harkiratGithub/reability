@@ -616,15 +616,17 @@ export class CommonComponent implements OnInit {
   }
 
   fetchRtmReport() {
-    this.http.getAllRtmReport().subscribe((response) => {
-      const { data } = response;
-      const rows = util.transformRtm(data);
-      this.setTable(consts.tableColumns.rtm, rows);
-      this.setLoading(false);
-    });
+    this.http
+      .getAllRtmReport({ month: String(moment().month() + 1), year: String(moment().year()) })
+      .subscribe((response) => {
+        const { data } = response;
+        const rows = util.transformRtm(data);
+        this.setTable(consts.tableColumns.rtm, rows);
+        this.setLoading(false);
+      });
   }
 
-  filterRtmReport(params: { startDate: string; endDate: string }) {
+  filterRtmReport(params: { month?: string; year?: string }) {
     this.http.getAllRtmReport(params).subscribe((response) => {
       const { data } = response;
       const rows = util.transformRtm(data);
@@ -1078,7 +1080,7 @@ export class CommonComponent implements OnInit {
       case consts.Tabs.therapists:
         return this.filterTherapistTable;
       case consts.Tabs.rtm:
-        this.filterRtmReport;
+        return this.filterRtmReport;
       default:
         return this.filterTableByText;
     }
@@ -1418,7 +1420,7 @@ export class CommonComponent implements OnInit {
           phone: item.phone || '',
           since: item.since || '',
           remote_monitoring: item?.event?.minutes_spent || '',
-          data_transmitted: item?.event?.therapist_session_minutes || '',
+          data_transmitted: item?.event?.daysDataTransmittedInMonth || '',
           M_98975: item['98975'] || 0,
           M_98977: item['98977'] || 0,
           M_98980: item['98980'] || 0,
@@ -1432,7 +1434,6 @@ export class CommonComponent implements OnInit {
         item.updated_at = this.splitDateFromTime(item.updated_at);
       }
       for (const key in item) {
-        console.log("order of keys: " ,key);
         if (Array.isArray(item[key])) {
           item[key] = JSON.stringify(item[key]).replace(/[\[\]"\']/g, '');
         }

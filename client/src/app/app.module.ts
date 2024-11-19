@@ -137,7 +137,7 @@ import { TwoFactorAuthVerifyComponent } from './common/password-routes/two-facto
 import { FeedbackFormComponent } from './patient/components/feedback-form/feedback-form.component';
 import { GameHistorySessionComponent } from './patient/components/game-history-session/game-history-session.component';
 import { PainScaleComponent } from './patient/components/pain-scale/pain-scale.component';
-
+import {MomentDateAdapter} from '@angular/material-moment-adapter';
 export const CUSTOM_MOMENT_FORMATS = {
   parse: {
     dateInput: 'l, LTS',
@@ -287,6 +287,7 @@ export const CUSTOM_MOMENT_FORMATS = {
     { provide: MAT_DATE_FORMATS, useValue: APP_DATE_FORMATS },
     TimePipe,
     BackOfficeActions,
+    MomentDateAdapter
   ],
   bootstrap: [AppComponent],
   entryComponents: [

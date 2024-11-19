@@ -1,14 +1,47 @@
-import { Component, OnInit, OnDestroy, Input, AfterViewInit, Output, EventEmitter } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  Input,
+  AfterViewInit,
+  Output,
+  EventEmitter,
+  ChangeDetectionStrategy,
+  ViewEncapsulation,
+} from '@angular/core';
+import { Validators, FormControl } from '@angular/forms';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
 import * as consts from '../backoffice-constants';
-
+import { MatDatepicker } from '@angular/material/datepicker';
 import { IBackOfficeTabFilter, IMultiSelectOptions } from '../../../types';
+import { MomentDateAdapter } from '@angular/material-moment-adapter';
+import _moment, { Moment } from 'moment';
+import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
+
+const moment = _moment;
+
+export const MY_FORMATS = {
+  parse: {
+    dateInput: 'MM/YYYY',
+  },
+  display: {
+    dateInput: 'MM/YYYY',
+    monthYearLabel: 'MMM YYYY',
+    dateA11yLabel: 'LL',
+    monthYearA11yLabel: 'MMMM YYYY',
+  },
+};
 @Component({
   selector: 'app-backoffice-search',
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss'],
+  providers: [
+    { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
+    { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
+  ],
+  encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SearchComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input() data: [];
@@ -19,57 +52,76 @@ export class SearchComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input() sharedFilters: IBackOfficeTabFilter[];
   @Input() filterBy: string = '';
   @Output() filterTextChanged = new EventEmitter<string>();
-  @Output() dateRangeChanged = new EventEmitter<{ startDate: string; endDate: string }>();
-  dateRangeForm: FormGroup;
+  @Output() monthChanged = new EventEmitter<{ month: string; year: string }>();
+  monthControl = new FormControl(moment().toISOString(), [Validators.required, this.monthValidator]);
   keyUp = new Subject<KeyboardEvent>();
   subscription: Subscription = new Subscription();
+  minDate: Moment;
+  maxDate: Moment;
 
-  constructor(private fb: FormBuilder) {}
+  constructor() {}
 
   ngOnInit() {
-    this.dateRangeForm = this.fb.group(
-      {
-        startDate: ['', Validators.required],
-        endDate: ['', Validators.required],
-      },
-      { validators: this.dateRangeValidator }
-    );
-
-    this.subscription.add(
-      this.dateRangeForm.valueChanges.subscribe((value) => {
-        console.log('selected date: ', value);
-        if (this.dateRangeForm.valid) {
-          // const startDate = value.startDate ? new Date(value.startDate).toISOString().split('T')[0] : null;
-          // const endDate = value.endDate ? new Date(value.endDate).toISOString().split('T')[0] : null;
-          const startDate = value.startDate ? new Date(value.startDate).toISOString().split('T')[0] + 'T00:00:00.000Z' : null;
-          const endDate = value.endDate ? new Date(value.endDate).toISOString().split('T')[0] + 'T00:00:00.000Z' : null;
-          this.updateAPIWithDateRange(startDate, endDate);
-          this.dateRangeChanged.emit({ startDate, endDate });
-        }
-      })
-    );
-
-    this.subscription.add(
-      this.keyUp
-        .pipe(
-          // tslint:disable-next-line:no-string-literal
-          map((event) => event.target['value']),
-          debounceTime(50),
-          distinctUntilChanged()
-        )
-        .subscribe((text) => {                                                                
-          console.log('subscribe', text);
-          this.filterBy = text;
-          this.filterTextChanged.emit(text);
-          this.filterFunc(this.data, text);
-          console.log(
-            'lala',
-            (this.filterBy = text),
-          );
-        })
-    );
+    if (this.rtmTab == this.currentTabIndex) {
+      console.log('Datatable');
+      const today = moment();
+      this.minDate = moment().startOf('year');
+      this.maxDate = moment().endOf('month');
+      this.monthControl.setValue(today);
+      this.emitMonth(today);
+      this.subscription.add(this.monthControl.valueChanges.subscribe((newMonth) => this.emitMonth(newMonth)));
+    } else {
+      this.subscription.add(
+        this.keyUp
+          .pipe(
+            // tslint:disable-next-line:no-string-literal
+            map((event) => event.target['value']),
+            debounceTime(50),
+            distinctUntilChanged()
+          )
+          .subscribe((text) => {
+            this.filterBy = text;
+            this.filterTextChanged.emit(text);
+            this.filterFunc(this.data, text);
+          })
+      );
+    }
   }
 
+  emitMonth(selectedMonth: moment.Moment = this.monthControl.value) {
+    if (selectedMonth) {
+      const month: string = selectedMonth.format('MM');
+      const year: string = selectedMonth.format('YYYY');
+      this.monthChanged.emit({ month, year });
+    }
+  }
+
+  monthValidator(control: FormControl) {
+    const value = control.value;
+    if (!value || !moment(value, 'MM/YYYY', true).isValid()) {
+      return { invalidMonth: true };
+    }
+    return null;
+  }
+
+  // setMonthAndYear(normalizedMonthAndYear: Moment, datepicker: MatDatepicker<Moment>) {
+  //   const ctrlValue = this.monthControl.value ?? moment();
+  //   ctrlValue.month(normalizedMonthAndYear.month());
+  //   ctrlValue.year(normalizedMonthAndYear.year());
+  //   this.monthControl.setValue(ctrlValue);
+  //   console.log('ctrlValue', ctrlValue, this.monthControl);
+  //   datepicker.close();
+  // }
+  setMonthAndYear(normalizedMonthAndYear: Moment, datepicker: MatDatepicker<Moment>) {
+    const ctrlValue = this.monthControl.value ?? moment();
+    ctrlValue.month(normalizedMonthAndYear.month());
+    ctrlValue.year(normalizedMonthAndYear.year());
+    this.monthControl.setValue(ctrlValue, { emitEvent: true });
+    console.log('ctrlValue', ctrlValue, this.monthControl.value);
+    datepicker.close();
+  }
+
+  
   ngAfterViewInit() {
     this.filterFunc(this.data, this.filterBy);
   }
@@ -82,30 +134,7 @@ export class SearchComponent implements OnInit, OnDestroy, AfterViewInit {
     filter.setSelectedOptions(selectedOptions, this.data);
   }
 
-  dateRangeValidator(form: FormGroup) {
-    const start = form.get('startDate')?.value;
-    const end = form.get('endDate')?.value;
-    if (!start || !end) {
-      return { required: true };
-    }
-
-    if (start && end && new Date(start) > new Date(end)) {
-      return { invalidDateRange: true };
-    }
-
-    return null;
-  }
-
   get rtmTab(): any {
     return consts.Tabs.rtm;
-  }
-
-  clearDateRange() {
-    this.dateRangeForm.get('startDate')?.setValue(null);
-    this.dateRangeForm.get('endDate')?.setValue(null);
-  }
-
-  updateAPIWithDateRange(startDate: string, endDate: string) {
-    console.log('Selected Date Range:', { startDate, endDate });
   }
 }

@@ -39,7 +39,7 @@
             [sharedFilters]="getSharedFilters(currentTabIndex)"
             [filterBy]="currentSearchText"
             (filterTextChanged)="setCurrentSearchText($event)"
-            (dateRangeChanged)="filterRtmReport($event)"
+            (monthChanged)="filterRtmReport($event)"
           >
           </app-backoffice-search>
         </div>

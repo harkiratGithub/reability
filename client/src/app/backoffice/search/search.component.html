@@ -46,15 +46,25 @@
   <ng-container *ngIf="currentTabIndex == rtmTab">
     <div class="date-picker">
       <mat-form-field appearance="fill" class="date-picker-field">
-        <mat-label>MM/DD/YYYY – MM/DD/YYYY</mat-label>
-        <mat-date-range-input [formGroup]="dateRangeForm" [rangePicker]="picker">
-          <input matStartDate formControlName="startDate" placeholder="Start date" />
-          <input matEndDate formControlName="endDate" placeholder="End date" />
-        </mat-date-range-input>
+        <mat-label>Choose RTM Month</mat-label>
+        <input
+          matInput
+          [matDatepicker]="picker"
+          [min]="minDate"
+          [max]="maxDate"
+          placeholder="Choose Month"
+          [formControl]="monthControl"
+        />
+        <mat-hint>MM/YYYY</mat-hint>
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-date-range-picker #picker></mat-date-range-picker>
-        <mat-error *ngIf="dateRangeForm.hasError('required')"> Start date & End date are required </mat-error>
-        <mat-error *ngIf="dateRangeForm.hasError('invalidDateRange')"> Start date cannot be after end date </mat-error>
+        <mat-datepicker
+          #picker
+          startView="multi-year"
+          (monthSelected)="setMonthAndYear($event, picker)"
+          class="month-picker"
+        ></mat-datepicker>
+        <!-- <mat-error *ngIf="monthControl.hasError('required')"> Month selection is required. </mat-error> -->
+        <mat-error *ngIf="monthControl.hasError('invalidMonth')"> Please select a valid month. </mat-error>
       </mat-form-field>
     </div>
   </ng-container>
