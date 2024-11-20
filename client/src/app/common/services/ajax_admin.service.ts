@@ -4,6 +4,7 @@ import { Moment } from 'moment';
 import { environment } from '../../../environments/environment';
 import { IPatient, ITherapistAvailability, ITreatmentListItem } from '../../../types';
 import { Observable } from 'rxjs';
+import { HttpParams } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
@@ -254,18 +255,17 @@ export class AjaxAdmin {
     return this.http.post<any>(`${this.baseUrl}/lead/create`, lead);
   }
 
-  // getAllRtm() {
-  //   return this.http.get<any>(`${this.baseUrl}/rtm-details`);
-  // }
-
   getAllRtmReport(params: { month?: string; year?: string } = {}) {
-    console.log('ajax call: ', params, typeof params);
-    const queryString = Object.keys(params)
-      .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
-      .join('&');
-    const url = `${this.baseUrl}/rtm-details${queryString ? `?${queryString}` : ''}`;
-    return this.http.get<any>(url);
+    let httpParams = new HttpParams();
+    Object.keys(params).forEach((key) => {
+      if (params[key] !== undefined) {
+        httpParams = httpParams.set(key, params[key]!);
+      }
+    });
+    const url = `${this.baseUrl}/rtm-details`;
+    return this.http.get<any>(url, { params: httpParams });
   }
+
   createReminder(reminder) {
     return this.http.post<any>(`${this.baseUrl}/lead/reminder/create`, reminder);
   }

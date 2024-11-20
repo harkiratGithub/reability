@@ -1080,7 +1080,7 @@ export class CommonComponent implements OnInit {
       case consts.Tabs.therapists:
         return this.filterTherapistTable;
       case consts.Tabs.rtm:
-        return this.filterRtmReport;
+        this.filterRtmReport;
       default:
         return this.filterTableByText;
     }

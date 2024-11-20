@@ -180,9 +180,9 @@ export class FileUploaderComponent implements OnInit {
   getGameId() {
     this.ajaxAdmin.getAllGames().subscribe((allGames) => {
       const whiteboardGame = allGames.filter((item) => {
-        return item.name == 'whiteboard';
+        return item?.name == 'whiteboard';
       });
-      this.gameId = whiteboardGame[0].id;
+      this.gameId = whiteboardGame[0]?.id;
     });
   }
 }
