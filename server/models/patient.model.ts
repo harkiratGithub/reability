@@ -1,7 +1,6 @@
 import { map } from 'lodash';
 import squel from 'squel';
-import moment from 'moment';
-
+import moment from 'moment-timezone';
 import * as BaseModel from '../services/BaseModel.service';
 import { TABLE_NAME } from '../const';
 import * as UtilModel from './util.model';
@@ -11,6 +10,10 @@ import { weekNumberFromDate } from '../services/week-number.helper';
 import { sgMail } from '../services/email.service';
 import * as ExcelJS from 'exceljs';
 
+export const getFormattedDateInTimeZone = (date: string) => {
+	console.log('getFormattedDateInTimeZone', date);
+	return moment(date).tz('America/New_York').format('YYYY-MM-DD HH:mm:ss'); // change to UTC
+};
 export interface IPatientModel {
 	id: number;
 	firstName?: string;
@@ -50,7 +53,7 @@ const patientValidationObject = [
 const rtmValidationObject = [
 	{ key: 'patient_id', type: 'number', required: true },
 	{ key: 'timestamp', type: 'string', required: false },
-	{ key: 'event', type: 'string', required: true },
+	{ key: 'data', type: 'string', required: true },
 ];
 
 const patientValidator = (patientObject) => {
@@ -511,7 +514,7 @@ export const addPatientRTM = (patient_id, painSession, client = null) => {
 		TABLE_NAME.RTM,
 		{
 			patient_id,
-			event: JSON.stringify({
+			data: JSON.stringify({
 				note: null,
 				pain_level: painSession,
 				therapist_id: null,
@@ -535,27 +538,29 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 		.field(`patient_user.email`, 'email')
 		.field(`patient_user.user_name`, 'patient_username')
 		.field(`rtm.patient_id`)
-		.field(`rtm.event`)
+		.field(`rtm.data`)
 		.field(`rtm.timestamp`, 'since')
-		.field(`${TABLE_NAME.THERAPIST}.first_name`, 'therapist_first_name')
-		.field(`${TABLE_NAME.THERAPIST}.last_name`, 'therapist_last_name')
-		.field(`therapist_user.user_name`, 'therapist_username')
+		// .field(`${TABLE_NAME.THERAPIST}.first_name`, 'therapist_first_name')
+		// .field(`${TABLE_NAME.THERAPIST}.last_name`, 'therapist_last_name')
+		// .field(`therapist_user.user_name`, 'therapist_username')
 		.from(TABLE_NAME.RTM, 'rtm')
 		.join(TABLE_NAME.PATIENT, null, `rtm.patient_id = ${TABLE_NAME.PATIENT}.id`)
-		.join(TABLE_NAME.USER, 'patient_user', `${TABLE_NAME.PATIENT}.user_id = patient_user.id`)
-		.join(TABLE_NAME.THERAPIST, null, `(rtm.event->>'therapist_id')::int = ${TABLE_NAME.THERAPIST}.id`)
-		.join(TABLE_NAME.USER, 'therapist_user', `${TABLE_NAME.THERAPIST}.user_id = therapist_user.id`);
+		.join(TABLE_NAME.USER, 'patient_user', `${TABLE_NAME.PATIENT}.user_id = patient_user.id`);
+	// .join(TABLE_NAME.THERAPIST, null, `(rtm.data->>'therapist_id')::int = ${TABLE_NAME.THERAPIST}.id`)
+	// .join(TABLE_NAME.USER, 'therapist_user', `${TABLE_NAME.THERAPIST}.user_id = therapist_user.id`);
+	console.log('User');
+	if (month !== null && year !== null) {
+		const parsedMonth = parseInt(month, 10);
+		const parsedYear = parseInt(year, 10);
+		if (isNaN(parsedMonth) || isNaN(parsedYear) || parsedMonth < 1 || parsedMonth > 12) {
+			return [];
+			// throw new Error(`Invalid month or year provided.`);
+		}
 
-	const parsedMonth = parseInt(month, 10);
-	const parsedYear = parseInt(year, 10);
-	if (isNaN(parsedMonth) || isNaN(parsedYear) || parsedMonth < 1 || parsedMonth > 12) {
-		return [];
-		// throw new Error(`Invalid month or year provided.`);
+		query.where(`DATE_TRUNC('month', rtm.timestamp) = ?`, `${parsedYear}-${parsedMonth}-01`);
 	}
-
-	query.where(`DATE_TRUNC('month', rtm.timestamp) = ?`, `${parsedYear}-${parsedMonth}-01`);
 	const result = await BaseModel.runQuery(query.toParam());
-
+	console.log(result.rows, 'console');
 	if (!result.rows.length) {
 		return [];
 		// throw new Error(`No data found for the specified date range.`);
@@ -563,109 +568,302 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 
 	const decryptedRows = result.rows.map((row) => EncryptHelper.decryptJson(row));
 
-	const aggregatedData = new Map();
-	decryptedRows.forEach((row) => {
+	const decryptedData = decryptedRows?.map(async (row) => {
 		const patientId = row.patient_id;
-		const daysData = parseInt(row.event.daysDataTransmittedInMonth) || 0;
-		const minutes = parseInt(row.event.therapist_session_minutes) || 0;
-
-		if (!aggregatedData.has(patientId)) {
-			aggregatedData.set(patientId, {
-				...row,
-				event: {
-					...row.event,
-					daysDataTransmittedInMonth: daysData,
-					therapist_session_minutes: minutes,
-				},
-			});
-		} else {
-			const existing = aggregatedData.get(patientId);
-			existing.event.daysDataTransmittedInMonth += daysData;
-			existing.event.therapist_session_minutes += minutes;
+		console.log(row.data.therapist, 'therpaist');
+		const rtmData = row.data;
+		if (rtmData.therapist) {
+			const therapistSessionQuery = squelPostgres
+				.select()
+				.field(`${TABLE_NAME.THERAPIST_SESSION}.start_time`)
+				.field(`${TABLE_NAME.THERAPIST_SESSION}.end_time`)
+				.from(TABLE_NAME.THERAPIST_SESSION, 'therapist_session')
+				.where(`id=?`, rtmData.therapist.therapist_session_id);
+			const therapistSessionResult = await BaseModel.runQuery(therapistSessionQuery.toParam());
+			// console.log(therapistSessionResult.rows, 'data decryptedData');
+			if (therapistSessionResult.rows.length > 0) {
+				row.data.therapist.start_time = getFormattedDateInTimeZone(therapistSessionResult.rows[0].start_time);
+				row.data.therapist.end_time = getFormattedDateInTimeZone(therapistSessionResult.rows[0].end_time);
+				// console.log('Date Data: ', row.data.therapist.start_time, row.data.therapist.end_time);
+				const startDate = new Date(row.data.therapist.start_time);
+				const endDate = new Date(row.data.therapist.end_time);
+				const diffInMilliseconds = endDate.getTime() - startDate.getTime();
+				const diffInSeconds = Math.floor(diffInMilliseconds / 1000);
+				const hours = Math.floor(diffInSeconds / 3600);
+				const minutes = Math.floor((diffInSeconds % 3600) / 60);
+				const seconds = diffInSeconds % 60;
+				const formattedTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(
+					seconds
+				).padStart(2, '0')}`;
+				row.data.therapist.minutes_spent = formattedTime;
+			}
+			const therapistDataQuery = squelPostgres
+				.select()
+				// .field(`${TABLE_NAME.USER}.first_name`)
+				.field(`${TABLE_NAME.USER}.user_name`)
+				.from(TABLE_NAME.USER, 'users')
+				.where(`id=?`, rtmData.therapist.therapist_id);
+			const therapistDataSessionResult = await BaseModel.runQuery(therapistDataQuery.toParam());
+			row.data.therapist.user_name = therapistDataSessionResult.rows[0]?.user_name;
+			// console.log(therapistDataSessionResult.rows, 'data decryptedData112');
 		}
-	});
-
-	const finalData = Array.from(aggregatedData.values()).map((row) => {
-		const daysDataTransmittedInMonth = row.event.daysDataTransmittedInMonth;
-
-		row['98977'] = daysDataTransmittedInMonth >= 16 ? 1 : 0;
-		row['98980'] = daysDataTransmittedInMonth >= 20 ? 1 : 0;
-		row['98981'] = daysDataTransmittedInMonth >= 40 ? 1 : 0;
-
-		// Only set `98975` to 1 for the first eligible entry
-		if (!row['98975'] && daysDataTransmittedInMonth >= 16) {
-			row['98975'] = 1;
-		} else {
-			row['98975'] = 0;
-		}
-
 		return row;
 	});
-	console.log('finalData: ', finalData);
-	if (!sendMail) {
-		return { data: finalData };
+	return Promise.all(decryptedData).then((values: any[]) => {
+		console.log(values, values[1].data.therapist, 'Valuesss');
+		if (!sendMail) {
+			const aggregatedData = new Map();
+			const finalResult: any = {
+				allData: values,
+				cumulativeData: {},
+			};
+
+			const initialValue = 0;
+			console.log(
+				'value bhai',
+				// values,
+				values.filter((ele) => ele.data.patient?.pain_level).length
+			);
+			finalResult.cumulativeData.daysDataTransmittedInMonth = values.filter(
+				(ele) => ele.data.patient?.pain_level
+			).length;
+			// finalResult.cumulativeData.therapist_session_minutes = values
+			// 	.filter((ele) => ele.data.therapist.minutes_spent !== null)
+			// 	?.reduce(
+			// 		(acc, cur) =>
+			// 			moment(acc.data.therapist.minutes_spent, 'HH:mm:ss').add(cur.data.therapist.minutes_spent, 'HH:mm:ss'),
+			// 		initialValue
+			// 	);
+			// const finalData = Array.from(aggregatedData.values()).map((row) => {
+			// 	const daysDataTransmittedInMonth = row.data.daysDataTransmittedInMonth;
+			finalResult.cumulativeData.therapist_session_minutes = 0;
+			finalResult.cumulativeData['98977'] = finalResult.cumulativeData.daysDataTransmittedInMonth >= 16 ? 1 : 0;
+			finalResult.cumulativeData['98980'] = finalResult.cumulativeData.daysDataTransmittedInMonth >= 20 ? 1 : 0;
+			finalResult.cumulativeData['98981'] = finalResult.cumulativeData.daysDataTransmittedInMonth >= 40 ? 1 : 0;
+
+			// Only set `98975` to 1 for the first eligible entry
+			if (!finalResult.cumulativeData['98975'] && finalResult.cumulativeData.daysDataTransmittedInMonth >= 16) {
+				finalResult.cumulativeData['98975'] = 1;
+			} else {
+				finalResult.cumulativeData['98975'] = 0;
+			}
+			// 	return row;
+			// });
+			return { data: finalResult };
+		} else {
+			const sendEmailData = async (finalValuesData) => {
+				const workbook = new ExcelJS.Workbook();
+				const worksheet = workbook.addWorksheet('Patients RTM Data');
+
+				worksheet.columns = [
+					// { header: 'Patient ID', key: 'patient_id' },
+					{ header: "Patient's Unique ID", key: 'username' },
+					{ header: 'First Name', key: 'first_name' },
+					{ header: 'Last Name', key: 'last_name' },
+					// { header: 'Phone', key: 'phone' },
+					// { header: 'Email', key: 'email' },
+					{ header: 'Since', key: 'since' },
+					// { header: 'Pain Level', key: 'pain_level' },
+					// { header: 'Review Activity', key: 'review_activity' },
+					// { header: 'Reminder to Exercise', key: 'reminder_to_exercise' },
+					// { header: 'No. of Minutes of Remote Monitoring', key: 'therapist_session_minutes' },
+					// { header: 'No. of Days of Data Transmitted', key: 'days_of_data_transmitted' },
+					// { header: '98975 (1,0)', key: '98975' },
+					// { header: '98977 (1,0)', key: '98977' },
+					// { header: '98980 (1,0)', key: '98980' },
+					// { header: '98981 (1,0)', key: '98981' },
+					// { header: 'Therapist ID', key: 'therapist_id' },
+					// { header: 'Therapist Username', key: 'therapist_username' },
+					// { header: 'Therapist First Name', key: 'therapist_first_name' },
+					// { header: 'Therapist Last Name', key: 'therapist_last_name' },
+					// { header: 'Therapist Note', key: 'event_note' },
+					// { header: 'Therapist Manual Minutes', key: 'minutes_spent' },
+					// { header: 'Therapist Session Minutes', key: 'therapist_session_minutes' }, // below
+					{ header: 'Patient Pain Level', key: 'patient_pain_level' },
+					{ header: 'Patient Note', key: 'patient_note' },
+					{ header: 'Therapist Id', key: 'therapist_id' },
+					{ header: 'Therapist User Name', key: 'therapist_user_name' },
+					{ header: 'Therapist Note', key: 'therapist_note' },
+					{ header: 'Therapist Session Start Time', key: 'therapist_session_start_time' },
+					{ header: 'Therapist Session End Time', key: 'therapist_session_end_time' },
+					{ header: 'Therapist Session Duration', key: 'therapist_session_duration' },
+					{ header: 'Therapist Session Review Activity', key: 'therapist_session_review_activity' },
+					{ header: 'Therapist Session Mode', key: 'therapist_session_mode' },
+				];
+
+				console.log(finalValuesData, 'finalValuesData123');
+				finalValuesData.forEach((entry) => {
+					worksheet.addRow({
+						username: entry.patient_username || '#',
+						first_name: entry.first_name || '#',
+						last_name: entry.last_name || '#',
+						// phone: entry.phone,
+						// email: entry.email,
+						since: entry.since || '#',
+						// pain_level: entry.data.pain_level,
+						// review_activity: entry.data.review_activity,
+						// reminder_to_exercise: entry.data.reminder_to_exercise,
+						// days_of_data_transmitted: entry.data.daysDataTransmittedInMonth,
+						// '98975': entry['98975'],
+						// '98977': entry['98977'],
+						// '98980': entry['98980'],
+						// '98981': entry['98981'],
+						// therapist_username: entry.therapist_username,
+						// therapist_first_name: entry.therapist_first_name,
+						// therapist_last_name: entry.therapist_last_name,
+						// event_note: entry.data.note,
+						// minutes_spent: entry.data.minutes_spent,
+						// therapist_session_minutes: entry.data.therapist_session_minutes,
+						patient_pain_level: entry.data.patient?.pain_level || '#',
+						patient_note: entry.data.patient?.note || '#',
+						therapist_id: entry.data.therapist?.therapist_id || '#',
+						therapist_user_name: entry.data.therapist?.user_name || '#',
+						therapist_note: entry.data.therapist?.note || '#',
+						therapist_session_start_time: entry.data.therapist?.start_time || '#',
+						therapist_session_end_time: entry.data.therapist?.end_time || '#',
+						therapist_session_duration: entry.data.therapist?.minutes_spent || '#',
+						therapist_session_review_activity: entry.data.therapist?.review_activity_type || '#',
+						therapist_session_mode: entry.data.therapist?.mode || '#',
+					});
+				});
+
+				const buffer = await workbook.xlsx.writeBuffer();
+
+				const msg = {
+					to: 'amit.sharma5@mail.vinove.com',
+					from: process.env.SENGRID_FROM_EMAIL ? process.env.SENGRID_FROM_EMAIL : 'yoramfeld@gmail.com',
+					subject: `Patient RTM Data Export - ${finalValuesData.length} Records Found`,
+					text: 'Please find the attached Excel file with the patients RTM data.',
+					attachments: [
+						{
+							content: Buffer.from(buffer).toString('base64'),
+							filename: `PatientData_${new Date().toISOString().split('T')[0]}.xlsx`,
+							type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+							disposition: 'attachment',
+						},
+					],
+				};
+
+				try {
+					await sgMail.send(msg);
+					return { message: 'Patient data successfully sent via email.' };
+				} catch (error) {
+					console.error('Error sending email:', error);
+					throw new Error('Could not send email. Please try again later.');
+				}
+			};
+			sendEmailData(values);
+		}
+	});
+};
+
+export const getAllPatientRTMDetai = async (month: any, year: any, sendMail: boolean = false) => {
+	const query = squelPostgres
+		.select()
+		.field(`${TABLE_NAME.PATIENT}.first_name`)
+		.field(`${TABLE_NAME.PATIENT}.last_name`)
+		.field(`${TABLE_NAME.PATIENT}.phone`)
+		.field(`patient_user.email`, 'email')
+		.field(`patient_user.user_name`, 'patient_username')
+		.field(`rtm.patient_id`)
+		.field(`rtm.data`)
+		.field(`rtm.timestamp`, 'since')
+		.from(TABLE_NAME.RTM, 'rtm')
+		.join(TABLE_NAME.PATIENT, null, `rtm.patient_id = ${TABLE_NAME.PATIENT}.id`)
+		.join(TABLE_NAME.USER, 'patient_user', `${TABLE_NAME.PATIENT}.user_id = patient_user.id`);
+
+	if (month !== null && year !== null) {
+		const parsedMonth = parseInt(month, 10);
+		const parsedYear = parseInt(year, 10);
+		if (isNaN(parsedMonth) || isNaN(parsedYear) || parsedMonth < 1 || parsedMonth > 12) return [];
+		query.where(`DATE_TRUNC('month', rtm.timestamp) = ?`, `${parsedYear}-${parsedMonth}-01`);
 	}
 
+	const result = await BaseModel.runQuery(query.toParam());
+	if (!result.rows.length) return [];
+
+	const decryptedRows = result.rows.map((row) => EncryptHelper.decryptJson(row));
+
+	const enrichedData = await Promise.all(
+		decryptedRows.map(async (row) => {
+			const { therapist } = row.data;
+			if (therapist?.therapist_session_id) {
+				const sessionQuery = squelPostgres
+					.select()
+					.field(`${TABLE_NAME.THERAPIST_SESSION}.start_time`)
+					.field(`${TABLE_NAME.THERAPIST_SESSION}.end_time`)
+					.from(TABLE_NAME.THERAPIST_SESSION, 'therapist_session')
+					.where(`id=?`, therapist.therapist_session_id);
+				const sessionResult = await BaseModel.runQuery(sessionQuery.toParam());
+
+				if (sessionResult.rows.length > 0) {
+					const [session] = sessionResult.rows;
+					const startTime = getFormattedDateInTimeZone(session.start_time);
+					const endTime = getFormattedDateInTimeZone(session.end_time);
+
+					const durationMs = new Date(endTime).getTime() - new Date(startTime).getTime();
+					const formattedDuration = new Date(durationMs).toISOString().substr(11, 8);
+
+					Object.assign(therapist, {
+						start_time: startTime,
+						end_time: endTime,
+						minutes_spent: formattedDuration,
+					});
+				}
+			}
+			return row;
+		})
+	);
+
+	if (sendMail) {
+		await sendEmail(enrichedData);
+	}
+	// return enrichedData;
+	return { data: enrichedData };
+};
+
+const sendEmail = async (data) => {
 	const workbook = new ExcelJS.Workbook();
 	const worksheet = workbook.addWorksheet('Patients RTM Data');
-
 	worksheet.columns = [
-		// { header: 'Patient ID', key: 'patient_id' },
 		{ header: "Patient's Unique ID", key: 'username' },
 		{ header: 'First Name', key: 'first_name' },
 		{ header: 'Last Name', key: 'last_name' },
-		// { header: 'Phone', key: 'phone' },
-		// { header: 'Email', key: 'email' },
 		{ header: 'Since', key: 'since' },
-		// { header: 'Pain Level', key: 'pain_level' },
-		// { header: 'Review Activity', key: 'review_activity' },
-		// { header: 'Reminder to Exercise', key: 'reminder_to_exercise' },
-		{ header: 'No. of Minutes of Remote Monitoring', key: 'therapist_session_minutes' },
-		{ header: 'No. of Days of Data Transmitted', key: 'days_of_data_transmitted' },
-		{ header: '98975 (1,0)', key: '98975' },
-		{ header: '98977 (1,0)', key: '98977' },
-		{ header: '98980 (1,0)', key: '98980' },
-		{ header: '98981 (1,0)', key: '98981' },
-		// { header: 'Therapist ID', key: 'therapist_id' },
-		// { header: 'Therapist Username', key: 'therapist_username' },
-		// { header: 'Therapist First Name', key: 'therapist_first_name' },
-		// { header: 'Therapist Last Name', key: 'therapist_last_name' },
-		// { header: 'Therapist Note', key: 'event_note' },
-		// { header: 'Therapist Manual Minutes', key: 'minutes_spent' },
-		// { header: 'Therapist Session Minutes', key: 'therapist_session_minutes' }, // below
+		{ header: 'Patient Pain Level', key: 'patient_pain_level' },
+		{ header: 'Patient Note', key: 'patient_note' },
+		{ header: 'Therapist Id', key: 'therapist_id' },
+		{ header: 'Therapist Note', key: 'therapist_note' },
+		{ header: 'Therapist Session Start Time', key: 'therapist_session_start_time' },
+		{ header: 'Therapist Session End Time', key: 'therapist_session_end_time' },
+		{ header: 'Therapist Session Duration', key: 'therapist_session_duration' },
+		{ header: 'Therapist Session Review Activity', key: 'therapist_session_review_activity' },
+		{ header: 'Therapist Session Mode', key: 'therapist_session_mode' },
 	];
 
-	finalData.forEach((entry) => {
+	data.forEach((entry) => {
 		worksheet.addRow({
-			username: entry.patient_username,
-			first_name: entry.first_name,
-			last_name: entry.last_name,
-			// phone: entry.phone,
-			// email: entry.email,
-			since: entry.since,
-			// pain_level: entry.event.pain_level,
-			// review_activity: entry.event.review_activity,
-			// reminder_to_exercise: entry.event.reminder_to_exercise,
-			days_of_data_transmitted: entry.event.daysDataTransmittedInMonth,
-			'98975': entry['98975'],
-			'98977': entry['98977'],
-			'98980': entry['98980'],
-			'98981': entry['98981'],
-			// therapist_username: entry.therapist_username,
-			// therapist_first_name: entry.therapist_first_name,
-			// therapist_last_name: entry.therapist_last_name,
-			// event_note: entry.event.note,
-			// minutes_spent: entry.event.minutes_spent,
-			therapist_session_minutes: entry.event.therapist_session_minutes,
+			username: entry.patient_username || '#',
+			first_name: entry.first_name || '#',
+			last_name: entry.last_name || '#',
+			since: entry.since || '#',
+			patient_pain_level: entry.data.patient?.pain_level || '#',
+			patient_note: entry.data.patient?.note || '#',
+			therapist_id: entry.data.therapist?.therapist_id || '#',
+			therapist_note: entry.data.therapist?.note || '#',
+			therapist_session_start_time: entry.data.therapist?.start_time || '#',
+			therapist_session_end_time: entry.data.therapist?.end_time || '#',
+			therapist_session_duration: entry.data.therapist?.minutes_spent || '#',
+			therapist_session_review_activity: entry.data.therapist?.review_activity_type || '#',
+			therapist_session_mode: entry.data.therapist?.mode || '#',
 		});
 	});
 
 	const buffer = await workbook.xlsx.writeBuffer();
-
 	const msg = {
-		to: 'yoramfeld@gmail.com', // yoramfeld@gmail.com
-		from: process.env.SENGRID_FROM_EMAIL ? process.env.SENGRID_FROM_EMAIL : 'yoramfeld@gmail.com',
-		subject: `Patient RTM Data Export - ${finalData.length} Records Found`,
+		to: 'amit.sharma5@mail.vinove.com',
+		from: process.env.SENGRID_FROM_EMAIL || 'default@mail.com',
+		subject: `Patient RTM Data Export - ${data.length} Records Found`,
 		text: 'Please find the attached Excel file with the patients RTM data.',
 		attachments: [
 			{
@@ -679,7 +877,6 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 
 	try {
 		await sgMail.send(msg);
-		return { message: 'Patient data successfully sent via email.' };
 	} catch (error) {
 		console.error('Error sending email:', error);
 		throw new Error('Could not send email. Please try again later.');

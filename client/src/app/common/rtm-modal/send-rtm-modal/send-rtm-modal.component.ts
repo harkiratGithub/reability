@@ -21,7 +21,6 @@ export class SendRTMModalComponent implements OnInit {
   reviewActivityTypes = [
     'Intro Phone Call - Answered',
     'Intro Phone Call - Not Answered',
-    'Intro Video Call - Answered',
     'Intro Video Call - Not Answered',
     'Follow-Up Phone Call - Answered',
     'Follow-Up Phone Call - Not Answered',

@@ -388,7 +388,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
       patient,
       approveCallback: async (modalValues: OuterModalInterface) => {
         await this.ajax
-          .sendRtmTherapistSession(patient.id, modalValues.dataFromInnerForm.innerModalValue.timestamp, {
+          .sendRtmTherapistSessions(patient.id, modalValues.dataFromInnerForm.innerModalValue.timestamp, {
             therapist_id: this.therapistId,
             note: modalValues.dataFromInnerForm.innerModalValue.note,
             minutes_spent: modalValues.dataFromInnerForm.innerModalValue.minutes_spent,

@@ -305,14 +305,22 @@ export class AjaxService {
     }
   };
 
-  sendRtmTherapistSession = (patientId,timestamp, data) => {
+  sendRtmTherapistSession = (patientId, timestamp, data) => {
     try {
-      return this.http.post<any>(`${this.baseUrl}/therapist/rtmSession`, { patientId,timestamp, data });
+      this.http.post<any>(`${this.baseUrl}/therapist/rtmSession`, { patientId, timestamp, data }).subscribe(() => {});
     } catch (err) {
-      console.error(err);
+      console.error(err, 'message');
     }
   };
 
+
+  sendRtmTherapistSessions = (patientId, timestamp, data) => {
+    try {
+      return this.http.post<any>(`${this.baseUrl}/therapist/rtmSession`, { patientId, timestamp, data });
+    } catch (err) {
+      console.error(err, 'message');
+    }
+  };
   // patient routes
   startGameSession = (gameId) => {
     try {

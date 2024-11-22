@@ -85,7 +85,7 @@ export const getUserDetails = async (userId) => {
 		.field(`${TABLE_NAME.USER}.fast_login_link`)
 		.field(`${TABLE_NAME.DEPARTMENT}.id`, 'department_id')
 		.field(`${TABLE_NAME.DEPARTMENT}.name`, 'department_name')
-		.field(`${TABLE_NAME.RTM}.event->>'pain_level'`, 'pain_level') 
+		.field(`${TABLE_NAME.RTM}.data->>'pain_level'`, 'pain_level') 
 		.field(`${TABLE_NAME.RTM}.timestamp`, 'timestamp')  
 		.from(TABLE_NAME.PATIENT)
 		.left_join(TABLE_NAME.USER, null, `${TABLE_NAME.PATIENT}.user_id = ${TABLE_NAME.USER}.id`)

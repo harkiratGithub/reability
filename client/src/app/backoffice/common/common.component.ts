@@ -1411,7 +1411,7 @@ export class CommonComponent implements OnInit {
         delete item?.therapist_first_name;
         delete item?.therapist_last_name;
         delete item?.therapist_username;
-        delete item?.event;
+        delete item?.data;
         delete item?.email;
         return {
           patient_id: item.patient_id || '',
