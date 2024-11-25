@@ -96,26 +96,41 @@ export const transformInstitutes = (data) => {
   return parsedRows;
 };
 
-export const transformRtm = (data) => {
+export const transformRtm = (allData, cumulativeData) => {
   const parsedRows = [];
-  data?.map((ele) => {
+  
+  allData?.forEach((ele) => {
+    const therapistData = ele?.data?.therapist || {};
+    const patientData = ele?.data?.patient || {};
+    
     const newRow = {
       patient_id: String(ele?.patient_id),
       first_name: ele?.first_name,
       last_name: ele?.last_name,
       phone: ele?.phone,
       since: ele?.since,
-      remote_monitoring: ele?.data?.minutes_spent ? String(ele?.data?.minutes_spent) : '-',
-      data_transmitted: ele?.data?.daysDataTransmittedInMonth ? String(ele?.data?.daysDataTransmittedInMonth) : '-',
-      98975: String(ele?.['98975']),
-      98977: String(ele?.['98977']),
-      98980: String(ele?.['98980']),
-      98981: String(ele?.['98981']),
+      remote_monitoring: therapistData.minutes_spent 
+        ? String(therapistData.minutes_spent) 
+        : '-',
+      data_transmitted: cumulativeData?.daysDataTransmittedInMonth 
+        ? String(cumulativeData.daysDataTransmittedInMonth) 
+        : '-',
+      note: patientData?.note || therapistData?.note || '-', // Note from patient or therapist
+      pain_level: patientData?.pain_level ? String(patientData.pain_level) : '-', // Pain level if available
+      review_activity_type: therapistData?.review_activity_type || '-',
+      mode: therapistData?.mode || '-',
+      98975: String(cumulativeData?.['98975'] || 0),
+      98977: String(cumulativeData?.['98977'] || 0),
+      98980: String(cumulativeData?.['98980'] || 0),
+      98981: String(cumulativeData?.['98981'] || 0),
     };
+
     parsedRows.push(newRow);
   });
+
   return parsedRows;
 };
+
 
 export const transformProfessions = (data) => {
   const parsedRows = [];

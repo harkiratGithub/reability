@@ -266,6 +266,17 @@ export class AjaxAdmin {
     return this.http.get<any>(url, { params: httpParams });
   }
 
+  sendRtmMailSessions(params: { month?: string; year?: string; sendMail?:boolean } = {}) {
+    let httpParams = new HttpParams();
+    Object.keys(params).forEach((key) => {
+      if (params[key] !== undefined) {
+        httpParams = httpParams.set(key, params[key]!);
+      }
+    });
+    const url = `${this.baseUrl}/rtm-details-send`;
+    return this.http.get<any>(url, { params: httpParams });
+  }
+
   createReminder(reminder) {
     return this.http.post<any>(`${this.baseUrl}/lead/reminder/create`, reminder);
   }

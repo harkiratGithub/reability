@@ -103,7 +103,7 @@
             <button
               class="open-modal-btn"
               (click)="openLogModal(patient.userId)"
-              *ngIf="patient.log"
+              *ngIf="patient.gameSummary"
               [ngClass]="{ 'animate-button': !shownLogs[patient.userId] }"
             >
               1
@@ -224,7 +224,7 @@
           </div>
         </div>
         <!--  Session Feedback -->
-        <div class="feeds" *ngIf="patient.log">
+        <div class="feeds" *ngIf="patient.gameSummary">
           <img
             src="../../../../assets/skel/conversation.png"
             alt="Feedback Icon"
@@ -249,7 +249,11 @@
         <div class="last-login">
           <div class="last-login-content">{{ patient.lastLogin | datepipe }}</div>
         </div>
-        <div class="right-setting-drop-down" [ngClass]="{ 'arrow-up': patient.settingMenuOpen }"></div>
+        <div
+          class="right-setting-drop-down"
+          [ngClass]="{ 'arrow-up': patient.settingMenuOpen }"
+          (click)="patient.settingMenuOpen = !patient.settingMenuOpen"
+        ></div>
         <div *ngIf="patient.settingMenuOpen" class="games-settings">
           <div class="settings-header">{{ headerMessage }}</div>
           <div class="settings-icon-container">
@@ -263,9 +267,9 @@
               {{ game.name }}
             </div>
             <div class="action-wrapper">
-              <div class="send-rtm-invitation" *ngIf="patient.isRTM">
+              <div class="send-rtm-invitation" *ngIf="patient.isRTM" >
                 <div class="settings-icons send-rtm" (click)="addRTMMinutes(patient)"></div>
-                <div class="sub-label">Add to RTM(minutes)</div>
+                <div class="sub-label" (click)="addRTMMinutes(patient)">Add to RTM(minutes)</div>
               </div>
               <!-- <div class="send-invitation">
                 <div class="settings-icons send" (click)="sendFastLoginLink(patient)"></div>

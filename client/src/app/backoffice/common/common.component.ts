@@ -419,6 +419,12 @@ export class CommonComponent implements OnInit {
   get showExportSessionsButton(): boolean {
     const TherapistTab = [consts.Tabs.therapists];
     return includes(TherapistTab, this.currentTabIndex);
+    
+  }
+
+  get showRtmExportSessionsButton(): boolean {
+    const RtmTab = [consts.Tabs.rtm];
+    return includes(RtmTab, this.currentTabIndex);
   }
 
   get gamesTab(): any {
@@ -619,8 +625,8 @@ export class CommonComponent implements OnInit {
     this.http
       .getAllRtmReport({ month: String(moment().month() + 1), year: String(moment().year()) })
       .subscribe((response) => {
-        const { data } = response;
-        const rows = util.transformRtm(data);
+        const { allData, cumulativeData} = response?.data;
+        const rows = util.transformRtm(allData, cumulativeData);
         this.setTable(consts.tableColumns.rtm, rows);
         this.setLoading(false);
       });
@@ -628,12 +634,24 @@ export class CommonComponent implements OnInit {
 
   filterRtmReport(params: { month?: string; year?: string }) {
     this.http.getAllRtmReport(params).subscribe((response) => {
-      const { data } = response;
-      const rows = util.transformRtm(data);
+      const { allData, cumulativeData} = response?.data;
+      const rows = util.transformRtm(allData, cumulativeData);
       this.setTable(consts.tableColumns.rtm, rows);
       this.setLoading(false);
     });
   }
+  sendRtmMailSessions(params: { month?: string; year?: string; sendMail?: boolean; }) {
+    console.log("sendRtmMailSessions")
+    const updatedParams = {
+      month: params?.month || String(moment().month() + 1),
+      year: params?.year || String(moment().year()),
+      sendMail: true
+  };
+    console.log(updatedParams, "updatedP");
+    this.http.sendRtmMailSessions(updatedParams).subscribe((data) => {
+        console.log('Mail sent successfully', data);
+    });
+}
 
   fetchProfessions() {
     this.http.getAllProfessions().subscribe((data) => {
@@ -1367,9 +1385,9 @@ export class CommonComponent implements OnInit {
     const tabName = this.getCurrentTab().name;
     if (tabName == 'rtm') {
       this.helperMethodsForExcelExport[tabName].subscribe((response) => {
-        const { data } = response;
-        const formattedData = this.formatReportData(data, tabName);
-        this.downloadExcel(formattedData, tabName);
+        const { allData, cumulativeData } = response.data;
+      const formattedData = this.formatReportData(allData, cumulativeData, tabName);
+      this.downloadExcel(formattedData, tabName);
       });
     } else
       this.helperMethodsForExcelExport[tabName].subscribe((data) => {
@@ -1405,43 +1423,84 @@ export class CommonComponent implements OnInit {
     return date.split(' ')[0];
   }
 
-  formatReportData(data, tabName) {
-    const formattedData = data.map((item) => {
-      if (tabName === 'rtm') {
-        delete item?.therapist_first_name;
-        delete item?.therapist_last_name;
-        delete item?.therapist_username;
-        delete item?.data;
-        delete item?.email;
+  // formatReportData(data, tabName) {
+  //   const formattedData = data.map((item) => {
+  //     if (tabName === 'rtm') {
+  //       delete item?.therapist_first_name;
+  //       delete item?.therapist_last_name;
+  //       delete item?.therapist_username;
+  //       delete item?.data;
+  //       delete item?.email;
+  //       return {
+  //         patient_id: item.patient_id || '',
+  //         first_name: item.first_name || '',
+  //         last_name: item.last_name || '',
+  //         phone: item.phone || '',
+  //         since: item.since || '',
+  //         remote_monitoring: item?.event?.minutes_spent || '',
+  //         data_transmitted: item?.event?.daysDataTransmittedInMonth || '',
+  //         M_98975: item['98975'] || 0,
+  //         M_98977: item['98977'] || 0,
+  //         M_98980: item['98980'] || 0,
+  //         M_98981: item['98981'] || 0,
+  //       };
+  //     }
+  //     if (item.created_at) {
+  //       item.created_at = this.splitDateFromTime(item.created_at);
+  //     }
+  //     if (item.updated_at) {
+  //       item.updated_at = this.splitDateFromTime(item.updated_at);
+  //     }
+  //     for (const key in item) {
+  //       if (Array.isArray(item[key])) {
+  //         item[key] = JSON.stringify(item[key]).replace(/[\[\]"\']/g, '');
+  //       }
+  //     }
+  //     return item;
+  //   });
+  //   return formattedData;
+  // }
+
+  formatReportData(allData, cumulativeData, tabName?) {
+    if (tabName === 'rtm') {
+      return allData.map((item) => {
+        const therapistData = item?.data?.therapist || {};
+        const patientData = item?.data?.patient || {};
+  
         return {
           patient_id: item.patient_id || '',
           first_name: item.first_name || '',
           last_name: item.last_name || '',
           phone: item.phone || '',
           since: item.since || '',
-          remote_monitoring: item?.event?.minutes_spent || '',
-          data_transmitted: item?.event?.daysDataTransmittedInMonth || '',
-          M_98975: item['98975'] || 0,
-          M_98977: item['98977'] || 0,
-          M_98980: item['98980'] || 0,
-          M_98981: item['98981'] || 0,
+          remote_monitoring: therapistData?.minutes_spent || '-',
+          data_transmitted: cumulativeData?.daysDataTransmittedInMonth || '-',
+          note: patientData?.note || therapistData?.note || '-', 
+          pain_level: patientData?.pain_level ? String(patientData.pain_level) : '-',
+          M_98975: cumulativeData?.['98975'] || 0,
+          M_98977: cumulativeData?.['98977'] || 0,
+          M_98980: cumulativeData?.['98980'] || 0,
+          M_98981: cumulativeData?.['98981'] || 0,
         };
-      }
-      if (item.created_at) {
-        item.created_at = this.splitDateFromTime(item.created_at);
-      }
-      if (item.updated_at) {
-        item.updated_at = this.splitDateFromTime(item.updated_at);
-      }
-      for (const key in item) {
-        if (Array.isArray(item[key])) {
-          item[key] = JSON.stringify(item[key]).replace(/[\[\]"\']/g, '');
+      });
+    } else {
+      return allData.map((item) => {
+        if (item.created_at) {
+          item.created_at = this.splitDateFromTime(item.created_at);
         }
-      }
-      return item;
-    });
-    return formattedData;
+        if (item.updated_at) {
+          item.updated_at = this.splitDateFromTime(item.updated_at);
+        }
+        for (const key in item) {
+          if (Array.isArray(item[key])) {
+            item[key] = JSON.stringify(item[key]).replace(/[\[\]"\']/g, '');
+          }
+        }
+        return item;
+      });
+    }
   }
+  
 
   timeToSeconds(timeStr) {
     const [hours, minutes, seconds] = timeStr.split(':').map(Number);

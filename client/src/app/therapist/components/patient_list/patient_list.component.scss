@@ -182,8 +182,8 @@
         background-color: #ffffff;
         box-shadow: 0 5px 10px 0 rgba(25, 148, 192, 0.1);
         margin: 16px;
-        align-items: center;
-        // padding-top: 1.5%;
+        align-items: start;
+        padding-top: 20px;
 
         .status {
           flex: 0.2;
@@ -216,7 +216,7 @@
         //           }
         .patient-log-modal {
           position: fixed;
-          top: 10%;
+          top: 20%;
           left: 50%;
           transform: translateX(-50%);
           background-color: #fff;
@@ -773,8 +773,8 @@
 
   .mat-tooltip {
     font-size: 14px;
-    white-space: pre-wrap; /* Enables newlines in tooltip */
-    max-width: 300px; /* Optional, adjusts tooltip width */
+    white-space: pre-wrap;
+    max-width: 300px;
   }
 
   .feedback-icon-container {

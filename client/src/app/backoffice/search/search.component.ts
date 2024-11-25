@@ -53,6 +53,7 @@ export class SearchComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input() filterBy: string = '';
   @Output() filterTextChanged = new EventEmitter<string>();
   @Output() monthChanged = new EventEmitter<{ month: string; year: string }>();
+  @Output() sendmonthChanged = new EventEmitter<{ month: string; year: string }>();
   monthControl = new FormControl(moment().toISOString(), [Validators.required, this.monthValidator]);
   keyUp = new Subject<KeyboardEvent>();
   subscription: Subscription = new Subscription();
@@ -93,6 +94,7 @@ export class SearchComponent implements OnInit, OnDestroy, AfterViewInit {
       const month: string = selectedMonth.format('MM');
       const year: string = selectedMonth.format('YYYY');
       this.monthChanged.emit({ month, year });
+      this.sendmonthChanged.emit({ month, year });
     }
   }
 
