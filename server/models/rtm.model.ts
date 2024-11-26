@@ -43,8 +43,25 @@ const rtmValidator = (rtmObject) => {
 	return UtilModel.modelValidator(rtmValidationObject, rtmObject, 'rtmValidator');
 };
 
+const getInstituteIdByPatientId = async (patient_id) => {
+    const query = squelPostgres
+        .select()
+        .field('d.institute_id')
+        .from(TABLE_NAME.PATIENT_DEPARTMENTS, 'pd')
+        .join(TABLE_NAME.DEPARTMENT, 'd', 'd.id = pd.department_id')
+        .where('pd.patient_id = ?', patient_id)
+        .toParam();
+
+    const result = await BaseModel.runQuery(query);
+
+    const institute_id = result?.rows?.[0]?.institute_id;
+
+    return institute_id;
+};
+
 export const updateRTM = async (patient_id, data, type = 'patient', client = null, timestamp = null) => {
 	const currentTimestamp = timestamp ? new Date(timestamp) : new Date();
+	const institute_id = await getInstituteIdByPatientId(patient_id);
 	// console.log("currentTimestamp: ",timestamp, currentTimestamp)
 	const currentMonth = currentTimestamp.getMonth() + 1;
 	const currentYear = currentTimestamp.getFullYear();
@@ -79,6 +96,7 @@ export const updateRTM = async (patient_id, data, type = 'patient', client = nul
 			TABLE_NAME.RTM,
 			{
 				patient_id,
+				institute_id: institute_id,
 				data: JSON.stringify({
 					patient: {
 						note: data?.patient_note,
@@ -129,8 +147,9 @@ export const updateRTM = async (patient_id, data, type = 'patient', client = nul
                         note: data.note,
 						mode: data.mode || "manual",
 						therapist_session_id: data.therapist_session_id
-					}
+					},
 				}),
+				institute_id: institute_id,
 				timestamp: new Date().toISOString(),
 			},
 			rtmValidator,

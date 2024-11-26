@@ -610,23 +610,74 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 		return row;
 	});
 	return Promise.all(decryptedData).then((values: any[]) => {
-		console.log(values, values[1].data.therapist, 'Valuesss');
+
+
 		if (!sendMail) {
+			const patientsGroup = values.reduce((acc, curr)=>{
+				if(!acc[curr.patient_id]){
+					acc[curr.patient_id] = [];
+				}
+	
+				acc[curr.patient_id].push(curr);
+				return acc;
+			},{});
+
 			const aggregatedData = new Map();
 			const finalResult: any = {
 				allData: values,
-				cumulativeData: {},
+				cumulativeData: [],
 			};
 
 			const initialValue = 0;
-			console.log(
-				'value bhai',
-				// values,
-				values.filter((ele) => ele.data.patient?.pain_level).length
-			);
-			finalResult.cumulativeData.daysDataTransmittedInMonth = values.filter(
-				(ele) => ele.data.patient?.pain_level
-			).length;
+			for (const key in patientsGroup) {
+				if (Object.prototype.hasOwnProperty.call(patientsGroup, key)) {
+					const element = patientsGroup[key];
+
+					const obj: any = {
+						patient_id:element[0].patient_username,
+						first_name: element[0].first_name,
+						last_name: element[0].last_name,
+						since: element[0].since,
+					};
+
+					obj.daysDataTransmittedInMonth = element.filter(
+						(ele: any) => ele.data.patient?.pain_level
+					).length;
+
+					obj.therapist_session_minutes = 0;
+
+					element.forEach((entry) => {
+						if (entry.data?.therapist?.minutes_spent) {
+							const timeSpent = entry.data.therapist.minutes_spent;
+							
+							const [hours, minutes, seconds] = timeSpent.split(':').map(Number);
+							const totalMinutes = hours * 60 + minutes + seconds / 60;
+							
+							obj.therapist_session_minutes += totalMinutes;
+						}
+					});
+					
+					const totalMinutes = Math.floor(obj.therapist_session_minutes);
+					const hours = Math.floor(totalMinutes / 60);
+					const minutes = totalMinutes % 60;
+					const seconds = Math.floor((obj.therapist_session_minutes - totalMinutes) * 60);
+					obj.therapist_session_minutes = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+					obj['98977'] = obj.daysDataTransmittedInMonth >= 16 ? 1 : 0;
+					obj['98980'] = obj.daysDataTransmittedInMonth >= 20 ? 1 : 0;
+					obj['98981'] = obj.daysDataTransmittedInMonth >= 40 ? 1 : 0;
+
+					if (!obj['98975'] && obj.daysDataTransmittedInMonth >= 16) {
+						obj['98975'] = 1;
+					} else {
+						obj['98975'] = 0;
+					}
+					
+					finalResult.cumulativeData.push(obj);
+				}
+			}
+
+			// console.log("teh finalResult::", finalResult);
 			// finalResult.cumulativeData.therapist_session_minutes = values
 			// 	.filter((ele) => ele.data.therapist.minutes_spent !== null)
 			// 	?.reduce(
@@ -636,19 +687,20 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 			// 	);
 			// const finalData = Array.from(aggregatedData.values()).map((row) => {
 			// 	const daysDataTransmittedInMonth = row.data.daysDataTransmittedInMonth;
-			finalResult.cumulativeData.therapist_session_minutes = 0;
-			finalResult.cumulativeData['98977'] = finalResult.cumulativeData.daysDataTransmittedInMonth >= 16 ? 1 : 0;
-			finalResult.cumulativeData['98980'] = finalResult.cumulativeData.daysDataTransmittedInMonth >= 20 ? 1 : 0;
-			finalResult.cumulativeData['98981'] = finalResult.cumulativeData.daysDataTransmittedInMonth >= 40 ? 1 : 0;
+			// finalResult.cumulativeData.therapist_session_minutes = 0;
+			// finalResult.cumulativeData['98977'] = finalResult.cumulativeData.daysDataTransmittedInMonth >= 16 ? 1 : 0;
+			// finalResult.cumulativeData['98980'] = finalResult.cumulativeData.daysDataTransmittedInMonth >= 20 ? 1 : 0;
+			// finalResult.cumulativeData['98981'] = finalResult.cumulativeData.daysDataTransmittedInMonth >= 40 ? 1 : 0;
 
-			// Only set `98975` to 1 for the first eligible entry
-			if (!finalResult.cumulativeData['98975'] && finalResult.cumulativeData.daysDataTransmittedInMonth >= 16) {
-				finalResult.cumulativeData['98975'] = 1;
-			} else {
-				finalResult.cumulativeData['98975'] = 0;
-			}
+			// // Only set `98975` to 1 for the first eligible entry
+			// if (!finalResult.cumulativeData['98975'] && finalResult.cumulativeData.daysDataTransmittedInMonth >= 16) {
+			// 	finalResult.cumulativeData['98975'] = 1;
+			// } else {
+			// 	finalResult.cumulativeData['98975'] = 0;
+			// }
 			// 	return row;
 			// });
+			// console.log("the finalResult::", finalResult);
 			return { data: finalResult };
 		} else {
 			const sendEmailData = async (finalValuesData) => {
