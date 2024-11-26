@@ -19,6 +19,7 @@ export class SendRTMModalComponent implements OnInit {
   isFormValid: boolean = true;
   isDateValid: boolean = true;
   reviewActivityTypes = [
+    'Reviewing Data and Settings',
     'Intro Phone Call - Answered',
     'Intro Phone Call - Not Answered',
     // 'Intro Video Call - Not Answered',
@@ -26,10 +27,9 @@ export class SendRTMModalComponent implements OnInit {
     'Follow-Up Phone Call - Not Answered',
     // 'Follow-Up Video Call - Answered',
     // 'Follow-Up Video Call - Not Answered',
-    'In-App Chat',
+    // 'In-App Chat',
     'Email',
     'Text/SMS',
-    'Reviewing Data',
     'Communicating with Provider',
     'Other/Non-Billable',
   ];
