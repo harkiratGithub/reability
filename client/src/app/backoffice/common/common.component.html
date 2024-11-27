@@ -40,12 +40,11 @@
             [filterBy]="currentSearchText"
             (filterTextChanged)="setCurrentSearchText($event)"
             (monthChanged)="filterRtmReport($event)"
-            (sendmonthChanged)="sendRtmMailSessions($event)"
           >
           </app-backoffice-search>
         </div>
         <div *ngIf="showExportSessionsButton" class="export-btn" (click)="exportSessions()">Export all sessions</div>
-        <div *ngIf="showRtmExportSessionsButton" class="export-btn" (click)="sendRtmMailSessions()">Email Report</div>
+        <div *ngIf="showRtmExportSessionsButton" class="export-btn" (click)="sendRtmMailSessionsData()">Email Report</div>
         <div class="action-buttons">
           <div *ngIf="showActiveInactiveFilter" class="active-inactive">
             <div class="active-inactive-header">

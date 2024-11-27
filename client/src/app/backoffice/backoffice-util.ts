@@ -98,31 +98,18 @@ export const transformInstitutes = (data) => {
 
 export const transformRtm = (allData, cumulativeData) => {
   const parsedRows = [];
-  
-  allData?.forEach((ele) => {
-    const therapistData = ele?.data?.therapist || {};
-    const patientData = ele?.data?.patient || {};
-    
+  cumulativeData?.forEach((cumData) => {
     const newRow = {
-      patient_id: String(ele?.patient_id),
-      first_name: ele?.first_name,
-      last_name: ele?.last_name,
-      phone: ele?.phone,
-      since: ele?.since,
-      remote_monitoring: therapistData.minutes_spent 
-        ? String(therapistData.minutes_spent) 
-        : '-',
-      data_transmitted: cumulativeData?.daysDataTransmittedInMonth 
-        ? String(cumulativeData.daysDataTransmittedInMonth) 
-        : '-',
-      note: patientData?.note || therapistData?.note || '-', // Note from patient or therapist
-      pain_level: patientData?.pain_level ? String(patientData.pain_level) : '-', // Pain level if available
-      review_activity_type: therapistData?.review_activity_type || '-',
-      mode: therapistData?.mode || '-',
-      98975: String(cumulativeData?.['98975'] || 0),
-      98977: String(cumulativeData?.['98977'] || 0),
-      98980: String(cumulativeData?.['98980'] || 0),
-      98981: String(cumulativeData?.['98981'] || 0),
+      patient_id: String(cumData?.patient_id || '-'),
+      first_name: cumData?.first_name || '-',
+      last_name: cumData?.last_name || '-',
+      since: cumData?.since || '-',
+      daysDataTransmittedInMonth: cumData?.daysDataTransmittedInMonth ? String(cumData.daysDataTransmittedInMonth) : '-',
+      therapist_session_minutes: cumData?.therapist_session_minutes ? String(cumData.daysDataTransmittedInMonth) : '-',
+      98975: String(cumData?.['98975'] || 0),
+      98977: String(cumData?.['98977'] || 0),
+      98980: String(cumData?.['98980'] || 0),
+      98981: String(cumData?.['98981'] || 0),
     };
 
     parsedRows.push(newRow);
@@ -130,7 +117,6 @@ export const transformRtm = (allData, cumulativeData) => {
 
   return parsedRows;
 };
-
 
 export const transformProfessions = (data) => {
   const parsedRows = [];

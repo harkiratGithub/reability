@@ -419,7 +419,6 @@ export class CommonComponent implements OnInit {
   get showExportSessionsButton(): boolean {
     const TherapistTab = [consts.Tabs.therapists];
     return includes(TherapistTab, this.currentTabIndex);
-    
   }
 
   get showRtmExportSessionsButton(): boolean {
@@ -625,8 +624,10 @@ export class CommonComponent implements OnInit {
     this.http
       .getAllRtmReport({ month: String(moment().month() + 1), year: String(moment().year()) })
       .subscribe((response) => {
-        const { allData, cumulativeData} = response?.data;
+        const { allData, cumulativeData } = response?.data;
         const rows = util.transformRtm(allData, cumulativeData);
+        console.log('fetchRtmReport: ', rows, allData, cumulativeData);
+
         this.setTable(consts.tableColumns.rtm, rows);
         this.setLoading(false);
       });
@@ -634,24 +635,25 @@ export class CommonComponent implements OnInit {
 
   filterRtmReport(params: { month?: string; year?: string }) {
     this.http.getAllRtmReport(params).subscribe((response) => {
-      const { allData, cumulativeData} = response?.data;
-      const rows = util.transformRtm(allData, cumulativeData);
+      let rows = [];
+      if (response?.data?.allData?.length && response?.data?.cumulativeData?.length) {
+        const { allData, cumulativeData } = response?.data;
+        rows = util.transformRtm(allData, cumulativeData);
+      }
       this.setTable(consts.tableColumns.rtm, rows);
       this.setLoading(false);
     });
   }
-  sendRtmMailSessions(params: { month?: string; year?: string; sendMail?: boolean; }) {
-    console.log("sendRtmMailSessions")
+  sendRtmMailSessionsData(params: { month?: string; year?: string; sendMail?: boolean }) {
     const updatedParams = {
       month: params?.month || String(moment().month() + 1),
       year: params?.year || String(moment().year()),
-      sendMail: true
-  };
-    console.log(updatedParams, "updatedP");
+      sendMail: true,
+    };
     this.http.sendRtmMailSessions(updatedParams).subscribe((data) => {
-        console.log('Mail sent successfully', data);
+      console.log('Mail sent successfully', data);
     });
-}
+  }
 
   fetchProfessions() {
     this.http.getAllProfessions().subscribe((data) => {
@@ -1386,8 +1388,8 @@ export class CommonComponent implements OnInit {
     if (tabName == 'rtm') {
       this.helperMethodsForExcelExport[tabName].subscribe((response) => {
         const { allData, cumulativeData } = response.data;
-      const formattedData = this.formatReportData(allData, cumulativeData, tabName);
-      this.downloadExcel(formattedData, tabName);
+        const formattedData = this.formatReportData(allData, tabName, cumulativeData);
+        this.downloadExcel(formattedData, tabName);
       });
     } else
       this.helperMethodsForExcelExport[tabName].subscribe((data) => {
@@ -1437,8 +1439,8 @@ export class CommonComponent implements OnInit {
   //         last_name: item.last_name || '',
   //         phone: item.phone || '',
   //         since: item.since || '',
-  //         remote_monitoring: item?.event?.minutes_spent || '',
-  //         data_transmitted: item?.event?.daysDataTransmittedInMonth || '',
+  //         therapist_session_minutes: item?.event?.minutes_spent || '',
+  //         daysDataTransmittedInMonth: item?.event?.daysDataTransmittedInMonth || '',
   //         M_98975: item['98975'] || 0,
   //         M_98977: item['98977'] || 0,
   //         M_98980: item['98980'] || 0,
@@ -1461,26 +1463,24 @@ export class CommonComponent implements OnInit {
   //   return formattedData;
   // }
 
-  formatReportData(allData, cumulativeData, tabName?) {
+  formatReportData(allData, tabName, cumulativeData?) {
     if (tabName === 'rtm') {
-      return allData.map((item) => {
-        const therapistData = item?.data?.therapist || {};
-        const patientData = item?.data?.patient || {};
-  
+      return cumulativeData.map((cumData) => {
         return {
-          patient_id: item.patient_id || '',
-          first_name: item.first_name || '',
-          last_name: item.last_name || '',
-          phone: item.phone || '',
-          since: item.since || '',
-          remote_monitoring: therapistData?.minutes_spent || '-',
-          data_transmitted: cumulativeData?.daysDataTransmittedInMonth || '-',
-          note: patientData?.note || therapistData?.note || '-', 
-          pain_level: patientData?.pain_level ? String(patientData.pain_level) : '-',
-          M_98975: cumulativeData?.['98975'] || 0,
-          M_98977: cumulativeData?.['98977'] || 0,
-          M_98980: cumulativeData?.['98980'] || 0,
-          M_98981: cumulativeData?.['98981'] || 0,
+          patient_id: cumData.patient_id || '',
+          first_name: cumData.first_name || '',
+          last_name: cumData.last_name || '',
+          since: cumData.since || '',
+          therapist_session_minutes: cumData.therapist_session_minutes || '-',
+          daysDataTransmittedInMonth: cumData.daysDataTransmittedInMonth
+            ? String(cumData.daysDataTransmittedInMonth)
+            : '-',
+          note: '-',
+          pain_level: '-',
+          M_98975: cumData['98975'] || 0,
+          M_98977: cumData['98977'] || 0,
+          M_98980: cumData['98980'] || 0,
+          M_98981: cumData['98981'] || 0,
         };
       });
     } else {
@@ -1500,7 +1500,6 @@ export class CommonComponent implements OnInit {
       });
     }
   }
-  
 
   timeToSeconds(timeStr) {
     const [hours, minutes, seconds] = timeStr.split(':').map(Number);

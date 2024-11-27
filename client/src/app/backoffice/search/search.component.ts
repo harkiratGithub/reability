@@ -64,7 +64,6 @@ export class SearchComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngOnInit() {
     if (this.rtmTab == this.currentTabIndex) {
-      console.log('Datatable');
       const today = moment();
       this.minDate = moment().startOf('year');
       this.maxDate = moment().endOf('month');
@@ -106,14 +105,6 @@ export class SearchComponent implements OnInit, OnDestroy, AfterViewInit {
     return null;
   }
 
-  // setMonthAndYear(normalizedMonthAndYear: Moment, datepicker: MatDatepicker<Moment>) {
-  //   const ctrlValue = this.monthControl.value ?? moment();
-  //   ctrlValue.month(normalizedMonthAndYear.month());
-  //   ctrlValue.year(normalizedMonthAndYear.year());
-  //   this.monthControl.setValue(ctrlValue);
-  //   console.log('ctrlValue', ctrlValue, this.monthControl);
-  //   datepicker.close();
-  // }
   setMonthAndYear(normalizedMonthAndYear: Moment, datepicker: MatDatepicker<Moment>) {
     const ctrlValue = this.monthControl.value ?? moment();
     ctrlValue.month(normalizedMonthAndYear.month());
