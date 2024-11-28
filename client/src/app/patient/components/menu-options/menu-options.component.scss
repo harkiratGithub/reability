@@ -31,6 +31,10 @@ $top_bottom-padding: 6%;
       padding: 0 20px;
       left: 0;
       z-index: 3;
+      .logo {
+        width: 120px;
+        height: 70px;
+      }
       .header-left-container {
         display: flex;
         align-items: center;

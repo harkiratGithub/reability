@@ -11,6 +11,10 @@
   padding: 25px 60px 0 60px;
   display: flex;
   align-items: flex-start;
+  .logo {
+    width: 120px;
+    height: 70px;
+  }
 }
 .footer {
   position: absolute;
