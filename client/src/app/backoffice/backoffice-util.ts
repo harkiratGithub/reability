@@ -100,6 +100,7 @@ export const transformRtm = (allData, cumulativeData) => {
   const parsedRows = [];
   cumulativeData?.forEach((cumData) => {
     const newRow = {
+      institute_name: cumData?.institute_name || '-',
       patient_id: String(cumData?.patient_id || '-'),
       first_name: cumData?.first_name || '-',
       last_name: cumData?.last_name || '-',

@@ -43,7 +43,6 @@ export class CommonComponent implements OnInit {
   allExpertises = [];
   allFollowups = [];
   allTherapists = [];
-  allRtmReport = [];
   filterFunc: (data: any[], text?: string) => void;
   isLoading = true;
   editedEntity;
@@ -249,6 +248,27 @@ export class CommonComponent implements OnInit {
     },
   ];
 
+  // instituteItemsSharedFilters: IBackOfficeTabFilter[] = [
+  //   {
+  //     displayText: 'Institutes',
+  //     isActive: false,
+  //     filter: (data) => {
+  //       this.toggleSharedActivity('institutes');
+  //       this.filterFunc(data, this.filteredText);
+  //     },
+  //     setSelectedOptions: (options, data) => {
+  //       console.log('234: ', options, data);
+  //       this.setFilterOptions('institutes', options);
+  //       const value = map(options, (o) => o.value);
+  //       console.log(value, 'values');
+  //       this.http.setUserFilters('institutes', value).toPromise();
+  //       this.filterFunc(data, this.filteredText);
+  //     },
+  //     allOptions: [],
+  //     selectedOptions: [],
+  //   },
+  // ];
+
   inactiveItemsSharedFilters: IBackOfficeTabFilter[] = [];
 
   activeItemsTabsAdditionalFilters: Record<string, IBackOfficeTabFilter[]> = {
@@ -327,6 +347,7 @@ export class CommonComponent implements OnInit {
   tabsAdditionalActions: Record<string, IBackOfficeTabAction[]> = this.activeItemsTabsAdditionalActions;
   tabsAdditionalFilters: Record<string, IBackOfficeTabFilter[]> = this.activeItemsTabsAdditionalFilters;
   sharedFilters: IBackOfficeTabFilter[] = this.activeItemsSharedFilters;
+  // rtmSharedFilters: IBackOfficeTabFilter[] = this.instituteItemsSharedFilters;
 
   toggleSharedActivity(filterName: string) {
     const filterDetailsInStore: IFilterDetails = this.selectedUserFilters.departments;
@@ -624,11 +645,25 @@ export class CommonComponent implements OnInit {
     this.http
       .getAllRtmReport({ month: String(moment().month() + 1), year: String(moment().year()) })
       .subscribe((response) => {
-        const { allData, cumulativeData } = response?.data;
-        const rows = util.transformRtm(allData, cumulativeData);
-        console.log('fetchRtmReport: ', rows, allData, cumulativeData);
-
-        this.setTable(consts.tableColumns.rtm, rows);
+        let rows = [];
+        if (response?.data?.allData?.length && response?.data?.cumulativeData?.length) {
+          const { allData, cumulativeData } = response?.data;
+          rows = util.transformRtm(allData, cumulativeData);
+        }
+        // this.helperMethodsForExcelExport.institutes.subscribe((response) => {
+        //   let filterData = response
+        //     ?.filter((item) => item?.department_name?.toLowerCase() == 'rtm')
+        //     ?.map((ele) => ({
+        //       value: ele?.id,
+        //       displayName: ele?.institute_name,
+        //     }));
+        //   console.log('Institute Data: ', filterData, response );
+        //   this.sharedFilters[0].allOptions = filterData;
+        // });
+        this.setTable(
+          consts.tableColumns.rtm,
+          rows.sort((a, b): any => a.institute_id > b.institute_id)
+        );
         this.setLoading(false);
       });
   }
@@ -1038,6 +1073,11 @@ export class CommonComponent implements OnInit {
     this.filteredText = '';
     this.setEditedEntity(null);
     this.fetchCurrentTabData(this.currentTabIndex);
+    // if (index == consts.Tabs.rtm) {
+    //   this.sharedFilters = this.instituteItemsSharedFilters;
+    // } else {
+    //   this.sharedFilters = this.activeItemsSharedFilters;
+    // }
   }
 
   setCurrentTab(index) {
@@ -1353,6 +1393,7 @@ export class CommonComponent implements OnInit {
   getSharedFilters(tabIndex) {
     if (includes(TABS_WITH_SHARED_FILTERS, tabIndex)) {
       return this.sharedFilters;
+      // return tabIndex == consts.Tabs.rtm ? this.rtmSharedFilters : this.sharedFilters;
     }
     return [];
   }
@@ -1374,6 +1415,7 @@ export class CommonComponent implements OnInit {
       : this.inactiveItemsTabsAdditionalFilters;
 
     this.sharedFilters = this.activeItemsMode ? this.activeItemsSharedFilters : this.inactiveItemsSharedFilters;
+    // this.rtmSharedFilters = this.activeItemsMode ? this.activeItemsSharedFilters : this.inactiveItemsSharedFilters;
   }
 
   activatePatient(patientId, row) {
@@ -1467,6 +1509,7 @@ export class CommonComponent implements OnInit {
     if (tabName === 'rtm') {
       return cumulativeData.map((cumData) => {
         return {
+          institute_name: cumData.institute_name || '',
           patient_id: cumData.patient_id || '',
           first_name: cumData.first_name || '',
           last_name: cumData.last_name || '',

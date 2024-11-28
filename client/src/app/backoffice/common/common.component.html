@@ -44,7 +44,7 @@
           </app-backoffice-search>
         </div>
         <div *ngIf="showExportSessionsButton" class="export-btn" (click)="exportSessions()">Export all sessions</div>
-        <div *ngIf="showRtmExportSessionsButton" class="export-btn" (click)="sendRtmMailSessionsData()">Email Report</div>
+        <div *ngIf="showRtmExportSessionsButton" class="export-btn" (click)="sendRtmMailSessionsData()">Email Detailed Report</div>
         <div class="action-buttons">
           <div *ngIf="showActiveInactiveFilter" class="active-inactive">
             <div class="active-inactive-header">
@@ -89,7 +89,6 @@
         [allExpertises]="allExpertises"
         [allTherapists]="allTherapists"
         [allFollowups]="allFollowups"
-        [allRtmReport]="allRtmReport"
         (goBack)="onReturnFromAddEdit($event)"
         (refreshPatientDetails)="onRefreshPatientDetails($event)"
         (openTherapistScheduler)="openTherapistScheduler($event)"

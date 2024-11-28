@@ -200,12 +200,14 @@ $SIDE_BAR_BACKGROUND: linear-gradient(270.06deg, #385f7c 0%, #294259 100%, #2725
       background: $SIDE_BAR_BACKGROUND;
 
       img {
-        height: 33px;
-        margin-left: 16px;
+        width:120px;
+        height:56px;
+        margin-left: 40px;
       }
     }
     .middle{
       width: 250px;
+      padding: 12px 0px;
       background: $HEADER_BACKGROUND;
       p{
         margin: 2px;

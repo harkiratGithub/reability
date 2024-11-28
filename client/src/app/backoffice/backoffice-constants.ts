@@ -104,10 +104,11 @@ export const tableColumns: Record<string, ITableColumn[]> = {
     { fieldName: 'duration', displayName: 'Duration', flex: 1 },
   ],
   rtm: [
+    { fieldName: 'institute_name', displayName: 'Institute Name', flex: 1 },
     { fieldName: 'patient_id', displayName: 'Patient Unique ID', flex: 1 },
     { fieldName: 'first_name', displayName: 'First Name', flex: 1 },
     { fieldName: 'last_name', displayName: 'Last Name', flex: 1 },
-    { fieldName: 'since', displayName: 'Since', flex: 1.2, datePipe: true  },
+    { fieldName: 'since', displayName: 'Since', flex: 1, datePipe: true  },
     { fieldName: 'therapist_session_minutes', displayName: 'Minutes of Remote Monitoring', flex: 2 },
     { fieldName: 'daysDataTransmittedInMonth', displayName: 'Days of Data Transmitted', flex: 2 },
     { fieldName: '98975', displayName: '98975(1,0)', flex: 1 },
@@ -284,6 +285,7 @@ export enum BookingDeleteOptions {
 }
 
 export const TABS_WITH_SHARED_FILTERS = [Tabs.therapists, Tabs.patients];
+// export const TABS_WITH_SHARED_FILTERS = [Tabs.therapists, Tabs.patients, Tabs.rtm];
 
 export const DURATION_OPTIONS = [15, 30, 45, 60, 90, 120];
 export const DEFAULT_DURATION = 45;

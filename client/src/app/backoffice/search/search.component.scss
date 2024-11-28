@@ -26,6 +26,7 @@ $BORDER_RADIUS: 26px;
   .date-picker {
     margin-top: -24px !important;
     .date-picker-field {
+      order: 1;
       width: 290px !important;
       mat-label,
       .mat-hint {

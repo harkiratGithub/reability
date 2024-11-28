@@ -26,23 +26,6 @@
       </app-multi-select>
     </div>
   </ng-container>
-  <ng-container *ngFor="let sharedFilter of sharedFilters; index as i">
-    <div class="filter" (click)="sharedFilter.filter(this.data)" [class.active]="sharedFilter.isActive">
-      {{ sharedFilter.displayText }}
-    </div>
-    <div class="dropdown">
-      <app-multi-select
-        [options]="sharedFilter.allOptions"
-        [sharedFilter]="sharedFilter"
-        [selected]="sharedFilter.selectedOptions"
-        [isSingleSelect]="sharedFilter.isSingleSelect"
-        (submit)="multiSelectSubmit($event, sharedFilter)"
-        *ngIf="sharedFilter.isActive && sharedFilter.allOptions"
-      >
-        <img src="assets/backoffice/arrow_down.png" alt="" />
-      </app-multi-select>
-    </div>
-  </ng-container>
   <ng-container *ngIf="currentTabIndex == rtmTab">
     <div class="date-picker">
       <mat-form-field appearance="fill" class="date-picker-field">
@@ -66,6 +49,23 @@
         <!-- <mat-error *ngIf="monthControl.hasError('required')"> Month selection is required. </mat-error> -->
         <mat-error *ngIf="monthControl.hasError('invalidMonth')"> Please select a valid month. </mat-error>
       </mat-form-field>
+    </div>
+  </ng-container>
+  <ng-container *ngFor="let sharedFilter of sharedFilters; index as i">
+    <div class="filter" (click)="sharedFilter.filter(this.data)" [class.active]="sharedFilter.isActive">
+      {{ sharedFilter.displayText }}
+    </div>
+    <div class="dropdown">
+      <app-multi-select
+        [options]="sharedFilter.allOptions"
+        [sharedFilter]="sharedFilter"
+        [selected]="sharedFilter.selectedOptions"
+        [isSingleSelect]="sharedFilter.isSingleSelect"
+        (submit)="multiSelectSubmit($event, sharedFilter)"
+        *ngIf="sharedFilter.isActive && sharedFilter.allOptions"
+      >
+        <img src="assets/backoffice/arrow_down.png" alt="" />
+      </app-multi-select>
     </div>
   </ng-container>
 </div>
