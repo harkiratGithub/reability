@@ -44,6 +44,9 @@
       'video-content-container-enlarge-video': enlargeVideo
     }"
   >
+
+  <!--<video #videoElement src="assets/video.mp4" autoplay muted controls width="333" height="299"></video>-->
+  
     <div id="remoteVideo" class="remoteVideo">
       <div *ngIf="therapistBusy && !isMobile" class="therapist-busy-message">
         <div class="therapist-busy-message-text">Therapist<br />on mute</div>
@@ -66,6 +69,14 @@
         <div class="dark-background"></div>
         <img src="../../../../assets/main-menu/no_camera.svg" />
       </div> -->
+
+      <div class="distance-warning">
+        <div class="icon">
+          <img src="../../../../assets/game-icons/camera-icon.svg" alt="Camera Icon" />
+        </div>
+        <span class="message">Please maintain distance from the camera.</span>
+      </div>
+
       <video
         *ngIf="!isDepthCameraConnected()"
         id="patient-video"
@@ -80,11 +91,12 @@
           'ios-hide': isIosDevice()
         }"
         class="patient-video"
-        width="200"
-        height="200"
+        width="291"
+        height="290"
         muted
         autoplay
         playsinline
+        #cameraElement
       ></video>
       <video
         *ngIf="isDepthCameraConnected()"
@@ -96,11 +108,12 @@
           'disabled-skeleton': this.currentUser.disabledSkeleton
         }"
         class="patient-video"
-        width="257"
-        height="200"
+        width="347"
+        height="227"
         muted
         autoplay
         playsinline
+        #cameraElement
       ></video>
 
       <div *ngIf="receivedRemoteVideo && connectionLost" class="no-camera-message">{{ connection_error_message }}</div>
@@ -109,16 +122,17 @@
           {{ PATIENT_CAMERA_ERROR }}
         </div>
       </div>
-      <canvas
+      <!--<canvas 
         id="patient-canvas"
         [ngClass]="{
           'patient-video-regular-video': !enlargeVideo,
           'patient-video-enlarge-video': enlargeVideo,
           'hide-video': !showLocalVideo || showPatientVideo || !trackBody
         }"
-        width="257"
-        height="192"
+        width="347"
+        height="227"
         class="patient-canvas"
+        #canvasElement2
       ></canvas>
       <canvas
         id="patient-canvas-skeleton"
@@ -127,10 +141,23 @@
           'patient-video-enlarge-video': enlargeVideo,
           'hide-video': !showLocalVideo || !showPatientVideo || !displaySkeleton
         }"
-        width="257"
-        height="192"
+        width="347"
+        height="227"
         class="patient-canvas"
-      ></canvas>
+        #canvasElement2
+      ></canvas> -->
+
+
+      <div class="text-container">
+        <span class="text-group">LS:14</span>
+        <span class="text-group">   LE:176</span>
+        <span class="separator">|</span>
+        <span class="text-group">  RS:42</span>
+        <span class="text-group">   RS:160</span>
+      </div>
+      
+      <canvas #canvasElement2 width="640" height="480" style="transform: scaleX(-1);"></canvas>
+
       <div *ngIf="trackBody && showAngles" class="angles">
         <div
           *ngFor="let organAngle of organAngles; let i = index"
@@ -149,5 +176,11 @@
     muted
     autoplay
     playsinline
+    #cameraElement
   ></video>
+
+  
+
+  
+
 </div>

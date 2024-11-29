@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Output, EventEmitter, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy, Output, EventEmitter, Input ,AfterViewInit, ViewChild, ElementRef} from '@angular/core';
 import { communicationUtil, MESSAGES } from '../../../common/services/communication_util.service';
 import { WebCamSkeletonService } from '../../../common/services/posenet_camera.service';
 import { PatientWebRtcService } from '../../services/patient_web_rtc.service';
@@ -18,6 +18,7 @@ import { ScoreType } from 'src/constants';
 import { MenuOptionsAppActions } from 'src/app/patient/components/menu-options/menu-options.actions';
 import { FeedbackFormComponent } from '../feedback-form/feedback-form.component';
 import { GameHistorySessionComponent } from '../game-history-session/game-history-session.component';
+import { SkeltonVideoService } from '../../../common/services/skelton-video.service';
 
 @Component({
   selector: 'app-game-wrapper',
@@ -72,6 +73,10 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
   @Output() sendInitGameSettingsForTherapist: EventEmitter<any> = new EventEmitter();
   @Output() sendShowTimerForTherapist: EventEmitter<any> = new EventEmitter();
 
+
+  //@ViewChild('iframeRef') iframeRef!: ElementRef<HTMLIFrameElement>;
+  @ViewChild('videoElement') videoElement!: ElementRef<HTMLVideoElement>;
+  @ViewChild('iframeRef', { static: false }) iframeRef!: ElementRef;
   constructor(
     private patientWebRtcService: PatientWebRtcService,
     private ajax: AjaxService,
@@ -81,11 +86,15 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
     private ngRedux: NgRedux<IAppState>,
     private dialog: MatDialog,
     private appActions: AppActions,
-    private menuOptionsAppActions: MenuOptionsAppActions
+    private menuOptionsAppActions: MenuOptionsAppActions,
+    private skeltonVideoService:SkeltonVideoService,
   ) {
+   
     this.subscription.add(
       this.currentGameUrl$.subscribe((currentGame) => {
         this.currentGameUrl = currentGame;
+       // this.updateIframeUrl (this.currentGameUrl);
+        
       })
     );
     this.subscription.add(
@@ -100,8 +109,32 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
       })
     );
   }
+/*
+  updateIframeUrl(url: string): void {
+    this.currentGameUrl = url;
+    this.skeltonVideoService.setIframeUrl(url); // Update the shared service
+  }*/
+  
+  
+
+  ngAfterViewInit(): void {
+    // Store the iframe and video element references in the service
+    //this.skeltonVideoService.setIframeElement(this.iframeRef.nativeElement);
+    //this.skeltonVideoService.setVideoElement(this.videoElement.nativeElement);
+  }
 
   ngOnInit() {
+
+    this.connectionId = this.connectionId;
+
+    window.addEventListener('message', (event) => {
+      //console.log('Message from iframe:', event.data);
+      if (event.data) {
+        this.skeltonVideoService.setGameVideoElement(event.data); // Pass video element to the service
+        //console.log('Video element successfully passed to the service.');
+      } 
+    }); 
+    
     if (!this.isTherapist) {
       this.initPatientCallbacks();
       this.initPatientSubscriptions();
@@ -579,8 +612,8 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
     }
   };
 
-  handleIframeLoad = () => {
-    this.iframeEl = document.getElementById('games-iframe-' + this.connectionId);
+  handleIframeLoad = () => {   
+    this.iframeEl = document.getElementById('games-iframe-' + this.connectionId);   
     if (this.isTherapist) {
       this.ajax.getGameSettingsForPatient(this.gameIdTherapist, this.connectedUser.patientId).subscribe((settings) => {
         communicationUtil.sendMessageToIframe(
@@ -619,6 +652,26 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
 
     this.onIframeLoad.emit();
   };
+
+  IframeEleLoad(iframeElement: ElementRef,connectionId): void {
+    console.log("before contentdocument",iframeElement);
+    console.log(connectionId);
+    /*const iframeDocument = iframeElement.nativeElement.contentDocument || iframeElement.nativeElement.contentWindow?.document;
+    console.log("before contentdocument===",iframeDocument);
+    if (iframeDocument) {
+      const videoElement = iframeDocument.getElementById('game-video') as HTMLVideoElement | null;
+      if (videoElement) {
+        this.skeltonVideoService.setGameVideoElement(videoElement); // Pass video element to the service
+        console.log('Video element successfully passed to the service.');
+      } else {
+        console.error('Video element not found inside iframe.');
+      }
+    } else {
+      console.error('Iframe document is not accessible.');
+    }*/
+  }
+
+
 
   getIframeSrc = () => {
     return this.isTherapist && this.gameUrl ? this.gameUrl.changingThisBreaksApplicationSecurity : this.currentGameUrl;

@@ -137,7 +137,9 @@ import { TwoFactorAuthVerifyComponent } from './common/password-routes/two-facto
 import { FeedbackFormComponent } from './patient/components/feedback-form/feedback-form.component';
 import { GameHistorySessionComponent } from './patient/components/game-history-session/game-history-session.component';
 import { PainScaleComponent } from './patient/components/pain-scale/pain-scale.component';
-
+import { PoseComparisonComponent } from './pose-detection/pose-comparison.component';
+import { CommonModule } from '@angular/common';
+import { GametimerSkeltonComponent } from './patient/components/gametimer-skelton/gametimer-skelton.component';
 export const CUSTOM_MOMENT_FORMATS = {
   parse: {
     dateInput: 'l, LTS',
@@ -230,6 +232,8 @@ export const CUSTOM_MOMENT_FORMATS = {
     FeedbackFormComponent,
     GameHistorySessionComponent,
     PainScaleComponent,
+    PoseComparisonComponent,
+    GametimerSkeltonComponent
   ],
   imports: [
     RouterModule.forRoot(routes, { useHash: true }),

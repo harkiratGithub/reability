@@ -25,6 +25,10 @@
         <img class="shiba-logo" src="assets/main-menu/beyond.png" />
         <img class="logo" src="assets/main-menu/svg-cards/gertner_logo1.png" />
       </div>
+     
+      <div *ngIf="isInGame"  class="header-center-container">
+      <app-gametimer-skelton #gametimer *ngIf="showTimer || showTimerForTherapist" class="timer-display"></app-gametimer-skelton>
+      </div>
       <div *ngIf="!isTherapistMode && !isInGame" class="header-right-container" (click)="logout()">
         <img class="log-out-image" src="assets/main-menu/svg-cards/log_out_new.svg" />
         <p class="log-out-text">Log out</p>
@@ -218,7 +222,9 @@
       (handleOtherSideLeftVideoSession)="handleOtherSideLeftVideoSession()"
       [currentGameName]="currentGameName"
       [videoSessionDisplay]="videoSessionDisplay"
-      [isMobile]="isMobile"
+      [isMobile]="isMobile"  
+      (closeGame)="handleQuitGame()"
+      (onIframeLoad)="handleIframeLoad()"    
     >
     </app-web-rtc-video>
     <div
@@ -245,7 +251,7 @@
         [isTherapist]="isTherapistMode"
       >
       </app-game-score>
-      <app-game-timer #gametimer *ngIf="showTimer || showTimerForTherapist" class="timer-display"></app-game-timer>
+      <!--<app-game-timer #gametimer *ngIf="showTimer || showTimerForTherapist" class="timer-display"></app-game-timer>-->
       <app-game-logs
         *ngIf="isTherapistMode && showTimerForTherapist"
         [connectedUser]="connectedUser"
