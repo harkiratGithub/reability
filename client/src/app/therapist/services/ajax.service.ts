@@ -305,6 +305,17 @@ export class AjaxService {
     }
   };
 
+  sendTermsConditions = (userId, dateAgreedTerms) => {
+    try {
+      return this.http.patch<any>(`${this.baseUrl}/patient/termsConditions`, {
+        id: userId,
+        date_agreed_terms: dateAgreedTerms,
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   sendRtmTherapistSession = (patientId, timestamp, data) => {
     try {
       this.http.post<any>(`${this.baseUrl}/therapist/rtmSession`, { patientId, timestamp, data }).subscribe(() => {});

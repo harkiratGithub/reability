@@ -1,0 +1,26 @@
+<div class="terms-container-wrapper" *ngIf="date_agreed_terms">
+  <div class="terms-container">
+    <h2>Terms and Conditions</h2>
+    <p>We have updated our terms and conditions. Please read and approve to proceed further.</p>
+
+    <div class="terms-box">
+      <a href="https://gertnervideos.blob.core.windows.net/privacy-doc/PatientPrivacyPolicy.pdf" target="_blank"
+        >Read the Terms and Conditions</a
+      >
+    </div>
+
+    <div class="actions">
+      <label>
+        <input type="checkbox" [(ngModel)]="isChecked" (change)="onCheckboxChange()" />
+        I agree to all the terms and conditions.
+      </label>
+    </div>
+
+    <div class="buttons">
+      <button class="logout-button" (click)="onLogout()">Logout</button>
+      <button class="continue-button" [class.disabled]="!isChecked" [disabled]="!isChecked" (click)="onContinue()">
+        Continue
+      </button>
+    </div>
+  </div>
+</div>

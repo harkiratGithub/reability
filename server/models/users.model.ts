@@ -85,8 +85,9 @@ export const getUserDetails = async (userId) => {
 		.field(`${TABLE_NAME.USER}.fast_login_link`)
 		.field(`${TABLE_NAME.DEPARTMENT}.id`, 'department_id')
 		.field(`${TABLE_NAME.DEPARTMENT}.name`, 'department_name')
-		.field(`${TABLE_NAME.RTM}.data->>'pain_level'`, 'pain_level') 
-		.field(`${TABLE_NAME.RTM}.timestamp`, 'timestamp')  
+		.field(`${TABLE_NAME.RTM}.data->>'pain_level'`, 'pain_level')
+		.field(`${TABLE_NAME.RTM}.timestamp`, 'timestamp')
+		.field(`${TABLE_NAME.USER}.date_agreed_terms`)
 		.from(TABLE_NAME.PATIENT)
 		.left_join(TABLE_NAME.USER, null, `${TABLE_NAME.PATIENT}.user_id = ${TABLE_NAME.USER}.id`)
 		.left_join(
@@ -99,11 +100,7 @@ export const getUserDetails = async (userId) => {
 			null,
 			`${TABLE_NAME.PATIENT_DEPARTMENTS}.department_id = ${TABLE_NAME.DEPARTMENT}.id`
 		)
-		.left_join(
-			TABLE_NAME.RTM,
-			null,
-			`${TABLE_NAME.PATIENT}.id = ${TABLE_NAME.RTM}.patient_id`
-		)
+		.left_join(TABLE_NAME.RTM, null, `${TABLE_NAME.PATIENT}.id = ${TABLE_NAME.RTM}.patient_id`)
 		.where(`user_id = ?`, userId)
 		.union(
 			squelPostgres
@@ -116,8 +113,9 @@ export const getUserDetails = async (userId) => {
 				.field(`${TABLE_NAME.USER}.fast_login_link`)
 				.field(`${TABLE_NAME.DEPARTMENT}.id`, 'department_id')
 				.field(`${TABLE_NAME.DEPARTMENT}.name`, 'department_name')
-				.field(`NULL`, 'pain_level') 
+				.field(`NULL`, 'pain_level')
 				.field(`NULL`, 'timestamp')
+				.field(`NULL::timestamp with time zone`, 'date_agreed_terms')
 				.from(TABLE_NAME.THERAPIST)
 				.left_join(TABLE_NAME.USER, null, `${TABLE_NAME.THERAPIST}.user_id = ${TABLE_NAME.USER}.id`)
 				.left_join(
@@ -136,7 +134,6 @@ export const getUserDetails = async (userId) => {
 	const result = await BaseModel.runQuery(query);
 	return result.rows;
 };
-
 
 export const getPatientsByTherapistId = async (therapistId) => {
 	const query = squelPostgres
@@ -220,6 +217,15 @@ export const removeUserGDPR = async (arrayOfIds, isTherapist) => {
 export const updateUserUsage = (id) => {
 	return BaseModel.updateRowByField(TABLE_NAME.USER, { logged_out_at: Helper.createTimeForDb() }, 'id', id);
 };
+export const updateUserTermsConditions = (id, dateAgreedTerms) => {
+	return BaseModel.updateRowByField(
+	  TABLE_NAME.USER, 
+	  { date_agreed_terms: dateAgreedTerms },  
+	  'id', 
+	  id 
+	);
+  };
+  
 
 export const getPeersByTherapistId = async (therapistId) => {
 	const query = squelPostgres

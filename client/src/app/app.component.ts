@@ -3,11 +3,7 @@ import {
   GeneralModalData,
   OuterModalInterface,
 } from './common/general-modal/general-modal.component';
-import {
-  RTMModalComponent,
-  RTMModalData,
-  RTMOuterModalInterface,
-} from './common/rtm-modal/rtm-modal.component';
+import { RTMModalComponent, RTMModalData, RTMOuterModalInterface } from './common/rtm-modal/rtm-modal.component';
 import { Component, OnInit, OnDestroy, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthenticationService } from './common/services/authentication.service';
@@ -184,6 +180,8 @@ export class AppComponent implements OnInit, OnDestroy {
               });
             }
             return;
+          } else if (userDataResult?.role === 'patient' && userDataResult?.date_agreed_terms) {
+            this.router.navigate([`${roleMainRoute('TERMS_CONDITIONS')}`]);
           } else if (userDataResult?.role === 'patient' && userDataResult?.isPainModelOpen) {
             this.router.navigate([`${roleMainRoute('RTM')}`]);
           } else this.router.navigate([`${roleMainRoute(userDataResult.role)}`]);

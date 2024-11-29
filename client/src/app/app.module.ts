@@ -138,6 +138,7 @@ import { FeedbackFormComponent } from './patient/components/feedback-form/feedba
 import { GameHistorySessionComponent } from './patient/components/game-history-session/game-history-session.component';
 import { PainScaleComponent } from './patient/components/pain-scale/pain-scale.component';
 import {MomentDateAdapter} from '@angular/material-moment-adapter';
+import { TermsConditionsComponent } from './patient/components/terms-conditions/terms-conditions.component';
 export const CUSTOM_MOMENT_FORMATS = {
   parse: {
     dateInput: 'l, LTS',
@@ -230,6 +231,7 @@ export const CUSTOM_MOMENT_FORMATS = {
     FeedbackFormComponent,
     GameHistorySessionComponent,
     PainScaleComponent,
+    TermsConditionsComponent,
   ],
   imports: [
     RouterModule.forRoot(routes, { useHash: true }),

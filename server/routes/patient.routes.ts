@@ -37,5 +37,6 @@ router.get('/feedback/questions', PatientController.getFeedbackQuestions);
 router.get('/games', GameDataController.getAllEndGames);
 router.post('/getPatientDataList', PatientController.getPatientListDataActivities);
 router.post('/rtmSession', RtmController.updatePatientRTMSession);
+router.patch('/termsConditions', PatientController.updateUserTermsConditions);
 
 export default router;

@@ -59,6 +59,7 @@ export const onLogIn = async (user: {
 					// department_id: department_id
 					pain_level: pain_level,
 					timestamp: timestamp,
+					date_agreed_terms: date_agreed_terms,
 				} = EncryptHelper.decryptJson(details[0]);
 				// const RTM =
 				// 	details?.filter((ele: { department_id: number }) => ele.department_id === 3)?.length > 0 ? true : false;
@@ -80,6 +81,8 @@ export const onLogIn = async (user: {
 				const validGames = await GameModel.getValidGameForPatient(patientId);
 				const patient = await PatientModel.findPatientByUserId(user.id);
 				const disabledSkeleton = patient.disabled_skeleton;
+				const requiresTermsAgreement = date_agreed_terms === null;
+
 				return {
 					...user,
 					// department_id,
@@ -93,6 +96,7 @@ export const onLogIn = async (user: {
 					disabledSkeleton,
 					fast_login_link,
 					isPainModelOpen,
+					date_agreed_terms:requiresTermsAgreement,
 				};
 		}
 	} catch (error) {
@@ -141,6 +145,11 @@ export const updateHeartBeat = async (userId: any, onTherapistSession = undefine
 	}
 };
 
+export const updateUserTermsConditions = async (userId, dateAgreedTerms) => {
+	return UserModel.updateUserTermsConditions(userId, dateAgreedTerms?.date_agreed_terms);
+  };
+
+  
 export const getOpenPeers = async (therapistId: any) => {
 	try {
 		const openPeers = await UserModel.getPeersByTherapistId(therapistId);

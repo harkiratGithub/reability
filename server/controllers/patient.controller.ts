@@ -270,3 +270,26 @@ export const getFeedbackQuestions = (req: Request, res: Response, next: NextFunc
 		})
 		.catch((err) => next(err));
 };
+
+export const updateUserTermsConditions = (req, res, next) => {
+	const { id, date_agreed_terms } = req.body; 
+	const user = req.user;
+	UserHelper.updateUserTermsConditions(id, { date_agreed_terms })
+	  .then(async (updatedUser) => {
+		await ActivityLogHelper.createLog(
+		  user?.id,
+		  updatedUser.id,
+		  TABLE_NAME.USER,
+		  LogAction.Update,
+		  updatedUser.id,
+		  null,
+		  { date_agreed_terms }
+		);
+		res.json(updatedUser);
+	  })
+	  .catch((err) => {
+		next(err); 
+	  });
+  };
+  
+

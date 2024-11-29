@@ -109,7 +109,9 @@ export class LoginPageComponent implements OnInit, OnDestroy {
           }
         } else {
           localStorage.setItem('verified2FA', 'true');
-          if (user?.role === 'patient' && user?.isPainModelOpen) {
+          if (user?.role === 'patient' && user?.date_agreed_terms) {
+            this.router.navigate([`${roleMainRoute('TERMS_CONDITIONS')}`]);
+          } else if (user?.role === 'patient' && user?.isPainModelOpen) {
             this.router.navigate([`${roleMainRoute('RTM')}`]);
           } else {
             this.router.navigate([`${roleMainRoute(user.role)}`]);

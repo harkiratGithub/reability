@@ -1,0 +1,120 @@
+.terms-container-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  background-color: #0e191f;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.terms-container {
+  width: 100%;
+  max-width: 600px;
+  background: #ffffff;
+  padding: 30px 40px;
+  border-radius: 10px;
+}
+
+.terms-container h2 {
+  text-align: center;
+  color: #2b3742;
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+
+.terms-container p {
+  margin-bottom: 20px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #555;
+}
+
+.terms-box a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: bold;
+  display: inline-block;
+  margin-bottom: 20px;
+}
+
+.terms-box a:hover {
+  text-decoration: underline;
+}
+
+.actions {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  color: #333;
+}
+
+.buttons {
+  margin-top: 40px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.logout-button {
+  display: flex;
+  align-items: center;
+  background-color: #ff3b30;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.logout-button:hover {
+  background-color: #d62b24;
+  transform: translateY(-2px);
+}
+
+.logout-button:active {
+  transform: translateY(0);
+}
+
+.continue-button {
+  display: flex;
+  align-items: center;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s, transform 0.2s;
+
+  &.disabled {
+    background-color: #cccccc;
+    color: #999999;
+    cursor: not-allowed;
+  }
+}
+
+.continue-button:hover:not(.disabled) {
+  background-color: #0056b3;
+  transform: translateY(-2px);
+}
+
+.continue-button:active:not(.disabled) {
+  transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+  .terms-container {
+    padding: 20px 30px;
+  }
+
+  .logout-button,
+  .continue-button {
+    font-size: 14px;
+    padding: 10px 15px;
+  }
+}
