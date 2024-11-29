@@ -13,7 +13,6 @@
       </mat-error>
     </mat-form-field>
   </label>
-
   <div class="date-time-wrapper">
     <label class="field-container link-type date">
       <span class="description">Date<span class="required-asterisk">*</span></span>
@@ -30,16 +29,20 @@
     <label class="field-container link-type">
       <span class="description">Time Spent<span class="required-asterisk">*</span></span>
       <mat-form-field>
-        <input matInput type="number" formControlName="minutes_spent" min="0" max="1440" required />
-        <div *ngIf="!customForm.controls.minutes_spent.value" class="min-place-holder">Min</div>
+        <input
+          matInput
+          type="text"
+          formControlName="minutes_spent"
+          maxlength="8"
+          (input)="onTimeInput($event)"
+          required
+        />
+        <div *ngIf="!customForm.controls.minutes_spent.value" class="min-place-holder">HH:mm:ss</div>
         <mat-error class="error-msg" *ngIf="customForm.get('minutes_spent').hasError('required')">
           Time spent is required
         </mat-error>
-        <mat-error class="error-msg" *ngIf="customForm.get('minutes_spent').hasError('max')">
-          Maximum time is 1440 minutes
-        </mat-error>
-        <mat-error class="error-msg" *ngIf="customForm.get('minutes_spent').hasError('min')">
-          Time must be greater than or equal to 0
+        <mat-error class="error-msg" *ngIf="customForm.get('minutes_spent').hasError('invalidTime')">
+          Invalid time format. Use HH:mm:ss.
         </mat-error>
       </mat-form-field>
     </label>

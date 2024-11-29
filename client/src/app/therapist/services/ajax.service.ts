@@ -313,10 +313,9 @@ export class AjaxService {
     }
   };
 
-
-  sendRtmTherapistSessions = (patientId, timestamp, data) => {
+  sendRtmTherapistSessions = (patientId, data, timestamp) => {
     try {
-      return this.http.post<any>(`${this.baseUrl}/therapist/rtmSession`, { patientId, timestamp, data });
+      return this.http.post<any>(`${this.baseUrl}/therapist/rtmSession`, { patientId, data, timestamp });
     } catch (err) {
       console.error(err, 'message');
     }

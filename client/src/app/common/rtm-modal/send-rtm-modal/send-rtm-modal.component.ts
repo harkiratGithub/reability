@@ -49,7 +49,7 @@ export class SendRTMModalComponent implements OnInit {
     this.customForm = new FormGroup({
       date_time: new FormControl(null, Validators.required),
       review_activity: new FormControl(null, Validators.required),
-      minutes_spent: new FormControl(null, [Validators.required, Validators.min(0), Validators.max(1440)]),
+      minutes_spent: new FormControl(null, [Validators.required, this.timeFormatValidator]),
       note: new FormControl(null, Validators.required),
     });
     this.setMaxDate();
@@ -67,6 +67,43 @@ export class SendRTMModalComponent implements OnInit {
     });
   }
 
+  timeFormatValidator(control: FormControl): { [key: string]: any } | null {
+    const timeRegex = /^([0-1]\d|2[0-3]):([0-5]\d):([0-5]\d)$/;
+    if (!control.value || timeRegex.test(control.value)) {
+      return null;
+    }
+    return { invalidTime: true };
+  }
+
+  convertTimeToSeconds(time: string): number {
+    const [hours, minutes, seconds] = time.split(':').map(Number);
+    return hours * 3600 + minutes * 60 + seconds;
+  }
+
+  getFormattedTime(): string {
+    const timeSpent = this.customForm.controls.minutes_spent.value;
+    if (timeSpent) {
+      const totalSeconds = this.convertTimeToSeconds(timeSpent);
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+      return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds
+        .toString()
+        .padStart(2, '0')}`;
+    }
+    return '00:00:00';
+  }
+
+  onTimeInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    let value = input.value.replace(/[^0-9]/g, '');
+    if (value.length > 2) value = value.slice(0, 2) + ':' + value.slice(2);
+    if (value.length > 5) value = value.slice(0, 5) + ':' + value.slice(5);
+
+    input.value = value;
+    this.customForm?.controls?.time_spent?.setValue(value, { emitEvent: false });
+  }
+
   setMaxDate = () => {
     const now = new Date();
     this.maxDate = new Date();
@@ -74,8 +111,10 @@ export class SendRTMModalComponent implements OnInit {
   };
 
   getDateTime = (date_time) => {
-    return date_time && moment(date_time).isValid() && date_time >= new Date()
-      ? moment(date_time).unix().toString()
+    return date_time && moment(date_time).isValid() && date_time <= new Date()
+      ? moment(date_time)
+          .set({ hour: moment().hour(), minute: moment().minute(), second: moment().second() })
+          .format('YYYY-MM-DD HH:mm:ss.SSSZZ')
       : null;
   };
 

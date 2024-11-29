@@ -387,30 +387,30 @@ export class PatientListComponent implements OnInit, OnDestroy {
       content: RTM_MODAL_CONTENT.SEND_FAST_LOGIN,
       patient,
       approveCallback: async (modalValues: OuterModalInterface) => {
+        const timestamp = modalValues.dataFromInnerForm.innerModalValue.date_time;
+        const payload = {
+          therapist_id: this.therapistId,
+          note: modalValues.dataFromInnerForm.innerModalValue.note,
+          minutes_spent: modalValues.dataFromInnerForm.innerModalValue.minutes_spent,
+          review_activity: modalValues.dataFromInnerForm.innerModalValue.review_activity,
+          reminder_to_exercise: null,
+          therapist_session_minutes: null,
+        };
         await this.ajax
-          .sendRtmTherapistSessions(patient.id, modalValues.dataFromInnerForm.innerModalValue.timestamp, {
-            therapist_id: this.therapistId,
-            note: modalValues.dataFromInnerForm.innerModalValue.note,
-            minutes_spent: modalValues.dataFromInnerForm.innerModalValue.minutes_spent,
-            review_activity: modalValues.dataFromInnerForm.innerModalValue.review_activity,
-            reminder_to_exercise: null,
-            therapist_session_minutes: null,
-          })
+          .sendRtmTherapistSessions(patient.id, payload, timestamp)
           .toPromise()
           .then((res) => {
-            console.log(res)
-            modalValues.dataFromInnerForm.innerModalValue.date_time 
-              ? this.appActions.setMessageRTMModal(
-                  'Manual Time track has been recorded' +
-                    moment
-                      .unix(Number.parseInt(modalValues.dataFromInnerForm.innerModalValue.date_time))
-                      .format('DD/MM/YYYY HH:mm')
-                )
-              : this.appActions.setMessageRTMModal('Manual Time track has been recorded');
+            const successMessage = timestamp
+              ? 'Manual Time track has been recorded on ' +
+                moment(timestamp)
+                  .set({ hour: moment().hour(), minute: moment().minute(), second: moment().second() })
+                  .format('DD/MM/YYYY HH:mm')
+              : 'Manual Time track has been recorded';
+            this.appActions.setMessageRTMModal(successMessage);
           })
           .catch((err) => {
             this.appActions.setMessageRTMModal('Error occurred. Please try again later');
-            console.log('error', err);
+            console.error('Error:', err);
           });
       },
       header: 'Add Manual Time Track',

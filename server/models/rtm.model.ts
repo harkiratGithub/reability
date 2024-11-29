@@ -40,27 +40,33 @@ const rtmValidationObject = [
 const squelPostgres = squel.useFlavour('postgres');
 
 const rtmValidator = (rtmObject) => {
+	if (typeof rtmObject.timestamp !== 'string' || isNaN(Date.parse(rtmObject.timestamp))) {
+		throw new Error('rtmValidator: timestamp not valid date');
+	}
 	return UtilModel.modelValidator(rtmValidationObject, rtmObject, 'rtmValidator');
 };
 
 const getInstituteIdByPatientId = async (patient_id) => {
-    const query = squelPostgres
-        .select()
-        .field('d.institute_id')
-        .from(TABLE_NAME.PATIENT_DEPARTMENTS, 'pd')
-        .join(TABLE_NAME.DEPARTMENT, 'd', 'd.id = pd.department_id')
-        .where('pd.patient_id = ?', patient_id)
-        .toParam();
+	const query = squelPostgres
+		.select()
+		.field('d.institute_id')
+		.from(TABLE_NAME.PATIENT_DEPARTMENTS, 'pd')
+		.join(TABLE_NAME.DEPARTMENT, 'd', 'd.id = pd.department_id')
+		.where('pd.patient_id = ?', patient_id)
+		.toParam();
 
-    const result = await BaseModel.runQuery(query);
+	const result = await BaseModel.runQuery(query);
 
-    const institute_id = result?.rows?.[0]?.institute_id;
+	const institute_id = result?.rows?.[0]?.institute_id;
 
-    return institute_id;
+	return institute_id;
 };
 
 export const updateRTM = async (patient_id, data, type = 'patient', client = null, timestamp = null) => {
 	const currentTimestamp = timestamp ? new Date(timestamp) : new Date();
+	if (isNaN(currentTimestamp.getTime())) {
+		throw new Error('Invalid timestamp provided');
+	}
 	const institute_id = await getInstituteIdByPatientId(patient_id);
 	// console.log("currentTimestamp: ",timestamp, currentTimestamp)
 	const currentMonth = currentTimestamp.getMonth() + 1;
@@ -90,7 +96,6 @@ export const updateRTM = async (patient_id, data, type = 'patient', client = nul
 	// const result = (await BaseModel.runQuery(query))?.rows;
 	// const isRTMExist = result?.length ? result[0] : null;
 	if (type == 'patient') {
-	
 		// if (!isRTMExist)
 		return BaseModel.createRow(
 			TABLE_NAME.RTM,
@@ -110,7 +115,7 @@ export const updateRTM = async (patient_id, data, type = 'patient', client = nul
 					// patient_note: data?.patient_note,
 					// daysDataTransmittedInMonth
 				}),
-				timestamp: timestamp ? new Date(timestamp).toISOString: new Date().toISOString(),
+				timestamp: currentTimestamp.toISOString(),
 			},
 			rtmValidator,
 			client
@@ -143,14 +148,14 @@ export const updateRTM = async (patient_id, data, type = 'patient', client = nul
 						end_time: data.end_time,
 						therapist_id: data.therapist_id,
 						minutes_spent: data.minutes_spent,
-                        review_activity_type: data.review_activity,
-                        note: data.note,
-						mode: data.mode || "manual",
-						therapist_session_id: data.therapist_session_id
+						review_activity_type: data.review_activity,
+						note: data.note,
+						mode: data.mode || 'manual',
+						therapist_session_id: data.therapist_session_id,
 					},
 				}),
 				institute_id: institute_id,
-				timestamp: new Date().toISOString(),
+				timestamp: currentTimestamp.toISOString(),
 			},
 			rtmValidator,
 			client
