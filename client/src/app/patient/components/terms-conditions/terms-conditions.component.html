@@ -17,10 +17,10 @@
     </div>
 
     <div class="buttons">
-      <button class="logout-button" (click)="onLogout()">Logout</button>
       <button class="continue-button" [class.disabled]="!isChecked" [disabled]="!isChecked" (click)="onContinue()">
         Continue
       </button>
+      <button class="logout-button" (click)="onLogout()">Cancel</button>
     </div>
   </div>
 </div>

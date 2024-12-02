@@ -46,7 +46,6 @@ export const onLogIn = async (user: {
 					first_name: firstName,
 					last_name: lastName,
 					is_two_factor_enabled: is_two_factor_enabled,
-					// department_id: department_id
 				} = EncryptHelper.decryptJson(userDetails[0]);
 				return { ...user, id, firstName, lastName, is_two_factor_enabled };
 			case ROLE.PATIENT:
@@ -56,28 +55,15 @@ export const onLogIn = async (user: {
 					first_name: firstNameDetails,
 					last_name: lastNameDetails,
 					fast_login_link: fast_login_link,
-					// department_id: department_id
 					pain_level: pain_level,
 					timestamp: timestamp,
 					date_agreed_terms: date_agreed_terms,
 				} = EncryptHelper.decryptJson(details[0]);
-				// const RTM =
-				// 	details?.filter((ele: { department_id: number }) => ele.department_id === 3)?.length > 0 ? true : false;
 				const RTM = details?.some((ele: { department_name: string }) => ele.department_name.toLowerCase() === 'rtm');
-
 				const isPainModelOpen =
-					RTM &&
-					!isNaN(pain_level) &&
-					new Date(new Date(timestamp).setDate(new Date(timestamp).getDate() + 1)) <= new Date()
+					RTM && !isNaN(pain_level) && new Date().getTime() - new Date(timestamp).getTime() >= 24 * 60 * 60 * 1000
 						? true
 						: false;
-				console.log(
-					'RTM Modal Condition: ',
-					isPainModelOpen,
-					RTM,
-					!isNaN(pain_level),
-					new Date(new Date(timestamp).setDate(new Date(timestamp).getDate() + 1)) <= new Date()
-				);
 				const validGames = await GameModel.getValidGameForPatient(patientId);
 				const patient = await PatientModel.findPatientByUserId(user.id);
 				const disabledSkeleton = patient.disabled_skeleton;
@@ -85,10 +71,6 @@ export const onLogIn = async (user: {
 
 				return {
 					...user,
-					// department_id,
-					// RTM,
-					// pain_level,
-					// timestamp ,
 					id: patientId,
 					firstName: firstNameDetails,
 					lastName: lastNameDetails,
@@ -96,7 +78,7 @@ export const onLogIn = async (user: {
 					disabledSkeleton,
 					fast_login_link,
 					isPainModelOpen,
-					date_agreed_terms:requiresTermsAgreement,
+					date_agreed_terms: requiresTermsAgreement,
 				};
 		}
 	} catch (error) {
@@ -147,9 +129,8 @@ export const updateHeartBeat = async (userId: any, onTherapistSession = undefine
 
 export const updateUserTermsConditions = async (userId, dateAgreedTerms) => {
 	return UserModel.updateUserTermsConditions(userId, dateAgreedTerms?.date_agreed_terms);
-  };
+};
 
-  
 export const getOpenPeers = async (therapistId: any) => {
 	try {
 		const openPeers = await UserModel.getPeersByTherapistId(therapistId);
