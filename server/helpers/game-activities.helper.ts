@@ -20,9 +20,6 @@ export const addUploadedGameRelatedImage = async (file) => {
         throw err;
     }
 };
-*/
-
-
 
 // export const addUploadedGameRelatedImage = async (file) => {
 //     // Extract the extension and generate a unique filename
