@@ -1509,17 +1509,15 @@ export class CommonComponent implements OnInit {
     if (tabName === 'rtm') {
       return cumulativeData.map((cumData) => {
         return {
-          institute_name: cumData.institute_name || '',
-          patient_id: cumData.patient_id || '',
-          first_name: cumData.first_name || '',
-          last_name: cumData.last_name || '',
-          since: cumData.since || '',
-          therapist_session_minutes: cumData.therapist_session_minutes || '-',
-          daysDataTransmittedInMonth: cumData.daysDataTransmittedInMonth
-            ? String(cumData.daysDataTransmittedInMonth)
+          institute_name: cumData?.institute_name || '',
+          patient_id: cumData?.patient_id || '',
+          first_name: cumData?.first_name || '',
+          last_name: cumData?.last_name || '',
+          since: cumData?.since || '',
+          therapist_session_minutes: cumData?.therapist_session_minutes || '-',
+          daysDataTransmittedInMonth: cumData?.daysDataTransmittedInMonth
+            ? String(cumData?.daysDataTransmittedInMonth)
             : '-',
-          note: '-',
-          pain_level: '-',
           M_98975: cumData['98975'] || 0,
           M_98977: cumData['98977'] || 0,
           M_98980: cumData['98980'] || 0,

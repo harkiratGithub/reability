@@ -551,7 +551,6 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 		.join(TABLE_NAME.INSTITUTE, 'institute', `rtm.institute_id = institute.id`);
 	// .join(TABLE_NAME.THERAPIST, null, `(rtm.data->>'therapist_id')::int = ${TABLE_NAME.THERAPIST}.id`)
 	// .join(TABLE_NAME.USER, 'therapist_user', `${TABLE_NAME.THERAPIST}.user_id = therapist_user.id`);
-	console.log('User');
 	if (month !== null && year !== null) {
 		const parsedMonth = parseInt(month, 10);
 		const parsedYear = parseInt(year, 10);
@@ -563,7 +562,6 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 		query.where(`DATE_TRUNC('month', rtm.timestamp) = ?`, `${parsedYear}-${parsedMonth}-01`);
 	}
 	const result = await BaseModel.runQuery(query.toParam());
-	console.log(result.rows, 'console');
 	if (!result.rows.length) {
 		return [];
 		// throw new Error(`No data found for the specified date range.`);
@@ -573,7 +571,6 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 
 	const decryptedData = decryptedRows?.map(async (row) => {
 		const patientId = row.patient_id;
-		console.log(row.data.therapist, 'therpaist');
 		const rtmData = row.data;
 		if (rtmData.therapist) {
 			const therapistSessionQuery = squelPostgres
@@ -583,11 +580,9 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 				.from(TABLE_NAME.THERAPIST_SESSION, 'therapist_session')
 				.where(`id=?`, rtmData.therapist.therapist_session_id);
 			const therapistSessionResult = await BaseModel.runQuery(therapistSessionQuery.toParam());
-			// console.log(therapistSessionResult.rows, 'data decryptedData');
 			if (therapistSessionResult.rows.length > 0) {
 				row.data.therapist.start_time = getFormattedDateInTimeZone(therapistSessionResult.rows[0].start_time);
 				row.data.therapist.end_time = getFormattedDateInTimeZone(therapistSessionResult.rows[0].end_time);
-				// console.log('Date Data: ', row.data.therapist.start_time, row.data.therapist.end_time);
 				const startDate = new Date(row.data.therapist.start_time);
 				const endDate = new Date(row.data.therapist.end_time);
 				const diffInMilliseconds = endDate.getTime() - startDate.getTime();
@@ -608,22 +603,19 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 				.where(`id=?`, rtmData.therapist.therapist_id);
 			const therapistDataSessionResult = await BaseModel.runQuery(therapistDataQuery.toParam());
 			row.data.therapist.user_name = therapistDataSessionResult.rows[0]?.user_name;
-			// console.log(therapistDataSessionResult.rows, 'data decryptedData112');
 		}
 		return row;
 	});
 	return Promise.all(decryptedData).then((values: any[]) => {
-
-
 		if (!sendMail) {
-			const patientsGroup = values.reduce((acc, curr)=>{
-				if(!acc[curr.patient_id]){
+			const patientsGroup = values.reduce((acc, curr) => {
+				if (!acc[curr.patient_id]) {
 					acc[curr.patient_id] = [];
 				}
-	
+
 				acc[curr.patient_id].push(curr);
 				return acc;
-			},{});
+			}, {});
 
 			const aggregatedData = new Map();
 			const finalResult: any = {
@@ -635,38 +627,35 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 			for (const key in patientsGroup) {
 				if (Object.prototype.hasOwnProperty.call(patientsGroup, key)) {
 					const element = patientsGroup[key];
-
 					const obj: any = {
-						patient_id:element[0].patient_username,
+						patient_id: element[0].patient_username,
 						first_name: element[0].first_name,
 						last_name: element[0].last_name,
 						since: element[0].since,
-						institute_name:element[0].institute_name,
-						institute_id:element[0].institute_id,
+						institute_name: element[0].institute_name,
+						institute_id: element[0].institute_id,
 					};
-
-					obj.daysDataTransmittedInMonth = element.filter(
-						(ele: any) => ele.data.patient?.pain_level
-					).length;
+					obj.daysDataTransmittedInMonth = element.filter((ele: any) => ele.data.patient?.pain_level).length;
 
 					obj.therapist_session_minutes = 0;
 
 					element.forEach((entry) => {
 						if (entry.data?.therapist?.minutes_spent) {
 							const timeSpent = entry.data.therapist.minutes_spent;
-							
 							const [hours, minutes, seconds] = timeSpent.split(':').map(Number);
 							const totalMinutes = hours * 60 + minutes + seconds / 60;
-							
 							obj.therapist_session_minutes += totalMinutes;
 						}
 					});
-					
+
 					const totalMinutes = Math.floor(obj.therapist_session_minutes);
 					const hours = Math.floor(totalMinutes / 60);
 					const minutes = totalMinutes % 60;
 					const seconds = Math.floor((obj.therapist_session_minutes - totalMinutes) * 60);
-					obj.therapist_session_minutes = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+					obj.therapist_session_minutes = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(
+						2,
+						'0'
+					)}:${String(seconds).padStart(2, '0')}`;
 
 					obj['98977'] = obj.daysDataTransmittedInMonth >= 16 ? 1 : 0;
 					obj['98980'] = obj.daysDataTransmittedInMonth >= 20 ? 1 : 0;
@@ -677,41 +666,15 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 					} else {
 						obj['98975'] = 0;
 					}
-					
+
 					finalResult.cumulativeData.push(obj);
 				}
 			}
-
-			// console.log("teh finalResult::", finalResult);
-			// finalResult.cumulativeData.therapist_session_minutes = values
-			// 	.filter((ele) => ele.data.therapist.minutes_spent !== null)
-			// 	?.reduce(
-			// 		(acc, cur) =>
-			// 			moment(acc.data.therapist.minutes_spent, 'HH:mm:ss').add(cur.data.therapist.minutes_spent, 'HH:mm:ss'),
-			// 		initialValue
-			// 	);
-			// const finalData = Array.from(aggregatedData.values()).map((row) => {
-			// 	const daysDataTransmittedInMonth = row.data.daysDataTransmittedInMonth;
-			// finalResult.cumulativeData.therapist_session_minutes = 0;
-			// finalResult.cumulativeData['98977'] = finalResult.cumulativeData.daysDataTransmittedInMonth >= 16 ? 1 : 0;
-			// finalResult.cumulativeData['98980'] = finalResult.cumulativeData.daysDataTransmittedInMonth >= 20 ? 1 : 0;
-			// finalResult.cumulativeData['98981'] = finalResult.cumulativeData.daysDataTransmittedInMonth >= 40 ? 1 : 0;
-
-			// // Only set `98975` to 1 for the first eligible entry
-			// if (!finalResult.cumulativeData['98975'] && finalResult.cumulativeData.daysDataTransmittedInMonth >= 16) {
-			// 	finalResult.cumulativeData['98975'] = 1;
-			// } else {
-			// 	finalResult.cumulativeData['98975'] = 0;
-			// }
-			// 	return row;
-			// });
-			// console.log("the finalResult::", finalResult);
 			return { data: finalResult };
 		} else {
 			const sendEmailData = async (finalValuesData) => {
 				const workbook = new ExcelJS.Workbook();
 				const worksheet = workbook.addWorksheet('Patients RTM Data');
-
 				worksheet.columns = [
 					{ header: 'Institute Name', key: 'institute_name' },
 					// { header: 'Patient ID', key: 'patient_id' },
@@ -747,13 +710,11 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 					{ header: 'Therapist Session Duration', key: 'therapist_session_duration' },
 					{ header: 'Therapist Session Review Activity', key: 'therapist_session_review_activity' },
 					{ header: 'Therapist Session Mode', key: 'therapist_session_mode' },
-
 				];
 
-				console.log(finalValuesData, 'finalValuesData123');
 				finalValuesData.forEach((entry) => {
 					worksheet.addRow({
-						institute_name: entry.data.institute_name || '--',
+						institute_name: entry.institute_name || '--',
 						username: entry.patient_username || '--',
 						first_name: entry.first_name || '--',
 						last_name: entry.last_name || '--',
@@ -784,7 +745,6 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 						therapist_session_duration: entry.data.therapist?.minutes_spent || '--',
 						therapist_session_review_activity: entry.data.therapist?.review_activity_type || '--',
 						therapist_session_mode: entry.data.therapist?.mode || '--',
-						
 					});
 				});
 
@@ -817,4 +777,3 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 		}
 	});
 };
-
