@@ -20,6 +20,7 @@ export const addUploadedGameRelatedImage = async (file) => {
         throw err;
     }
 };
+*/
 
 
 // export const addUploadedGameRelatedImage = async (file) => {
