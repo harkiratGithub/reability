@@ -1,0 +1,41 @@
+.time-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #40576c; /* Button background color */
+    padding: 10px 20px;
+    border-radius: 8px; /* Rounded edges */
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Optional shadow */
+    min-width:200px;
+    height: 60px;
+  }
+  
+  .time-button .icon {
+    margin-right: 8px;
+    font-size: 20px;
+  }
+  
+  .time-button .label {
+    margin-right: 10px;
+    font-weight: 400;
+  }
+  
+  .time-button .time {
+    font-weight: bold;
+    font-size: 18px;
+    color: #ff83c4; /* Time color */
+  }
+
+  .timer-colon {
+    color: #ECECED;
+    font-family: "Open Sans";
+    font-size: 44px;
+    letter-spacing: 0;
+    line-height: 60px;
+    text-align: center;
+    margin: 0 10px;
+}
+  
