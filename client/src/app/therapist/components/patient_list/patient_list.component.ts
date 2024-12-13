@@ -519,48 +519,44 @@ export class PatientListComponent implements OnInit, OnDestroy {
 
   async copyToClipboard() {
     try {
-      if (!this?.patientLog || !this?.patientLog?.length) {
+      if (!this.patientLog || !this.patientLog.length) {
         console.log('No game session logs available to copy.');
         return;
       }
 
-      const formattedLogs = this.patientLog?.map((game) => {
-        const gameName = `Game Name: ${game?.gameName[0].toUpperCase() + game?.gameName.slice(1)}`;
-        const duration = `Duration: ${game?.latestSession?.duration || 'N/A'}`;
+      const latestGame = this.patientLog[this.patientLog.length - 1];
 
-        let summary = '';
-        if (game.latestSession?.gameSummary) {
-          summary += `Total Squats: ${
-            game.latestSession.gameSummary.totalSquats !== undefined &&
-            game.latestSession.gameSummary.totalSquats !== null
-              ? game.latestSession.gameSummary.totalSquats
-              : 'N/A'
-          }\n`;
-          summary += `Squats Per Set: ${game.latestSession.gameSummary.squatsPerSet?.join(', ') || 'N/A'}\n`;
-          summary += `Game Time (seconds): ${
-            game.latestSession?.gameSummary?.gameTimeSeconds !== undefined &&
-            game.latestSession.gameSummary.gameTimeSeconds !== null
-              ? game.latestSession.gameSummary.gameTimeSeconds
-              : 'N/A'
-          }\n`;
-        } else {
-          summary += 'No game summary available\n';
-        }
+      const gameName = `Game Name: ${latestGame.gameName}`;
+      const duration = `Duration: ${latestGame.latestSession?.duration || 'N/A'}`;
 
-        let feedback = '';
-        if (game.latestSession?.sessionFeedback?.questions?.length) {
-          feedback += 'Session Feedback:\n';
-          game.latestSession.sessionFeedback.questions.forEach((question: any) => {
-            feedback += `${question.question}: ${question.answer || 'N/A'}\n`;
-          });
-        } else {
-          feedback += 'No session feedback available\n';
-        }
-                                                                            
-        return `${gameName}\n${duration}\n${summary}${feedback}`;
-      });
+      let summary = '';
+      if (latestGame.latestSession?.gameSummary) {
+        summary += `Total Squats: ${
+          latestGame.latestSession.gameSummary.totalSquats !== undefined
+            ? latestGame.latestSession.gameSummary.totalSquats
+            : 'N/A'
+        }\n`;
+        summary += `Squats Per Set: ${latestGame.latestSession.gameSummary.squatsPerSet?.join(', ') || 'N/A'}\n`;
+        summary += `Game Time (seconds): ${
+          latestGame.latestSession.gameSummary.gameTimeSeconds !== null
+            ? latestGame.latestSession.gameSummary.gameTimeSeconds
+            : 'N/A'
+        }\n`;
+      } else {
+        summary += 'No game summary available\n';
+      }
 
-      const formattedLog = formattedLogs.join('\n|** Game Logs **|\n\n');
+      let feedback = '';
+      if (latestGame.latestSession?.sessionFeedback?.questions?.length) {
+        feedback += 'Session Feedback:\n';
+        latestGame.latestSession.sessionFeedback.questions.forEach((question: any) => {
+          feedback += `${question.question}: ${question.answer || 'N/A'}\n`;
+        });
+      } else {
+        feedback += 'No session feedback available\n';
+      }
+
+      const formattedLog = `${gameName}\n${duration}\n${summary}\n${feedback}`;
 
       await navigator.clipboard.writeText(formattedLog);
 
@@ -570,7 +566,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
       console.log('Failed to copy log to clipboard:', e);
     }
   }
-
+  
   closeEraseLogModal = () => {
     this.isCopiedToClipboard = false;
   };
