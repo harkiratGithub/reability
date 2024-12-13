@@ -208,12 +208,12 @@ export class PatientListComponent implements OnInit, OnDestroy {
               return acc;
             }
 
-            if (!this.allGames || this.allGames.length === 0) {
+            if (!this?.allGames || this?.allGames.length === 0) {
               console.error('No games available in this.allGames');
               return acc;
             }
 
-            const game = this.allGames.find((game) => game.id === a.game_id);
+            const game = this?.allGames.find((game) => game.id === a.game_id);
             if (!game) {
               console.warn(`Game not found for game_id: ${a.game_id}`);
               return acc;
@@ -452,7 +452,6 @@ export class PatientListComponent implements OnInit, OnDestroy {
     this.selectedPatientId = patientId;
 
     const selectedPatient = this.patientListFiltered.find((patient) => patient.userId === patientId);
-    console.log('the selectedPatient::', selectedPatient);
 
     const gameMap = new Map<string, any[]>();
 
@@ -520,44 +519,48 @@ export class PatientListComponent implements OnInit, OnDestroy {
 
   async copyToClipboard() {
     try {
-      if (!this.patientLog || !this.patientLog.length) {
+      if (!this?.patientLog || !this?.patientLog?.length) {
         console.log('No game session logs available to copy.');
         return;
       }
 
-      const latestGame = this.patientLog[this.patientLog.length - 1];
+      const formattedLogs = this.patientLog?.map((game) => {
+        const gameName = `Game Name: ${game?.gameName[0].toUpperCase() + game?.gameName.slice(1)}`;
+        const duration = `Duration: ${game?.latestSession?.duration || 'N/A'}`;
 
-      const gameName = `Game Name: ${latestGame.gameName}`;
-      const duration = `Duration: ${latestGame.latestSession?.duration || 'N/A'}`;
+        let summary = '';
+        if (game.latestSession?.gameSummary) {
+          summary += `Total Squats: ${
+            game.latestSession.gameSummary.totalSquats !== undefined &&
+            game.latestSession.gameSummary.totalSquats !== null
+              ? game.latestSession.gameSummary.totalSquats
+              : 'N/A'
+          }\n`;
+          summary += `Squats Per Set: ${game.latestSession.gameSummary.squatsPerSet?.join(', ') || 'N/A'}\n`;
+          summary += `Game Time (seconds): ${
+            game.latestSession?.gameSummary?.gameTimeSeconds !== undefined &&
+            game.latestSession.gameSummary.gameTimeSeconds !== null
+              ? game.latestSession.gameSummary.gameTimeSeconds
+              : 'N/A'
+          }\n`;
+        } else {
+          summary += 'No game summary available\n';
+        }
 
-      let summary = '';
-      if (latestGame.latestSession?.gameSummary) {
-        summary += `Total Squats: ${
-          latestGame.latestSession.gameSummary.totalSquats !== undefined
-            ? latestGame.latestSession.gameSummary.totalSquats
-            : 'N/A'
-        }\n`;
-        summary += `Squats Per Set: ${latestGame.latestSession.gameSummary.squatsPerSet?.join(', ') || 'N/A'}\n`;
-        summary += `Game Time (seconds): ${
-          latestGame.latestSession.gameSummary.gameTimeSeconds !== null
-            ? latestGame.latestSession.gameSummary.gameTimeSeconds
-            : 'N/A'
-        }\n`;
-      } else {
-        summary += 'No game summary available\n';
-      }
+        let feedback = '';
+        if (game.latestSession?.sessionFeedback?.questions?.length) {
+          feedback += 'Session Feedback:\n';
+          game.latestSession.sessionFeedback.questions.forEach((question: any) => {
+            feedback += `${question.question}: ${question.answer || 'N/A'}\n`;
+          });
+        } else {
+          feedback += 'No session feedback available\n';
+        }
+                                                                            
+        return `${gameName}\n${duration}\n${summary}${feedback}`;
+      });
 
-      let feedback = '';
-      if (latestGame.latestSession?.sessionFeedback?.questions?.length) {
-        feedback += 'Session Feedback:\n';
-        latestGame.latestSession.sessionFeedback.questions.forEach((question: any) => {
-          feedback += `${question.question}: ${question.answer || 'N/A'}\n`;
-        });
-      } else {
-        feedback += 'No session feedback available\n';
-      }
-
-      const formattedLog = `${gameName}\n${duration}\n${summary}\n${feedback}`;
+      const formattedLog = formattedLogs.join('\n|** Game Logs **|\n\n');
 
       await navigator.clipboard.writeText(formattedLog);
 

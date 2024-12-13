@@ -159,13 +159,13 @@ export class GameHistorySessionComponent implements OnInit {
             }
 
             if (!this?.allGames || this?.allGames?.length === 0) {
-              console.error('No games available in this allGames');
+              // console.error('No games available in this allGames');
               return acc;
             }
 
             const game = this.allGames.find((game) => game.id === a.game_id);
             if (!game) {
-              console.warn(`Game not found for game_id: ${a.game_id}`);
+              // console.warn(`Game not found for game_id: ${a.game_id}`);
               return acc;
             }
             const gameSummary = a.game_summary;

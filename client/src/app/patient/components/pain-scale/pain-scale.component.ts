@@ -18,6 +18,7 @@ export class PainScaleComponent implements OnInit {
   patient_note: string = '';
   patientId: number = -1;
   isPainModelOpen: boolean = false;
+  isSaving: boolean = false; 
 
   async ngOnInit() {
     try {
@@ -39,13 +40,23 @@ export class PainScaleComponent implements OnInit {
   }
 
   savePainValue(): void {
+    if (this.isSaving) return; 
+    this.isSaving = true
     try {
-      this.ajax.sendPatientPainScale(this.patientId, this.painValue, this.patient_note).subscribe((response) => {
-        this.isPainModelOpen = false;
-        this.router.navigate(['/games_lobby']);
-      });
+      this.ajax.sendPatientPainScale(this.patientId, this.painValue, this.patient_note).subscribe(
+        (response) => {
+          this.isPainModelOpen = false;
+          this.isSaving = false;
+          this.router.navigate(['/games_lobby']);
+        },
+        (error) => {
+          console.error('Error saving pain value:', error);
+          this.isSaving = false;
+        }
+      );
     } catch (error) {
       console.log('Pain level error:', error);
+      this.isSaving = false;
     }
   }
 

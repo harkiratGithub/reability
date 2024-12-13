@@ -14,6 +14,7 @@ export const getFormattedDateInTimeZone = (date: string) => {
 	console.log('getFormattedDateInTimeZone', date);
 	return moment(date).tz('America/New_York').format('YYYY-MM-DD HH:mm:ss'); // change to UTC
 };
+
 export interface IPatientModel {
 	id: number;
 	firstName?: string;
@@ -631,7 +632,7 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 						patient_id: element[0].patient_username,
 						first_name: element[0].first_name,
 						last_name: element[0].last_name,
-						since: element[0].since,
+						since: element[element.length - 1].since,
 						institute_name: element[0].institute_name,
 						institute_id: element[0].institute_id,
 					};
@@ -683,7 +684,7 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 					{ header: 'Last Name', key: 'last_name' },
 					// { header: 'Phone', key: 'phone' },
 					// { header: 'Email', key: 'email' },
-					{ header: 'Since', key: 'since' },
+					{ header: 'Date', key: 'since' },
 					// { header: 'Pain Level', key: 'pain_level' },
 					// { header: 'Review Activity', key: 'review_activity' },
 					// { header: 'Reminder to Exercise', key: 'reminder_to_exercise' },
@@ -707,7 +708,7 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 					{ header: 'Therapist Note', key: 'therapist_note' },
 					{ header: 'Therapist Session Start Time', key: 'therapist_session_start_time' },
 					{ header: 'Therapist Session End Time', key: 'therapist_session_end_time' },
-					{ header: 'Therapist Session Duration', key: 'therapist_session_duration' },
+					{ header: 'Duration', key: 'therapist_session_duration' },
 					{ header: 'Therapist Session Review Activity', key: 'therapist_session_review_activity' },
 					{ header: 'Therapist Session Mode', key: 'therapist_session_mode' },
 				];
