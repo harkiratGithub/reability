@@ -39,8 +39,11 @@ testem.log
 Thumbs.db
 .tool-versions
 
-# .env
+.env
 .vscode
+.env.local
+.env.demo
+.env.prod
 
 #newrelic log
 newrelic_agent.log
