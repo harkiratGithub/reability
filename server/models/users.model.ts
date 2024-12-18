@@ -89,13 +89,10 @@ export const isPatientEntryForToday = async (
 			.toParam();
 
 		const result = await BaseModel.runQuery(query);
-		console.log('Result: ', result);
 		const hasEntries = result.rows.length > 0;
 		const painLevel = hasEntries ? result.rows[0]?.pain_level : undefined;
-        console.log('Has entries for today:', hasEntries, 'Pain level:', painLevel);
-        return { hasEntries, painLevel };
+		return { hasEntries, painLevel };
 	} catch (error) {
-		console.error('Error checking patient entry for today:', error);
 		return { hasEntries: false };
 	}
 };
@@ -156,6 +153,18 @@ export const getUserDetails = async (userId) => {
 				.where(`user_id = ?`, userId)
 		)
 		.toParam();
+	const result = await BaseModel.runQuery(query);
+	return result.rows;
+};
+
+export const getAdminDetails = async (userId: number) => {
+	const query = squelPostgres
+		.select()
+		.field(`${TABLE_NAME.USER}.email`, 'email')
+		.from(TABLE_NAME.USER)
+		.where(`id = ?`, userId)
+		.toParam();
+
 	const result = await BaseModel.runQuery(query);
 	return result.rows;
 };

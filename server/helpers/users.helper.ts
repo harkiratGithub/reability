@@ -28,6 +28,7 @@ export const onLogIn = async (user: {
 	username: string;
 	isTherapist: boolean;
 	peerId: string;
+	email: string;
 	is_two_factor_enabled: boolean;
 }): Promise<any> => {
 	try {
@@ -37,7 +38,9 @@ export const onLogIn = async (user: {
 		});
 		switch (user.role) {
 			case ROLE.ADMIN:
-				return user;
+				const adminDetails = await UserModel.getAdminDetails(user.id);
+				const { email } = EncryptHelper.decryptJson(adminDetails[0]);
+				return { ...user, email };
 			case ROLE.THERAPIST:
 			case ROLE.VIDEO_PATIENT:
 				const userDetails = await UserModel.getUserDetails(user.id);

@@ -37,13 +37,17 @@
           (input)="onTimeInput($event)"
           required
         />
-        <div *ngIf="!customForm.controls.minutes_spent.value" class="min-place-holder">HH:mm:ss</div>
+        <!-- *ngIf="!customForm.controls.minutes_spent.value" -->
+        <div class="min-place-holder">mm:ss</div>
+        <mat-error class="error-msg" *ngIf="customForm.get('minutes_spent').hasError('maxDurationExceeded')">
+          Maximum allowed duration is 59:59
+        </mat-error>
         <mat-error class="error-msg" *ngIf="customForm.get('minutes_spent').hasError('required')">
           Time spent is required
         </mat-error>
-        <mat-error class="error-msg" *ngIf="customForm.get('minutes_spent').hasError('invalidTime')">
-          Invalid time format. Use HH:mm:ss.
-        </mat-error>
+        <!-- <mat-error class="error-msg" *ngIf="customForm.get('minutes_spent').hasError('invalidTime')">
+          Invalid time format. Use mm:ss format.
+        </mat-error> -->
       </mat-form-field>
     </label>
   </div>
