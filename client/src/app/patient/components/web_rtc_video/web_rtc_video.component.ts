@@ -376,6 +376,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         therapistToPatientConnection.send({ type: 'track_body', payload: this.trackBody });
       }
     }, this.POSENET_LOADING_TIME_PASSED_DURATION);
+    document.addEventListener('touchstart', this.handleBodyTracking.bind(this), { passive: false });
   }
 
   ngAfterViewInit() {
@@ -427,9 +428,14 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     therapistToPatientConnection.send(data);
   };
 
-  isIosDevice = () => {
+  /*isIosDevice = () => {
     return ['iPad', 'iPhone', 'iPod'].indexOf(navigator.platform) >= 0;
   };
+  */
+
+  isIosDevice(): boolean {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  }
 
   isBodyTrackingReady = () => {
     return this.isBodyTrackingAvailable && this.webCamSkeletonService.modelInitialized && this.posenetLoadingTimePassed;
@@ -444,6 +450,41 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     let canv;
     canv = document.getElementById('patient-canvas') as HTMLCanvasElement;
 
+    // below are the code for make the IPAD compatibility Mime Type 
+
+    if (canv && canv.getContext) {
+      const context = canv.getContext('2d');
+      if (!context) {
+        console.error('Canvas 2D context is not available.');
+      }
+    } else {
+      console.error('Canvas is not supported.');
+    }
+    const mimeTypes: string[] = [
+      'video/webm;codecs=vp8',
+      'video/webm;codecs=vp9',
+      'video/webm;codecs=h264',
+      'video/mp4'
+    ];  
+
+    // below function to check dynamically supported mime type 
+    function getSupportedMimeType(): string | null {
+      for (const mimeType of mimeTypes) {
+        if (MediaRecorder.isTypeSupported(mimeType)) {
+          return mimeType;
+        }
+      }
+      return null; // No supported MIME type found
+    }
+    // Selection of mime type 
+    const supportedMimeType = getSupportedMimeType();
+    if (supportedMimeType) {
+      options.mimeType = supportedMimeType;
+      console.log(`Selected MIME type: ${supportedMimeType}`);
+    } else {
+      console.error('No supported MIME type found for MediaRecorder.');
+    }
+    
     this.localStream = canv.captureStream(60);
     const mediaRecorder = new MediaRecorder(this.localStream, options);
     mediaRecorder.start();
@@ -1031,13 +1072,51 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         videoBitsPerSecond: 2500000,
         mimeType: 'video/webm;codecs=vp8',
       };
+      
       let canv;
+
+      
       if (this.depthCameraSocketService.isDepthCameraConnected) {
         canv = document.getElementById('patient-canvas-skeleton') as HTMLCanvasElement;
       } else if (this.currentUser.disabledSkeleton) {
         return this.localVideo.srcObject;
       } else if (!this.depthCameraSocketService.isDepthCameraConnected) {
         return this.localStream;
+      }
+
+      // below are the code for make the IPAD compatibility Mime Type 
+
+      if (canv && canv.getContext) {
+        const context = canv.getContext('2d');
+        if (!context) {
+          console.error('Canvas 2D context is not available.');
+        }
+      } else {
+        console.error('Canvas is not supported.');
+      }
+      const mimeTypes: string[] = [
+        'video/webm;codecs=vp8',
+        'video/webm;codecs=vp9',
+        'video/webm;codecs=h264',
+        'video/mp4'
+      ];  
+
+      // below function to check dynamically supported mime type 
+      function getSupportedMimeType(): string | null {
+        for (const mimeType of mimeTypes) {
+          if (MediaRecorder.isTypeSupported(mimeType)) {
+            return mimeType;
+          }
+        }
+        return null; // No supported MIME type found
+      }
+      // Selection of mime type 
+      const supportedMimeType = getSupportedMimeType();
+      if (supportedMimeType) {
+        options.mimeType = supportedMimeType;
+        console.log(`Selected MIME type: ${supportedMimeType}`);
+      } else {
+        console.error('No supported MIME type found for MediaRecorder.');
       }
 
       let outgoingStream = canv.captureStream(60);

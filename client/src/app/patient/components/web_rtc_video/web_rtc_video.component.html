@@ -7,7 +7,7 @@
     isBodyTrackingReady() && trackBody ? 'skeleton-border-wrap-active' : ''
   ]"
   title="{{ getSkeletonTitle() }}"
-  (click)="handleBodyTracking()"
+  (click)="handleBodyTracking()" (touchstart)="handleBodyTracking()"
   *ngIf="!videoSessionDisplay && !isMobile"
 >
   <div [ngClass]="[isBodyTrackingReady() || trackBody ? 'skeleton-ready' : 'skeleton-loading']">
