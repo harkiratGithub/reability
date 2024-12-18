@@ -530,7 +530,7 @@ export const addPatientRTM = (patient_id, painSession, client = null) => {
 	);
 };
 
-export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: boolean = false) => {
+export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: boolean = false, userDetails) => {
 	const query = squelPostgres
 		.select()
 		.field(`${TABLE_NAME.PATIENT}.first_name`)
@@ -637,13 +637,33 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 						institute_id: element[0].institute_id,
 					};
 					obj.daysDataTransmittedInMonth = element.filter((ele: any) => ele.data.patient?.pain_level).length;
-
 					obj.therapist_session_minutes = 0;
+					// element.forEach((entry) => {
+					// 	if (entry.data?.therapist?.minutes_spent) {
+					// 		const timeSpent = entry.data.therapist.minutes_spent;
+					// 		console.log("timeSpent: ", timeSpent);
+					// 		const [hours, minutes, seconds] = timeSpent.split(':').map(Number);
+					// 		const totalMinutes = hours * 60 + minutes + seconds / 60;
+					// 		obj.therapist_session_minutes += totalMinutes;
+					// 	}
+					// });
 
+					// const totalMinutes = Math.floor(obj.therapist_session_minutes);
+					// const hours = Math.floor(totalMinutes / 60);
+					// const minutes = totalMinutes % 60;
+					// const seconds = Math.floor((obj.therapist_session_minutes - totalMinutes) * 60);
+					// obj.therapist_session_minutes = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(
+					// 	2,
+					// 	'0'
+					// )}:${String(seconds).padStart(2, '0')}`;
 					element.forEach((entry) => {
 						if (entry.data?.therapist?.minutes_spent) {
 							const timeSpent = entry.data.therapist.minutes_spent;
-							const [hours, minutes, seconds] = timeSpent.split(':').map(Number);
+							const timeParts = timeSpent.split(':').map(Number);
+							const hours = timeParts.length === 3 ? timeParts[0] : 0;
+							const minutes = timeParts.length === 3 ? timeParts[1] : timeParts[0];
+							const seconds = timeParts.length === 3 ? timeParts[2] : timeParts[1];
+
 							const totalMinutes = hours * 60 + minutes + seconds / 60;
 							obj.therapist_session_minutes += totalMinutes;
 						}
@@ -750,9 +770,8 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 				});
 
 				const buffer = await workbook.xlsx.writeBuffer();
-
 				const msg = {
-					to: 'yoramfeld@gmail.com',
+					to: `${userDetails?.email}`,
 					from: process.env.SENGRID_FROM_EMAIL ? process.env.SENGRID_FROM_EMAIL : 'yoramfeld@gmail.com',
 					subject: `Patient RTM Data Export - ${finalValuesData.length} Records Found`,
 					text: 'Please find the attached Excel file with the patients RTM data.',
