@@ -612,4 +612,17 @@ export class AjaxService {
   getFeedbackQuestions(): Observable<FeedbackQuestion[]> {
     return this.http.get<FeedbackQuestion[]>(`${this.baseUrl}/patient/feedback/questions`);
   }
+  
+  // patient create routes from therapist end
+  getAllInstitutes() {
+    return this.http.get<any[]>(`${this.baseUrl}/therapist/institute`);
+  }
+
+  getAllDepartments() {
+    return this.http.get<any[]>(`${this.baseUrl}/therapist/department`);
+  }
+
+  createPatient(patient) {
+    return this.http.post<any>(`${this.baseUrl}/therapist/patient/create`, { patient });
+  }
 }

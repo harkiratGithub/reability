@@ -66,6 +66,41 @@ export const getAll = async () => {
 	return result.rows;
 };
 
+export const getAllInstitutes = async () => {
+	const query = squelPostgres
+		.select()
+		.field(`${TABLE_NAME.INSTITUTE}.id`)
+		.field(`${TABLE_NAME.INSTITUTE}.name`, 'institute_name')
+		.field(`${TABLE_NAME.INSTITUTE}.image_id`)
+		.field(`${TABLE_NAME.IMAGE}.url`, 'logo_url')
+		.field(`${TABLE_NAME.INSTITUTE}.created_at`)
+		.field(`${TABLE_NAME.DEPARTMENT}.name`, 'department_name')
+		.field(`${TABLE_NAME.DEPARTMENT}.id`, 'department_id')
+		.from(TABLE_NAME.INSTITUTE)
+		.left_join(
+			TABLE_NAME.DEPARTMENT,
+			null,
+			`${TABLE_NAME.INSTITUTE}.id = ${TABLE_NAME.DEPARTMENT}.institute_id`
+		)
+		.left_join(
+			TABLE_NAME.IMAGE,
+			null,
+			`${TABLE_NAME.INSTITUTE}.image_id = ${TABLE_NAME.IMAGE}.id`
+		)
+		.left_join(
+			TABLE_NAME.THERAPIST_DEPARTMENTS,
+			null,
+			`${TABLE_NAME.DEPARTMENT}.id = ${TABLE_NAME.THERAPIST_DEPARTMENTS}.department_id`
+		)
+		.where(`${TABLE_NAME.INSTITUTE}.active = ?`, true)
+		.where(`${TABLE_NAME.DEPARTMENT}.active = ?`, true)
+		.where(`${TABLE_NAME.THERAPIST_DEPARTMENTS}.department_id = ${TABLE_NAME.DEPARTMENT}.id`)
+		.toParam();
+	const result = await BaseModel.runQuery(query);
+	return result.rows;
+};
+
+
 export const getDepartmentByInstitute = async (instituteId, client = null) => {
 	return BaseModel.itemsByField(
 		TABLE_NAME.DEPARTMENT,

@@ -10,7 +10,8 @@ import * as GameActivitiesController from '../controllers/game-activities.contro
 import * as UserGameDataController from '../controllers/user-game-data.controller';
 import * as GameDataController from '../controllers/game-data.controller';
 import * as ServerLogController from '../controllers/server-log.controller';
-
+import * as InstituteController from '../controllers/institute.controller';
+import * as DepartmentController from '../controllers/department.controller';
 import express from 'express';
 import multer from 'multer';
 
@@ -67,5 +68,10 @@ router.get('/games', GameDataController.getAllGames);
 
 router.post('/addServerLog', ServerLogController.sendLogToServer);
 router.post('/rtmSession', RtmController.updateTherapistRTMSession);
+
+// patient create routes
+router.get('/institute', InstituteController.getAllInstitutes);
+router.get('/department', DepartmentController.getAll);
+router.post('/patient/create', PatientController.createPatient);
 
 export default router;

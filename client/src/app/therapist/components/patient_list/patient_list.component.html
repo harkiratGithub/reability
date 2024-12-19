@@ -53,6 +53,15 @@
         </div>
       </div>
     </div>
+    <div class="patient-container">
+      <img
+        class="icon_back_office_plus_green"
+        src="assets/backoffice/icon_back_office_plus_green.svg"
+        (click)="onClickNew()"
+      />
+      <span (click)="onClickNew()">NEW PATIENT</span>
+    </div>
+
     <div class="search-container">
       <app-backoffice-search
         [data]="patientList"
@@ -62,7 +71,7 @@
     </div>
   </div>
 
-  <div class="table-container">
+  <div class="table-container" *ngIf="!isPatientViewEnable">
     <div class="table-header">
       <div class="status-header">Status</div>
       <div class="full-name-header">User Name</div>
@@ -267,7 +276,11 @@
               {{ game.name }}
             </div>
             <div class="action-wrapper">
-              <div class="send-rtm-invitation" *ngIf="patient.isRTM" >
+              <!-- <div class="show-rtm-invitation" *ngIf="patient.isRTM">
+                <div class="settings-icons show-rtm" (click)="showRTMMinutes(patient)"></div>
+                <div class="sub-show-label" (click)="showRTMMinutes(patient)">Show RTM</div>
+              </div> -->
+              <div class="send-rtm-invitation" *ngIf="patient.isRTM">
                 <div class="settings-icons send-rtm" (click)="addRTMMinutes(patient)"></div>
                 <div class="sub-label" (click)="addRTMMinutes(patient)">Add to RTM(minutes)</div>
               </div>
@@ -281,5 +294,18 @@
       </div>
     </div>
   </div>
+
+  <ng-template [ngIf]="!isViewMode() && isPatientViewEnable">
+    <app-backoffice-add-edit
+      [currentTab]="getCurrentTab()"
+      [currentTabIndex]="currentTabIndex"
+      [editedEntity]="editedEntity"
+      [allInstitutes]="parsedInstitutes"
+      [allDepartments]="parsedDepartments"
+      (goBack)="onReturnFromAddEdit()"
+      [isPatient]="true"
+    >
+    </app-backoffice-add-edit>
+  </ng-template>
 </div>
 <div id="audio-container"></div>
