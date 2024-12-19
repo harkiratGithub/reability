@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 61.1 (89650) - https://sketch.com -->
+    <title>therapist_side_activity_checked</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Therapist" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="03-Therapist--Patients" transform="translate(-735.000000, -252.000000)" stroke="#44D7B6">
+            <g id="Group-10" transform="translate(16.000000, 234.000000)">
+                <g id="Group-6" transform="translate(720.000000, 19.000000)">
+                    <g id="patient-list/day/yes">
+                        <g id="patient-list/status/online-copy">
+                            <g id="Group-10">
+                                <g id="Group-11">
+                                    <circle id="Oval-Copy-6" fill-opacity="0.57544799" fill="#EDEFF7" cx="11" cy="11" r="11.5"></circle>
+                                    <g id="icon_check" transform="translate(5.000000, 7.000000)" fill="#44D7B6" fill-rule="nonzero">
+                                        <path d="M3.85185185,6.51433012 L1.0959204,3.87254967 C0.84521345,3.63222703 0.438737167,3.63222703 0.188030215,3.87254967 C-0.0626767382,4.11287231 -0.0626767382,4.5025123 0.188030215,4.74283494 L3.39790676,7.81975802 C3.64861371,8.06008066 4.05508999,8.06008066 4.30579695,7.81975802 L11.3675253,1.05052725 C11.6182323,0.810204609 11.6182323,0.420564622 11.3675253,0.180241981 C11.1168184,-0.0600806603 10.7103421,-0.0600806603 10.4596352,0.180241981 L3.85185185,6.51433012 Z" id="Path"></path>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

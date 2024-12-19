@@ -50,7 +50,7 @@ if (process.env.NODE_ENV === 'development') {
 			app
 		)
 		.listen(process.env.PORT || 8080, () => {
-			console.log('Example app listening on port 3000! Go to https://localhost:3000/');
+			console.log('Example app listening on port 8080! Go to https://localhost:8080/');
 		});
 } else {
 	server = app.listen(process.env.PORT || 8080);
