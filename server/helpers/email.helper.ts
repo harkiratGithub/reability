@@ -33,15 +33,28 @@ export const sendFastLoginEmail = async (userEmail, fastLoginToken) => {
 	const html = `<div>Welcome to ReAbility system. Please <a href="${tokenUrl}">click here</a> to login</div>`;
 	await EmailHelper.sendMail(userEmail, subject, html);
 };
-
 export const sendPatientCredentialsEmail = async (userEmail, userName, password) => {
 	const url = `${baseUrl()}`;
-	const subject = 'Welcome to ReAbility';
-	const html = `<div style="direction:rtl">ברכות להצטרפותך לשיקום מרחוק, שיבא ביונד.<br><br>להלן ההנחיות להתחברות:<br><br> מחשב עם מצלמת אינטרנט, מיקרופון (לרוב אינטגרלי במצלמה) רמקולים,  <span style="font-weight:bold; ">דרישות טכניות:</span>דפדפן Chrome. יש לעדכן אותנו בהקדם אם אין ברשותך הציוד המתאים .<br><br><div>
-	- יש לוודא שהמצלמה והרמקולים מחוברים למחשב (בתכנית קול יש להשתמש באזניות שקיבלת מאיתנו)<br>-  להיכנס לקישור:<a href="${url}">${process.env.SERVER_URL}</a><br>-  להקליד שם משתמש וסיסמא:</div><br>
-	<div style="font-weight:bold;font-size:20px; ">שם משתמש: ${userName}<br>סיסמה: ${password}</div><br><div></div>-  לאשר להשתמש במיקרופון ומצלמה<br>-  להמתין שנחייג אליך דרך המחשב <br><br>
-<div style="font-weight:bold;">*לכניסה מהירה מומלץ לאשר לשמור את שם המשתמש והסיסמא וכמו כן לשמור את הלינק לאתר שלנו ב"סרגל הסימניות" של כרום או באמצעות קישור על שולחן העבודה</div>
-	<br><div style="font-weight:bold;"><div style="text-decoration:underline; margin-top:10px;">נא להכין תעודת זהות להצגה בתחילת הטיפול</div><br>בהצלחה,<br><br>שיקום מרחוק, שיבא ביונד<br>03-5309661</div></div>`;
+	const domain = new URL(url).hostname; 
+	let subject;
+	let html;
+	if (process.env.EMAIL_LANGUAGE === 'english') {
+		subject = 'Welcome to ReAbility';
+		html = `<div style="direction:ltl">Congratulations on joining remote rehabilitation, TheRPT. <br><br> Here are the instructions for connecting to our application website:<br><br> Use a PC or laptop with a webcam, a microphone (usually integrated in the camera), speakers. We recommend Google Chrome browser. <br><br>
+   		<div>Link:<a href="${url}">${process.env.SERVER_URL}</a></div>
+		<div style="font-weight:bold;font-size:20px;">Username:${userName}<br>Password:${password}</div><br><div></div>
+		Note: on your first login the browser will ask your permission to use the microphone and camera. Please confirm. The browser will also ask you to confirm saving the username and password. Please confirm.
+		<br><br>We also suggest adding the site to the bookmarks and/or the Desktop for easy access.<div style="font-weight:bold;"><br>Good luck and enjoy,<br>
+		<br>TheRPT team </div>
+		</div></div>`;
+	} else {
+		subject = 'Welcome to ReAbility';
+		html = `<div style="direction:rtl">ברכות להצטרפותך לשיקום מרחוק, שיבא ביונד.<br><br>להלן ההנחיות להתחברות:<br><br> מחשב עם מצלמת אינטרנט, מיקרופון (לרוב אינטגרלי במצלמה) רמקולים,  <span style="font-weight:bold; ">דרישות טכניות:</span>דפדפן Chrome. יש לעדכן אותנו בהקדם אם אין ברשותך הציוד המתאים .<br><br><div>
+		- יש לוודא שהמצלמה והרמקולים מחוברים למחשב (בתכנית קול יש להשתמש באזניות שקיבלת מאיתנו)<br>-  להיכנס לקישור:<a href="${url}">${process.env.SERVER_URL}</a><br>-  להקליד שם משתמש וסיסמא:</div><br>
+		<div style="font-weight:bold;font-size:20px; ">שם משתמש: ${userName}<br>סיסמה: ${password}</div><br><div></div>-  לאשר להשתמש במיקרופון ומצלמה<br>-  להמתין שנחייג אליך דרך המחשב <br><br>
+		<div style="font-weight:bold;">*לכניסה מהירה מומלץ לאשר לשמור את שם המשתמש והסיסמא וכמו כן לשמור את הלינק לאתר שלנו ב"סרגל הסימניות" של כרום או באמצעות קישור על שולחן העבודה</div>
+		<br><div style="font-weight:bold;"><div style="text-decoration:underline; margin-top:10px;">נא להכין תעודת זהות להצגה בתחילת הטיפול</div><br>בהצלחה,<br><br>שיקום מרחוק, שיבא ביונד<br>03-5309661</div></div>`;
+	}
 	await EmailHelper.sendMail(userEmail, subject, html, therapistEmail);
 };
 
