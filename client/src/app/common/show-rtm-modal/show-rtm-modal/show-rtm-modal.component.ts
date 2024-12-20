@@ -13,7 +13,7 @@ import moment from 'moment';
 export class ShowRTMModalComponent implements OnInit {
   @Output() returnedData = new EventEmitter<InnerModalInterface>();
   @Input() patient;
-  @Input() rows: any[] = []; // Input for ro
+  @Input() rows: any[] = [];
   @Input() columns: any[] = [
     { field: 'date', header: 'Date' },
     { field: 'activity', header: 'Activity' },
