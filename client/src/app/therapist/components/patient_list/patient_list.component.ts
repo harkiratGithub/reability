@@ -23,6 +23,7 @@ import {
   RTM_MODAL_STYLE,
   RTMModalComponent,
   RTMModalData,
+  SHOWRTMModalData
 } from 'src/app/common/rtm-modal/rtm-modal.component';
 
 @Component({
@@ -418,6 +419,28 @@ export class PatientListComponent implements OnInit, OnDestroy {
     this.appActions.openRTMModal(modalData);
   };
 
+  showRTMMinutes = (patient: { id: any; userId: number }) => {
+    console.log('API call to show');
+    const modalData: SHOWRTMModalData = {
+      modalStyle: RTM_MODAL_STYLE.WHITE,
+      content: RTM_MODAL_CONTENT.SEND_FAST_LOGIN,
+      patient,
+      approveCallback: async (modalValues: OuterModalInterface) => {
+        await this.ajax
+          .getAllRtmReport({ month: String(moment().month() + 1), year: String(moment().year()) })
+          .toPromise()
+          .then((response) => {
+            console.log('Response: ', response);
+          })
+          .catch((err) => {
+            console.error('Error:', err);
+          });
+      },
+      header: 'RTM Patient Track Report',
+    };
+    this.appActions.openRTMModal(modalData);
+  };
+
   getActivityTooltipText = (activity: { duration: string; gamesDuration: any }) => {
     if (!activity.duration) {
       return '';
@@ -566,7 +589,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
       console.log('Failed to copy log to clipboard:', e);
     }
   }
-  
+
   closeEraseLogModal = () => {
     this.isCopiedToClipboard = false;
   };

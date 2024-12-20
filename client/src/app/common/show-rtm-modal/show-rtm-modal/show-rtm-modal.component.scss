@@ -1,0 +1,176 @@
+.rtm-form {
+  display: flex;
+  gap: 30px;
+  margin: 30px 0;
+  flex-direction: column;
+  .date-time-wrapper {
+    display: flex;
+    gap: 40px;
+    align-items: center;
+    flex-direction: row;
+    // margin: -8px 0px 12px 0px;
+  }
+  .field-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: unset;
+    &.link-type {
+      input {
+        background: inherit;
+        height: 40px;
+        width: 260px;
+        padding-left: 8px;
+        padding-right: 8px;
+        font-size: 16px;
+        font-family: 'Roboto';
+        color: #6d7278;
+        border: 1px solid #b6c5cf;
+        border-radius: 10px;
+        outline: none;
+        &.disabled {
+          pointer-events: none;
+          opacity: 0.4;
+        }
+      }
+      .description {
+        display: block;
+        font-family: 'Roboto';
+        font-size: 16px;
+      }
+    }
+    &.date {
+      .mat-datepicker-toggle {
+        color: #a1c8eb;
+        position: absolute;
+        left: -34px;
+        top: 0px;
+      }
+    }
+    &.link-type {
+      select {
+        background: inherit;
+        height: 40px;
+        width: 100%;
+        padding-left: 8px;
+        padding-right: 8px;
+        font-size: 16px;
+        font-family: 'Roboto';
+        color: #6d7278;
+        border: 1px solid #b6c5cf;
+        border-radius: 10px;
+        outline: none;
+      }
+      .description {
+        display: block;
+        font-family: 'Roboto';
+        font-size: 16px;
+      }
+      .required-asterisk {
+        color: red;
+        margin-left: 2px;
+      }
+    }
+  }
+  .error-msg,
+  .mat-error {
+    color: red;
+    margin-top: 16px;
+    font-family: 'Roboto';
+  }
+  .radio-group {
+    position: absolute;
+    top: 10px;
+    right: 0;
+    .radio-button {
+      margin-right: 5px;
+    }
+  }
+}
+
+.place-holder {
+  position: absolute;
+  top: 12px;
+  left: 10px;
+  font-size: 14px;
+  font-family: 'Roboto';
+  color: #6d7278;
+}
+
+.min-place-holder {
+  position: absolute;
+  top: 12px;
+  color: #6d7278;
+  right: 25px;
+  font-size: 14px;
+  font-family: 'Roboto';
+}
+
+.field-container.link-type mat-select {
+  background: inherit;
+  padding: 10px;
+  width: 100%;
+  font-size: 16px;
+  font-family: 'Roboto';
+  color: #6d7278;
+  border: 1px solid #b6c5cf;
+  border-radius: 10px;
+  outline: none;
+}
+
+.field-container.link-type .mat-label {
+  margin-top: 30px;
+  padding-left: 10px;
+}
+
+::ng-deep .send-later-radio .mat-radio-label {
+  margin-right: 8px;
+}
+
+::ng-deep .field-container.link-type mat-form-field .mat-input-element {
+  padding: 8px;
+  resize: none;
+  border-radius: 10px;
+  box-sizing: border-box;
+  border: 1px solid #b6c5cf !important;
+}
+
+::ng-deep .mat-form-field-appearance-legacy .mat-form-field-underline {
+  display: none !important;
+}
+
+::ng-deep .mat-form-field-wrapper {
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
+::ng-deep .mat-form-field-appearance-legacy .mat-form-field-wrapper {
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+}
+
+::ng-deep .mat-form-field-appearance-legacy .mat-form-field-infix {
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+}
+
+::ng-deep .mat-radio-button.mat-accent.mat-radio-checked .mat-radio-outer-circle {
+  border-color: #4a7091 !important;
+}
+
+::ng-deep .mat-radio-button.mat-accent .mat-radio-inner-circle {
+  background-color: #4a7091 !important;
+}
+
+::ng-deep .mat-form-field-suffix {
+  margin: auto;
+  padding-top: 15px;
+}
+
+::ng-deep .mat-form-field-appearance-legacy .mat-form-field-suffix .mat-datepicker-toggle-default-icon {
+  width: 30px !important;
+  height: 30px !important;
+}
+
+::ng-deep .mat-form-field-infix {
+  width: 260px !important;
+}

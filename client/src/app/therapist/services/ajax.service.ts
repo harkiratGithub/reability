@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Moment } from 'moment';
 import _ from 'lodash';
+import { HttpParams } from '@angular/common/http';
 
 import { environment } from '../../../environments/environment';
 import { User } from '../../common/models/user';
@@ -612,4 +613,16 @@ export class AjaxService {
   getFeedbackQuestions(): Observable<FeedbackQuestion[]> {
     return this.http.get<FeedbackQuestion[]>(`${this.baseUrl}/patient/feedback/questions`);
   }
+// therapist rtm report
+    getAllRtmReport(params: { month?: string; year?: string } = {}) {
+      let httpParams = new HttpParams();
+      Object.keys(params).forEach((key) => {
+        if (params[key] !== undefined) {
+          httpParams = httpParams.set(key, params[key]!);
+        }
+      });
+      const url = `${this.baseUrl}/rtm-details`;
+      return this.http.get<any>(url, { params: httpParams });
+    }
+  
 }
