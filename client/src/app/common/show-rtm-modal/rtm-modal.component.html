@@ -5,8 +5,8 @@
 
   <div class="main-section">
     <div *ngIf="isRtmModel(rtmModelContent.SEND_FAST_LOGIN)">
-      <app-send-rtm-modal [patient]="patient" (returnedData)="getDataFromModal($event)">
-      </app-send-rtm-modal>
+      <app-show-rtm-modal [patient]="patient" (returnedData)="getDataFromModal($event)">
+      </app-show-rtm-modal>
     </div>
     <div class="general-message" *ngIf="isRtmModel(rtmModelContent.MSG)">
       {{ generalMsg }}
@@ -50,7 +50,7 @@
 
   <div class="main-section">
     <div *ngIf="isRtmModel(rtmModelContent.SEND_FAST_LOGIN)">
-      <app-send-rtm-modal [patient]="patient" (returnedData)="getDataFromModal($event)"></app-send-rtm-modal>
+      <app-show-rtm-modal [patient]="patient" (returnedData)="getDataFromModal($event)"></app-show-rtm-modal>
     </div>
     <div *ngIf="isRtmModel(rtmModelContent.MSG)">
       {{ generalMsg }}

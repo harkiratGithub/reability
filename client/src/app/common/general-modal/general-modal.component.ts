@@ -28,6 +28,7 @@ export interface InnerModalInterface {
 export interface OuterModalInterface {
   isApproveClicked: boolean,
   dataFromInnerForm: InnerModalInterface
+  rows?: any[];
 }
 
 export enum GENERAL_MODAL_CONTENT {

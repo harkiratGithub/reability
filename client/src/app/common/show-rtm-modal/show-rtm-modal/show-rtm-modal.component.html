@@ -1,61 +1,8 @@
-<form class="rtm-form" [formGroup]="customForm">
-  <label class="field-container link-type">
-    <span class="description">Review Activity <span class="required-asterisk">*</span></span>
-    <mat-form-field>
-      <mat-label class="mat-label">Select One</mat-label>
-      <mat-select matNativeControl disableRipple formControlName="review_activity" name="review_activity">
-        <mat-option *ngFor="let review_activity of reviewActivityTypes" [value]="review_activity">
-          {{ review_activity }}
-        </mat-option>
-      </mat-select>
-      <mat-error *ngIf="customForm.get('review_activity').hasError('required')">
-        Review activity is required
-      </mat-error>
-    </mat-form-field>
-  </label>
-  <div class="date-time-wrapper">
-    <label class="field-container link-type date">
-      <span class="description">Date<span class="required-asterisk">*</span></span>
-      <mat-form-field>
-        <input matInput [matDatepicker]="picker" formControlName="date_time" [min]="minDate" [max]="maxDate" />
-        <div *ngIf="!customForm.controls.date_time.value" class="place-holder">Select Date</div>
-        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-datepicker #picker></mat-datepicker>
-        <mat-error class="error-msg" *ngIf="customForm.get('date_time').hasError('required')"
-          >Date is required</mat-error
-        >
-      </mat-form-field>
-    </label>
-    <label class="field-container link-type">
-      <span class="description">Time Spent<span class="required-asterisk">*</span></span>
-      <mat-form-field>
-        <input
-          matInput
-          type="text"
-          formControlName="minutes_spent"
-          maxlength="8"
-          (input)="onTimeInput($event)"
-          required
-        />
-        <!-- *ngIf="!customForm.controls.minutes_spent.value" -->
-        <div class="min-place-holder">mm:ss</div>
-        <mat-error class="error-msg" *ngIf="customForm.get('minutes_spent').hasError('maxDurationExceeded')">
-          Maximum allowed duration is 59:59
-        </mat-error>
-        <mat-error class="error-msg" *ngIf="customForm.get('minutes_spent').hasError('required')">
-          Time spent is required
-        </mat-error>
-        <!-- <mat-error class="error-msg" *ngIf="customForm.get('minutes_spent').hasError('invalidTime')">
-          Invalid time format. Use mm:ss format.
-        </mat-error> -->
-      </mat-form-field>
-    </label>
-  </div>
-  <label class="field-container link-type note">
-    <span class="description">Note<span class="required-asterisk">*</span></span>
-    <mat-form-field>
-      <textarea matInput formControlName="note"></textarea>
-      <mat-error class="error-msg" *ngIf="customForm.get('note').hasError('required')">Note is required</mat-error>
-    </mat-form-field>
-  </label>
-</form>
+<div class="table-container">
+  <app-backoffice-table
+    [currentTabIndex]="0"
+    [columns]="columns"
+    [rows]="rows"
+    [additionalActions]="[]">
+  </app-backoffice-table>
+</div>

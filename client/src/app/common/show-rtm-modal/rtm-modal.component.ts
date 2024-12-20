@@ -7,7 +7,7 @@ import { localeData } from 'moment';
 
 export interface SHOWRTMModalData {
   header?: string;
-  content?: RTM_MODAL_CONTENT;
+  content?: SHOW_RTM_MODAL_CONTENT;
   acceptBtnImg?: string;
   acceptBtnImgHover?: string;
   declineBtnImg?: string;
@@ -16,7 +16,7 @@ export interface SHOWRTMModalData {
   declineCallback?: any;
   positionRelativeToElement?: HTMLElement;
   isTherapist?: boolean
-  modalStyle: RTM_MODAL_STYLE,
+  modalStyle: SHOW_RTM_MODAL_STYLE,
   patient: any
 }
 
@@ -25,32 +25,32 @@ export interface InnerModalInterface {
   innerModalValue: any
 }
 
-export interface RTMOuterModalInterface {
+export interface SHOWRTMOuterModalInterface {
   isApproveClicked: boolean,
   dataFromInnerForm: InnerModalInterface
 }
 
-export enum RTM_MODAL_CONTENT {
+export enum SHOW_RTM_MODAL_CONTENT {
   NONE = 0,
   SEND_FAST_LOGIN = 1,
   MSG = 2,
 }
 
-export enum RTM_MODAL_STYLE {
+export enum SHOW_RTM_MODAL_STYLE {
   BLUE = 0,
   WHITE = 1,
 }
 
 @Component({
-  selector: 'app-show-rtm-modal',
-  templateUrl: './show-rtm-modal.component.html',
-  styleUrls: ['./show-rtm-modal.component.scss']
+  selector: 'app-rtm-modal',
+  templateUrl: './rtm-modal.component.html',
+  styleUrls: ['./rtm-modal.component.scss']
 })
-export class RTMModalComponent implements OnInit {
-  @select(state => state.global.rtmModalMsg) readonly rtmModalMsg$: Observable<string>;
+export class SHOWRTMModalComponent implements OnInit {
+  @select(state => state.global.showrtmModalMsg) readonly showrtmModalMsg$: Observable<string>;
 
   header: string;
-  content: RTM_MODAL_CONTENT;
+  content: SHOW_RTM_MODAL_CONTENT;
   acceptBtnImg: string;
   acceptBtnImgHover: string;
   declineBtnImg: string;
@@ -58,11 +58,11 @@ export class RTMModalComponent implements OnInit {
   approveCallback: any;
   declineCallback: any;
   isTherapist: boolean
-  @Output() isApprove = new EventEmitter<RTMOuterModalInterface>();
+  @Output() isApprove = new EventEmitter<SHOWRTMOuterModalInterface>();
   dataFromInnerForm: InnerModalInterface;
-  rtmModalMsgSubscription: Subscription;
+  showrtmModalMsgSubscription: Subscription;
   generalMsg: string;
-  modalStyle: RTM_MODAL_STYLE = RTM_MODAL_STYLE.WHITE
+  modalStyle: SHOW_RTM_MODAL_STYLE = SHOW_RTM_MODAL_STYLE.WHITE
   patient: any;
   positionRelativeToElement: HTMLElement;
   matDialogConfig;
@@ -71,7 +71,7 @@ export class RTMModalComponent implements OnInit {
   // isSwappedScreen: boolean;
 
   constructor(
-    public dialogRef: MatDialogRef<RTMModalComponent>,
+    public dialogRef: MatDialogRef<SHOWRTMModalComponent>,
     @Inject(MAT_DIALOG_DATA) public dialogData: SHOWRTMModalData,
     public appActions: AppActions,
   ) {
@@ -100,22 +100,22 @@ export class RTMModalComponent implements OnInit {
       this.dialogRef.updatePosition(this.matDialogConfig.position);
     }
 
-    this.rtmModalMsgSubscription = this.rtmModalMsg$.subscribe((msg: string) => {
+    this.showrtmModalMsgSubscription = this.showrtmModalMsg$.subscribe((msg: string) => {
       console.log("Message: " , msg );
       if (!msg || msg === "") { return }
       this.generalMsg = msg;
-      this.content = RTM_MODAL_CONTENT.MSG;
-      setTimeout(() => { this.appActions.closeRTMModal() }, 5000)
+      this.content = SHOW_RTM_MODAL_CONTENT.MSG;
+      setTimeout(() => { this.appActions.showCloseRTMModal() }, 5000)
     });
   }
 
   // getter for enum
-  public get rtmModelContent(): typeof RTM_MODAL_CONTENT {
-    return RTM_MODAL_CONTENT;
+  public get rtmModelContent(): typeof SHOW_RTM_MODAL_CONTENT {
+    return SHOW_RTM_MODAL_CONTENT;
   }
 
-  public get generalModelStyle(): typeof RTM_MODAL_STYLE {
-    return RTM_MODAL_STYLE;
+  public get generalModelStyle(): typeof SHOW_RTM_MODAL_STYLE {
+    return SHOW_RTM_MODAL_STYLE;
   }
 
   getModalRelativePosition = () => {
@@ -141,7 +141,7 @@ export class RTMModalComponent implements OnInit {
     return `action-btn ${this.isTherapist ? 'therapist' : 'patient'}`;
   }
 
-  isRtmModel(modelType: RTM_MODAL_CONTENT) {
+  isRtmModel(modelType: SHOW_RTM_MODAL_CONTENT) {
     return modelType === this.content
   }
 
@@ -149,7 +149,7 @@ export class RTMModalComponent implements OnInit {
     this.dataFromInnerForm = event;
   }
 
-  isRtmModelStyle(modelStyle: RTM_MODAL_STYLE) {
+  isRtmModelStyle(modelStyle: SHOW_RTM_MODAL_STYLE) {
     return modelStyle === this.modalStyle
   }
 }

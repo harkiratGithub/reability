@@ -41,6 +41,18 @@ export enum RTM_MODAL_STYLE {
   WHITE = 1,
 }
 
+export enum SHOW_RTM_MODAL_CONTENT {
+  NONE = 0,
+  SEND_FAST_LOGIN = 1,
+  MSG = 2,
+}
+
+export enum SHOW_RTM_MODAL_STYLE {
+  BLUE = 0,
+  WHITE = 1,
+}
+
+
 @Component({
   selector: 'app-rtm-modal',
   templateUrl: './rtm-modal.component.html',
