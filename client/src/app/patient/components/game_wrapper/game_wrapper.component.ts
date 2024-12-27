@@ -71,9 +71,7 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
   @Output() hideGameMessage: EventEmitter<void> = new EventEmitter();
   @Output() sendInitGameSettingsForTherapist: EventEmitter<any> = new EventEmitter();
   @Output() sendShowTimerForTherapist: EventEmitter<any> = new EventEmitter();
-  carouselText: string[] = [    
-    'Pause the video and make 3 sets of 10 repititions.if you do not have a broom stick use a spong stick.'
-  ];
+  carouselText: string[] = [];
   currentTextIndex: number = 0;
   showCarouselText: boolean = false;
   isPopupVisible = false;
@@ -150,28 +148,38 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
     
         const integerVidTime = Math.floor(vidTime);
         this.currentVideoID = videoId;
-        if(integerVidTime <= 30  && this.currentVideoID==videoId){ 
-          this.elapsedTime = integerVidTime; 
+        
+        
+        if (this.currentGameSettings[index]?.fileName === videoId) {          
+          const additionalInfo = this.currentGameSettings[index]?.additionalInfo?.trim();
+          this.carouselText = additionalInfo ? [additionalInfo] : []; 
+        } else {
+          this.carouselText = []; 
         }
     
-        if (this.currentGameSettings[index]?.fileName === videoId) {
-          this.carouselText = [this.currentGameSettings[index].additionalInfo];
-        }
-    
+        
         if (type === 'sync_video_data') {
+          if (this.isEmpty(this.carouselText)) {
+            this.isPopupVisible = false; 
+          }
+    
           if (!this.timer) {
             this.startTimer();
           }
     
-          if (this.elapsedTime >= 30 && integerVidTime >= 30 && !this.isPopupVisible) {
+          if (this.elapsedTime >= 30 && integerVidTime >= 30 && !this.isPopupVisible && !this.isEmpty(this.carouselText)) {
             this.isPopupVisible = true;
             this.startCarousel();
-          } else if (integerVidTime < 30) {
+          } else if (integerVidTime < 30 || this.isEmpty(this.carouselText)) {
             this.isPopupVisible = false; 
           }
         }
       }
     });    
+  }
+
+  isEmpty(array: string[]): boolean {
+    return !array || array.length === 0 || array.every(item => item.trim() === '');
   }
   
   resetTimer() {
@@ -182,10 +190,8 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
   
   startTimer() {
     this.timer = setInterval(() => {
-      this.elapsedTime += 1;
-      //console.log(`Elapsed Time: ${this.elapsedTime} seconds`);
-  
-      if (this.elapsedTime >= 30 && !this.isPopupVisible) {
+      this.elapsedTime += 1;  
+      if (this.elapsedTime >= 30 && !this.isPopupVisible && !this.isEmpty(this.carouselText)) {
         this.isPopupVisible = true;
         this.startCarousel();
       }
