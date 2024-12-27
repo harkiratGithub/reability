@@ -20,7 +20,7 @@ router.post('/gameSession/updateSession', GameSessionController.endGameSession);
 router.post('/gameSettings/saveNewGameSettings', GameSettingsController.saveNewSettings);
 
 router.post('/cameraAvailability', PatientController.updatePatientCameraAvailability);
-
+router.post('/getGameSettings', GameSettingsController.getGameSettings);
 router.post(
 	'/gameactivities/uploadgamerelatedimage',
 	upload.single('file'),

@@ -18,7 +18,7 @@ import { ScoreType } from 'src/constants';
 import { MenuOptionsAppActions } from 'src/app/patient/components/menu-options/menu-options.actions';
 import { FeedbackFormComponent } from '../feedback-form/feedback-form.component';
 import { GameHistorySessionComponent } from '../game-history-session/game-history-session.component';
-
+import { User } from '../../../common/models/user';
 @Component({
   selector: 'app-game-wrapper',
   templateUrl: './game_wrapper.component.html',
@@ -57,7 +57,7 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
   @Input() isMobile;
   @Input() currentGameName;
   @Input() isSwappedScreen = false;
-  @Input() connectedUser;
+  @Input() connectedUser: any;
   @Input() inTherapistSession = false;
   @Input() isIntroductionProgressEnded = false;
   @Input() isGameReadyToStart = false;
@@ -71,7 +71,17 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
   @Output() hideGameMessage: EventEmitter<void> = new EventEmitter();
   @Output() sendInitGameSettingsForTherapist: EventEmitter<any> = new EventEmitter();
   @Output() sendShowTimerForTherapist: EventEmitter<any> = new EventEmitter();
-
+  carouselText: string[] = [    
+    'Pause the video and make 3 sets of 10 repititions.if you do not have a broom stick use a spong stick.'
+  ];
+  currentTextIndex: number = 0;
+  showCarouselText: boolean = false;
+  isPopupVisible = false;
+  timer: any = null; 
+  elapsedTime: number = 0; 
+  currentVideoID="";
+  currentUser: User;
+  currentGameSettings = null;
   constructor(
     private patientWebRtcService: PatientWebRtcService,
     private ajax: AjaxService,
@@ -86,6 +96,11 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this.currentGameUrl$.subscribe((currentGame) => {
         this.currentGameUrl = currentGame;
+      })
+    );
+    this.subscription.add(
+      this.authenticationService.currentUser.subscribe((user) => {
+        this.currentUser = user;
       })
     );
     this.subscription.add(
@@ -105,9 +120,67 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
     if (!this.isTherapist) {
       this.initPatientCallbacks();
       this.initPatientSubscriptions();
+      const patientId =
+      this.connectedUser && this.connectedUser.patientId ? this.connectedUser.patientId : this.currentUser.id;
+    
+     if(patientId && this.gameId){
+        this.ajax.getGameSettings(this.gameId, patientId ).subscribe((gamesettings) => {
+          this.currentGameSettings=gamesettings.current_set;
+        });
+      }
     } else {
       this.handleTherapistCallbacks();
     }
+
+      window.addEventListener('message', (event) => {      
+        if (event.data) {
+          const parsedResponse = JSON.parse(event.data);
+          // Access values
+          const type = parsedResponse.msg.type;
+          const index = parsedResponse.msg.data.index;
+          const shouldPlay = parsedResponse.msg.data.shouldPlay;
+          const vidTime = parsedResponse.msg.data.currentPlayTime.vidTime;
+        const sourceUrl = parsedResponse.msg.data.source;
+          const videoIdMatch = sourceUrl.match(/P\d+/);
+          const videoId = videoIdMatch ? videoIdMatch[0] : null;
+          if(this.currentVideoID!=videoId){
+            this.timer=0;
+            this.elapsedTime=0;
+          }
+          const integerVidTime = Math.floor(vidTime);
+          if(integerVidTime <= 30  && this.currentVideoID==videoId)
+            { this.elapsedTime = integerVidTime; }
+          this.currentVideoID = videoId;
+        if(this.currentGameSettings[index].fileName==videoId){
+          this.carouselText = [this.currentGameSettings[index].additionalInfo];          
+          }
+          console.log('Type:', type);
+          if(type==='sync_video_data'){        
+            if (!this.timer) {
+              this.startTimer(); 
+            }
+            if (this.elapsedTime >= 30 && integerVidTime >=30 && !this.isPopupVisible) {
+              this.isPopupVisible=true;
+              this.startCarousel(); 
+            }else{
+              this.isPopupVisible=false;
+            }
+          }else{
+          }   
+        } 
+      }); 
+      
+    }
+    startTimer() {
+      this.timer = setInterval(() => {
+        this.elapsedTime += 1; 
+        console.log(`Elapsed Time: ${this.elapsedTime} seconds`);  
+        if (this.elapsedTime >= 30 && !this.isPopupVisible) {
+          this.isPopupVisible=true;
+          console.log("crousel text start from settimer fucntion");
+          this.startCarousel(); 
+        }
+      }, 1000); 
   }
 
   ngOnDestroy() {
@@ -863,4 +936,11 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
       return { gameId: this.gameIdTherapist, userId: this.peerId };
     }
   };
+  startCarousel(): void {
+    if(this.isPopupVisible){
+      setInterval(() => {
+        this.currentTextIndex = (this.currentTextIndex + 1) % this.carouselText.length;
+      }, 6000);
+    } 
+  }
 }

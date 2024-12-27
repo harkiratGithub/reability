@@ -296,6 +296,17 @@ export class AjaxService {
     }
   };
 
+  getGameSettings = (gameId, patientId) => {
+    try {
+      return this.http.post<any>(`${this.baseUrl}/patient/getGameSettings`, {
+        gameId,
+        patientId,
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   // patient RTM routes
   sendPatientPainScale = (patientId, painValue, patient_note) => {
     try {
