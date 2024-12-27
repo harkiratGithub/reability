@@ -132,55 +132,64 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
       this.handleTherapistCallbacks();
     }
 
-      window.addEventListener('message', (event) => {      
-        if (event.data) {
-          const parsedResponse = JSON.parse(event.data);
-          // Access values
-          const type = parsedResponse.msg.type;
-          const index = parsedResponse.msg.data.index;
-          const shouldPlay = parsedResponse.msg.data.shouldPlay;
-          const vidTime = parsedResponse.msg.data.currentPlayTime.vidTime;
+    window.addEventListener('message', (event) => {      
+      if (event.data) {
+        const parsedResponse = JSON.parse(event.data);
+        const type = parsedResponse.msg.type;
+        const index = parsedResponse.msg.data.index;
+        const shouldPlay = parsedResponse.msg.data.shouldPlay;
+        const vidTime = parsedResponse.msg.data.currentPlayTime.vidTime;
         const sourceUrl = parsedResponse.msg.data.source;
-          const videoIdMatch = sourceUrl.match(/P\d+/);
-          const videoId = videoIdMatch ? videoIdMatch[0] : null;
-          if(this.currentVideoID!=videoId){
-            this.timer=0;
-            this.elapsedTime=0;
-          }
-          const integerVidTime = Math.floor(vidTime);
-          if(integerVidTime <= 30  && this.currentVideoID==videoId)
-            { this.elapsedTime = integerVidTime; }
-          this.currentVideoID = videoId;
-        if(this.currentGameSettings[index].fileName==videoId){
-          this.carouselText = [this.currentGameSettings[index].additionalInfo];          
-          }
-          console.log('Type:', type);
-          if(type==='sync_video_data'){        
-            if (!this.timer) {
-              this.startTimer(); 
-            }
-            if (this.elapsedTime >= 30 && integerVidTime >=30 && !this.isPopupVisible) {
-              this.isPopupVisible=true;
-              this.startCarousel(); 
-            }else{
-              this.isPopupVisible=false;
-            }
-          }else{
-          }   
-        } 
-      }); 
-      
-    }
-    startTimer() {
-      this.timer = setInterval(() => {
-        this.elapsedTime += 1; 
-        console.log(`Elapsed Time: ${this.elapsedTime} seconds`);  
-        if (this.elapsedTime >= 30 && !this.isPopupVisible) {
-          this.isPopupVisible=true;
-          console.log("crousel text start from settimer fucntion");
-          this.startCarousel(); 
+    
+        const videoIdMatch = sourceUrl.match(/P\d+/);
+        const videoId = videoIdMatch ? videoIdMatch[0] : null;
+    
+        if (this.currentVideoID !== videoId) {
+          this.resetTimer();
         }
-      }, 1000); 
+    
+        const integerVidTime = Math.floor(vidTime);
+        this.currentVideoID = videoId;
+        if(integerVidTime <= 30  && this.currentVideoID==videoId){ 
+          this.elapsedTime = integerVidTime; 
+        }
+    
+        if (this.currentGameSettings[index]?.fileName === videoId) {
+          this.carouselText = [this.currentGameSettings[index].additionalInfo];
+        }
+    
+        if (type === 'sync_video_data') {
+          if (!this.timer) {
+            this.startTimer();
+          }
+    
+          if (this.elapsedTime >= 30 && integerVidTime >= 30 && !this.isPopupVisible) {
+            this.isPopupVisible = true;
+            this.startCarousel();
+          } else if (integerVidTime < 30) {
+            this.isPopupVisible = false; 
+          }
+        }
+      }
+    });    
+  }
+  
+  resetTimer() {
+    clearInterval(this.timer);
+    this.timer = null;
+    this.elapsedTime = 0;
+  }
+  
+  startTimer() {
+    this.timer = setInterval(() => {
+      this.elapsedTime += 1;
+      //console.log(`Elapsed Time: ${this.elapsedTime} seconds`);
+  
+      if (this.elapsedTime >= 30 && !this.isPopupVisible) {
+        this.isPopupVisible = true;
+        this.startCarousel();
+      }
+    }, 1000);
   }
 
   ngOnDestroy() {

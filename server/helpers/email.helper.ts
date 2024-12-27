@@ -47,6 +47,7 @@ export const sendPatientCredentialsEmail = async (userEmail, userName, password)
 		<br><br>We also suggest adding the site to the bookmarks and/or the Desktop for easy access.<div style="font-weight:bold;"><br>Good luck and enjoy,<br>
 		<br>TheRPT team </div>
 		</div></div>`;
+		
 	} else {
 		subject = 'Welcome to ReAbility';
 		html = `<div style="direction:rtl">ברכות להצטרפותך לשיקום מרחוק, שיבא ביונד.<br><br>להלן ההנחיות להתחברות:<br><br> מחשב עם מצלמת אינטרנט, מיקרופון (לרוב אינטגרלי במצלמה) רמקולים,  <span style="font-weight:bold; ">דרישות טכניות:</span>דפדפן Chrome. יש לעדכן אותנו בהקדם אם אין ברשותך הציוד המתאים .<br><br><div>

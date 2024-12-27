@@ -17,7 +17,7 @@
   >
     <div class="outer-border">
       <div class="content-background" [ngClass]="{ 'white-bg': currentGameName == 'whiteboard' }">
-        <div class="breaking-news-wrapper" *ngIf="isPopupVisible"></div>
+        <div class="breaking-news-wrapper" *ngIf="isPopupVisible">
           <div class="carousel-text-container">
             <div class="carousel-text">{{ carouselText[currentTextIndex] }}</div>
           </div>
