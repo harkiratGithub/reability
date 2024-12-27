@@ -41,12 +41,13 @@ export const sendPatientCredentialsEmail = async (userEmail, userName, password)
 	if (process.env.EMAIL_LANGUAGE === 'english') {
 		subject = 'Welcome to ReAbility';
 		html = `<div style="direction:ltl">Congratulations on joining remote rehabilitation, TheRPT. <br><br> Here are the instructions for connecting to our application website:<br><br> Use a PC or laptop with a webcam, a microphone (usually integrated in the camera), speakers. We recommend Google Chrome browser. <br><br>
-   		<div>Link:<a href="${url}">${process.env.SERVER_URL}</a></div>
+   		<div style="font-weight:bold;font-size:20px;">Link:<a href="${url}">${process.env.SERVER_URL}</a></div>
 		<div style="font-weight:bold;font-size:20px;">Username:${userName}<br>Password:${password}</div><br><div></div>
-		Note: on your first login the browser will ask your permission to use the microphone and camera. Please confirm. The browser will also ask you to confirm saving the username and password. Please confirm.
+		<div style="font-weight:bold;font-size:20px;">Note: on your first login the browser will ask your permission to use the microphone and camera. Please confirm. The browser will also ask you to confirm saving the username and password. Please confirm.</div>
 		<br><br>We also suggest adding the site to the bookmarks and/or the Desktop for easy access.<div style="font-weight:bold;"><br>Good luck and enjoy,<br>
 		<br>TheRPT team </div>
 		</div></div>`;
+		
 	} else {
 		subject = 'Welcome to ReAbility';
 		html = `<div style="direction:rtl">ברכות להצטרפותך לשיקום מרחוק, שיבא ביונד.<br><br>להלן ההנחיות להתחברות:<br><br> מחשב עם מצלמת אינטרנט, מיקרופון (לרוב אינטגרלי במצלמה) רמקולים,  <span style="font-weight:bold; ">דרישות טכניות:</span>דפדפן Chrome. יש לעדכן אותנו בהקדם אם אין ברשותך הציוד המתאים .<br><br><div>
