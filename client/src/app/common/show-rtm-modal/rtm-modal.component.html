@@ -5,8 +5,8 @@
 
   <div class="main-section">
     <div *ngIf="isRtmModel(rtmModelContent.SEND_FAST_LOGIN)">
-      <app-send-rtm-modal [patient]="patient" (returnedData)="getDataFromModal($event)">
-      </app-send-rtm-modal>
+      <app-show-rtm-modal [patient]="patient" (returnedData)="getDataFromModal($event)">
+      </app-show-rtm-modal>
     </div>
     <div class="general-message" *ngIf="isRtmModel(rtmModelContent.MSG)">
       {{ generalMsg }}
@@ -48,59 +48,9 @@
     <mat-icon (click)="handleDecline()">close</mat-icon>
   </div>
 
-  <div class="filtered-data-table" *ngIf="content === rtmModelContent.MSG && isTableVisible">
-    <h3>Patient Data</h3>
-    <div *ngIf="filteredData.length === 0; else dataTable">
-      <p>No patient data available.</p>
-    </div>
-  
-    <ng-template #dataTable>
-      <table class="data-table">
-        <thead>
-          <tr>
-            <!-- <th>Institute Name</th>
-            <th>Username</th>
-            <th>First Name</th>
-            <th>Last Name</th> -->
-            <th>Date</th>
-            <th>Pain Level</th>
-            <th>Patient Note</th>
-            <!-- <th>Therapist ID</th> -->
-            <th>Therapist Name</th>
-            <th>Therapist Note</th>
-            <th>Session Start Time</th>
-            <!-- <th>Session End Time</th> -->
-            <th>Session Duration</th>
-            <th>Session Review Activity</th>
-            <!-- <th>Session Mode</th> -->
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let data of filteredData">
-            <!-- <td>{{ data.institute_name || '--' }}</td>
-            <td>{{ data.patient_username || '--' }}</td>
-            <td>{{ data.first_name || '--' }}</td>
-            <td>{{ data.last_name || '--' }}</td> -->
-            <td>{{ data.since | date: 'yyyy-MM-dd' || '--' }}</td>
-            <td>{{ data.data.patient?.pain_level || '--' }}</td>
-            <td>{{ data.data.patient?.note || '--' }}</td>
-            <!-- <td>{{ data.data.therapist?.therapist_id || '--' }}</td> -->
-            <td>{{ data.data.therapist?.user_name || '--' }}</td>
-            <td>{{ data.data.therapist?.note || '--' }}</td>
-            <td>{{ data.data.therapist?.start_time || '--' }}</td>
-            <!-- <td>{{ data.data.therapist?.end_time || '--' }}</td> -->
-            <td>{{ data.data.therapist?.minutes_spent || '--' }}</td>
-            <td>{{ data.data.therapist?.review_activity_type || '--' }}</td>
-            <!-- <td>{{ data.data.therapist?.mode || '--' }}</td> -->
-          </tr>
-        </tbody>
-      </table>
-    </ng-template>
-  </div>  
-
   <div class="main-section">
     <div *ngIf="isRtmModel(rtmModelContent.SEND_FAST_LOGIN)">
-      <app-send-rtm-modal [patient]="patient" (returnedData)="getDataFromModal($event)"></app-send-rtm-modal>
+      <app-show-rtm-modal [patient]="patient" (returnedData)="getDataFromModal($event)"></app-show-rtm-modal>
     </div>
     <div *ngIf="isRtmModel(rtmModelContent.MSG)">
       {{ generalMsg }}

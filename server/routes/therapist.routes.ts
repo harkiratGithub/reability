@@ -68,4 +68,8 @@ router.get('/games', GameDataController.getAllGames);
 router.post('/addServerLog', ServerLogController.sendLogToServer);
 router.post('/rtmSession', RtmController.updateTherapistRTMSession);
 
+// rtm therapist routes
+router.get('/rtm-details', PatientController.getAllRTMDetails);
+
+
 export default router;
