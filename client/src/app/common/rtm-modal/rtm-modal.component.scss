@@ -1,5 +1,11 @@
 .general-modal-container-blue {
-  position: relative;
+  min-width: 750px;
+  // position: relative;
+  position: fixed;  // This will make the modal float above other content
+  top: 50%;         // Position the modal at the vertical center
+  left: 50%;        // Position the modal at the horizontal center
+  transform: translate(-50%, -50%); // Adjust to truly center it
+  z-index: 1000;  
   background-image: url('../../../assets/textures/main_bg.jpg');
   background-size: cover;
   border-radius: 65px;
@@ -89,7 +95,11 @@
 .general-modal-container-white {
   min-width: 750px;
   // height: 600px;
-  position: relative;
+  position: fixed;  // This will make the modal float above other content
+  top: 50%;         // Position the modal at the vertical center
+  left: 50%;        // Position the modal at the horizontal center
+  transform: translate(-50%, -50%); // Adjust to truly center it
+  z-index: 1000;
   border-radius: 20px;
   background-color: #ffffff;
   box-shadow: 0 5px 10px 0 rgba(25, 148, 192, 0.1);
@@ -126,6 +136,7 @@
     justify-content: center;
     align-items: center;
     margin-top: 20px;
+    flex-grow: 1;
     
   }
   .actions-section {
@@ -164,3 +175,31 @@
 .general-message {
   margin-top: 10px;
 }
+
+
+
+// rtm info filtered
+.filtered-data-table {
+  margin-top: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.data-table th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+

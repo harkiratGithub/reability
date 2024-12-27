@@ -621,7 +621,7 @@ export class AjaxService {
           httpParams = httpParams.set(key, params[key]!);
         }
       });
-      const url = `${this.baseUrl}/rtm-details`;
+      const url = `${this.baseUrl}/therapist/rtm-details`;
       return this.http.get<any>(url, { params: httpParams });
     }
   

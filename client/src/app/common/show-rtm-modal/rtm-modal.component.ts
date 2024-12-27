@@ -33,6 +33,7 @@ export interface SHOWRTMOuterModalInterface {
 export enum SHOW_RTM_MODAL_CONTENT {
   NONE = 0,
   SEND_FAST_LOGIN = 1,
+  SHOW_RTM = 2,
   MSG = 2,
 }
 

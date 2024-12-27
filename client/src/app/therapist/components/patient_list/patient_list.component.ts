@@ -464,7 +464,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
     console.log('API call to show');
     const modalData: SHOWRTMModalData = {
       modalStyle: SHOW_RTM_MODAL_STYLE.WHITE,
-      content: SHOW_RTM_MODAL_CONTENT.SEND_FAST_LOGIN,
+      content: SHOW_RTM_MODAL_CONTENT.SHOW_RTM,
       patient,
       approveCallback: async (modalValues: OuterModalInterface) => {
         console.log('approveCallback Mod: ', modalValues);
