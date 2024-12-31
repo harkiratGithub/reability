@@ -425,49 +425,12 @@ export class PatientListComponent implements OnInit, OnDestroy {
     this.appActions.openRTMModal(modalData);
   };
 
-  // showRTMMinutes = (patient: { id: any; userId: number }) => {
-  //   console.log('API call to show');
-  //   const modalData: SHOWRTMModalData = {
-  //     modalStyle: SHOW_RTM_MODAL_STYLE.WHITE,
-  //     content: SHOW_RTM_MODAL_CONTENT.SEND_FAST_LOGIN,
-  //     patient,
-  //     approveCallback: async (modalValues: OuterModalInterface) => {
-  //       console.log('approveCallback Mod: ', modalValues);
-  //       // await this.ajax
-  //       //   .getAllRtmReport({ month: String(moment().month() + 1), year: String(moment().year()) })
-  //       //   .toPromise()
-  //       //   .then((response) => {
-  //       //     this.appActions.setMessageShowRTMModal({
-  //       //       rows: response.data,
-  //       //     });
-  //       //     console.log('Response: ', response);
-  //       //   })
-  //       //   .catch((err) => {
-  //       //     console.error('Error:', err);
-  //       //   });
-  //       await this.ajax
-  //         .getAllRtmReport({ month: String(moment().month() + 1), year: String(moment().year()) })
-  //         .subscribe((response) => {
-  //           let rows = [];
-  //           if (response?.data?.allData?.length && response?.data?.cumulativeData?.length) {
-  //             const { allData, cumulativeData } = response?.data;
-  //             rows = util.transformRtm(allData, cumulativeData);
-  //           }
-  //         });
-  //     },
-  //     header: 'RTM Patient Track Report',
-  //   };
-  //   this.appActions.showOpenRTMModal(modalData);
-  // };
-
   showRTMMinutes = (patient: { id: any; userId: number }) => {
-    console.log('API call to show');
     const modalData: SHOWRTMModalData = {
       modalStyle: SHOW_RTM_MODAL_STYLE.WHITE,
       content: SHOW_RTM_MODAL_CONTENT.SHOW_RTM,
       patient,
       approveCallback: async (modalValues: OuterModalInterface) => {
-        console.log('approveCallback Mod: ', modalValues);
         await this.ajax
           .getAllRtmReport({ month: String(moment().month() + 1), year: String(moment().year()) })
           .toPromise()
@@ -476,7 +439,6 @@ export class PatientListComponent implements OnInit, OnDestroy {
               const { allData, cumulativeData } = response.data;
               const transformedRows = util.transformRtm(allData, cumulativeData);
               modalValues.rows = transformedRows;
-              console.log('Transformed Rows: ', transformedRows);
             }
           })
           .catch((err) => {

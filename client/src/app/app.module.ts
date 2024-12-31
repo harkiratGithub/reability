@@ -78,6 +78,7 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatSelectModule } from '@angular/material/select';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 import {
   NgxMatMomentModule,
@@ -267,6 +268,7 @@ export const CUSTOM_MOMENT_FORMATS = {
     MatMenuModule,
     MatSnackBarModule,
     NgxFileDropModule,
+    MatProgressSpinnerModule
   ],
   providers: [
     NgReduxRouter,

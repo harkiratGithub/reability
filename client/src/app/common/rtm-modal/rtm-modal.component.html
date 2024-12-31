@@ -5,8 +5,7 @@
 
   <div class="main-section">
     <div *ngIf="isRtmModel(rtmModelContent.SEND_FAST_LOGIN)">
-      <app-send-rtm-modal [patient]="patient" (returnedData)="getDataFromModal($event)">
-      </app-send-rtm-modal>
+      <app-send-rtm-modal [patient]="patient" (returnedData)="getDataFromModal($event)"> </app-send-rtm-modal>
     </div>
     <div class="general-message" *ngIf="isRtmModel(rtmModelContent.MSG)">
       {{ generalMsg }}
@@ -14,29 +13,53 @@
   </div>
 
   <div class="actions-section" *ngIf="!isRtmModel(rtmModelContent.MSG)">
-    <div appHand [hoverClass]="'timer'" [selectable]="true" [timeToWait]="2000" (click)="handleApprove()"
-      (outputFunc)="handleApprove()" [class]="getActionButtonClass()" [activeOnStartHover]="clearPopupTimeut"
-      [activeOnOutHover]="createPopupTimeut">
+    <div
+      appHand
+      [hoverClass]="'timer'"
+      [selectable]="true"
+      [timeToWait]="2000"
+      (click)="handleApprove()"
+      (outputFunc)="handleApprove()"
+      [class]="getActionButtonClass()"
+      [activeOnStartHover]="clearPopupTimeut"
+      [activeOnOutHover]="createPopupTimeut"
+    >
       <img class="img-hover" [src]="acceptBtnImgHover" alt="accept hover" />
       <img [src]="acceptBtnImg" alt="accept" />
 
       <svg viewBox="0 0 36 36" class="loader">
-        <path class="circle" stroke-dasharray="100, 100" d="M18 2.0845
+        <path
+          class="circle"
+          stroke-dasharray="100, 100"
+          d="M18 2.0845
           a 15.9155 15.9155 0 0 1 0 31.831
-          a 15.9155 15.9155 0 0 1 0 -31.831" />
+          a 15.9155 15.9155 0 0 1 0 -31.831"
+        />
       </svg>
     </div>
 
-    <div appHand [hoverClass]="'timer'" [selectable]="true" [timeToWait]="2000" (click)="handleDecline()"
-      (outputFunc)="handleDecline()" [class]="getActionButtonClass()" [activeOnStartHover]="clearPopupTimeut"
-      [activeOnOutHover]="createPopupTimeut">
+    <div
+      appHand
+      [hoverClass]="'timer'"
+      [selectable]="true"
+      [timeToWait]="2000"
+      (click)="handleDecline()"
+      (outputFunc)="handleDecline()"
+      [class]="getActionButtonClass()"
+      [activeOnStartHover]="clearPopupTimeut"
+      [activeOnOutHover]="createPopupTimeut"
+    >
       <img class="img-hover" [src]="declineBtnImgHover" alt="decline hover" />
       <img [src]="declineBtnImg" alt="decline" />
 
       <svg viewBox="0 0 36 36" class="loader">
-        <path class="circle" stroke-dasharray="100, 100" d="M18 2.0845
+        <path
+          class="circle"
+          stroke-dasharray="100, 100"
+          d="M18 2.0845
           a 15.9155 15.9155 0 0 1 0 31.831
-          a 15.9155 15.9155 0 0 1 0 -31.831" />
+          a 15.9155 15.9155 0 0 1 0 -31.831"
+        />
       </svg>
     </div>
   </div>
@@ -49,54 +72,58 @@
   </div>
 
   <div class="filtered-data-table" *ngIf="content === rtmModelContent.MSG && isTableVisible">
-    <h3>Patient Data</h3>
-    <div *ngIf="filteredData.length === 0; else dataTable">
-      <p>No patient data available.</p>
+    <div class="table-heading">Patient Data</div>
+    <div *ngIf="isLoading" class="loader-container">
+      <mat-spinner [diameter]="40"></mat-spinner>
     </div>
-  
-    <ng-template #dataTable>
-      <table class="data-table">
-        <thead>
-          <tr>
-            <!-- <th>Institute Name</th>
-            <th>Username</th>
-            <th>First Name</th>
-            <th>Last Name</th> -->
-            <th>Date</th>
-            <th>Pain Level</th>
-            <th>Patient Note</th>
-            <!-- <th>Therapist ID</th> -->
-            <th>Therapist Name</th>
-            <th>Therapist Note</th>
-            <th>Session Start Time</th>
-            <!-- <th>Session End Time</th> -->
-            <th>Session Duration</th>
-            <th>Session Review Activity</th>
-            <!-- <th>Session Mode</th> -->
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let data of filteredData">
-            <!-- <td>{{ data.institute_name || '--' }}</td>
-            <td>{{ data.patient_username || '--' }}</td>
-            <td>{{ data.first_name || '--' }}</td>
-            <td>{{ data.last_name || '--' }}</td> -->
-            <td>{{ data.since | date: 'yyyy-MM-dd' || '--' }}</td>
-            <td>{{ data.data.patient?.pain_level || '--' }}</td>
-            <td>{{ data.data.patient?.note || '--' }}</td>
-            <!-- <td>{{ data.data.therapist?.therapist_id || '--' }}</td> -->
-            <td>{{ data.data.therapist?.user_name || '--' }}</td>
-            <td>{{ data.data.therapist?.note || '--' }}</td>
-            <td>{{ data.data.therapist?.start_time || '--' }}</td>
-            <!-- <td>{{ data.data.therapist?.end_time || '--' }}</td> -->
-            <td>{{ data.data.therapist?.minutes_spent || '--' }}</td>
-            <td>{{ data.data.therapist?.review_activity_type || '--' }}</td>
-            <!-- <td>{{ data.data.therapist?.mode || '--' }}</td> -->
-          </tr>
-        </tbody>
-      </table>
-    </ng-template>
-  </div>  
+
+    <div *ngIf="!isLoading">
+      <div *ngIf="filteredData.length === 0; else dataTable">
+        <p class="table-message">No patient data available.</p>
+      </div>
+
+      <ng-template #dataTable>
+        <div class="table-container-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Pain Level</th>
+                <th>By</th>
+                <th>Note</th>
+                <th>Activity</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let data of filteredData">
+                <td>{{ data.since | date : 'yyyy-MM-dd' || '--' }}</td>
+                <td>
+                  {{
+                    data.data.therapist?.minutes_spent === '00:00' || data.data.therapist?.minutes_spent === '--'
+                      ? ''
+                      : data.data.therapist?.minutes_spent
+                  }}
+                </td>
+                <td>{{ data.data.patient?.pain_level || '--' }}</td>
+                <td>{{ data.data.patient?.note ? 'Patient' : data.data.therapist?.user_name || '--' }}</td>
+                <td>{{ data.data.therapist?.note || data.data.patient?.note || '--' }}</td>
+                <td>{{ data.data.therapist?.review_activity_type || '--' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+
+  <div class="filtered-data-table" *ngIf="content === rtmModelContent.MSG && !isTableVisible && isLoading">
+    <div class="loader-container">
+      <mat-spinner [diameter]="40"></mat-spinner>
+    </div>
+    <div class="table-heading">Patient Data</div>
+    <p class="table-message-context">No patient data available.</p>
+  </div>
 
   <div class="main-section">
     <div *ngIf="isRtmModel(rtmModelContent.SEND_FAST_LOGIN)">

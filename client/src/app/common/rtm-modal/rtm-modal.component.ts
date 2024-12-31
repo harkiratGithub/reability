@@ -16,19 +16,19 @@ export interface RTMModalData {
   approveCallback?: any;
   declineCallback?: any;
   positionRelativeToElement?: HTMLElement;
-  isTherapist?: boolean
-  modalStyle: RTM_MODAL_STYLE,
-  patient: any
+  isTherapist?: boolean;
+  modalStyle: RTM_MODAL_STYLE;
+  patient: any;
 }
 
 export interface InnerModalInterface {
-  isValid: boolean,
-  innerModalValue: any
+  isValid: boolean;
+  innerModalValue: any;
 }
 
 export interface RTMOuterModalInterface {
-  isApproveClicked: boolean,
-  dataFromInnerForm: InnerModalInterface
+  isApproveClicked: boolean;
+  dataFromInnerForm: InnerModalInterface;
 }
 
 export enum RTM_MODAL_CONTENT {
@@ -53,11 +53,10 @@ export enum SHOW_RTM_MODAL_STYLE {
   WHITE = 1,
 }
 
-
 @Component({
   selector: 'app-rtm-modal',
   templateUrl: './rtm-modal.component.html',
-  styleUrls: ['./rtm-modal.component.scss']
+  styleUrls: ['./rtm-modal.component.scss'],
 })
 export class RTMModalComponent implements OnInit {
   @select((state) => state.global.rtmModalMsg) readonly rtmModalMsg$: Observable<string>;
@@ -78,21 +77,21 @@ export class RTMModalComponent implements OnInit {
   modalStyle: RTM_MODAL_STYLE = RTM_MODAL_STYLE.WHITE;
   patient: any;
   positionRelativeToElement: HTMLElement;
-  matDialogConfig;
-  rect;
-  position;
+  matDialogConfig: MatDialogConfig<any>;
+  rect: DOMRect;
+  position: { left: string; top: string };
   // isSwappedScreen: boolean;
 
   filteredData: any[] = [];
   isTableVisible = false;
+  isLoading: boolean = false;
 
   constructor(
     private ajax: AjaxService,
     public dialogRef: MatDialogRef<RTMModalComponent>,
     @Inject(MAT_DIALOG_DATA) public dialogData: RTMModalData,
     public appActions: AppActions
-  ) {
-    // alert("fdljkfhdfihgfkgfdkhgkhbkbkjbkjbk")
+  ) {                       
     dialogRef.disableClose = true;
     (this.positionRelativeToElement = this.dialogData.positionRelativeToElement),
       (this.header = this.dialogData.header),
@@ -118,7 +117,6 @@ export class RTMModalComponent implements OnInit {
     }
 
     this.rtmModalMsgSubscription = this.rtmModalMsg$.subscribe((msg: string) => {
-      console.log('Message: ', msg);
       if (!msg || msg === '') {
         return;
       }
@@ -132,6 +130,7 @@ export class RTMModalComponent implements OnInit {
   }
 
   private async getAllRtmData() {
+    this.isLoading = true;
     try {
       if (this.content !== 1) {
         const response = await this.ajax
@@ -139,16 +138,21 @@ export class RTMModalComponent implements OnInit {
           .toPromise();
 
         if (response && response.data) {
-          const { allData, cumulativeData } = response.data;
+          const { allData } = response.data;
           const desiredPatientId = this.patient?.id;
-          const filteredAllData = allData.filter((entry: any) => entry.patient_id === desiredPatientId);
-
+          const filteredAllData = allData
+            .sort(
+              (a: { since: string }, b: { since: string }) => new Date(b.since).getTime() - new Date(a.since).getTime()
+            )
+            .filter((entry: any) => entry.patient_id === desiredPatientId);
           this.filteredData = filteredAllData;
           this.isTableVisible = this.filteredData.length > 0;
         }
       }
     } catch (err) {
       console.error('Error fetching RTM Report:', err);
+    } finally {
+      this.isLoading = false; 
     }
   }
 
@@ -189,7 +193,7 @@ export class RTMModalComponent implements OnInit {
     return modelType === this.content;
   }
 
-  getDataFromModal(event) {
+  getDataFromModal(event: InnerModalInterface) {
     this.dataFromInnerForm = event;
   }
 

@@ -102,7 +102,6 @@ export class SHOWRTMModalComponent implements OnInit {
     }
 
     this.showrtmModalMsgSubscription = this.showrtmModalMsg$.subscribe((msg: string) => {
-      console.log("Message: " , msg );
       if (!msg || msg === "") { return }
       this.generalMsg = msg;
       this.content = SHOW_RTM_MODAL_CONTENT.MSG;

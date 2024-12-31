@@ -204,7 +204,6 @@ export class AppActions {
   };
 
   showOpenRTMModal = (modalData: SHOWRTMModalData) => {
-    console.log('showOpenRTMModal: ', modalData);
     this.ngRedux.dispatch({
       type: AppActions.SHOW_OPEN_RTM_MODAL,
       payload: modalData,

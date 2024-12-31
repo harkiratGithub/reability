@@ -132,7 +132,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this.subscription.add(
       this.rtmModal$.subscribe((modalData: any) => {
-        console.log("rtmModal$: ", modalData);
         if (modalData.open && !this.rtmDialogRef) {
           this.openRTMModal(modalData.data);
         }
@@ -144,7 +143,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this.subscription.add(
       this.showrtmModal$.subscribe((modalData: any) => {
-        console.log("showrtmModal$: ",modalData)
         if (modalData.open && !this.showrtmDialogRef) {
           this.showOpenRTMModal(modalData.data);
         }
