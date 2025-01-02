@@ -125,6 +125,7 @@ export const editPatient = (req, res, next) => {
 	const { patientId } = req.body;
 	const { patientData, userData, patientContacts } = extractBodyParams(req.body.patient, patientId);
 	const user = req.user;
+	console.log("patient data: ", patientData, userData, patientContacts);
 	PatientHelper.editPatient({ ...patientData, patientId }, userData, patientContacts)
 		.then(([updatedPatient, patientChanges, oldPatientValues]) => {
 			ActivityLogHelper.createLog(
@@ -174,16 +175,18 @@ export const getAllActive = (req, res, next) => {
 		.catch((err) => next(err));
 };
 
-export const getAllRTMDetails = (req, res, next) => {
+export const getAllRTMDetails = async (req, res, next) => {
 	const { month, year, sendMail } = req.query;
-	getAllPatientRTMDetails(month || null, year || null, sendMail || false)
+	getAllPatientRTMDetails(month || null, year || null, sendMail || false, null)
 		.then((rtmData) => res.json(rtmData))
 		.catch((err) => next(err));
 };
 
-export const sendAllRTMDetails = (req, res, next) => {
+export const sendAllRTMDetails = async (req, res, next) => {
+	const user = req.user;
+	const userDetails = await UserHelper.onLogIn(user);
 	const { month, year, sendMail } = req.query;
-	getAllPatientRTMDetails(month || null, year || null, sendMail || true)
+	getAllPatientRTMDetails(month || null, year || null, sendMail || true, userDetails)
 		.then((response) => res.json(response))
 		.catch((err) => next(err));
 };
@@ -272,24 +275,22 @@ export const getFeedbackQuestions = (req: Request, res: Response, next: NextFunc
 };
 
 export const updateUserTermsConditions = (req, res, next) => {
-	const { id, date_agreed_terms } = req.body; 
+	const { id, date_agreed_terms } = req.body;
 	const user = req.user;
 	UserHelper.updateUserTermsConditions(id, { date_agreed_terms })
-	  .then(async (updatedUser) => {
-		await ActivityLogHelper.createLog(
-		  user?.id,
-		  updatedUser.id,
-		  TABLE_NAME.USER,
-		  LogAction.Update,
-		  updatedUser.id,
-		  null,
-		  { date_agreed_terms }
-		);
-		res.json(updatedUser);
-	  })
-	  .catch((err) => {
-		next(err); 
-	  });
-  };
-  
-
+		.then(async (updatedUser) => {
+			await ActivityLogHelper.createLog(
+				user?.id,
+				updatedUser.id,
+				TABLE_NAME.USER,
+				LogAction.Update,
+				updatedUser.id,
+				null,
+				{ date_agreed_terms }
+			);
+			res.json(updatedUser);
+		})
+		.catch((err) => {
+			next(err);
+		});
+};

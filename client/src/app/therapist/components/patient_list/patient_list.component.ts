@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { reduce, chain, filter, groupBy, capitalize, startsWith, head } from 'lodash';
 import moment from 'moment';
-
+import * as util from '../../../backoffice/backoffice-util';
 import {
   GeneralModalData,
   GENERAL_MODAL_CONTENT,
@@ -24,6 +24,13 @@ import {
   RTMModalComponent,
   RTMModalData,
 } from 'src/app/common/rtm-modal/rtm-modal.component';
+
+import {
+  SHOW_RTM_MODAL_CONTENT,
+  SHOW_RTM_MODAL_STYLE,
+  SHOWRTMModalComponent,
+  SHOWRTMModalData,
+} from 'src/app/common/show-rtm-modal/rtm-modal.component';
 
 @Component({
   selector: 'app-patient-patient-list-component',
@@ -208,12 +215,12 @@ export class PatientListComponent implements OnInit, OnDestroy {
               return acc;
             }
 
-            if (!this.allGames || this.allGames.length === 0) {
+            if (!this?.allGames || this?.allGames.length === 0) {
               console.error('No games available in this.allGames');
               return acc;
             }
 
-            const game = this.allGames.find((game) => game.id === a.game_id);
+            const game = this?.allGames.find((game) => game.id === a.game_id);
             if (!game) {
               console.warn(`Game not found for game_id: ${a.game_id}`);
               return acc;
@@ -418,6 +425,31 @@ export class PatientListComponent implements OnInit, OnDestroy {
     this.appActions.openRTMModal(modalData);
   };
 
+  showRTMMinutes = (patient: { id: any; userId: number }) => {
+    const modalData: SHOWRTMModalData = {
+      modalStyle: SHOW_RTM_MODAL_STYLE.WHITE,
+      content: SHOW_RTM_MODAL_CONTENT.SHOW_RTM,
+      patient,
+      approveCallback: async (modalValues: OuterModalInterface) => {
+        await this.ajax
+          .getAllRtmReport({ month: String(moment().month() + 1), year: String(moment().year()) })
+          .toPromise()
+          .then((response) => {
+            if (response?.data?.allData?.length && response?.data?.cumulativeData?.length) {
+              const { allData, cumulativeData } = response.data;
+              const transformedRows = util.transformRtm(allData, cumulativeData);
+              modalValues.rows = transformedRows;
+            }
+          })
+          .catch((err) => {
+            console.error('Error fetching RTM Report:', err);
+          });
+      },
+      header: 'RTM Patient Track Report',
+    };
+    this.appActions.showOpenRTMModal(modalData);
+  };
+  
   getActivityTooltipText = (activity: { duration: string; gamesDuration: any }) => {
     if (!activity.duration) {
       return '';
@@ -452,7 +484,6 @@ export class PatientListComponent implements OnInit, OnDestroy {
     this.selectedPatientId = patientId;
 
     const selectedPatient = this.patientListFiltered.find((patient) => patient.userId === patientId);
-    console.log('the selectedPatient::', selectedPatient);
 
     const gameMap = new Map<string, any[]>();
 

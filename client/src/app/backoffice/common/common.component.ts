@@ -23,6 +23,8 @@ import { getWeek } from '../../common/date-util';
 import { BackOfficeActions } from '../backoffice-actions';
 import { IAppState } from 'src/app/app.state';
 import { TABS_WITH_SHARED_FILTERS } from '../backoffice-constants';
+import { AjaxService } from 'src/app/therapist/services/ajax.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-common',
@@ -420,8 +422,9 @@ export class CommonComponent implements OnInit {
 
   constructor(
     private http: AjaxAdmin,
+    private ajax: AjaxService,
+    private snackBar: MatSnackBar,
     private authenticationService: AuthenticationService,
-    private router: Router,
     private backOfficeActions: BackOfficeActions
   ) {}
 
@@ -679,15 +682,24 @@ export class CommonComponent implements OnInit {
       this.setLoading(false);
     });
   }
-  sendRtmMailSessionsData(params: { month?: string; year?: string; sendMail?: boolean }) {
-    const updatedParams = {
-      month: params?.month || String(moment().month() + 1),
-      year: params?.year || String(moment().year()),
-      sendMail: true,
-    };
-    this.http.sendRtmMailSessions(updatedParams).subscribe((data) => {
-      console.log('Mail sent successfully', data);
-    });
+
+  async sendRtmMailSessionsData(params: { month?: string; year?: string; sendMail?: boolean }) {
+    try {
+      const userData = await this.ajax.getUserData().toPromise();
+      const updatedParams = {
+        month: params?.month || String(moment().month() + 1),
+        year: params?.year || String(moment().year()),
+        sendMail: true,
+      };
+      await this.http.sendRtmMailSessions(updatedParams).toPromise();
+      this.snackBar.open('Mail sent successfully to', `${userData.email}`, {
+        duration: 3000,
+        verticalPosition: 'top',
+        horizontalPosition: 'right',
+      });
+    } catch (error) {
+      console.error('Error sending mail', error);
+    }
   }
 
   fetchProfessions() {

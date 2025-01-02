@@ -46,10 +46,16 @@ export class SendRTMModalComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
+    const today = moment().toDate();
+    const defaultTime = '00:00';
     this.customForm = new FormGroup({
-      date_time: new FormControl(null, Validators.required),
+      date_time: new FormControl(today, Validators.required),
       review_activity: new FormControl(null, Validators.required),
-      minutes_spent: new FormControl(null, [Validators.required, this.timeFormatValidator]),
+      minutes_spent: new FormControl(defaultTime, [
+        Validators.required,
+        this.timeFormatValidator,
+        this.maxDurationValidator,
+      ]),
       note: new FormControl(null, Validators.required),
     });
     this.setMaxDate();
@@ -67,39 +73,50 @@ export class SendRTMModalComponent implements OnInit {
     });
   }
 
-  timeFormatValidator(control: FormControl): { [key: string]: any } | null {
-    const timeRegex = /^([0-1]\d|2[0-3]):([0-5]\d):([0-5]\d)$/;
-    if (!control.value || timeRegex.test(control.value)) {
-      return null;
-    }
-    return { invalidTime: true };
+maxDurationValidator = (control: FormControl): { [key: string]: any } | null => {
+  if (!control.value) {
+    return null;
   }
+  const totalSeconds = +this.convertTimeToSeconds(control.value);
+  const maxAllowedSeconds = 59 * 60 + 59; 
+  if (totalSeconds < maxAllowedSeconds) {
+    return null;
+  }
+  return { maxDurationExceeded: true };
+};
 
-  convertTimeToSeconds(time: string): number {
-    const [hours, minutes, seconds] = time.split(':').map(Number);
-    return hours * 3600 + minutes * 60 + seconds;
+timeFormatValidator(control: FormControl): { [key: string]: any } | null {
+  const timeRegex = /^([0-5]?\d):([0-5]\d)$/;
+  if (!control.value || timeRegex.test(control.value)) {
+    return null;
   }
+  return { invalidTime: true };
+}
 
-  getFormattedTime(): string {
-    const timeSpent = this.customForm.controls.minutes_spent.value;
-    if (timeSpent) {
-      const totalSeconds = this.convertTimeToSeconds(timeSpent);
-      const hours = Math.floor(totalSeconds / 3600);
-      const minutes = Math.floor((totalSeconds % 3600) / 60);
-      const seconds = totalSeconds % 60;
-      return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds
-        .toString()
-        .padStart(2, '0')}`;
-    }
-    return '00:00:00';
+convertTimeToSeconds(time: string): number {
+  const [minutes, seconds] = time.split(':').map(Number);
+  return minutes * 60 + seconds;
+}
+
+getFormattedTime(): string {
+  const timeSpent = this.customForm.controls.minutes_spent.value;
+  if (timeSpent) {
+    const totalSeconds = this.convertTimeToSeconds(timeSpent);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   }
+  return '00:00';
+}
 
   onTimeInput(event: Event): void {
     const input = event.target as HTMLInputElement;
     let value = input.value.replace(/[^0-9]/g, '');
     if (value.length > 2) value = value.slice(0, 2) + ':' + value.slice(2);
-    if (value.length > 5) value = value.slice(0, 5) + ':' + value.slice(5);
-
+    if (value.length > 5) value = value.slice(0, 5);
+    if (this.convertTimeToSeconds(value) > 59 * 60 + 59) {
+      value = '59:59';
+    }
     input.value = value;
     this.customForm?.controls?.time_spent?.setValue(value, { emitEvent: false });
   }

@@ -28,6 +28,7 @@ export const onLogIn = async (user: {
 	username: string;
 	isTherapist: boolean;
 	peerId: string;
+	email: string;
 	is_two_factor_enabled: boolean;
 }): Promise<any> => {
 	try {
@@ -37,7 +38,9 @@ export const onLogIn = async (user: {
 		});
 		switch (user.role) {
 			case ROLE.ADMIN:
-				return user;
+				const adminDetails = await UserModel.getAdminDetails(user.id);
+				const { email } = EncryptHelper.decryptJson(adminDetails[0]);
+				return { ...user, email };
 			case ROLE.THERAPIST:
 			case ROLE.VIDEO_PATIENT:
 				const userDetails = await UserModel.getUserDetails(user.id);
@@ -56,14 +59,11 @@ export const onLogIn = async (user: {
 					last_name: lastNameDetails,
 					fast_login_link: fast_login_link,
 					pain_level: pain_level,
-					timestamp: timestamp,
 					date_agreed_terms: date_agreed_terms,
 				} = EncryptHelper.decryptJson(details[0]);
 				const RTM = details?.some((ele: { department_name: string }) => ele.department_name.toLowerCase() === 'rtm');
-				const isPainModelOpen =
-					RTM && !isNaN(pain_level) && new Date().getTime() - new Date(timestamp).getTime() >= 24 * 60 * 60 * 1000
-						? true
-						: false;
+				const todayEntry = await UserModel.isPatientEntryForToday(patientId);
+				const isPainModelOpen = RTM && typeof todayEntry.painLevel === 'undefined' && !todayEntry.hasEntries;
 				const validGames = await GameModel.getValidGameForPatient(patientId);
 				const patient = await PatientModel.findPatientByUserId(user.id);
 				const disabledSkeleton = patient.disabled_skeleton;

@@ -108,7 +108,7 @@ export const tableColumns: Record<string, ITableColumn[]> = {
     { fieldName: 'patient_id', displayName: 'Patient Unique ID', flex: 1 },
     { fieldName: 'first_name', displayName: 'First Name', flex: 1 },
     { fieldName: 'last_name', displayName: 'Last Name', flex: 1 },
-    { fieldName: 'since', displayName: 'Since', flex: 1, datePipe: true  },
+    { fieldName: 'since', displayName: 'Date', flex: 1, datePipe: true  },
     { fieldName: 'therapist_session_minutes', displayName: 'Minutes of Remote Monitoring', flex: 2 },
     { fieldName: 'daysDataTransmittedInMonth', displayName: 'Days of Data Transmitted', flex: 2 },
     { fieldName: '98975', displayName: '98975(1,0)', flex: 1 },

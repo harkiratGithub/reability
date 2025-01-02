@@ -38,6 +38,13 @@ export const getGameSettingsForPatient = (req, res, next) => {
 		.catch((err) => next(err));
 };
 
+export const getGameSettings = (req, res, next) => {
+	const { patientId, gameId } = req.body;
+	GameSettingHelper.getGameSettings(gameId, patientId)
+		.then((name) => res.json(name))
+		.catch((err) => next(err));
+};
+
 export const addGameToPatient = (req, res, next) => {
 	const { patientId, gameId } = req.body;
 	GameModel.addGameToPatient(patientId, gameId)

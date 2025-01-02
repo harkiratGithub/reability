@@ -18,7 +18,7 @@ import { ScoreType } from 'src/constants';
 import { MenuOptionsAppActions } from 'src/app/patient/components/menu-options/menu-options.actions';
 import { FeedbackFormComponent } from '../feedback-form/feedback-form.component';
 import { GameHistorySessionComponent } from '../game-history-session/game-history-session.component';
-
+import { User } from '../../../common/models/user';
 @Component({
   selector: 'app-game-wrapper',
   templateUrl: './game_wrapper.component.html',
@@ -57,7 +57,7 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
   @Input() isMobile;
   @Input() currentGameName;
   @Input() isSwappedScreen = false;
-  @Input() connectedUser;
+  @Input() connectedUser: any;
   @Input() inTherapistSession = false;
   @Input() isIntroductionProgressEnded = false;
   @Input() isGameReadyToStart = false;
@@ -71,7 +71,15 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
   @Output() hideGameMessage: EventEmitter<void> = new EventEmitter();
   @Output() sendInitGameSettingsForTherapist: EventEmitter<any> = new EventEmitter();
   @Output() sendShowTimerForTherapist: EventEmitter<any> = new EventEmitter();
-
+  carouselText: string[] = [];
+  currentTextIndex: number = 0;
+  showCarouselText: boolean = false;
+  isPopupVisible = false;
+  timer: any = null; 
+  elapsedTime: number = 0; 
+  currentVideoID="";
+  currentUser: User;
+  currentGameSettings = null;
   constructor(
     private patientWebRtcService: PatientWebRtcService,
     private ajax: AjaxService,
@@ -86,6 +94,11 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this.currentGameUrl$.subscribe((currentGame) => {
         this.currentGameUrl = currentGame;
+      })
+    );
+    this.subscription.add(
+      this.authenticationService.currentUser.subscribe((user) => {
+        this.currentUser = user;
       })
     );
     this.subscription.add(
@@ -105,9 +118,84 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
     if (!this.isTherapist) {
       this.initPatientCallbacks();
       this.initPatientSubscriptions();
+      const patientId =
+      this.connectedUser && this.connectedUser.patientId ? this.connectedUser.patientId : this.currentUser.id;
+    
+     if(patientId && this.gameId){
+        this.ajax.getGameSettings(this.gameId, patientId ).subscribe((gamesettings) => {
+          this.currentGameSettings=gamesettings.current_set;
+        });
+      }
     } else {
       this.handleTherapistCallbacks();
     }
+
+    window.addEventListener('message', (event) => {      
+      if (event.data) {
+        const parsedResponse = JSON.parse(event.data);
+        const type = parsedResponse.msg.type;
+        const index = parsedResponse.msg.data.index;
+        const shouldPlay = parsedResponse.msg.data.shouldPlay;
+        const vidTime = parsedResponse.msg.data.currentPlayTime.vidTime;
+        const sourceUrl = parsedResponse.msg.data.source;
+    
+        const videoIdMatch = sourceUrl.match(/P\d+/);
+        const videoId = videoIdMatch ? videoIdMatch[0] : null;
+    
+        if (this.currentVideoID !== videoId) {
+          this.resetTimer();
+        }
+    
+        const integerVidTime = Math.floor(vidTime);
+        this.currentVideoID = videoId;
+        
+        
+        if (this.currentGameSettings[index]?.fileName === videoId) {          
+          const additionalInfo = this.currentGameSettings[index]?.additionalInfo?.trim();
+          this.carouselText = additionalInfo ? [additionalInfo] : []; 
+        } else {
+          this.carouselText = []; 
+        }
+    
+        
+        if (type === 'sync_video_data') {
+          if (this.isEmpty(this.carouselText)) {
+            this.isPopupVisible = false; 
+          }
+    
+          if (!this.timer) {
+            this.startTimer();
+          }
+    
+          if (this.elapsedTime >= 2 && integerVidTime >= 2 && !this.isPopupVisible && !this.isEmpty(this.carouselText)) {
+            this.isPopupVisible = true;
+            this.startCarousel();
+          } else if (integerVidTime < 2 || this.isEmpty(this.carouselText)) {
+            this.isPopupVisible = false; 
+          }
+        }
+      }
+    });    
+  }
+
+  isEmpty(array: string[]): boolean {
+    return !array || array.length === 0 || array.every(item => item.trim() === '');
+  }
+  
+  resetTimer() {
+    clearInterval(this.timer);
+    this.timer = null;
+    this.elapsedTime = 0;
+  }
+  
+  startTimer() {
+    this.timer = setInterval(() => {
+      this.elapsedTime += 1;  
+      if (this.elapsedTime >= 2 && !this.isPopupVisible && !this.isEmpty(this.carouselText)) {
+        this.isPopupVisible = true;
+        this.startCarousel();
+      }
+    }, 1000);
   }
 
   ngOnDestroy() {
@@ -863,4 +951,11 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
       return { gameId: this.gameIdTherapist, userId: this.peerId };
     }
   };
+  startCarousel(): void {
+    if(this.isPopupVisible){
+      setInterval(() => {
+        this.currentTextIndex = (this.currentTextIndex + 1) % this.carouselText.length;
+      }, 20000);
+    } 
+  }
 }

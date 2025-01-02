@@ -78,6 +78,7 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatSelectModule } from '@angular/material/select';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 import {
   NgxMatMomentModule,
@@ -94,6 +95,7 @@ import { GeneralModalComponent } from './common/general-modal/general-modal.comp
 import { RTMModalComponent } from './common/rtm-modal/rtm-modal.component';
 import { SendFastLoginModalComponent } from './common/general-modals/send-fast-login-modal/send-fast-login-modal.component';
 import { SendRTMModalComponent } from './common/rtm-modal/send-rtm-modal/send-rtm-modal.component';
+import { ShowRTMModalComponent } from './common/show-rtm-modal/show-rtm-modal/show-rtm-modal.component';
 import { FastLoginComponent } from './common/password-routes/fast-login/fast-login.component';
 import { DurationPipe } from '../app/pipes/duration.pipe';
 import { AddEditFollowupComponent } from './backoffice/add-edit/add-edit-followup/add-edit-followup.component';
@@ -192,6 +194,7 @@ export const CUSTOM_MOMENT_FORMATS = {
     RTMModalComponent,
     SendFastLoginModalComponent,
     SendRTMModalComponent,
+    ShowRTMModalComponent,
     FastLoginComponent,
     DurationPipe,
     AddEditFollowupComponent,
@@ -265,6 +268,7 @@ export const CUSTOM_MOMENT_FORMATS = {
     MatMenuModule,
     MatSnackBarModule,
     NgxFileDropModule,
+    MatProgressSpinnerModule
   ],
   providers: [
     NgReduxRouter,

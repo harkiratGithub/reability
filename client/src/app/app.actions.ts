@@ -6,6 +6,7 @@ import { IAppState, IGameAppData } from './app.state';
 import { GeneralModalData } from './common/general-modal/general-modal.component';
 import { IOrganAngle } from '../types';
 import { RTMModalData } from './common/rtm-modal/rtm-modal.component';
+import { SHOWRTMModalData } from './common/show-rtm-modal/rtm-modal.component';
 
 export interface IAppAction extends Action {
   counter: number;
@@ -32,7 +33,10 @@ export class AppActions {
   static SET_MESSAGE_GENERAL_MODAL = 'SET_MESSAGE_GENERAL_MODAL';
   static OPEN_RTM_MODAL = 'open_rtm_modal';
   static CLOSE_RTM_MODAL = 'close_rtm_modal';
+  static SHOW_OPEN_RTM_MODAL = 'show_open_rtm_modal';
+  static SHOW_CLOSE_RTM_MODAL = 'show_close_rtm_modal';
   static SET_MESSAGE_RTM_MODAL = 'SET_MESSAGE_RTM_MODAL';
+  static SET_MESSAGE_SHOW_RTM_MODAL = 'SET_MESSAGE_SHOW_RTM_MODAL';
   static TOGGLE_BODY_TRACKING = 'TOGGLE_BODY_TRACKING';
   static SET_BODY_TRACKING_UNAVAILABLE = 'SET_BODY_TRACKING_UNAVAILABLE';
   static SET_SEND_MEDIA_TO_IFRAME_REQUEST = 'SET_SEND_MEDIA_TO_IFRAME_REQUEST';
@@ -199,9 +203,30 @@ export class AppActions {
     });
   };
 
+  showOpenRTMModal = (modalData: SHOWRTMModalData) => {
+    this.ngRedux.dispatch({
+      type: AppActions.SHOW_OPEN_RTM_MODAL,
+      payload: modalData,
+    });
+  };
+
+  showCloseRTMModal = () => {
+    this.ngRedux.dispatch({
+      type: AppActions.SHOW_CLOSE_RTM_MODAL,
+    });
+  };
+
   setMessageRTMModal = (msg) => {
     this.ngRedux.dispatch({
       type: AppActions.SET_MESSAGE_RTM_MODAL,
+      payload: msg,
+    });
+  };
+
+  setMessageShowRTMModal = (msg) => {
+    console.log('setMessageShowRTMModal: ', msg);
+    this.ngRedux.dispatch({
+      type: AppActions.SET_MESSAGE_SHOW_RTM_MODAL,
       payload: msg,
     });
   };

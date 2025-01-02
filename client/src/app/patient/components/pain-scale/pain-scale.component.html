@@ -6,15 +6,15 @@
     </div>
     <h2 class="heading">PAIN MEASUREMENT SCALE</h2>
     <div class="gradient-bar">
-      <input 
-        type="range" 
-        min="0" 
-        max="10" 
-        step="1" 
-        class="pain-slider" 
-        id="painSlider" 
-        [value]="painValue" 
-        (input)="onSliderChange($event)" 
+      <input
+        type="range"
+        min="0"
+        max="10"
+        step="1"
+        class="pain-slider"
+        id="painSlider"
+        [value]="painValue"
+        (input)="onSliderChange($event)"
       />
     </div>
     <div class="pain-labels">
@@ -23,20 +23,17 @@
 
     <div class="textarea-container">
       <label for="patientNote" class="textarea-label">Additional Notes</label>
-      <textarea 
-        id="patientNote" 
-        [(ngModel)]="patient_note" 
-        rows="4" 
+      <textarea
+        id="patientNote"
+        [(ngModel)]="patient_note"
+        rows="4"
         placeholder="Please enter any additional information about your pain..."
         class="textarea"
       ></textarea>
     </div>
 
     <div class="save-button-container">
-      <button 
-        class="save-button" 
-        (click)="savePainValue()"
-      >
+      <button class="save-button" (click)="savePainValue()" [disabled]="isSaving">
         <img class="file-icon" width="25" height="25" src="../../../../assets/login/save.png" />
         Save
       </button>

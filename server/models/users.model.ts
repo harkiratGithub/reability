@@ -74,6 +74,28 @@ export const usersValidator = (usersObject) => {
 // 	return result.rows;
 // };
 
+export const isPatientEntryForToday = async (
+	patientId: number
+): Promise<{ hasEntries: boolean; painLevel?: number }> => {
+	try {
+		console.log('Checking entries for patientId:', patientId);
+		const query = squelPostgres
+			.select()
+			.field(`${TABLE_NAME.RTM}.timestamp`, 'timestamp')
+			.field(`${TABLE_NAME.RTM}.data->'patient'->>'pain_level'`, 'pain_level')
+			.from(TABLE_NAME.RTM)
+			.where('patient_id = ?', patientId)
+			.where('DATE(timestamp) = CURRENT_DATE')
+			.toParam();
+
+		const result = await BaseModel.runQuery(query);
+		const hasEntries = result.rows.length > 0;
+		const painLevel = hasEntries ? result.rows[0]?.pain_level : undefined;
+		return { hasEntries, painLevel };
+	} catch (error) {
+		return { hasEntries: false };
+	}
+};
 export const getUserDetails = async (userId) => {
 	const query = squelPostgres
 		.select()
@@ -85,7 +107,7 @@ export const getUserDetails = async (userId) => {
 		.field(`${TABLE_NAME.USER}.fast_login_link`)
 		.field(`${TABLE_NAME.DEPARTMENT}.id`, 'department_id')
 		.field(`${TABLE_NAME.DEPARTMENT}.name`, 'department_name')
-		.field(`${TABLE_NAME.RTM}.data->>'pain_level'`, 'pain_level')
+		.field(`${TABLE_NAME.RTM}.data->'patient'->>'pain_level'`, 'pain_level')
 		.field(`${TABLE_NAME.RTM}.timestamp`, 'timestamp')
 		.field(`${TABLE_NAME.USER}.date_agreed_terms`)
 		.from(TABLE_NAME.PATIENT)
@@ -131,6 +153,18 @@ export const getUserDetails = async (userId) => {
 				.where(`user_id = ?`, userId)
 		)
 		.toParam();
+	const result = await BaseModel.runQuery(query);
+	return result.rows;
+};
+
+export const getAdminDetails = async (userId: number) => {
+	const query = squelPostgres
+		.select()
+		.field(`${TABLE_NAME.USER}.email`, 'email')
+		.from(TABLE_NAME.USER)
+		.where(`id = ?`, userId)
+		.toParam();
+
 	const result = await BaseModel.runQuery(query);
 	return result.rows;
 };
@@ -218,14 +252,8 @@ export const updateUserUsage = (id) => {
 	return BaseModel.updateRowByField(TABLE_NAME.USER, { logged_out_at: Helper.createTimeForDb() }, 'id', id);
 };
 export const updateUserTermsConditions = (id, dateAgreedTerms) => {
-	return BaseModel.updateRowByField(
-	  TABLE_NAME.USER, 
-	  { date_agreed_terms: dateAgreedTerms },  
-	  'id', 
-	  id 
-	);
-  };
-  
+	return BaseModel.updateRowByField(TABLE_NAME.USER, { date_agreed_terms: dateAgreedTerms }, 'id', id);
+};
 
 export const getPeersByTherapistId = async (therapistId) => {
 	const query = squelPostgres
