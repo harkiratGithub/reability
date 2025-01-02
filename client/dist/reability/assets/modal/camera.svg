@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="40px" height="40px" viewBox="0 0 40 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>CD548B72-AD21-4326-987B-C2C6DED18C9B</title>
+    <g id="02-Reability-Board-V2" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Game-board---Call" transform="translate(-586.000000, -371.000000)">
+            <g id="Group-8" transform="translate(522.000000, 307.000000)">
+                <g id="Group-2" transform="translate(48.000000, 48.000000)">
+                    <g id="fullscreen_black_24dp" transform="translate(16.000000, 16.000000)">
+                        <polygon id="Path" points="0 0 40 0 40 40 0 40"></polygon>
+                        <g id="videocam_black_24dp" transform="translate(5.000000, 10.000000)" fill="#F5006E" fill-rule="nonzero">
+                            <path d="M23.3333333,7.5 L23.3333333,1.66666667 C23.3333333,0.75 22.5833333,0 21.6666667,0 L1.66666667,0 C0.75,0 0,0.75 0,1.66666667 L0,18.3333333 C0,19.25 0.75,20 1.66666667,20 L21.6666667,20 C22.5833333,20 23.3333333,19.25 23.3333333,18.3333333 L23.3333333,12.5 L27.15,16.3166667 C28.2,17.3666667 30,16.6166667 30,15.1333333 L30,4.85 C30,3.36666667 28.2,2.61666667 27.15,3.66666667 L23.3333333,7.5 Z" id="Path"></path>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

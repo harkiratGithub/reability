@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="8px" height="13px" viewBox="0 0 8 13" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 63.1 (92452) - https://sketch.com -->
+    <title>arrow_left</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Therapist" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="02_Therapist--Patients" transform="translate(-455.000000, -192.000000)" fill="#6A879E" fill-rule="nonzero">
+            <g id="Group-14" transform="translate(441.000000, 174.000000)">
+                <g id="Group-12">
+                    <g id="Group-2">
+                        <g id="Group-9">
+                            <g id="angle-right-b-copy" transform="translate(18.000000, 24.500000) scale(-1, 1) translate(-18.000000, -24.500000) translate(14.000000, 18.000000)">
+                                <path d="M6.87626428,5.68242227 L1.72594408,0.609773533 C1.55508576,0.439805997 1.32250616,0.344201676 1.07987918,0.344201676 C0.837252207,0.344201676 0.604672606,0.439805997 0.433814282,0.609773533 C0.0810049779,0.959954595 0.0810049779,1.52551012 0.433814282,1.87569118 L4.93806958,6.36476086 L0.433814282,10.8089398 C0.0810049779,11.1591209 0.0810049779,11.7246764 0.433814282,12.0748575 C0.604040041,12.2462104 0.836698629,12.3432056 1.07987918,12.3442017 C1.32305974,12.3432056 1.55571833,12.2462104 1.72594408,12.0748575 L6.87626428,7.00220876 C7.06299632,6.83223859 7.1692073,6.59298417 7.1692073,6.34231551 C7.1692073,6.09164686 7.06299632,5.85239244 6.87626428,5.68242227 Z" id="arrow_left"></path>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

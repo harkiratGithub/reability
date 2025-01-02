@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32px" height="32px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>D769CB7D-BB2E-40CF-881A-92EBE4A71020</title>
+    <g id="02-Reability-Board-V2" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Game-board---nav" transform="translate(-1674.000000, -62.000000)">
+            <g id="Camera" transform="translate(1660.000000, 48.000000)">
+                <g id="Group-6" transform="translate(14.000000, 14.000000)">
+                    <g id="Group">
+                        <polygon id="Path" points="0 0 32 0 32 32 0 32"></polygon>
+                        <path d="M18.6666667,10.6666667 L18.6666667,8 C18.6666667,6.52724067 17.4727593,5.33333333 16,5.33333333 L6.66666667,5.33333333 C5.19390733,5.33333333 4,6.52724067 4,8 L4,24 C4,25.4727593 5.19390733,26.6666667 6.66666667,26.6666667 L16,26.6666667 C17.4727593,26.6666667 18.6666667,25.4727593 18.6666667,24 L18.6666667,21.3333333" id="Path" fill="#FFFFFF"></path>
+                        <path d="M9.33333333,16 L28,16 L24,12 M24,20 L28,16" id="Shape" stroke="#3E474B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <path d="M19.7990774,16 L28,16 L24,12 M24,20 L28,16" id="Shape" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                    </g>
+                    <rect id="Rectangle" fill="#FFFFFF" x="18.67" y="15" width="4" height="2"></rect>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

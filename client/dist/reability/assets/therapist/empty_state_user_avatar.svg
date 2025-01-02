@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="153px" height="153px" viewBox="0 0 153 153" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 59.1 (86144) - https://sketch.com -->
+    <title>empty_state_user_avatar</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Therapist" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" opacity="0.300000012">
+        <g id="02_Therapist--Sessions-Copy" transform="translate(-745.000000, -293.000000)" fill="#6A94BA" fill-rule="nonzero">
+            <g id="Group-4" transform="translate(290.000000, 128.000000)">
+                <g id="Group-3">
+                    <g id="Group-5" transform="translate(357.000000, 165.000000)">
+                        <g id="Group-2">
+                            <g id="Group">
+                                <path d="M233.864,0 C238.488023,0 242.499983,1.699983 245.9,5.1 C249.300017,8.500017 251,12.5119769 251,17.136 L251,135.864 C251,140.488023 249.300017,144.499983 245.9,147.9 C242.499983,151.300017 238.488023,153 233.864,153 L115.136,153 C110.511977,153 106.500017,151.300017 103.1,147.9 C99.699983,144.499983 98,140.488023 98,135.864 L98,17.136 C98,12.5119769 99.699983,8.500017 103.1,5.1 C106.500017,1.699983 110.511977,0 115.136,0 L233.864,0 Z M175,87 C161.65,87 135,93.7 135,107 L135,112 C135,114.75 137.25,117 140,117 L210,117 C212.75,117 215,114.75 215,112 L215,107 C215,93.7 188.35,87 175,87 Z M175,37 C163.95,37 155,45.95 155,57 C155,68.05 163.95,77 175,77 C186.05,77 195,68.05 195,57 C195,45.95 186.05,37 175,37 Z" id="empty_state_user_avatar"></path>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
