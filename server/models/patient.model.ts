@@ -616,14 +616,25 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 				).padStart(2, '0')}`;
 				row.data.therapist.minutes_spent = formattedTime;
 			}
-			const therapistDataQuery = squelPostgres
+			const userDataQuery = squelPostgres
 				.select()
 				// .field(`${TABLE_NAME.USER}.first_name`)
-				.field(`${TABLE_NAME.USER}.user_name`)
-				.from(TABLE_NAME.USER, 'users')
+				.field(`${TABLE_NAME.THERAPIST}.user_id`)
+				.from(TABLE_NAME.THERAPIST, 'therapist')
 				.where(`id=?`, rtmData.therapist.therapist_id);
-			const therapistDataSessionResult = await BaseModel.runQuery(therapistDataQuery.toParam());
-			row.data.therapist.user_name = therapistDataSessionResult.rows[0]?.user_name;
+			const userDataSessionResult = await BaseModel.runQuery(userDataQuery.toParam());
+			if (userDataSessionResult?.rows?.length > 0) {
+				const therapistDataQuery = squelPostgres
+					.select()
+					// .field(`${TABLE_NAME.USER}.first_name`)
+					.field(`${TABLE_NAME.USER}.user_name`)
+					.from(TABLE_NAME.USER, 'users')
+					.where(`id=?`, userDataSessionResult?.rows[0].user_id);
+				const therapistDataSessionResult = await BaseModel.runQuery(therapistDataQuery.toParam());
+				row.data.therapist.user_name = therapistDataSessionResult.rows[0]?.user_name;
+
+			}
+
 		}
 		return row;
 	});
