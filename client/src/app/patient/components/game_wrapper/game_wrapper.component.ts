@@ -167,10 +167,10 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
             this.startTimer();
           }
     
-          if (this.elapsedTime >= 30 && integerVidTime >= 30 && !this.isPopupVisible && !this.isEmpty(this.carouselText)) {
+          if (this.elapsedTime >= 2 && integerVidTime >= 2 && !this.isPopupVisible && !this.isEmpty(this.carouselText)) {
             this.isPopupVisible = true;
             this.startCarousel();
-          } else if (integerVidTime < 30 || this.isEmpty(this.carouselText)) {
+          } else if (integerVidTime < 2 || this.isEmpty(this.carouselText)) {
             this.isPopupVisible = false; 
           }
         }
@@ -191,7 +191,7 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
   startTimer() {
     this.timer = setInterval(() => {
       this.elapsedTime += 1;  
-      if (this.elapsedTime >= 30 && !this.isPopupVisible && !this.isEmpty(this.carouselText)) {
+      if (this.elapsedTime >= 2 && !this.isPopupVisible && !this.isEmpty(this.carouselText)) {
         this.isPopupVisible = true;
         this.startCarousel();
       }
@@ -955,7 +955,7 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
     if(this.isPopupVisible){
       setInterval(() => {
         this.currentTextIndex = (this.currentTextIndex + 1) % this.carouselText.length;
-      }, 6000);
+      }, 20000);
     } 
   }
 }
