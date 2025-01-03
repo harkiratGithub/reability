@@ -208,7 +208,6 @@ export const getActivities = async (therapistId, startTime, endTime) => {
 		const contactsByPatientId = groupBy(contacts, 'patient_id');
 		// const rtmList = await BaseModel.itemsInArray(TABLE_NAME.PATIENT_DEPARTMENTS, 'department_id', ['3', '172']);
 		const rtmList = await PatientModel.getRTMList();
-		console.log('RTMList', rtmList);
 		const newActivities = allPatients.map((patient) => {
 			const patientPeer = res[1].find((x) => patient.user_id === x.user_id);
 			const { duration, ...restPatient } = patient;

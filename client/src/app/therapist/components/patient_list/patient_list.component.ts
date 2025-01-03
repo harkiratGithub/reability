@@ -68,7 +68,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
     public dialog: MatDialog,
     public appActions: AppActions,
     private recaptchaV3Service: ReCaptchaV3Service
-  ) {}
+  ) { }
   ngOnInit() {
     this.therapistId = this.authenticationService.currentUserValue.id;
     this.filterFunc = this.filterByName;
@@ -370,11 +370,11 @@ export class PatientListComponent implements OnInit, OnDestroy {
             .then((res) => {
               modalValues.dataFromInnerForm.innerModalValue.date_time
                 ? this.appActions.setMessageGeneralModal(
-                    'The message will be sent at ' +
-                      moment
-                        .unix(Number.parseInt(modalValues.dataFromInnerForm.innerModalValue.date_time))
-                        .format('DD/MM/YYYY HH:mm')
-                  )
+                  'The message will be sent at ' +
+                  moment
+                    .unix(Number.parseInt(modalValues.dataFromInnerForm.innerModalValue.date_time))
+                    .format('DD/MM/YYYY HH:mm')
+                )
                 : this.appActions.setMessageGeneralModal('The message was sent');
             })
             .catch((err) => {
@@ -409,9 +409,9 @@ export class PatientListComponent implements OnInit, OnDestroy {
           .then((res) => {
             const successMessage = timestamp
               ? 'Manual Time track has been recorded on ' +
-                moment(timestamp)
-                  .set({ hour: moment().hour(), minute: moment().minute(), second: moment().second() })
-                  .format('DD/MM/YYYY HH:mm')
+              moment(timestamp)
+                .set({ hour: moment().hour(), minute: moment().minute(), second: moment().second() })
+                .format('DD/MM/YYYY HH:mm')
               : 'Manual Time track has been recorded';
             this.appActions.setMessageRTMModal(successMessage);
           })
@@ -449,7 +449,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
     };
     this.appActions.showOpenRTMModal(modalData);
   };
-  
+
   getActivityTooltipText = (activity: { duration: string; gamesDuration: any }) => {
     if (!activity.duration) {
       return '';
@@ -555,43 +555,41 @@ export class PatientListComponent implements OnInit, OnDestroy {
         console.log('No game session logs available to copy.');
         return;
       }
+      const formattedLogs = this.patientLog?.map((game) => {
+        const gameName = `Game Name: ${game?.gameName[0].toUpperCase() + game?.gameName.slice(1)}`;
+        const duration = `Duration: ${game?.latestSession?.duration || ''}`;
+        let summary = '';
+        if (game.latestSession?.gameSummary) {
+          summary += `Total Squats: ${game.latestSession.gameSummary.totalSquats !== undefined &&
+            game.latestSession.gameSummary.totalSquats !== null
+            ? game.latestSession.gameSummary.totalSquats
+            : ''
+            }\n`;
+          summary += `Squats Per Set: ${game.latestSession.gameSummary.squatsPerSet?.join(', ') || ''}\n`;
+          summary += `Game Time (seconds): ${game.latestSession?.gameSummary?.gameTimeSeconds !== undefined &&
+            game.latestSession.gameSummary.gameTimeSeconds !== null
+            ? game.latestSession.gameSummary.gameTimeSeconds
+            : ''
+            }\n`;
+        } else {
+          summary += 'No game summary available\n';
+        }
 
-      const latestGame = this.patientLog[this.patientLog.length - 1];
+        let feedback = '';
+        if (game.latestSession?.sessionFeedback?.questions?.length) {
+          feedback += 'Session Feedback:\n';
+          game.latestSession.sessionFeedback.questions.forEach((question: any) => {
+            feedback += `${question.question}: ${question.answer || ''}\n`;
+          });
+        } 
+        // else {
+        //   feedback += 'No session feedback available\n';
+        // }
+        return `${gameName}\n${duration}\n${summary}${feedback}`;
+      });
 
-      const gameName = `Game Name: ${latestGame.gameName}`;
-      const duration = `Duration: ${latestGame.latestSession?.duration || 'N/A'}`;
-
-      let summary = '';
-      if (latestGame.latestSession?.gameSummary) {
-        summary += `Total Squats: ${
-          latestGame.latestSession.gameSummary.totalSquats !== undefined
-            ? latestGame.latestSession.gameSummary.totalSquats
-            : 'N/A'
-        }\n`;
-        summary += `Squats Per Set: ${latestGame.latestSession.gameSummary.squatsPerSet?.join(', ') || 'N/A'}\n`;
-        summary += `Game Time (seconds): ${
-          latestGame.latestSession.gameSummary.gameTimeSeconds !== null
-            ? latestGame.latestSession.gameSummary.gameTimeSeconds
-            : 'N/A'
-        }\n`;
-      } else {
-        summary += 'No game summary available\n';
-      }
-
-      let feedback = '';
-      if (latestGame.latestSession?.sessionFeedback?.questions?.length) {
-        feedback += 'Session Feedback:\n';
-        latestGame.latestSession.sessionFeedback.questions.forEach((question: any) => {
-          feedback += `${question.question}: ${question.answer || 'N/A'}\n`;
-        });
-      } else {
-        feedback += 'No session feedback available\n';
-      }
-
-      const formattedLog = `${gameName}\n${duration}\n${summary}\n${feedback}`;
-
+      const formattedLog = formattedLogs.join('\n|** Game Logs **|\n\n');
       await navigator.clipboard.writeText(formattedLog);
-
       this.isLogModalOpen = false;
       this.isCopiedToClipboard = true;
     } catch (e) {
@@ -645,8 +643,8 @@ export class PatientListComponent implements OnInit, OnDestroy {
     const convertToSeconds = (timeStr: {
       split: (arg0: string) => {
         (): any;
-        new (): any;
-        map: { (arg0: NumberConstructor): [any, any, any]; new (): any };
+        new(): any;
+        map: { (arg0: NumberConstructor): [any, any, any]; new(): any };
       };
     }) => {
       const [hours, minutes, seconds] = timeStr.split(':').map(Number);
@@ -681,9 +679,8 @@ export class PatientListComponent implements OnInit, OnDestroy {
             if (feedback && feedback.questions) {
               const feedbackText = feedback.questions
                 .map((q: { question: any; answer: string }) => {
-                  return `* ${q.question}: ${
-                    options?.find((o) => o?.value == q.answer)?.label || 'No answer provided'
-                  }`;
+                  return `* ${q.question}: ${options?.find((o) => o?.value == q.answer)?.label || 'No answer provided'
+                    }`;
                 })
                 .join('\n');
 

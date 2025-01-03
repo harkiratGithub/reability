@@ -78,7 +78,6 @@ export const isPatientEntryForToday = async (
 	patientId: number
 ): Promise<{ hasEntries: boolean; painLevel?: number }> => {
 	try {
-		console.log('Checking entries for patientId:', patientId);
 		const query = squelPostgres
 			.select()
 			.field(`${TABLE_NAME.RTM}.timestamp`, 'timestamp')
