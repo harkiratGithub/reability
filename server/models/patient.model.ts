@@ -351,7 +351,7 @@ export const getPatientsActivitiesData = async (patientId, startTime, endTime) =
 		.left_join(TABLE_NAME.USER, null, `${TABLE_NAME.USER}.id = ${TABLE_NAME.PATIENT}.user_id`)
 		.where(`${TABLE_NAME.PATIENT}.id = ?`, patientId)
 		.where(`${TABLE_NAME.USER}.active = ?`, true)
-		.where(`LOWER(${TABLE_NAME.DEPARTMENT}.name) IN ?`, ['rtm'])
+		// .where(`LOWER(${TABLE_NAME.DEPARTMENT}.name) IN ?`, ['rtm'])
 		.toParam();
 	const patientDetails = await BaseModel.runQuery(getPatientDetails);
 	return patientDetails.rows;
