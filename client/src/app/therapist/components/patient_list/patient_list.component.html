@@ -198,6 +198,7 @@
               <div class="logs-container">
                 <div *ngFor="let log of patientLog">
                   <div class="game-log">
+                    <!-- <h3>Game Name: {{ log.gameName | titlecase }}</h3> -->
                     <h3>Game Name: {{ log.gameName | titlecase }}</h3>
                     <div class="duration">
                       <p><strong>Duration:</strong> {{ log.latestSession.duration }}</p>
