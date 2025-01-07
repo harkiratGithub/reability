@@ -110,13 +110,12 @@
             </button>
           </div>
 
-          <div
+          <!-- <div
             *ngIf="isLogModalOpen && patientLog?.length && selectedPatientId == patient.userId"
             class="patient-log-modal"
           >
             <div class="patient-log-content">
               <h3 class="game-heading">Game Information</h3>
-
               <div class="logs-container">
                 <div *ngFor="let log of patientLog">
                   <div class="game-log">
@@ -142,13 +141,6 @@
                         </p>
                       </div>
                     </div>
-
-                    <!-- <p class="session-feedback"><strong>Session Feedback</strong></p>
-                    <ul>
-                      <li *ngFor="let feedback of log.latestSession.sessionFeedback">
-                        {{ feedback.question }} - {{ feedback.answer }}
-                      </li>
-                    </ul> -->
 
                     <div class="button-container">
                       <button
@@ -178,17 +170,85 @@
                             Game Score: {{ session.gameSummary.gameScore.join(', ') }}
                           </p>
                         </div>
+                      </div>
+                    </div>
 
-                        <!-- <p class="session-feedback" *ngIf="session?.sessionFeedback?.length > 0">
-                          <strong>Session Feedback:</strong>
-                        </p> -->
+                  </div>
+                </div>
+              </div>
 
-                        <!-- <div *ngFor="let feedback of session.sessionFeedback">
-                          <ul class="ques-ans">
-                            <li>{{ feedback?.question }}</li>
-                            <p>{{ feedback?.answer }}</p>
-                          </ul>
-                        </div> -->
+              <div class="total-duration">
+                <h4>Total Time Spent on Games:</h4>
+                <span>{{ getTotalDuration(patientLog) || '00:00:00' }}</span>
+              </div>
+
+              <div class="modal-actions">
+                <button class="close-btn" (click)="closeModal()">Close</button>
+                <button (click)="copyToClipboard()" title="copy" class="copy-btn">Copy</button>
+              </div>
+            </div>
+          </div> -->
+
+          <div
+            *ngIf="isLogModalOpen && patientLog?.length && selectedPatientId == patient.userId"
+            class="patient-log-modal"
+          >
+            <div class="patient-log-content">
+              <h3 class="game-heading">Game Information</h3>
+              <div class="logs-container">
+                <div *ngFor="let log of patientLog">
+                  <div class="game-log">
+                    <h3>Game Name: {{ log.gameName | titlecase }}</h3>
+                    <div class="duration">
+                      <p><strong>Duration:</strong> {{ log.latestSession.duration }}</p>
+                    </div>
+
+                    <div class="game-summary" *ngIf="log.latestSession.gameSummary && hasValidProperties(log.latestSession.gameSummary)">
+                      <p><strong>Game Summary:</strong></p>
+                      <div >
+                        <ng-container *ngFor="let key of getKeys(log.latestSession.gameSummary)">
+                          <p
+                            *ngIf="
+                              log.latestSession.gameSummary[key] !== null &&
+                              log.latestSession.gameSummary[key] !== undefined &&
+                              log.latestSession.gameSummary[key] !== '{}'
+                            "
+                          >
+                            <strong>{{ key | titlecase }}:</strong>
+                            {{ log.latestSession.gameSummary[key] }}
+                          </p>
+                        </ng-container>
+                      </div>
+                    </div>
+
+                    <div class="button-container">
+                      <button
+                        class="submit-button"
+                        *ngIf="log.remainingSessions.length > 0"
+                        (click)="log.showMore = !log.showMore"
+                      >
+                        {{ log.showMore ? 'Show Less' : 'Show More' }}
+                      </button>
+                    </div>
+
+                    <div *ngIf="log.showMore">
+                      <div *ngFor="let session of log.remainingSessions">
+                        <p><strong>Additional Session - Duration:</strong> {{ session.duration }}</p>
+                        <hr />
+                        <div class="additional-session">
+                          <ng-container *ngFor="let key of getKeys(session.gameSummary)">
+                            <p
+                              *ngIf="
+                                session.gameSummary[key] !== null &&
+                                session.gameSummary[key] !== undefined &&
+                                session.gameSummary[key] !== '{}'
+                              "
+                            >
+                              <strong>{{ key | titlecase }}:</strong>
+                              {{ session.gameSummary[key] }}
+                            </p>
+                          </ng-container>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -199,6 +259,7 @@
                 <h4>Total Time Spent on Games:</h4>
                 <span>{{ getTotalDuration(patientLog) || '00:00:00' }}</span>
               </div>
+
               <div class="modal-actions">
                 <button class="close-btn" (click)="closeModal()">Close</button>
                 <button (click)="copyToClipboard()" title="copy" class="copy-btn">Copy</button>
@@ -271,7 +332,7 @@
                 <div class="settings-icons show-rtm" (click)="showRTMMinutes(patient)"></div>
                 <div class="sub-show-label" (click)="showRTMMinutes(patient)">Show RTM</div>
               </div>
-              <div class="send-rtm-invitation" *ngIf="patient.isRTM" >
+              <div class="send-rtm-invitation" *ngIf="patient.isRTM">
                 <div class="settings-icons send-rtm" (click)="addRTMMinutes(patient)"></div>
                 <div class="sub-label" (click)="addRTMMinutes(patient)">Add to RTM(minutes)</div>
               </div>

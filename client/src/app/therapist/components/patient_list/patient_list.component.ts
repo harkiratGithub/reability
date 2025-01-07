@@ -125,8 +125,16 @@ export class PatientListComponent implements OnInit, OnDestroy {
       });
   };
 
-  getKeys(obj: any): string[] {
-    return Object.keys(obj);
+  getKeys(object: any): string[] {
+    console.log(object ? Object.keys(object) : []);
+    
+    return object ? Object.keys(object) : [];
+  }
+
+  hasValidProperties(object: any): boolean {
+    return Object.values(object).some(
+      value => value !== null && value !== undefined && typeof value !== 'object'
+    );
   }
 
   setFilteredData = (filteredData: any[]) => (this.patientListFiltered = filteredData);
@@ -173,7 +181,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
             ?.map((item) => ({
               start_time: item.start_time,
               game_summary: item?.game_summary,
-              session_feedback: item?.session_feedback,
+              // session_feedback: item?.session_feedback,
             }))
             ?.sort((a, b) => new Date(b?.start_time)?.getTime() - new Date(a?.start_time)?.getTime())
         )?.game_summary,
@@ -226,13 +234,14 @@ export class PatientListComponent implements OnInit, OnDestroy {
               return acc;
             }
             const gameSummary = a.game_summary;
-            const sessionFeedback = a.session_feedback;
+            // const sessionFeedback = a.session_feedback;
             const gameName = game ? game.name : a.game_id.toString();
             const gameDuration = acc.gamesDuration.find((gameDuration) => gameDuration.gameName === gameName);
             if (gameDuration) {
               gameDuration.duration = addTwoDurationTimeTogether(gameDuration.duration, a.duration);
             } else {
-              acc.gamesDuration.push({ gameName, duration: a.duration, gameSummary, sessionFeedback });
+              // acc.gamesDuration.push({ gameName, duration: a.duration, gameSummary, sessionFeedback });
+              acc.gamesDuration.push({ gameName, duration: a.duration, gameSummary });
             }
             return acc;
           },
