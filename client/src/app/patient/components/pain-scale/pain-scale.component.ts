@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AjaxService } from 'src/app/therapist/services/ajax.service';
 import { AuthenticationService } from '../../../common/services/authentication.service';
+import { isMobileDevice, MOBILE_OR_SMALL_RESOLUTION } from '../../../common/utils';
 
 @Component({
   selector: 'app-pain-scale',
@@ -9,16 +10,24 @@ import { AuthenticationService } from '../../../common/services/authentication.s
   styleUrls: ['./pain-scale.component.scss'],
 })
 export class PainScaleComponent implements OnInit {
-  constructor(
-    private ajax: AjaxService,
-    private router: Router,
-    private authenticationService: AuthenticationService
-  ) {}
+
   painValue: number = 0;
   patient_note: string = '';
   patientId: number = -1;
   isPainModelOpen: boolean = false;
   isSaving: boolean = false; 
+  isMobileScreen: boolean = false; 
+
+  constructor(
+    private ajax: AjaxService,
+    private router: Router,
+    private authenticationService: AuthenticationService
+  ) {
+    this.isMobileScreen = MOBILE_OR_SMALL_RESOLUTION ? true : false;
+    window.addEventListener('resize', () => {
+      this.isMobileScreen = MOBILE_OR_SMALL_RESOLUTION ? true : false;
+    });
+  }
 
   async ngOnInit() {
     try {
