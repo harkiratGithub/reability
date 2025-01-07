@@ -508,7 +508,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
       sessions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
       const latestSession = sessions[0];
       const remainingSessions = sessions.slice(1);
-
+      console.log("patient_log_1",this.patientLog);
       return {
         gameName,
         latestSession,
@@ -587,7 +587,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
         // }
         return `${gameName}\n${duration}\n${summary}${feedback}`;
       });
-
+      console.log("==formated log===",formattedLogs );
       const formattedLog = formattedLogs.join('\n|** Game Logs **|\n\n');
       await navigator.clipboard.writeText(formattedLog);
       this.isLogModalOpen = false;
