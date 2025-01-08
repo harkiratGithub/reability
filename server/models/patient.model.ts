@@ -572,7 +572,7 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 		.join(TABLE_NAME.INSTITUTE, 'institute', `rtm.institute_id = institute.id`);
 	// .join(TABLE_NAME.THERAPIST, null, `(rtm.data->>'therapist_id')::int = ${TABLE_NAME.THERAPIST}.id`)
 	// .join(TABLE_NAME.USER, 'therapist_user', `${TABLE_NAME.THERAPIST}.user_id = therapist_user.id`);
-	if (month !== null && year !== null) {
+	if (!sendMail && month !== null && year !== null) {
 		const parsedMonth = parseInt(month, 10);
 		const parsedYear = parseInt(year, 10);
 		if (isNaN(parsedMonth) || isNaN(parsedYear) || parsedMonth < 1 || parsedMonth > 12) {
@@ -632,9 +632,7 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 					.where(`id=?`, userDataSessionResult?.rows[0].user_id);
 				const therapistDataSessionResult = await BaseModel.runQuery(therapistDataQuery.toParam());
 				row.data.therapist.user_name = therapistDataSessionResult.rows[0]?.user_name;
-
 			}
-
 		}
 		return row;
 	});
@@ -802,7 +800,8 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 
 				const buffer = await workbook.xlsx.writeBuffer();
 				const msg = {
-					to: `${userDetails?.email}`,
+					// to: `${userDetails?.email}`,
+					to: `amit.sharma5@mail.vinove.com`,
 					from: process.env.SENGRID_FROM_EMAIL ? process.env.SENGRID_FROM_EMAIL : 'yoramfeld@gmail.com',
 					subject: `Patient RTM Data Export - ${finalValuesData.length} Records Found`,
 					text: 'Please find the attached Excel file with the patients RTM data.',
