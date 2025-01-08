@@ -418,6 +418,7 @@ export const getPatientById = async (id: number) => {
 		.field(`${TABLE_NAME.PATIENT}.tech_issue`)
 		.field(`${TABLE_NAME.PATIENT}.tech_reason`)
 		.field(`${TABLE_NAME.PATIENT}.notification_email`)
+		.field(`${TABLE_NAME.PATIENT}.login_notification_email`)
 		.field(`${TABLE_NAME.PATIENT}.referral`)
 		.field(`${TABLE_NAME.PATIENT}.has_camera`)
 		.field(`${TABLE_NAME.USER}.logged_in_at`)

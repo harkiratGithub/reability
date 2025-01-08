@@ -51,7 +51,6 @@ export class AddEditPatientComponent implements OnInit, OnDestroy {
     if (this.editedEntity) {
       this.userLog = this.editedEntity.userLog;
     }
-
     this.patientView = this.editedEntity?.patientView ?? PatientView.Details;
     if (this.patientView !== PatientView.Details) {
       return;
@@ -72,6 +71,7 @@ export class AddEditPatientComponent implements OnInit, OnDestroy {
       primary_contact_email: new FormControl(this.getDefaultValue(this.editedEntity, 'primary_contact_email')),
       referral: new FormControl(this.getDefaultValue(this.editedEntity, 'referral')),
       notification_email: new FormControl(this.getDefaultValue(this.editedEntity, 'notification_email')),
+      login_notification_email: new FormControl(this.getDefaultValue(this.editedEntity, 'login_notification_email') || ''),
       secondary_contact_full_name: new FormControl(
         this.getDefaultValue(this.editedEntity, 'secondary_contact_full_name')
       ),

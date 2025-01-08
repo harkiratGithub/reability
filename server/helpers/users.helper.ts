@@ -104,6 +104,7 @@ export const getPatientsByTherapist = async (therapistId: any) => {
 			role: decryptPatient.role,
 			username: decryptPatient.user_name,
 			notification_email: decryptPatient.notification_email,
+			login_notification_email: decryptPatient.login_notification_email,
 			disabledSkeleton: decryptPatient.disabled_skeleton,
 			hasCamera: decryptPatient.has_camera,
 			phone: decryptPatient.phone,
