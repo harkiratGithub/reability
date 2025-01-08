@@ -145,6 +145,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
   }
 
   hasValidProperties(object: any): boolean {
+    console.log("Property: ", object);
     return Object.values(object).some((value) => value !== null && value !== undefined && typeof value !== 'object');
   }
 
