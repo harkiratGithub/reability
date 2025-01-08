@@ -178,7 +178,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
             ?.map((item) => ({
               start_time: item.start_time,
               game_summary: item?.game_summary,
-              // session_feedback: item?.session_feedback,
+              session_feedback: item?.session_feedback,
             }))
             ?.sort((a, b) => new Date(b?.start_time)?.getTime() - new Date(a?.start_time)?.getTime())
         )?.game_summary,
@@ -231,14 +231,13 @@ export class PatientListComponent implements OnInit, OnDestroy {
               return acc;
             }
             const gameSummary = a.game_summary;
-            // const sessionFeedback = a.session_feedback;
+            const sessionFeedback = a.session_feedback;
             const gameName = game ? game.name : a.game_id.toString();
             const gameDuration = acc.gamesDuration.find((gameDuration) => gameDuration.gameName === gameName);
             if (gameDuration) {
               gameDuration.duration = addTwoDurationTimeTogether(gameDuration.duration, a.duration);
             } else {
-              // acc.gamesDuration.push({ gameName, duration: a.duration, gameSummary, sessionFeedback });
-              acc.gamesDuration.push({ gameName, duration: a.duration, gameSummary });
+              acc.gamesDuration.push({ gameName, duration: a.duration, gameSummary, sessionFeedback });
             }
             return acc;
           },
@@ -595,7 +594,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
         // }
         return `${gameName}\n${duration}\n${summary}${feedback}`;
       });
-
+      console.log("==formated log===",formattedLogs );
       const formattedLog = formattedLogs.join('\n|** Game Logs **|\n\n');
       await navigator.clipboard.writeText(formattedLog);
       this.isLogModalOpen = false;
