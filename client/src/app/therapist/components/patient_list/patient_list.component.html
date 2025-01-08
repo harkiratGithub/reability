@@ -110,7 +110,7 @@
             </button>
           </div>
 
-          <!-- <div
+          <div
             *ngIf="isLogModalOpen && patientLog?.length && selectedPatientId == patient.userId"
             class="patient-log-modal"
           >
@@ -122,91 +122,15 @@
                     <h3>Game Name: {{ log.gameName | titlecase }}</h3>
                     <div class="duration">
                       <p><strong>Duration:</strong></p>
-                      <p>{{ log.latestSession.duration }}</p>
+                      {{ log.latestSession.duration }}
                     </div>
-                    <div class="game-summary">
+
+                    <div
+                      class="game-summary"
+                      *ngIf="log.latestSession.gameSummary && hasValidProperties(log.latestSession.gameSummary)"
+                    >
                       <p><strong>Game Summary:</strong></p>
                       <div>
-                        <p *ngIf="log.latestSession.gameSummary.totalSquats !== undefined">
-                          Total Squats: {{ log.latestSession.gameSummary.totalSquats }}
-                        </p>
-                        <p *ngIf="log.latestSession.gameSummary.gameTimeSeconds !== undefined">
-                          Game Time (seconds): {{ log.latestSession.gameSummary.gameTimeSeconds }}
-                        </p>
-                        <p *ngIf="log.latestSession.gameSummary.difficult !== undefined">
-                          Difficulty: {{ log.latestSession.gameSummary.difficult }}
-                        </p>
-                        <p *ngIf="log.latestSession.gameSummary.gameScore !== undefined">
-                          Game Score: {{ log.latestSession.gameSummary.gameScore.join(', ') }}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div class="button-container">
-                      <button
-                        class="submit-button"
-                        *ngIf="log.remainingSessions.length > 0"
-                        (click)="log.showMore = !log.showMore"
-                      >
-                        {{ log.showMore ? 'Show Less' : 'Show More' }}
-                      </button>
-                    </div>
-
-                    <div *ngIf="log.showMore">
-                      <div *ngFor="let session of log.remainingSessions">
-                        <p><strong>Additional Session - Duration:</strong> {{ session.duration }}</p>
-                        <hr />
-                        <div class="additional-session">
-                          <p *ngIf="session.gameSummary.totalSquats !== undefined">
-                            Total Squats: {{ session.gameSummary.totalSquats }}
-                          </p>
-                          <p *ngIf="session.gameSummary.gameTimeSeconds !== undefined">
-                            Game Time (seconds): {{ session.gameSummary.gameTimeSeconds }}
-                          </p>
-                          <p *ngIf="session.gameSummary.difficult !== undefined">
-                            Difficulty: {{ session.gameSummary.difficult }}
-                          </p>
-                          <p *ngIf="session.gameSummary.gameScore !== undefined">
-                            Game Score: {{ session.gameSummary.gameScore.join(', ') }}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                  </div>
-                </div>
-              </div>
-
-              <div class="total-duration">
-                <h4>Total Time Spent on Games:</h4>
-                <span>{{ getTotalDuration(patientLog) || '00:00:00' }}</span>
-              </div>
-
-              <div class="modal-actions">
-                <button class="close-btn" (click)="closeModal()">Close</button>
-                <button (click)="copyToClipboard()" title="copy" class="copy-btn">Copy</button>
-              </div>
-            </div>
-          </div> -->
-
-          <div
-            *ngIf="isLogModalOpen && patientLog?.length && selectedPatientId == patient.userId"
-            class="patient-log-modal"
-          >
-            <div class="patient-log-content">
-              <h3 class="game-heading">Game Information</h3>
-              <div class="logs-container">
-                <div *ngFor="let log of patientLog">
-                  <div class="game-log">
-                    <!-- <h3>Game Name: {{ log.gameName | titlecase }}</h3> -->
-                    <h3>Game Name: {{ log.gameName | titlecase }}</h3>
-                    <div class="duration">
-                      <p><strong>Duration:</strong> {{ log.latestSession.duration }}</p>
-                    </div>
-
-                    <div class="game-summary" *ngIf="log.latestSession.gameSummary && hasValidProperties(log.latestSession.gameSummary)">
-                      <p><strong>Game Summary:</strong></p>
-                      <div >
                         <ng-container *ngFor="let key of getKeys(log.latestSession.gameSummary)">
                           <p
                             *ngIf="
@@ -334,18 +258,20 @@
                 <div class="sub-show-label" (click)="showRTMMinutes(patient)">Show RTM</div>
               </div>
               <div class="send-rtm-invitation" *ngIf="patient.isRTM">
-                <div class="settings-icons send-rtm" (click)="addRTMMinutes(patient)"></div>
-                <div class="sub-label" (click)="addRTMMinutes(patient)">Add to RTM(minutes)</div>
-              </div>
-              <!-- <div class="send-invitation">
+                <div class="send-rtm-invitation" *ngIf="patient.isRTM">
+                  <div class="settings-icons send-rtm" (click)="addRTMMinutes(patient)"></div>
+                  <div class="sub-label" (click)="addRTMMinutes(patient)">Add to RTM(minutes)</div>
+                </div>
+                <!-- <div class="send-invitation">
                 <div class="settings-icons send" (click)="sendFastLoginLink(patient)"></div>
                 <div class="label">Send Invitation</div>
               </div> -->
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+  <div id="audio-container"></div>
 </div>
-<div id="audio-container"></div>
