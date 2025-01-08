@@ -16,6 +16,6 @@ export const environment = {
   signalingServerPort: 3001,
   serverUrl: `https://${MY_IP}:8080`,
   secretKey: 'gertner-little-secret',
-  recaptchaKey: '6Lc8yKspAAAAAAQ6ItzKFYZ-uJ5GG2PdWGtHZwhM',
+  recaptchaKey: '6LfH9NQZAAAAAHwE5RHsubonW58QHvqMWQJXwMzf',
   // recaptchaKey: '6Lc-udQZAAAAAIkxjUJNnu5xTV8Fcdq_xlqXcmiZ',
 };

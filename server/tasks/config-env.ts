@@ -9,7 +9,6 @@ const secret = process.env.SECRET_KEY;
 const signalingServer = process.env.SIGNALING_SERVER;
 const recaptchaKey = process.env.CAPTCHA_CLIENT_KEY;
 const signalingServerUrl = process.env.SIGNALING_SERVER_URL;
-console.log(recaptchaKey);
 
 const targetPath = `./client/src/environments/environment.prod.ts`;
 const envConfigFile = `

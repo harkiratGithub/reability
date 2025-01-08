@@ -125,6 +125,7 @@ export const editPatient = (req, res, next) => {
 	const { patientId } = req.body;
 	const { patientData, userData, patientContacts } = extractBodyParams(req.body.patient, patientId);
 	const user = req.user;
+	console.log("patient data: ", patientData, userData, patientContacts);
 	PatientHelper.editPatient({ ...patientData, patientId }, userData, patientContacts)
 		.then(([updatedPatient, patientChanges, oldPatientValues]) => {
 			ActivityLogHelper.createLog(

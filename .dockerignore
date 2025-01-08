@@ -10,7 +10,7 @@
 # dependencies
 /node_modules
 /client/node_modules/
-/client/dist/
+# /client/dist/
 # profiling files
 chrome-profiler-events.json
 speed-measure-plugin.json
@@ -39,11 +39,8 @@ testem.log
 Thumbs.db
 .tool-versions
 
-.env
+# .env
 .vscode
-.env.local
-.env.demo
-.env.prod
 
 #newrelic log
 newrelic_agent.log

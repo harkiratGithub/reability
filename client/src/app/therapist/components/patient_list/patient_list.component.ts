@@ -2,6 +2,7 @@ import moment from 'moment';
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { reduce, chain, filter, groupBy, capitalize, startsWith, head } from 'lodash';
+import * as util from '../../../backoffice/backoffice-util';
 import {
   GeneralModalData,
   GENERAL_MODAL_CONTENT,
@@ -25,6 +26,13 @@ interface IListItem {
   institute_id?: number;
   profession_id?: number;
 }
+
+import {
+  SHOW_RTM_MODAL_CONTENT,
+  SHOW_RTM_MODAL_STYLE,
+  SHOWRTMModalComponent,
+  SHOWRTMModalData,
+} from 'src/app/common/show-rtm-modal/rtm-modal.component';
 
 @Component({
   selector: 'app-patient-patient-list-component',
@@ -131,8 +139,13 @@ export class PatientListComponent implements OnInit, OnDestroy {
       });
   };
 
-  getKeys(obj: any): string[] {
-    return Object.keys(obj);
+  getKeys(object: any): string[] {
+    console.log('Keys: ', object ? Object.keys(object) : []);
+    return object ? Object.keys(object) : [];
+  }
+
+  hasValidProperties(object: any): boolean {
+    return Object.values(object).some((value) => value !== null && value !== undefined && typeof value !== 'object');
   }
 
   setFilteredData = (filteredData: any[]) => (this.patientListFiltered = filteredData);
@@ -430,8 +443,30 @@ export class PatientListComponent implements OnInit, OnDestroy {
   };
 
   showRTMMinutes = (patient: { id: any; userId: number }) => {
-    console.log('showRTMMinutes: ', patient);
+    const modalData: SHOWRTMModalData = {
+      modalStyle: SHOW_RTM_MODAL_STYLE.WHITE,
+      content: SHOW_RTM_MODAL_CONTENT.SHOW_RTM,
+      patient,
+      approveCallback: async (modalValues: OuterModalInterface) => {
+        await this.ajax
+          .getAllRtmReport({ month: String(moment().month() + 1), year: String(moment().year()) })
+          .toPromise()
+          .then((response) => {
+            if (response?.data?.allData?.length && response?.data?.cumulativeData?.length) {
+              const { allData, cumulativeData } = response.data;
+              const transformedRows = util.transformRtm(allData, cumulativeData);
+              modalValues.rows = transformedRows;
+            }
+          })
+          .catch((err) => {
+            console.error('Error fetching RTM Report:', err);
+          });
+      },
+      header: 'RTM Patient Track Report',
+    };
+    this.appActions.showOpenRTMModal(modalData);
   };
+
   getActivityTooltipText = (activity: { duration: string; gamesDuration: any }) => {
     if (!activity.duration) {
       return '';
@@ -490,7 +525,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
       sessions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
       const latestSession = sessions[0];
       const remainingSessions = sessions.slice(1);
-
+      console.log('patientLog: ,', this.patientLog);
       return {
         gameName,
         latestSession,
@@ -537,43 +572,43 @@ export class PatientListComponent implements OnInit, OnDestroy {
         console.log('No game session logs available to copy.');
         return;
       }
+      const formattedLogs = this.patientLog?.map((game) => {
+        const gameName = `Game Name: ${game?.gameName[0].toUpperCase() + game?.gameName.slice(1)}`;
+        const duration = `Duration: ${game?.latestSession?.duration || ''}`;
+        let summary = '';
+        if (game.latestSession?.gameSummary) {
+          summary += `Total Squats: ${
+            game.latestSession.gameSummary.totalSquats !== undefined &&
+            game.latestSession.gameSummary.totalSquats !== null
+              ? game.latestSession.gameSummary.totalSquats
+              : ''
+          }\n`;
+          summary += `Squats Per Set: ${game.latestSession.gameSummary.squatsPerSet?.join(', ') || ''}\n`;
+          summary += `Game Time (seconds): ${
+            game.latestSession?.gameSummary?.gameTimeSeconds !== undefined &&
+            game.latestSession.gameSummary.gameTimeSeconds !== null
+              ? game.latestSession.gameSummary.gameTimeSeconds
+              : ''
+          }\n`;
+        } else {
+          summary += 'No game summary available\n';
+        }
 
-      const latestGame = this.patientLog[this.patientLog.length - 1];
-
-      const gameName = `Game Name: ${latestGame.gameName}`;
-      const duration = `Duration: ${latestGame.latestSession?.duration || 'N/A'}`;
-
-      let summary = '';
-      if (latestGame.latestSession?.gameSummary) {
-        summary += `Total Squats: ${
-          latestGame.latestSession.gameSummary.totalSquats !== undefined
-            ? latestGame.latestSession.gameSummary.totalSquats
-            : 'N/A'
-        }\n`;
-        summary += `Squats Per Set: ${latestGame.latestSession.gameSummary.squatsPerSet?.join(', ') || 'N/A'}\n`;
-        summary += `Game Time (seconds): ${
-          latestGame.latestSession.gameSummary.gameTimeSeconds !== null
-            ? latestGame.latestSession.gameSummary.gameTimeSeconds
-            : 'N/A'
-        }\n`;
-      } else {
-        summary += 'No game summary available\n';
-      }
-
-      let feedback = '';
-      if (latestGame.latestSession?.sessionFeedback?.questions?.length) {
-        feedback += 'Session Feedback:\n';
-        latestGame.latestSession.sessionFeedback.questions.forEach((question: any) => {
-          feedback += `${question.question}: ${question.answer || 'N/A'}\n`;
-        });
-      } else {
-        feedback += 'No session feedback available\n';
-      }
-
-      const formattedLog = `${gameName}\n${duration}\n${summary}\n${feedback}`;
-
+        let feedback = '';
+        if (game.latestSession?.sessionFeedback?.questions?.length) {
+          feedback += 'Session Feedback:\n';
+          game.latestSession.sessionFeedback.questions.forEach((question: any) => {
+            feedback += `${question.question}: ${question.answer || ''}\n`;
+          });
+        }
+        // else {
+        //   feedback += 'No session feedback available\n';
+        // }
+        return `${gameName}\n${duration}\n${summary}${feedback}`;
+      });
+      console.log("==formated log===",formattedLogs );
+      const formattedLog = formattedLogs.join('\n|** Game Logs **|\n\n');
       await navigator.clipboard.writeText(formattedLog);
-
       this.isLogModalOpen = false;
       this.isCopiedToClipboard = true;
     } catch (e) {

@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Moment } from 'moment';
 import _ from 'lodash';
+import { HttpParams } from '@angular/common/http';
 
 import { environment } from '../../../environments/environment';
 import { User } from '../../common/models/user';
@@ -288,6 +289,17 @@ export class AjaxService {
   getGameSettingsForPatient = (gameId, patientId) => {
     try {
       return this.http.post<any>(`${this.baseUrl}/therapist/getGameSettings`, {
+        gameId,
+        patientId,
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  getGameSettings = (gameId, patientId) => {
+    try {
+      return this.http.post<any>(`${this.baseUrl}/patient/getGameSettings`, {
         gameId,
         patientId,
       });
@@ -625,4 +637,16 @@ export class AjaxService {
   createPatient(patient) {
     return this.http.post<any>(`${this.baseUrl}/therapist/patient/create`, { patient });
   }
+// therapist rtm report
+    getAllRtmReport(params: { month?: string; year?: string } = {}) {
+      let httpParams = new HttpParams();
+      Object.keys(params).forEach((key) => {
+        if (params[key] !== undefined) {
+          httpParams = httpParams.set(key, params[key]!);
+        }
+      });
+      const url = `${this.baseUrl}/therapist/rtm-details`;
+      return this.http.get<any>(url, { params: httpParams });
+    }
+  
 }

@@ -117,6 +117,7 @@ export class AddEditPatientComponent implements OnInit, OnDestroy {
   }
 
   filterDepartmentsByInstituteId(instituteId, departments) {
+    console.log("Institute Id's: ", instituteId, departments);
     if (!instituteId) {
       return [];
     }
@@ -168,6 +169,7 @@ export class AddEditPatientComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this.customForm.controls.institute_id.valueChanges.subscribe((instituteId) => {
         this.filteredDepartments = this.filterDepartmentsByInstituteId(instituteId, this.departments);
+        this.customForm.controls.departments_ids.setValue([]);
         this.filteredDepartments.length > 0
           ? this.customForm.controls.departments_ids.enable()
           : this.customForm.controls.departments_ids.disable();

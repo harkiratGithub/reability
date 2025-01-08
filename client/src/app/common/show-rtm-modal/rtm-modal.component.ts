@@ -5,9 +5,9 @@ import { Component, OnInit, Inject, EventEmitter, Output } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogConfig } from '@angular/material/dialog';
 import { localeData } from 'moment';
 
-export interface GeneralModalData {
+export interface SHOWRTMModalData {
   header?: string;
-  content?: GENERAL_MODAL_CONTENT;
+  content?: SHOW_RTM_MODAL_CONTENT;
   acceptBtnImg?: string;
   acceptBtnImgHover?: string;
   declineBtnImg?: string;
@@ -16,7 +16,7 @@ export interface GeneralModalData {
   declineCallback?: any;
   positionRelativeToElement?: HTMLElement;
   isTherapist?: boolean
-  modalStyle: GENERAL_MODAL_STYLE,
+  modalStyle: SHOW_RTM_MODAL_STYLE,
   patient: any
 }
 
@@ -25,33 +25,33 @@ export interface InnerModalInterface {
   innerModalValue: any
 }
 
-export interface OuterModalInterface {
+export interface SHOWRTMOuterModalInterface {
   isApproveClicked: boolean,
   dataFromInnerForm: InnerModalInterface
-  rows?: any[];
 }
 
-export enum GENERAL_MODAL_CONTENT {
+export enum SHOW_RTM_MODAL_CONTENT {
   NONE = 0,
   SEND_FAST_LOGIN = 1,
+  SHOW_RTM = 2,
   MSG = 2,
 }
 
-export enum GENERAL_MODAL_STYLE {
+export enum SHOW_RTM_MODAL_STYLE {
   BLUE = 0,
   WHITE = 1,
 }
 
 @Component({
-  selector: 'app-general-modal',
-  templateUrl: './general-modal.component.html',
-  styleUrls: ['./general-modal.component.scss']
+  selector: 'app-rtm-modal',
+  templateUrl: './rtm-modal.component.html',
+  styleUrls: ['./rtm-modal.component.scss']
 })
-export class GeneralModalComponent implements OnInit {
-  @select(state => state.global.generalModalMsg) readonly generalModalMsg$: Observable<string>;
+export class SHOWRTMModalComponent implements OnInit {
+  @select(state => state.global.showrtmModalMsg) readonly showrtmModalMsg$: Observable<string>;
 
   header: string;
-  content: GENERAL_MODAL_CONTENT;
+  content: SHOW_RTM_MODAL_CONTENT;
   acceptBtnImg: string;
   acceptBtnImgHover: string;
   declineBtnImg: string;
@@ -59,11 +59,11 @@ export class GeneralModalComponent implements OnInit {
   approveCallback: any;
   declineCallback: any;
   isTherapist: boolean
-  @Output() isApprove = new EventEmitter<OuterModalInterface>();
+  @Output() isApprove = new EventEmitter<SHOWRTMOuterModalInterface>();
   dataFromInnerForm: InnerModalInterface;
-  generalModalMsgSubscription: Subscription;
+  showrtmModalMsgSubscription: Subscription;
   generalMsg: string;
-  modalStyle: GENERAL_MODAL_STYLE = GENERAL_MODAL_STYLE.WHITE
+  modalStyle: SHOW_RTM_MODAL_STYLE = SHOW_RTM_MODAL_STYLE.WHITE
   patient: any;
   positionRelativeToElement: HTMLElement;
   matDialogConfig;
@@ -72,10 +72,11 @@ export class GeneralModalComponent implements OnInit {
   // isSwappedScreen: boolean;
 
   constructor(
-    public dialogRef: MatDialogRef<GeneralModalComponent>,
-    @Inject(MAT_DIALOG_DATA) public dialogData: GeneralModalData,
+    public dialogRef: MatDialogRef<SHOWRTMModalComponent>,
+    @Inject(MAT_DIALOG_DATA) public dialogData: SHOWRTMModalData,
     public appActions: AppActions,
   ) {
+    // alert("fdljkfhdfihgfkgfdkhgkhbkbkjbkjbk")
     dialogRef.disableClose = true;
     (this.positionRelativeToElement = this.dialogData.positionRelativeToElement),
       (this.header = this.dialogData.header),
@@ -100,21 +101,21 @@ export class GeneralModalComponent implements OnInit {
       this.dialogRef.updatePosition(this.matDialogConfig.position);
     }
 
-    this.generalModalMsgSubscription = this.generalModalMsg$.subscribe((msg: string) => {
+    this.showrtmModalMsgSubscription = this.showrtmModalMsg$.subscribe((msg: string) => {
       if (!msg || msg === "") { return }
       this.generalMsg = msg;
-      this.content = GENERAL_MODAL_CONTENT.MSG;
-      setTimeout(() => { this.appActions.closeGeneralModal() }, 5000)
+      this.content = SHOW_RTM_MODAL_CONTENT.MSG;
+      setTimeout(() => { this.appActions.showCloseRTMModal() }, 5000)
     });
   }
 
   // getter for enum
-  public get generalModelContent(): typeof GENERAL_MODAL_CONTENT {
-    return GENERAL_MODAL_CONTENT;
+  public get rtmModelContent(): typeof SHOW_RTM_MODAL_CONTENT {
+    return SHOW_RTM_MODAL_CONTENT;
   }
 
-  public get generalModelStyle(): typeof GENERAL_MODAL_STYLE {
-    return GENERAL_MODAL_STYLE;
+  public get generalModelStyle(): typeof SHOW_RTM_MODAL_STYLE {
+    return SHOW_RTM_MODAL_STYLE;
   }
 
   getModalRelativePosition = () => {
@@ -127,7 +128,7 @@ export class GeneralModalComponent implements OnInit {
   }
 
   handleApprove() {
-    if (this.dataFromInnerForm.isValid) { // check if the inner form is valid
+    if (this.dataFromInnerForm?.isValid) { // check if the inner form is valid
       this.isApprove.emit({ isApproveClicked: true, dataFromInnerForm: this.dataFromInnerForm })
     }
   }
@@ -140,7 +141,7 @@ export class GeneralModalComponent implements OnInit {
     return `action-btn ${this.isTherapist ? 'therapist' : 'patient'}`;
   }
 
-  isGeneralModel(modelType: GENERAL_MODAL_CONTENT) {
+  isRtmModel(modelType: SHOW_RTM_MODAL_CONTENT) {
     return modelType === this.content
   }
 
@@ -148,7 +149,7 @@ export class GeneralModalComponent implements OnInit {
     this.dataFromInnerForm = event;
   }
 
-  isGeneralModelStyle(modelStyle: GENERAL_MODAL_STYLE) {
+  isRtmModelStyle(modelStyle: SHOW_RTM_MODAL_STYLE) {
     return modelStyle === this.modalStyle
   }
 }

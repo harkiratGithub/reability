@@ -46,10 +46,12 @@ export class SendRTMModalComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
+    const today = moment().toDate();
+    const defaultTime = '00:00';
     this.customForm = new FormGroup({
-      date_time: new FormControl(null, Validators.required),
+      date_time: new FormControl(today, Validators.required),
       review_activity: new FormControl(null, Validators.required),
-      minutes_spent: new FormControl(null, [
+      minutes_spent: new FormControl(defaultTime, [
         Validators.required,
         this.timeFormatValidator,
         this.maxDurationValidator,

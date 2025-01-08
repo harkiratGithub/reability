@@ -285,6 +285,7 @@ export const getPatientsActivities = async (therapistId, startTime, endTime) => 
 		.field(`${TABLE_NAME.PATIENT}.phone`)
 		.field(`${TABLE_NAME.USER}.user_name`)
 		.field('logged_in_at')
+		.field(`${TABLE_NAME.DEPARTMENT}.name`, 'department_name')
 		.from(TABLE_NAME.THERAPIST)
 		.left_join(
 			TABLE_NAME.THERAPIST_DEPARTMENTS,
@@ -298,11 +299,29 @@ export const getPatientsActivities = async (therapistId, startTime, endTime) => 
 		)
 		.left_join(TABLE_NAME.PATIENT, null, `${TABLE_NAME.PATIENT_DEPARTMENTS}.patient_id = ${TABLE_NAME.PATIENT}.id`)
 		.left_join(TABLE_NAME.USER, null, `${TABLE_NAME.USER}.id = ${TABLE_NAME.PATIENT}.user_id`)
+		.left_join(
+			TABLE_NAME.DEPARTMENT,
+			null,
+			`${TABLE_NAME.PATIENT_DEPARTMENTS}.department_id = ${TABLE_NAME.DEPARTMENT}.id`
+		)
 		.where(`${TABLE_NAME.THERAPIST}.id = ?`, therapistId)
 		.where(`${TABLE_NAME.USER}.active = ?`, true)
 		.toParam();
 	const patientDetails = await BaseModel.runQuery(getPatientDetails);
 	return patientDetails.rows;
+};
+
+export const getRTMList = async () => {
+	const query = squelPostgres
+		.select()
+		.field(`${TABLE_NAME.PATIENT_DEPARTMENTS}.patient_id`)
+		.from(TABLE_NAME.PATIENT_DEPARTMENTS)
+		.join(TABLE_NAME.DEPARTMENT, null, `${TABLE_NAME.PATIENT_DEPARTMENTS}.department_id = ${TABLE_NAME.DEPARTMENT}.id`)
+		.where(`LOWER(${TABLE_NAME.DEPARTMENT}.name) = ?`, 'rtm')
+		.toParam();
+
+	const result = await BaseModel.runQuery(query);
+	return result.rows;
 };
 
 export const getPatientsActivitiesData = async (patientId, startTime, endTime) => {
@@ -332,6 +351,7 @@ export const getPatientsActivitiesData = async (patientId, startTime, endTime) =
 		.left_join(TABLE_NAME.USER, null, `${TABLE_NAME.USER}.id = ${TABLE_NAME.PATIENT}.user_id`)
 		.where(`${TABLE_NAME.PATIENT}.id = ?`, patientId)
 		.where(`${TABLE_NAME.USER}.active = ?`, true)
+		// .where(`LOWER(${TABLE_NAME.DEPARTMENT}.name) IN ?`, ['rtm'])
 		.toParam();
 	const patientDetails = await BaseModel.runQuery(getPatientDetails);
 	return patientDetails.rows;
@@ -596,14 +616,25 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 				).padStart(2, '0')}`;
 				row.data.therapist.minutes_spent = formattedTime;
 			}
-			const therapistDataQuery = squelPostgres
+			const userDataQuery = squelPostgres
 				.select()
 				// .field(`${TABLE_NAME.USER}.first_name`)
-				.field(`${TABLE_NAME.USER}.user_name`)
-				.from(TABLE_NAME.USER, 'users')
+				.field(`${TABLE_NAME.THERAPIST}.user_id`)
+				.from(TABLE_NAME.THERAPIST, 'therapist')
 				.where(`id=?`, rtmData.therapist.therapist_id);
-			const therapistDataSessionResult = await BaseModel.runQuery(therapistDataQuery.toParam());
-			row.data.therapist.user_name = therapistDataSessionResult.rows[0]?.user_name;
+			const userDataSessionResult = await BaseModel.runQuery(userDataQuery.toParam());
+			if (userDataSessionResult?.rows?.length > 0) {
+				const therapistDataQuery = squelPostgres
+					.select()
+					// .field(`${TABLE_NAME.USER}.first_name`)
+					.field(`${TABLE_NAME.USER}.user_name`)
+					.from(TABLE_NAME.USER, 'users')
+					.where(`id=?`, userDataSessionResult?.rows[0].user_id);
+				const therapistDataSessionResult = await BaseModel.runQuery(therapistDataQuery.toParam());
+				row.data.therapist.user_name = therapistDataSessionResult.rows[0]?.user_name;
+
+			}
+
 		}
 		return row;
 	});

@@ -4,6 +4,7 @@ import {
   OuterModalInterface,
 } from './common/general-modal/general-modal.component';
 import { RTMModalComponent, RTMModalData, RTMOuterModalInterface } from './common/rtm-modal/rtm-modal.component';
+import { SHOWRTMModalComponent, SHOWRTMModalData, SHOWRTMOuterModalInterface } from './common/show-rtm-modal/rtm-modal.component';
 import { Component, OnInit, OnDestroy, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthenticationService } from './common/services/authentication.service';
@@ -33,11 +34,13 @@ export class AppComponent implements OnInit, OnDestroy {
   @select((state) => state.global.mutedMicModal) readonly mutedMicModal$: Observable<boolean>;
   @select((state) => state.global.generalModal) readonly generalModal$: Observable<boolean>;
   @select((state) => state.global.rtmModal) readonly rtmModal$: Observable<boolean>;
+  @select((state) => state.global.showrtmModal) readonly showrtmModal$: Observable<boolean>;
   @select((state) => state.global.patientGeneralModal) readonly patientGeneralModal$: Observable<boolean>;
 
   dialogRef: any;
   globalDialogRef: any;
   rtmDialogRef: any;
+  showrtmDialogRef: any;
   subscription: Subscription = new Subscription();
   audioContext;
   callAudio;
@@ -133,6 +136,17 @@ export class AppComponent implements OnInit, OnDestroy {
           this.openRTMModal(modalData.data);
         }
         if (!modalData.open && this.rtmDialogRef) {
+          this.closeGlobalModal();
+        }
+      })
+    );
+
+    this.subscription.add(
+      this.showrtmModal$.subscribe((modalData: any) => {
+        if (modalData.open && !this.showrtmDialogRef) {
+          this.showOpenRTMModal(modalData.data);
+        }
+        if (!modalData.open && this.showrtmDialogRef) {
           this.closeGlobalModal();
         }
       })
@@ -436,6 +450,57 @@ export class AppComponent implements OnInit, OnDestroy {
     if (this.rtmDialogRef) {
       this.rtmDialogRef.close();
       this.rtmDialogRef = null;
+    }
+  }
+  showOpenRTMModal(modalData: SHOWRTMModalData) {
+    const wrapperEl = document.getElementById('main-app');
+    const {
+      header,
+      content,
+      approveCallback,
+      declineCallback,
+      isTherapist,
+      modalStyle,
+      patient,
+      acceptBtnImg = '',
+      acceptBtnImgHover = '',
+      declineBtnImg = '',
+      declineBtnImgHover = '',
+    } = modalData;
+    this.showrtmDialogRef = this.dialog.open(SHOWRTMModalComponent, {
+      data: {
+        header,
+        content,
+        acceptBtnImg,
+        acceptBtnImgHover,
+        declineBtnImg,
+        declineBtnImgHover,
+        approveCallback,
+        declineCallback,
+        positionRelativeToElement: wrapperEl,
+        isTherapist,
+        modalStyle,
+        patient,
+      },
+    });
+
+    this.subscription.add(
+      this.showrtmDialogRef.componentInstance['isApprove'].subscribe((modalData: SHOWRTMOuterModalInterface) => {
+        if (modalData.isApproveClicked) {
+          approveCallback(modalData);
+        } else {
+          declineCallback();
+          this.showcloseRTMModal();
+        }
+      })
+    );
+  }
+
+  showcloseRTMModal() {
+    this.appActions.setMessageShowRTMModal('');
+    if (this.showrtmDialogRef) {
+      this.showrtmDialogRef.close();
+      this.showrtmDialogRef = null;
     }
   }
 

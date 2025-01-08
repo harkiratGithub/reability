@@ -18,7 +18,16 @@
       />
     </div>
     <div class="pain-labels">
-      <img src="../../../../assets/login/pain-scale.png" width="auto" height="100" />
+      <!-- Show text labels for mobile -->
+      <div *ngIf="isMobileScreen" class="pain-text-labels">
+        <span>No Pain</span>
+        <span>Mild</span>
+        <span>Moderate</span>
+        <span>Severe</span>
+        <span>Worst Pain</span>
+      </div>
+      <!-- Show image for desktop/iPad -->
+      <img *ngIf="!isMobileScreen" src="../../../../assets/login/pain-scale.png" alt="Pain Scale" class="pain-scale-image" />
     </div>
 
     <div class="textarea-container">
