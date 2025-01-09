@@ -216,6 +216,7 @@ export const updatePatientCameraAvailability = (req, res, next) => {
 
 export const getActive = (req: Request, res: Response, next: NextFunction) => {
 	const { id } = req.params;
+	console.log("====inside patient contrller ====",req.params);
 	PatientHelper.getPatientById(+id)
 		.then((activePatient) => res.json(activePatient))
 		.catch((err) => next(err));

@@ -85,3 +85,9 @@ export const sendQrReVerify2FA = async (userEmail, qrLink) => {
 	`;
 	await EmailHelper.sendMail(userEmail, subject, html, null, attachments);
 };
+
+export const sendUserLoggedInEmail = async (patient) => {
+	const subject = `${patient.user_name}  patient is online` ;
+	const html = `<div>Patient ${patient.user_name} has connected .   </div>`;
+	await EmailHelper.sendMail(patient.login_notification_email, subject, html);
+};

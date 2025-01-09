@@ -6,7 +6,7 @@ import * as GameActivitiesController from '../controllers/game-activities.contro
 import * as UserGameDataController from '../controllers/user-game-data.controller';
 import * as ServerLogController from '../controllers/server-log.controller';
 import * as GameDataController from '../controllers/game-data.controller';
-
+import * as UserController from '../controllers/user.controller';
 
 import express from 'express';
 import multer from 'multer';
@@ -38,5 +38,6 @@ router.get('/games', GameDataController.getAllEndGames);
 router.post('/getPatientDataList', PatientController.getPatientListDataActivities);
 router.post('/rtmSession', RtmController.updatePatientRTMSession);
 router.patch('/termsConditions', PatientController.updateUserTermsConditions);
-
+router.post('/users/sendEmail', UserController.sendEmailAfterlogin);
+router.get('/users/:id', PatientController.getActive);
 export default router;

@@ -17,7 +17,7 @@ export class PainScaleComponent implements OnInit {
   isPainModelOpen: boolean = false;
   isSaving: boolean = false; 
   isMobileScreen: boolean = false; 
-
+  patient_data: any = [];
   constructor(
     private ajax: AjaxService,
     private router: Router,
@@ -31,7 +31,7 @@ export class PainScaleComponent implements OnInit {
 
   async ngOnInit() {
     try {
-      const userData = await this.ajax.getUserData().toPromise();
+      const userData = await this.ajax.getUserData().toPromise();      
       if (userData?.isPainModelOpen) {
         this.isPainModelOpen = userData.isPainModelOpen;
         this.patientId = userData.patientId;
@@ -51,9 +51,14 @@ export class PainScaleComponent implements OnInit {
   savePainValue(): void {
     if (this.isSaving) return; 
     this.isSaving = true
-    try {
+    try {    
+      this.patient_data =  this.ajax.getActivePatient(this.patientId).subscribe((response)=>{
+        console.log("===response===",response);
+        this.patient_data = response;
+       });  
       this.ajax.sendPatientPainScale(this.patientId, this.painValue, this.patient_note).subscribe(
-        (response) => {
+        (response) => {          
+          this.ajax.sendEmailAfterLogin(this.patient_data).subscribe((data) => { console.log("===data===",data)});   
           this.isPainModelOpen = false;
           this.isSaving = false;
           this.router.navigate(['/games_lobby']);
