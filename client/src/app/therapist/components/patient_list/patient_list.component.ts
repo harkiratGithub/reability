@@ -126,12 +126,12 @@ export class PatientListComponent implements OnInit, OnDestroy {
   };
 
   getKeys(object: any): string[] {
-    console.log('Keys: ', object ? Object.keys(object) : []);
+    // console.log('Keys: ', object ? Object.keys(object) : []);
     return object ? Object.keys(object) : [];
   }
 
   hasValidProperties(object: any): boolean {
-    console.log("Property: ", object);
+    // console.log("Property: ", object, Object.values(object));
     return Object.values(object).some((value) => value !== null && value !== undefined && typeof value !== 'object');
   }
 
@@ -222,7 +222,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
             }
 
             if (!this?.allGames || this?.allGames.length === 0) {
-              console.error('No games available in this.allGames');
+              console.log('No games available');
               return acc;
             }
 
@@ -555,53 +555,438 @@ export class PatientListComponent implements OnInit, OnDestroy {
     this.selectedPatientId = '';
   };
 
+  // async copyToClipboard() {
+  //   try {
+  //     if (!this.patientLog || !this.patientLog.length) {
+  //       console.log('No game session logs available to copy.');
+  //       return;
+  //     }
+  //     const formattedLogs = this.patientLog?.map((game) => {
+  //       const gameName = `Game Name: ${game?.gameName[0].toUpperCase() + game?.gameName.slice(1)}`;
+  //       const duration = `Duration: ${game?.latestSession?.duration || ''}`;
+  //       let summary = '';
+  //       if (game.latestSession?.gameSummary) {
+  //         summary += `Total Squats: ${
+  //           game.latestSession.gameSummary.totalSquats !== undefined &&
+  //           game.latestSession.gameSummary.totalSquats !== null
+  //             ? game.latestSession.gameSummary.totalSquats
+  //             : ''
+  //         }\n`;
+  //         summary += `Squats Per Set: ${game.latestSession.gameSummary.squatsPerSet?.join(', ') || ''}\n`;
+  //         summary += `Game Time (seconds): ${
+  //           game.latestSession?.gameSummary?.gameTimeSeconds !== undefined &&
+  //           game.latestSession.gameSummary.gameTimeSeconds !== null
+  //             ? game.latestSession.gameSummary.gameTimeSeconds
+  //             : ''
+  //         }\n`;
+  //       } else {
+  //         summary += 'No game summary available\n';
+  //       }
+
+  //       let feedback = '';
+  //       if (game.latestSession?.sessionFeedback?.questions?.length) {
+  //         feedback += 'Session Feedback:\n';
+  //         game.latestSession.sessionFeedback.questions.forEach((question: any) => {
+  //           feedback += `${question.question}: ${question.answer || ''}\n`;
+  //         });
+  //       }
+  //       // else {
+  //       //   feedback += 'No session feedback available\n';
+  //       // }
+  //       return `${gameName}\n${duration}\n${summary}${feedback}`;
+  //     });
+  //     console.log("==formated log===",formattedLogs );
+  //     const formattedLog = formattedLogs.join('\n|** Game Logs **|\n\n');
+  //     await navigator.clipboard.writeText(formattedLog);
+  //     this.isLogModalOpen = false;
+  //     this.isCopiedToClipboard = true;
+  //   } catch (e) {
+  //     console.log('Failed to copy log to clipboard:', e);
+  //   }
+  // }
+
+  // async copyToClipboard() {
+  //   try {
+  //     if (!this.patientLog || !this.patientLog.length) {
+  //       console.log('No game session logs available to copy.');
+  //       return;
+  //     }
+  
+  //     const formattedLogs = this.patientLog.map((game) => {
+  //       let formattedGame = '';
+  
+  //       // Dynamically handle top-level keys for each game
+  //       Object.keys(game).forEach((key) => {
+  //         const value = game[key];
+  //         if (value !== null && value !== undefined && typeof value !== 'object') {
+  //           formattedGame += `${key.replace(/([A-Z])/g, ' $1')}: ${value}\n`; // Format key for readability
+  //         }
+  //       });
+  
+  //       // Handle latestSession if it exists
+  //       if (game.latestSession) {
+  //         formattedGame += `Latest Session:\n`;
+  
+  //         Object.keys(game.latestSession).forEach((key) => {
+  //           const value = game.latestSession[key];
+  //           if (value !== null && value !== undefined && typeof value !== 'object') {
+  //             formattedGame += `  ${key.replace(/([A-Z])/g, ' $1')}: ${value}\n`;
+  //           }
+  //         });
+  
+  //         // Handle gameSummary within latestSession
+  //         if (game.latestSession.gameSummary) {
+  //           formattedGame += `  Game Summary:\n`;
+  //           Object.keys(game.latestSession.gameSummary).forEach((key) => {
+  //             const value = game.latestSession.gameSummary[key];
+  //             if (value !== null && value !== undefined) {
+  //               formattedGame += `    ${key.replace(/([A-Z])/g, ' $1')}: ${value}\n`;
+  //             }
+  //           });
+  //         }
+  
+  //         // Handle sessionFeedback within latestSession
+  //         if (game.latestSession.sessionFeedback?.questions?.length) {
+  //           formattedGame += `  Session Feedback:\n`;
+  //           game.latestSession.sessionFeedback.questions.forEach((question: any) => {
+  //             if (question.answer !== null && question.answer !== undefined) {
+  //               formattedGame += `    ${question.question}: ${question.answer}\n`;
+  //             }
+  //           });
+  //         }
+  //       }
+  
+  //       // Handle remainingSessions if they exist
+  //       if (game.remainingSessions?.length) {
+  //         formattedGame += `Remaining Sessions:\n`;
+  //         game.remainingSessions.forEach((session, index) => {
+  //           formattedGame += `  Session ${index + 1}:\n`;
+  //           Object.keys(session).forEach((key) => {
+  //             const value = session[key];
+  //             if (value !== null && value !== undefined && typeof value !== 'object') {
+  //               formattedGame += `    ${key.replace(/([A-Z])/g, ' $1')}: ${value}\n`;
+  //             }
+  //           });
+  
+  //           // Handle gameSummary within each remaining session
+  //           if (session.gameSummary) {
+  //             formattedGame += `    Game Summary:\n`;
+  //             Object.keys(session.gameSummary).forEach((key) => {
+  //               const value = session.gameSummary[key];
+  //               if (value !== null && value !== undefined) {
+  //                 formattedGame += `      ${key.replace(/([A-Z])/g, ' $1')}: ${value}\n`;
+  //               }
+  //             });
+  //           }
+  //         });
+  //       }
+  
+  //       return formattedGame;
+  //     });
+  
+  //     const formattedLog = formattedLogs.join('\n|** Game Logs **|\n\n');
+  //     console.log('==Formatted Log==', formattedLog);
+  
+  //     await navigator.clipboard.writeText(formattedLog);
+  //     this.isLogModalOpen = false;
+  //     this.isCopiedToClipboard = true;
+  
+  //     console.log('Logs successfully copied to clipboard.');
+  //   } catch (e) {
+  //     console.error('Failed to copy log to clipboard:', e.message || e);
+  //   }
+  // }
+  
+  // async copyToClipboard() {
+  //   try {
+  //     if (!this.patientLog || !this.patientLog.length) {
+  //       console.log('No game session logs available to copy.');
+  //       return;
+  //     }
+  
+  //     const formattedLogs = this.patientLog.map((game) => {
+  //       let formattedGame = '';
+  
+  //       // Dynamically handle top-level keys for each game
+  //       Object.keys(game).forEach((key) => {
+  //         const value = game[key];
+  //         if (value !== null && value !== undefined && typeof value !== 'object') {
+  //           formattedGame += `${key.replace(/([A-Z])/g, ' $1')}: ${value}\n`; // Format key for readability
+  //         }
+  //       });
+  
+  //       // Handle latestSession if it exists
+  //       if (game.latestSession) {
+  //         formattedGame += `Latest Session:\n`;
+  
+  //         Object.keys(game.latestSession).forEach((key) => {
+  //           const value = game.latestSession[key];
+  //           if (value !== null && value !== undefined && typeof value !== 'object') {
+  //             formattedGame += `  ${key.replace(/([A-Z])/g, ' $1')}: ${value}\n`;
+  //           }
+  //         });
+  
+  //         // Handle gameSummary within latestSession
+  //         if (game.latestSession.gameSummary) {
+  //           formattedGame += `  Game Summary:\n`;
+  //           Object.keys(game.latestSession.gameSummary).forEach((key) => {
+  //             const value = game.latestSession.gameSummary[key];
+  //             if (value !== null && value !== undefined) {
+  //               formattedGame += `    ${key.replace(/([A-Z])/g, ' $1')}: ${value}\n`;
+  //             }
+  //           });
+  //         }
+  
+  //         // Handle sessionFeedback within latestSession
+  //         if (game.latestSession.sessionFeedback?.questions?.length) {
+  //           formattedGame += `  Session Feedback:\n`;
+  //           game.latestSession.sessionFeedback.questions.forEach((question: any) => {
+  //             if (question.answer !== null && question.answer !== undefined) {
+  //               formattedGame += `    ${question.question}: ${question.answer}\n`;
+  //             }
+  //           });
+  //         }
+  //       }
+  
+  //       // Handle remainingSessions if they exist
+  //       if (game.remainingSessions?.length) {
+  //         formattedGame += `Remaining Sessions:\n`;
+  //         game.remainingSessions.forEach((session, index) => {
+  //           formattedGame += `  Session ${index + 1}:\n`;
+  //           Object.keys(session).forEach((key) => {
+  //             const value = session[key];
+  //             if (value !== null && value !== undefined && typeof value !== 'object') {
+  //               formattedGame += `    ${key.replace(/([A-Z])/g, ' $1')}: ${value}\n`;
+  //             }
+  //           });
+  
+  //           // Handle gameSummary within each remaining session
+  //           if (session.gameSummary) {
+  //             formattedGame += `    Game Summary:\n`;
+  //             Object.keys(session.gameSummary).forEach((key) => {
+  //               const value = session.gameSummary[key];
+  //               if (value !== null && value !== undefined) {
+  //                 formattedGame += `      ${key.replace(/([A-Z])/g, ' $1')}: ${value}\n`;
+  //               }
+  //             });
+  //           }
+  //         });
+  //       }
+  
+  //       return formattedGame;
+  //     });
+  
+  //     const formattedLog = formattedLogs.join('\n|** Game Logs **|\n\n');
+  //     console.log('==Formatted Log==', formattedLog);
+  
+  //     await navigator.clipboard.writeText(formattedLog);
+  //     this.isLogModalOpen = false;
+  //     this.isCopiedToClipboard = true;
+  
+  //     console.log('Logs successfully copied to clipboard.');
+  //   } catch (e) {
+  //     console.error('Failed to copy log to clipboard:', e.message || e);
+  //   }
+  // }
+  
+  // async copyToClipboard() {
+  //   try {
+  //     if (!this.patientLog || !this.patientLog.length) {
+  //       return;
+  //     }
+  
+  //     const toTitleCase = (str: string): string => {
+  //       return str
+  //         .replace(/([A-Z])/g, ' $1') 
+  //         .toLowerCase()
+  //         .replace(/\b\w/g, (char) => char.toUpperCase());
+  //     };
+  
+  //     const formattedLogs = this.patientLog.map((game) => {
+  //       let formattedGame = '';
+
+  //       Object.keys(game)
+  //         .filter((key) => key !== 'showMore') 
+  //         .forEach((key) => {
+  //           const value = game[key];
+  //           if (value !== null && value !== undefined && typeof value !== 'object') {
+  //             formattedGame += `${toTitleCase(key)}: ${value}\n`;
+  //           }
+  //         });
+  
+  //       if (game.latestSession) {
+  //         formattedGame += `Latest Session:\n`;
+  
+  //         Object.keys(game.latestSession)
+  //           .filter((key) => key !== 'showMore')
+  //           .forEach((key) => {
+  //             const value = game.latestSession[key];
+  //             if (value !== null && value !== undefined && typeof value !== 'object') {
+  //               formattedGame += `  ${toTitleCase(key)}: ${value}\n`;
+  //             }
+  //           });
+
+  //         if (game.latestSession.gameSummary) {
+  //           formattedGame += `  Game Summary:\n`;
+  //           Object.keys(game.latestSession.gameSummary)
+  //             .filter((key) => key !== 'showMore')
+  //             .forEach((key) => {
+  //               const value = game.latestSession.gameSummary[key];
+  //               if (value !== null && value !== undefined) {
+  //                 formattedGame += `    ${toTitleCase(key)}: ${value}\n`;
+  //               }
+  //             });
+  //         }
+  //       }
+  
+  //       if (game.remainingSessions?.length) {
+  //         formattedGame += `Remaining Sessions:\n`;
+  //         game.remainingSessions.forEach((session, index) => {
+  //           formattedGame += `  Session ${index + 1}:\n`;
+  //           Object.keys(session)
+  //             .filter((key) => key !== 'showMore') 
+  //             .forEach((key) => {
+  //               const value = session[key];
+  //               if (value !== null && value !== undefined && typeof value !== 'object') {
+  //                 formattedGame += `    ${toTitleCase(key)}: ${value}\n`;
+  //               }
+  //             });
+
+  //           if (session.gameSummary) {
+  //             formattedGame += `    Game Summary:\n`;
+  //             Object.keys(session.gameSummary)
+  //               .filter((key) => key !== 'showMore') 
+  //               .forEach((key) => {
+  //                 const value = session.gameSummary[key];
+  //                 if (value !== null && value !== undefined) {
+  //                   formattedGame += `      ${toTitleCase(key)}: ${value}\n`;
+  //                 }
+  //               });
+  //           }
+  //         });
+  //       }
+  
+  //       return formattedGame;
+  //     });
+  
+  //     const formattedLog = formattedLogs.join('\n|** Game Logs **|\n\n');
+  //     console.log('==Formatted Log==', formattedLog);
+  
+  //     await navigator.clipboard.writeText(formattedLog);
+  //     this.isLogModalOpen = false;
+  //     this.isCopiedToClipboard = true;
+  
+  //     console.log('Logs successfully copied to clipboard.');
+  //   } catch (e) {
+  //     console.error('Failed to copy log to clipboard:', e.message || e);
+  //   }
+  // }
+
   async copyToClipboard() {
     try {
       if (!this.patientLog || !this.patientLog.length) {
-        console.log('No game session logs available to copy.');
         return;
       }
-      const formattedLogs = this.patientLog?.map((game) => {
-        const gameName = `Game Name: ${game?.gameName[0].toUpperCase() + game?.gameName.slice(1)}`;
-        const duration = `Duration: ${game?.latestSession?.duration || ''}`;
-        let summary = '';
-        if (game.latestSession?.gameSummary) {
-          summary += `Total Squats: ${
-            game.latestSession.gameSummary.totalSquats !== undefined &&
-            game.latestSession.gameSummary.totalSquats !== null
-              ? game.latestSession.gameSummary.totalSquats
-              : ''
-          }\n`;
-          summary += `Squats Per Set: ${game.latestSession.gameSummary.squatsPerSet?.join(', ') || ''}\n`;
-          summary += `Game Time (seconds): ${
-            game.latestSession?.gameSummary?.gameTimeSeconds !== undefined &&
-            game.latestSession.gameSummary.gameTimeSeconds !== null
-              ? game.latestSession.gameSummary.gameTimeSeconds
-              : ''
-          }\n`;
-        } else {
-          summary += 'No game summary available\n';
+  
+      const toTitleCase = (str: string): string => {
+        return str
+          .replace(/([A-Z])/g, ' $1') 
+          .toLowerCase()
+          .replace(/\b\w/g, (char) => char.toUpperCase());
+      };
+  
+      const formattedLogs = this.patientLog.map((game) => {
+        let formattedGame = '';
+  
+        Object.keys(game)
+          .filter((key) => key !== 'showMore') 
+          .forEach((key) => {
+            const value = game[key];
+            if (value !== null && value !== undefined && typeof value !== 'object') {
+              formattedGame += `${toTitleCase(key)}: ${value}\n`;
+            }
+          });
+  
+        if (game.latestSession) {
+          formattedGame += `Latest Session:\n`;
+  
+          Object.keys(game.latestSession)
+            .filter((key) => key !== 'showMore')
+            .forEach((key) => {
+              const value = game.latestSession[key];
+              if (value !== null && value !== undefined && typeof value !== 'object') {
+                formattedGame += `  ${toTitleCase(key)}: ${value}\n`;
+              }
+            });
+  
+          if (
+            game.latestSession.gameSummary &&
+            Object.keys(game.latestSession.gameSummary).some(
+              (key) =>
+                game.latestSession.gameSummary[key] !== null &&
+                game.latestSession.gameSummary[key] !== undefined
+            )
+          ) {
+            formattedGame += `  Game Summary:\n`;
+            Object.keys(game.latestSession.gameSummary)
+              .filter((key) => key !== 'showMore')
+              .forEach((key) => {
+                const value = game.latestSession.gameSummary[key];
+                if (value !== null && value !== undefined) {
+                  formattedGame += `    ${toTitleCase(key)}: ${value}\n`;
+                }
+              });
+          }
         }
-
-        let feedback = '';
-        if (game.latestSession?.sessionFeedback?.questions?.length) {
-          feedback += 'Session Feedback:\n';
-          game.latestSession.sessionFeedback.questions.forEach((question: any) => {
-            feedback += `${question.question}: ${question.answer || ''}\n`;
+  
+        if (game.remainingSessions?.length) {
+          formattedGame += `Remaining Sessions:\n`;
+          game.remainingSessions.forEach((session, index) => {
+            formattedGame += `  Session ${index + 1}:\n`;
+  
+            Object.keys(session)
+              .filter((key) => key !== 'showMore') 
+              .forEach((key) => {
+                const value = session[key];
+                if (value !== null && value !== undefined && typeof value !== 'object') {
+                  formattedGame += `    ${toTitleCase(key)}: ${value}\n`;
+                }
+              });
+  
+            if (
+              session.gameSummary &&
+              Object.keys(session.gameSummary).some(
+                (key) =>
+                  session.gameSummary[key] !== null &&
+                  session.gameSummary[key] !== undefined
+              )
+            ) {
+              formattedGame += `    Game Summary:\n`;
+              Object.keys(session.gameSummary)
+                .filter((key) => key !== 'showMore')
+                .forEach((key) => {
+                  const value = session.gameSummary[key];
+                  if (value !== null && value !== undefined) {
+                    formattedGame += `      ${toTitleCase(key)}: ${value}\n`;
+                  }
+                });
+            }
           });
         }
-        // else {
-        //   feedback += 'No session feedback available\n';
-        // }
-        return `${gameName}\n${duration}\n${summary}${feedback}`;
+  
+        return formattedGame;
       });
-      console.log("==formated log===",formattedLogs );
+  
       const formattedLog = formattedLogs.join('\n|** Game Logs **|\n\n');
+      console.log('==Formatted Log==', formattedLog);
+  
       await navigator.clipboard.writeText(formattedLog);
       this.isLogModalOpen = false;
       this.isCopiedToClipboard = true;
+  
+      console.log('Logs successfully copied to clipboard.');
     } catch (e) {
-      console.log('Failed to copy log to clipboard:', e);
+      console.error('Failed to copy log to clipboard:', e.message || e);
     }
   }
 
