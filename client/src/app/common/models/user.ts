@@ -18,4 +18,5 @@ export class User {
   disabledSkeleton: boolean;
   hasCamera: boolean;
   notification_email?: string;
+  login_notification_email?: string;
 }

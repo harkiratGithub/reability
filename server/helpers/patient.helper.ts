@@ -338,6 +338,7 @@ const getCommonData = (patient, userId?) => {
 		tech_issue: patient.tech_issue,
 		tech_reason: patient.tech_reason,
 		notification_email: patient.notification_email,
+		login_notification_email: patient.login_notification_email,
 		suspend: patient.suspend,
 		referral: patient.referral,
 		...(userId && { user_id: userId }),
