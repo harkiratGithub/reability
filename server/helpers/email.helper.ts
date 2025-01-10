@@ -88,6 +88,7 @@ export const sendQrReVerify2FA = async (userEmail, qrLink) => {
 
 export const sendUserLoggedInEmail = async (patient) => {
 	const subject = `${patient.user_name}  patient is online` ;
-	const html = `<div>Patient ${patient.user_name} has connected .   </div>`;
+	const html = `<div>This is an automated message from TheRPT platform. I was instructed to send you this email as soon as patient ${patient.user_name} logs in.
+					<br><br>Guess what, it has just happened. <br><br> TheRPT platform</div>`;
 	await EmailHelper.sendMail(patient.login_notification_email, subject, html);
 };

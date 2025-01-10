@@ -112,8 +112,9 @@ export const reVerify2FA = async (req, res) => {
 		res.status(400).json({ success: false, message: error.message });
 	}
 };
+
 export const sendEmailAfterlogin = (req, res, next) => {
-	EmailHelper.sendUserLoggedInEmail(req.body.patient, req.body.therapist)
+	EmailHelper.sendUserLoggedInEmail(req.body.patient)
 		.then(() => res.json({ message: 'success' }))
 		.catch((err) => res.status(400).json({ message: err }));
 };
