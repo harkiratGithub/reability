@@ -29,6 +29,7 @@ export class LoginPageComponent implements OnInit, OnDestroy {
   isMobile = false;
   mainMenu;
   ShowLoginErrorMobile = false;
+  patient_data: any = [];
 
   constructor(
     private formBuilder: FormBuilder,
@@ -116,6 +117,12 @@ export class LoginPageComponent implements OnInit, OnDestroy {
           } */else if (user?.role === 'patient' && user?.isPainModelOpen) {
             this.router.navigate([`${roleMainRoute('RTM')}`]);
           } else {
+            if (user?.role === 'patient' && user?.isPainModelOpen===false && user?.isRTM===true) {
+              this.patient_data =  this.ajax.getActivePatient(user?.patientId).subscribe((response)=>{
+                this.patient_data = response;
+                this.ajax.sendEmailAfterLogin(this.patient_data).subscribe((data) => { console.log("===data===",data)});   
+              }); 
+            }
             this.router.navigate([`${roleMainRoute(user.role)}`]);
           }
         }
