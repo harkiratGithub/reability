@@ -800,8 +800,7 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 
 				const buffer = await workbook.xlsx.writeBuffer();
 				const msg = {
-					// to: `${userDetails?.email}`,
-					to: `amit.sharma5@mail.vinove.com`,
+					to: `${userDetails?.email}`,
 					from: process.env.SENGRID_FROM_EMAIL ? process.env.SENGRID_FROM_EMAIL : 'yoramfeld@gmail.com',
 					subject: `Patient RTM Data Export - ${finalValuesData.length} Records Found`,
 					text: 'Please find the attached Excel file with the patients RTM data.',
