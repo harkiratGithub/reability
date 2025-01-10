@@ -71,7 +71,7 @@ router.post('/rtmSession', RtmController.updateTherapistRTMSession);
 
 // patient create routes
 router.get('/institute', InstituteController.getAllInstitutes);
-router.get('/department', DepartmentController.getAll);
+router.get('/department', DepartmentController.getAllTherapistDepartment);
 router.post('/patient/create', PatientController.createPatient);
 // rtm therapist routes
 router.get('/rtm-details', PatientController.getAllRTMDetails);
