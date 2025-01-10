@@ -126,12 +126,12 @@ export class PatientListComponent implements OnInit, OnDestroy {
   };
 
   getKeys(object: any): string[] {
-    console.log('Keys: ', object ? Object.keys(object) : []);
+    // console.log('Keys: ', object ? Object.keys(object) : []);
     return object ? Object.keys(object) : [];
   }
 
   hasValidProperties(object: any): boolean {
-    console.log("Property: ", object, Object.values(object));
+    // console.log("Property: ", object, Object.values(object));
     return Object.values(object).some((value) => value !== null && value !== undefined && typeof value !== 'object');
   }
 
