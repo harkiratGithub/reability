@@ -12,7 +12,7 @@ import { ForgotPasswordComponent } from './common/password-routes/forgot-passwor
 import { TwoFactorAuthVerifyComponent } from './common/password-routes/two-factor-auth-verify/two-factor-auth-verify.component';
 import { PainScaleComponent } from './patient/components/pain-scale/pain-scale.component';
 import { TermsConditionsComponent } from './patient/components/terms-conditions/terms-conditions.component';
-
+import { MobilePopupComponent } from './patient/components/mobile-popup/mobile-popup.component';
 export const ROUTES = {
   LOGIN: 'login',
   VERIFY_2FA: 'verify-2fa/:id',
@@ -27,11 +27,13 @@ export const ROUTES = {
   FAST_LOGIN: 'fast_login',
   PAIN_SCALE: 'pain_scale',
   TERMS_CONDITIONS: 'terms_conditions',
+  MOBILE_POPUP: 'mobile_popup',
 };
 
 export const routes = [
   { path: ROUTES.LOGIN, component: LoginPageComponent },
   { path: ROUTES.PAIN_SCALE, component: PainScaleComponent, canActivate: [AuthGuard], data: { roles: [Role.Patient] } },
+  { path: ROUTES.MOBILE_POPUP, component: MobilePopupComponent, canActivate: [AuthGuard], data: { roles: [Role.Patient] } },
   { path: ROUTES.TERMS_CONDITIONS, component: TermsConditionsComponent, canActivate: [AuthGuard], data: { roles: [Role.Patient] } },
   { path: ROUTES.VERIFY_2FA, component: TwoFactorAuthVerifyComponent },
   {
@@ -84,6 +86,8 @@ export const roleMainRoute = (role) => {
       return ROUTES.PATIENT_HOME_PAGE;
     case 'RTM':
       return ROUTES.PAIN_SCALE;
+    case 'MOBILE_POPUP':
+      return ROUTES.MOBILE_POPUP;
     case 'TERMS_CONDITIONS':
       return ROUTES.TERMS_CONDITIONS;
     case Role.Video_Patient:

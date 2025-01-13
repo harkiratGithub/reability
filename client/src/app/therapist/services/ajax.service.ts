@@ -635,5 +635,22 @@ export class AjaxService {
       const url = `${this.baseUrl}/therapist/rtm-details`;
       return this.http.get<any>(url, { params: httpParams });
     }
+
+    getActivePatient = (patientId) => {
+      try {        
+        return this.http.get<any>(`${this.baseUrl}/patient/users/${patientId}`);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    sendEmailAfterLogin = (patient) => {
+      try {
+        return this.http.post<any>(`${this.baseUrl}/patient/users/sendEmail`, { patient });
+      } catch (err) {
+        console.error(err);
+      }
+    };  
+    
   
 }

@@ -59,11 +59,14 @@ export const onLogIn = async (user: {
 					last_name: lastNameDetails,
 					fast_login_link: fast_login_link,
 					pain_level: pain_level,
+					timestamp: timestamp,
 					date_agreed_terms: date_agreed_terms,
 				} = EncryptHelper.decryptJson(details[0]);
 				const RTM = details?.some((ele: { department_name: string }) => ele.department_name.toLowerCase() === 'rtm');
 				const todayEntry = await UserModel.isPatientEntryForToday(patientId);
 				const isPainModelOpen = RTM && typeof todayEntry.painLevel === 'undefined' && !todayEntry.hasEntries;
+				const isMobileModelOpen = RTM &&  new Date().getTime() - new Date(timestamp).getTime() >= 24 * 60 * 60 * 1000 ? true : false;
+				const isRTM = RTM;
 				const validGames = await GameModel.getValidGameForPatient(patientId);
 				const patient = await PatientModel.findPatientByUserId(user.id);
 				const disabledSkeleton = patient.disabled_skeleton;
@@ -78,6 +81,8 @@ export const onLogIn = async (user: {
 					disabledSkeleton,
 					fast_login_link,
 					isPainModelOpen,
+					isMobileModelOpen,
+					isRTM,
 					date_agreed_terms: requiresTermsAgreement,
 				};
 		}
@@ -99,6 +104,7 @@ export const getPatientsByTherapist = async (therapistId: any) => {
 			role: decryptPatient.role,
 			username: decryptPatient.user_name,
 			notification_email: decryptPatient.notification_email,
+			login_notification_email: decryptPatient.login_notification_email,
 			disabledSkeleton: decryptPatient.disabled_skeleton,
 			hasCamera: decryptPatient.has_camera,
 			phone: decryptPatient.phone,
