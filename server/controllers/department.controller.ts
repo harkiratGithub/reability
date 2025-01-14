@@ -1,4 +1,5 @@
 import * as DepartmentHelper from '../helpers/department.helper';
+import * as UserHelper from '../helpers/users.helper';
 
 export const createDepartment = (req, res, next) => {
 	const { name, instituteId } = req.body;
@@ -19,6 +20,14 @@ export const deleteDepartment = (req, res, next) => {
 
 export const getAll = (req, res, next) => {
 	DepartmentHelper.getAll()
+		.then((departments) => res.json(departments))
+		.catch((err) => next(err));
+};
+
+export const getAllTherapistDepartment = async (req, res, next) => {
+	const user = req.user;
+	const userDetails = await UserHelper.onLogIn(user);
+	DepartmentHelper.getAllTherapistDepartment(userDetails)
 		.then((departments) => res.json(departments))
 		.catch((err) => next(err));
 };

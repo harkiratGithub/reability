@@ -108,3 +108,36 @@ export const getTherapistsIdsByPatientDepartments = async (patientId: number, cl
 
 	return map(matchedTherapists, (therapist) => therapist.therapist_id);
 };
+
+export const getTherapistByDepartmentId = async (arrayOfIds, client = null) => {
+	try {
+		const rows = await BaseModel.itemsInArray(TABLE_NAME.THERAPIST_DEPARTMENTS, 'therapist_id', arrayOfIds, client);
+		return rows;
+	} catch (error) {
+		throw error;
+	}
+};
+
+export const getAllByIdsAndInstitute = async (departmentIds: number[], therapistId: number, client = null) => {
+	try {
+		const query = squelPostgres
+			.select()
+			.from(TABLE_NAME.DEPARTMENT, 'd')
+			.join(TABLE_NAME.THERAPIST_DEPARTMENTS, 'td', 'd.id = td.department_id')
+			.where('td.therapist_id = ?', therapistId)
+			.where('d.id IN ?', departmentIds)
+			.toParam();
+		const result = await BaseModel.runQuery(query, client);
+		const formattedResults = result.rows.map((row) => ({
+			id: row.department_id,
+			name: row.name,
+			institute_id: row.institute_id,
+			created_at: row.created_at,
+			updated_at: row.updated_at,
+			active: row.active,
+		}));
+		return formattedResults;
+	} catch (error) {
+		throw error;
+	}
+};
