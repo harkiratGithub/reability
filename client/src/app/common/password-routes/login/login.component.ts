@@ -120,7 +120,12 @@ export class LoginPageComponent implements OnInit, OnDestroy {
             if (user?.role === 'patient' && user?.isPainModelOpen===false && user?.isRTM===true) {
               this.patient_data =  this.ajax.getActivePatient(user?.patientId).subscribe((response)=>{
                 this.patient_data = response;
-                this.ajax.sendEmailAfterLogin(this.patient_data).subscribe((data) => { console.log("===data===",data)});   
+                if (this.patient_data?.login_notification_email) {
+                  this.ajax.sendEmailAfterLogin(this.patient_data).subscribe((data) => {
+                    console.log("===Email sent===", data);
+                  });
+                }
+                //this.ajax.sendEmailAfterLogin(this.patient_data).subscribe((data) => { console.log("===data===",data)});   
               }); 
             }
             this.router.navigate([`${roleMainRoute(user.role)}`]);
