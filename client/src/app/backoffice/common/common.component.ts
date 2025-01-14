@@ -528,7 +528,7 @@ export class CommonComponent implements OnInit {
   }
   fetchTherapists() {
     this.http.getActiveTherapists().subscribe((data) => {
-      const rows = util.transformUsers(data);
+      const rows = util.transformUsers(data);      
       this.setTable(consts.tableColumns.therapists, rows);
       this.setLoading(false);
     });
