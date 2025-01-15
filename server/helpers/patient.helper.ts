@@ -221,6 +221,7 @@ export const getActivities = async (therapistId, startTime, endTime) => {
 				...decryptedPatient,
 				duration: durationString,
 				full_name: `${decryptedPatient.first_name} ${decryptedPatient.last_name}`,
+				created_at: decryptedPatient.created_at
 			};
 			const isRTM = rtmList?.find((rtm) => rtm.patient_id == patient.id) ? true : false;
 			return patientPeer

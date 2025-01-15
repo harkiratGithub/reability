@@ -786,6 +786,7 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
     if (this.dialogRef) {
       this.dialogRef.close();
       this.dialogRef = null;
+      this.isEndGameModalOpen = false;
     }
   
     if (!this.isTherapist && !this.inTherapistSession) {
@@ -798,10 +799,13 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
         },
       });
     }
+    this.isEndGameModalOpen = true;
 
     setTimeout(() => {
       if (this.dialogRef) {
         this.dialogRef.close();
+        this.dialogRef = null;
+        this.isEndGameModalOpen = false; 
       }
     }, 5000); 
     
