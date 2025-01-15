@@ -183,6 +183,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
         userName: items[0].user_name,
         status: items[0].status,
         lastLogin: items[0].logged_in_at,
+        created_at: items[0].created_at,
         // gameSummaries: items
         //   ?.filter((item) => Object.keys(item?.game_summary || {})?.length)
         //   ?.map((item) => ({ start_time: item.start_time, game_summary: item?.game_summary }))
@@ -207,7 +208,15 @@ export class PatientListComponent implements OnInit, OnDestroy {
       }))
       .values()
       .uniqBy('id')
-      .orderBy([(p) => (p.status === 'online' ? 1 : 0), (p) => new Date(p.lastLogin)], ['desc', 'desc'])
+      // .orderBy([(p) => (p.status === 'online' ? 1 : 0), (p) => new Date(p.lastLogin)], ['desc', 'desc'])
+      .orderBy(
+        [
+          (p) => (new Date(p.created_at)), 
+          (p) => (p.status === 'online' ? 1 : 0), 
+          (p) => new Date(p.lastLogin),
+        ],
+        ['desc', 'desc', 'desc']
+      )
       .value();
 
     patients.forEach((patient) => {
@@ -1165,6 +1174,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
 
   onReturnFromAddEdit() {
     this.isPatientViewEnable = false;
+    this.getPatientActivities();
     // const currentUrl = this.router.url;
     // this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
     //   this.router.navigate([currentUrl]);

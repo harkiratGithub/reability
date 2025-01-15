@@ -48,7 +48,7 @@ export class AddEditPatientComponent implements OnInit, OnDestroy {
   viewType = PatientView;
   userLog: IUserLogEntry[] = [];
   currentRemark = '';
-
+  
   ngOnInit() {
     if (this.editedEntity) {
       this.userLog = this.editedEntity.userLog;
@@ -123,7 +123,6 @@ export class AddEditPatientComponent implements OnInit, OnDestroy {
     }
     return departments.filter((dep) => dep.institute_id === instituteId);
   }
-
   initDropDowns() {
     if (this.institutes?.length > 0) {
       this.customForm.controls.institute_id.enable();
@@ -142,6 +141,10 @@ export class AddEditPatientComponent implements OnInit, OnDestroy {
     } else {
       this.customForm.controls.institute_id.disable();
       this.filteredDepartments = [];
+    }
+
+    if (this.editedEntity) {
+      this.customForm.controls.institute_id.disable();
     }
   
     if (this.filteredDepartments.length > 0) {
