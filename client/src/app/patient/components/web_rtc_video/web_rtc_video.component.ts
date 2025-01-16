@@ -9,6 +9,9 @@ import {
   AfterViewInit,
   SimpleChanges,
   OnChanges,
+  ViewChild,
+  ElementRef,
+  ChangeDetectorRef,
 } from '@angular/core';
 import Peer from 'peerjs';
 import { AuthenticationService } from '../../../common/services/authentication.service';
@@ -32,6 +35,9 @@ import { isNil, isBoolean, throttle } from 'lodash';
 import { setCameraFrameRate } from '../../../common/helpers/webRTC-common-utils';
 import { IOrganAngle, IScore } from '../../../../types';
 import { IGameAppData } from '../../../../app/app.state';
+import { Pose, POSE_CONNECTIONS, Results } from '@mediapipe/pose';
+import { Camera } from '@mediapipe/camera_utils';
+import { SkeltonVideoService } from 'src/app/common/services/skelton-video.service';
 
 let therapistToPatientConnection = null;
 declare var MediaRecorder: any;
@@ -65,7 +71,128 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   @Output() handleTherapistClickHome = new EventEmitter();
   @Output() handleOtherSideLeftVideoSession = new EventEmitter();
   @Output() handleShareScreen = new EventEmitter();
+  ///pose comparision var initialise here ////////////////
 
+  @ViewChild('videoElement') videoElement!: ElementRef;
+  @ViewChild('cameraElement') cameraElement!: ElementRef;
+  @ViewChild('canvasElement1') canvasElement1!: ElementRef;
+  @ViewChild('canvasElement2') canvasElement2!: ElementRef;
+
+  //videoElement: HTMLVideoElement | null = null;
+  iframeElement: HTMLIFrameElement | null = null;
+
+  private videoPose!: Pose;
+  private cameraPose!: Pose;
+  private camera!: Camera;
+  private angleCalculationInterval = 5000; // 5 seconds
+  private lastCalculationTime = 0;
+  private lastYPositions: { [key: string]: number[] } = {
+    leftWrist: [],
+    rightWrist: [],
+  };
+  leftMatching = false;
+  rightMatching = false;
+  private peakDetectionThreshold = 0.01;
+  private lastAngles: { [key: string]: number[] } = {
+    leftWrist: [],
+    rightWrist: [],
+  };
+  private peakLogged: { [key: string]: boolean } = {
+    leftWrist: false,
+    rightWrist: false,
+  };
+  public minVideoAngle: { [key: string]: number } = {
+    leftWrist: Infinity,
+    rightWrist: Infinity,
+  };
+  public maxVideoAngle: { [key: string]: number } = {
+    leftWrist: -Infinity,
+    rightWrist: -Infinity,
+  };
+  public cameraAngle: { [key: string]: number } = {
+    leftWrist: Infinity,
+    rightWrist: Infinity,
+  };
+  public videoAngle: { [key: string]: number } = {
+    leftWrist: Infinity,
+    rightWrist: Infinity,
+  };
+  public minCameraAngle: { [key: string]: number } = {
+    leftWrist: Infinity,
+    rightWrist: Infinity,
+  };
+  public maxCameraAngle: { [key: string]: number } = {
+    leftWrist: -Infinity,
+    rightWrist: -Infinity,
+  };
+  private matchingData: { timestamp: string; wrist: string; status: string }[] = [];
+  private csvFilePath = 'matching_results.xlsx';
+  private matchingCameraData: { timestamp: string; 'LSA Deg': string; 'RSA Deg': string; }[] = [];
+  private startTime: number;
+  private videoIndex: number;
+  private videoSeconds: number = 0;
+  private currentVideoIndex: number = 0;
+  videoMinMax = [{
+    "ClipMinMax": "Max Value",
+    "ClipTimestamp": 6.012,
+    "ClipDeg": 178
+  }, {
+    "ClipMinMax": "Min Value",
+    "ClipTimestamp": 10.744,
+    "ClipDeg": 6
+  }, {
+    "ClipMinMax": "Max Value",
+    "ClipTimestamp": 15.522,
+    "ClipDeg": 177
+  }, {
+    "ClipMinMax": "Min Value",
+    "ClipTimestamp": 19.577,
+    "ClipDeg": 7
+  }, {
+    "ClipMinMax": "Max Value",
+    "ClipTimestamp": 23.986,
+    "ClipDeg": 176
+  }, {
+    "ClipMinMax": "Min Value",
+    "ClipTimestamp": 28.765,
+    "ClipDeg": 7
+  }, {
+    "ClipMinMax": "Max Value",
+    "ClipTimestamp": 33.42,
+    "ClipDeg": 176
+  }, {
+    "ClipMinMax": "Min Value",
+    "ClipTimestamp": 38.314,
+    "ClipDeg": 7
+  }, {
+    "ClipMinMax": "Max Value",
+    "ClipTimestamp": 42.881,
+    "ClipDeg": 176
+  }, {
+    "ClipMinMax": "Min Value",
+    "ClipTimestamp": 47.993,
+    "ClipDeg": 6
+  }, {
+    "ClipMinMax": "Max Value",
+    "ClipTimestamp": 52.187,
+    "ClipDeg": 177
+  }, {
+    "ClipMinMax": "Min Value",
+    "ClipTimestamp": 57.337,
+    "ClipDeg": 7
+  }, {
+    "ClipMinMax": "Max Value",
+    "ClipTimestamp": 61.772,
+    "ClipDeg": 176
+  }, {
+    "ClipMinMax": "Min Value",
+    "ClipTimestamp": 66.646,
+    "ClipDeg": 7
+  }]
+
+  rightComment = '';
+  leftComment = '';
+  processedTimestamps: Set<string> = new Set();
   receivedRemoteVideo: boolean = false;
   connection: WebSocket;
   mediaStreamConstraints;
@@ -134,7 +261,9 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     private menuOptionsActions: MenuOptionsAppActions,
     private depthCameraSocketService: DepthCameraSocketService,
     private webCamSkeletonService: WebCamSkeletonService,
-    private ajaxService: AjaxService
+    private ajaxService: AjaxService,
+    private cdr: ChangeDetectorRef,
+    private skeltonVideoService: SkeltonVideoService,
   ) {
     this.subscription.add(
       this.ajaxService.getIceServers().subscribe((res) => {
@@ -165,6 +294,41 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         this.isBodyTrackingAvailable = isBodyTrackingAvailable;
       })
     );
+
+    /* this.skeltonVideoService.iframeUrl$.subscribe((url) => {
+       console.log("iframeurl in webrtccomponents123===", url);
+       this.iframeUrl = url;
+     });
+     */
+
+    this.skeltonVideoService.gameVideoElement$.subscribe((iframeaction) => {
+      // console.log(" in webrtccomponents iframeaction===", iframeaction);
+      if (typeof iframeaction === 'string') {
+        const action = JSON.parse(iframeaction);
+        console.log("action.msg.data.currentPlayTime.vidTime===", action);
+        if (action.msg && action.msg.data && action.msg.data.shouldPlay) {
+          const videoTime = action.msg.data.currentPlayTime.vidTime;
+          const currentPlayTime = new Date(action.msg.data.currentPlayTime.sysTime).getSeconds();
+          if (this.videoSeconds == 0) {
+            this.videoSeconds = currentPlayTime
+          }
+          if (this.videoSeconds < currentPlayTime || videoTime > 0) {
+            this.initializeCameraPoseModels()
+            if (!this.startTime) {
+              this.startTime = new Date().getTime(); // Save the initial timestamp
+            }
+            this.videoSeconds = currentPlayTime
+            if (this.videoIndex != action.msg.data.index) {
+              this.videoIndex = action.msg.data.index
+              this.processedTimestamps = new Set();
+              this.startTime = new Date().getTime();
+            }
+          }
+        }
+      }
+      //this.iframeUrl = action;
+    });
+
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -376,12 +540,32 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         therapistToPatientConnection.send({ type: 'track_body', payload: this.trackBody });
       }
     }, this.POSENET_LOADING_TIME_PASSED_DURATION);
-    document.addEventListener('touchstart', this.handleBodyTracking.bind(this), { passive: false });
+
+    // Retrieve the iframe and video elements from the service
+
+    /*this.skeltonVideoService.iframeUrl$.subscribe((url) => {
+      console.log("iframeurl in webrtccomponents===", url);
+      this.iframeUrl = url;
+    });
+    */
+
+    // getIframeUrl
+    this.skeltonVideoService.gameVideoElement$.subscribe((iframeaction) => {
+      // const action = JSON.parse(iframeaction);
+      console.log(" in webrtccomponents iframeaction===", iframeaction);
+      // if (action.msg.shouldPlay) {
+      //   this.initializePoseModels
+      // }
+      //this.iframeUrl = action;
+    });
+
   }
 
   ngAfterViewInit() {
     this.skeletonBtn = document.getElementById('skeleton-border-wrap');
     this.skeletonLoadingBar();
+    this.initializeCamera();
+    this.initializePoseModels();
   }
 
   handleCameraAvailability() {
@@ -465,7 +649,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       'video/webm;codecs=vp9',
       'video/webm;codecs=h264',
       'video/mp4'
-    ];  
+    ];
 
     // below function to check dynamically supported mime type 
     function getSupportedMimeType(): string | null {
@@ -484,7 +668,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     } else {
       console.error('No supported MIME type found for MediaRecorder.');
     }
-    
+
     this.localStream = canv.captureStream(60);
     const mediaRecorder = new MediaRecorder(this.localStream, options);
     mediaRecorder.start();
@@ -840,7 +1024,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       this.peerHasErrors = false;
     });
     this.patientPeer.on('error', (err) => {
-      console.warn('therapist peer error' + err);
+      // console.warn('therapist peer error' + err);
       if (err.message && err.message.includes('Lost connection to server')) {
         if (!this.peerHasErrors) {
           this.peerHasErrors = true;
@@ -941,8 +1125,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         acceptBtnImg: '../../../assets/buttons/btn_decline.png',
         acceptBtnImgHover: '../../../assets/buttons/btn_decline_hover.png',
         timeout: 5,
-        approveCallback: async () => {},
-        declineCallback: async () => {},
+        approveCallback: async () => { },
+        declineCallback: async () => { },
       },
       false
     );
@@ -1072,10 +1256,10 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         videoBitsPerSecond: 2500000,
         mimeType: 'video/webm;codecs=vp8',
       };
-      
+
       let canv;
 
-      
+
       if (this.depthCameraSocketService.isDepthCameraConnected) {
         canv = document.getElementById('patient-canvas-skeleton') as HTMLCanvasElement;
       } else if (this.currentUser.disabledSkeleton) {
@@ -1099,7 +1283,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         'video/webm;codecs=vp9',
         'video/webm;codecs=h264',
         'video/mp4'
-      ];  
+      ];
 
       // below function to check dynamically supported mime type 
       function getSupportedMimeType(): string | null {
@@ -1268,8 +1452,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         content: VIDEO_PATIENT_MESSAGES.muted_mic_message,
         acceptBtnImg: '../../../assets/modal/btn_hover_request_timer.png',
         acceptBtnImgHover: '../../../assets/modal/btn_accept_hover.png',
-        approveCallback: () => {},
-        declineCallback: () => {},
+        approveCallback: () => { },
+        declineCallback: () => { },
       });
     }
   };
@@ -1290,8 +1474,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         content: VIDEO_PATIENT_MESSAGES.no_mic_connection_message,
         acceptBtnImg: '../../../assets/modal/btn_hover_request_timer.png',
         acceptBtnImgHover: '../../../assets/modal/btn_accept_hover.png',
-        approveCallback: () => {},
-        declineCallback: () => {},
+        approveCallback: () => { },
+        declineCallback: () => { },
         timeout: 30000,
       });
     }
@@ -1325,5 +1509,624 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     }
     this.subscription.unsubscribe();
     this.patientPeer.destroy();
+  }
+
+  matchClipAndPatientData(matchingClipData: any[], matchingPatientData: any[]) {
+    const results = [];
+    const timeThreshold = 3; // Time difference threshold (seconds)
+    const angleThreshold = 5; // Angle difference threshold
+
+    // Loop through clip and patient data to find matches
+    matchingClipData.forEach((clipEntry) => {
+      const closestPatient = matchingPatientData.reduce(
+        (closest, patientEntry) => {
+          const timeDiff = Math.abs(+clipEntry.ClipTimestamp - +patientEntry.timestamp);
+          const angleLeftDiff = Math.abs(clipEntry.ClipDeg - patientEntry['LSA Deg']);
+          const angleRightDiff = Math.abs(clipEntry.ClipDeg - patientEntry['RSA Deg']);
+
+          if (timeDiff <= timeThreshold) {
+            if (!closest || angleRightDiff < closest.angleRightDiff || angleLeftDiff < closest.angleLeftDiff || ((angleRightDiff === closest.angleRightDiff || angleLeftDiff === closest.angleLeftDiff) && timeDiff < closest.timeDiff)) {
+              return { patientEntry, timeDiff, angleRightDiff, angleLeftDiff };
+            }
+          }
+          return closest;
+        },
+        null
+      );
+
+      const isRightGood =
+        closestPatient &&
+        closestPatient.timeDiff <= timeThreshold &&
+        closestPatient.angleRightDiff <= angleThreshold;
+
+      const isLeftGood =
+        closestPatient &&
+        closestPatient.timeDiff <= timeThreshold &&
+        closestPatient.angleLeftDiff <= angleThreshold;
+
+      // Store the comparison data
+      results.push({
+        ClipDeg: clipEntry.ClipDeg,
+        ClipMinMax: clipEntry.ClipMinMax,
+        PatientMinMax: clipEntry.ClipMinMax,
+        ClipTimestamp: clipEntry.ClipTimestamp,
+        LeftComments: isLeftGood ? "Good" : "Not Good",
+        RightComments: isRightGood ? "Good" : "Not Good",
+        PatientLeftDeg: closestPatient?.patientEntry['LSA Deg'],
+        PatientRightDeg: closestPatient?.patientEntry['RSA Deg'],
+        PatientTimestamp: closestPatient?.patientEntry.timestamp,
+      });
+    });
+
+    return results;
+  }
+
+  updateComments(matchingData: any[]) {
+    const timestampThreshold = 2; // Difference in seconds
+    const angleThreshold = 3; // Difference in degrees
+
+    matchingData.forEach((entry) => {
+      const timestampDiff = Math.abs(+entry.ClipTimestamp - +entry.PatientTimestamp);
+      const angleLeftDiff = +entry.ClipDeg - +entry.PatientLeftDeg;
+      const angleRightDiff = +entry.ClipDeg - +entry.PatientRightDeg;
+
+      if (timestampDiff > timestampThreshold) {
+        entry.RightComments = "Too Late";
+      } else if (angleRightDiff > angleThreshold) {
+        entry.RightComments = "Too Low";
+      } else if (angleRightDiff < -angleThreshold) {
+        entry.RightComments = "Too High";
+      }
+
+      if (timestampDiff > timestampThreshold) {
+        entry.LeftComments = "Too Late";
+      } else if (angleLeftDiff > angleThreshold) {
+        entry.LeftComments = "Too Low";
+      } else if (angleLeftDiff < -angleThreshold) {
+        entry.LeftComments = "Too High";
+      }
+    });
+
+    return matchingData;
+  }
+
+  /////// pose detection code start from here //////////////////
+
+  private recordMatch(angle: number, wrist: string, status: string, angleType: 'min' | 'max' | '90-degree') {
+    // Retrieve existing data from localStorage
+    const timestamp = new Date().toISOString();
+    const currentTimestamp = new Date().getTime();
+    let existingData = JSON.parse(localStorage.getItem('matchingData') || '[]');
+
+    // Check if there's already an entry for the given wrist and angleType
+    const existingEntry = existingData.find(
+      (entry: any) => {
+        const entryTimestamp = new Date(entry.timestamp).getTime();
+        return (
+          Math.abs(entryTimestamp - currentTimestamp) <= 2000 &&
+          entry.wrist === wrist &&
+          entry.angleType === angleType
+        );
+      }
+    );
+
+    if (!existingEntry) {
+      // Save the new match only if it hasn't been saved yet
+      const newEntry = { timestamp, wrist, status, angleType, angle };
+      existingData.push(newEntry);
+
+      // Save updated data back to localStorage
+      localStorage.setItem('matchingData', JSON.stringify(existingData));
+    }
+
+    if (angleType === '90-degree' && Math.abs(angle - 90) <= 1) { // ±1 degree tolerance
+      const ninetyDegreeEntry = existingData.find(
+        (entry: any) => {
+          const entryTimestamp = new Date(entry.timestamp).getTime();
+          return (
+            Math.abs(entryTimestamp - currentTimestamp) <= 2000 &&
+            entry.wrist === wrist &&
+            entry.angleType === angleType
+          );
+        }
+      );
+
+      if (!ninetyDegreeEntry) {
+        const timestamp = new Date().toISOString();
+        const newEntry = { timestamp, wrist, status, angleType, angle };
+        existingData.push(newEntry);
+
+        // Save updated data back to localStorage
+        localStorage.setItem('matchingData', JSON.stringify(existingData));
+      }
+    }
+  }
+
+  private manage90DegreeCount(wrist: string, angle: number, threshold: number = 90) {
+    // Retrieve existing data from localStorage
+    let data = JSON.parse(localStorage.getItem('matchingData') || '{}');
+
+    if (!data[wrist]) {
+      data[wrist] = { count90: 0 };
+    }
+
+    // Check if the angle is close to 90 degrees (within a small tolerance)
+    if (Math.abs(angle - threshold) <= 1) {
+      data[wrist].count90 += 1;
+    }
+
+    // Save updated data back to localStorage
+    localStorage.setItem('matchingData', JSON.stringify(data));
+  }
+
+  // Example: Retrieve and use stored data
+  private getStoredData(): any[] {
+    return JSON.parse(localStorage.getItem('matchingData') || '[]');
+  }
+
+  private initializePoseModels() {
+    // this.videoPose = new Pose({
+    //   locateFile: (file) =>
+    //     `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`,
+    // });
+    this.cameraPose = new Pose({
+      locateFile: (file) =>
+        `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`,
+    });
+
+    const poseOptions: any = {
+      modelComplexity: 1,
+      smoothLandmarks: true,
+      enableSegmentation: false,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5,
+    };
+    // this.videoPose.setOptions(poseOptions);
+    this.cameraPose.setOptions(poseOptions);
+
+    // this.videoPose.onResults((results: Results) => {
+    //   this.onPoseVideoResults(results, this.canvasElement1.nativeElement);
+    // });
+    this.cameraPose.onResults((results: Results) => {
+      this.onPoseCameraResults(false, results, this.canvasElement2.nativeElement);
+    });
+
+    // this.videoElement.nativeElement.onloadeddata = () => {
+    //   this.processVideoFrames();
+    // };
+  }
+
+  private initializeCameraPoseModels() {
+    // this.videoPose = new Pose({
+    //   locateFile: (file) =>
+    //     `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`,
+    // });
+    this.cameraPose = new Pose({
+      locateFile: (file) =>
+        `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`,
+    });
+
+    const poseOptions: any = {
+      modelComplexity: 1,
+      smoothLandmarks: true,
+      enableSegmentation: false,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5,
+    };
+    // this.videoPose.setOptions(poseOptions);
+    this.cameraPose.setOptions(poseOptions);
+
+    // this.videoPose.onResults((results: Results) => {
+    //   this.onPoseVideoResults(results, this.canvasElement1.nativeElement);
+    // });
+    this.cameraPose.onResults((results: Results) => {
+      this.onPoseCameraResults(true, results, this.canvasElement2.nativeElement);
+    });
+
+    // this.videoElement.nativeElement.onloadeddata = () => {
+    //   this.processVideoFrames();
+    // };
+  }
+
+  private async processVideoFrames() {
+    const video = this.videoElement.nativeElement;
+    const renderFrame = async () => {
+      if (video.paused || video.ended) return;
+      await this.videoPose.send({ image: video });
+      requestAnimationFrame(renderFrame);
+    };
+    renderFrame();
+  }
+
+  private initializeCamera() {
+    // console.log("initialize camera call");
+    this.camera = new Camera(this.cameraElement.nativeElement, {
+      onFrame: async () => {
+        await this.cameraPose.send({ image: this.cameraElement.nativeElement });
+      },
+      width: 291,
+      height: 290,
+    });
+    this.camera.start();
+  }
+
+  private calculateAngleBetweenPoints(
+    A: { x: number; y: number; z: number },
+    B: { x: number; y: number; z: number }
+  ): number {
+    const vectorAB = { x: B.x - A.x, y: B.y - A.y };
+    const verticalVector = { x: 0, y: 1 };
+
+    const dotProduct =
+      vectorAB.x * verticalVector.x + vectorAB.y * verticalVector.y;
+
+    const magnitudeAB = Math.sqrt(vectorAB.x ** 2 + vectorAB.y ** 2);
+    const magnitudeVertical = Math.sqrt(
+      verticalVector.x ** 2 + verticalVector.y ** 2
+    );
+
+    const angleInRadians = Math.acos(
+      dotProduct / (magnitudeAB * magnitudeVertical)
+    );
+    return angleInRadians * (180 / Math.PI);
+  }
+
+  private onPoseVideoResults(
+    results: Results,
+    canvasElement: HTMLCanvasElement
+  ) {
+    const canvasCtx = canvasElement.getContext('2d');
+    if (canvasCtx) {
+      canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+      canvasCtx.drawImage(
+        results.image,
+        0,
+        0,
+        canvasElement.width,
+        canvasElement.height
+      );
+
+      if (results.poseLandmarks) {
+        const leftShoulder = results.poseLandmarks[11];
+        const leftWrist = results.poseLandmarks[15];
+        const rightShoulder = results.poseLandmarks[12];
+        const rightWrist = results.poseLandmarks[16];
+
+        // Calculate angles for left and right wrists
+        const leftAngle = this.calculateAngleBetweenPoints(
+          { x: leftShoulder.x, y: leftShoulder.y, z: leftShoulder.z },
+          { x: leftWrist.x, y: leftWrist.y, z: leftWrist.z }
+        );
+
+        const rightAngle = this.calculateAngleBetweenPoints(
+          { x: rightShoulder.x, y: rightShoulder.y, z: rightShoulder.z },
+          { x: rightWrist.x, y: rightWrist.y, z: rightWrist.z }
+        );
+
+        // Update min and max only if source is video
+        if (leftAngle < this.minVideoAngle['leftWrist'])
+          this.minVideoAngle['leftWrist'] = leftAngle;
+        if (leftAngle > this.maxVideoAngle['leftWrist'])
+          this.maxVideoAngle['leftWrist'] = leftAngle;
+        if (rightAngle < this.minVideoAngle['rightWrist'])
+          this.minVideoAngle['rightWrist'] = rightAngle;
+        if (rightAngle > this.maxVideoAngle['rightWrist'])
+          this.maxVideoAngle['rightWrist'] = rightAngle;
+        this.videoAngle['leftWrist'] = leftAngle;
+        this.videoAngle['rightWrist'] = rightAngle;
+        const tolerance = 3;
+
+
+        if (Math.abs(leftAngle - 90) <= 1) {
+          this.recordMatch(leftAngle, 'leftWrist', 'Matched at 90 degrees', '90-degree');
+        }
+
+        if (Math.abs(rightAngle - 90) <= 1) {
+          this.recordMatch(rightAngle, 'rightWrist', 'Matched at 90 degrees', '90-degree');
+        }
+
+        const withinTolerance = (
+          angle: number,
+          target: number,
+          tolerance: number
+        ) => angle >= target - tolerance && angle <= target + tolerance;
+
+        if (
+          withinTolerance(leftAngle, this.minVideoAngle['leftWrist'], tolerance)
+        ) {
+          this.leftMatching = withinTolerance(
+            this.cameraAngle['leftWrist'],
+            this.minVideoAngle['leftWrist'],
+            tolerance
+          );
+          if (this.leftMatching) {
+            this.recordMatch(leftAngle, 'leftWrist', 'Left Wrist is matching the video angle', 'min');
+          }
+        }
+
+        if (
+          withinTolerance(leftAngle, this.maxVideoAngle['leftWrist'], tolerance)
+        ) {
+          this.leftMatching = withinTolerance(
+            this.cameraAngle['leftWrist'],
+            this.maxVideoAngle['leftWrist'],
+            tolerance
+          );
+          if (this.leftMatching) {
+            this.recordMatch(leftAngle, 'leftWrist', 'Left Wrist is matching the video angle', 'max');
+          }
+        }
+
+        if (
+          withinTolerance(
+            rightAngle,
+            this.minVideoAngle['rightWrist'],
+            tolerance
+          )
+        ) {
+          this.rightMatching = withinTolerance(
+            this.cameraAngle['rightWrist'],
+            this.minVideoAngle['rightWrist'],
+            tolerance
+          );
+          if (this.rightMatching) {
+            this.recordMatch(rightAngle, 'rightWrist', 'Right Wrist is matching the video angle', 'min');
+          }
+        }
+
+        if (
+          withinTolerance(
+            rightAngle,
+            this.maxVideoAngle['rightWrist'],
+            tolerance
+          )
+        ) {
+          this.rightMatching = withinTolerance(
+            this.cameraAngle['rightWrist'],
+            this.maxVideoAngle['rightWrist'],
+            tolerance
+          );
+          if (this.rightMatching) {
+            this.recordMatch(rightAngle, 'rightWrist', 'Right Wrist is matching the video angle', 'max');
+          }
+        }
+
+        this.cdr.detectChanges();
+
+
+        // Additional code to draw pose landmarks and connections on the canvas
+        results.poseLandmarks.forEach((landmark) => {
+          canvasCtx.beginPath();
+          canvasCtx.arc(
+            landmark.x * canvasElement.width,
+            landmark.y * canvasElement.height,
+            5,
+            0,
+            2 * Math.PI
+          );
+          canvasCtx.fillStyle = 'rgba(255, 0, 0, 0.6)';
+          canvasCtx.fill();
+        });
+
+        POSE_CONNECTIONS.forEach(([start, end]) => {
+          const startLandmark = results.poseLandmarks[start];
+          const endLandmark = results.poseLandmarks[end];
+          canvasCtx.beginPath();
+          canvasCtx.moveTo(
+            startLandmark.x * canvasElement.width,
+            startLandmark.y * canvasElement.height
+          );
+          canvasCtx.lineTo(
+            endLandmark.x * canvasElement.width,
+            endLandmark.y * canvasElement.height
+          );
+          canvasCtx.lineWidth = 2;
+          canvasCtx.strokeStyle = 'rgba(0, 255, 0, 0.6)';
+          canvasCtx.stroke();
+        });
+      }
+    }
+  }
+
+  private onPoseCameraResults(
+    showMarker: boolean,
+    results: Results,
+    canvasElement: HTMLCanvasElement
+  ) {
+    const canvasCtx = canvasElement.getContext('2d');
+    if (canvasCtx) {
+      canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+      canvasCtx.drawImage(
+        results.image,
+        0,
+        0,
+        canvasElement.width,
+        canvasElement.height
+      );
+
+      if (results.poseLandmarks && showMarker) {
+        const leftShoulder = results.poseLandmarks[11];
+        const leftWrist = results.poseLandmarks[15];
+        const rightShoulder = results.poseLandmarks[12];
+        const rightWrist = results.poseLandmarks[16];
+
+        // Calculate angles for left and right wrists
+        const leftAngle = this.calculateAngleBetweenPoints(
+          { x: leftShoulder.x, y: leftShoulder.y, z: leftShoulder.z },
+          { x: leftWrist.x, y: leftWrist.y, z: leftWrist.z }
+        );
+
+        const rightAngle = this.calculateAngleBetweenPoints(
+          { x: rightShoulder.x, y: rightShoulder.y, z: rightShoulder.z },
+          { x: rightWrist.x, y: rightWrist.y, z: rightWrist.z }
+        );
+
+        this.cameraAngle['leftWrist'] = leftAngle;
+        this.cameraAngle['rightWrist'] = rightAngle;
+
+        const elapsedTime = ((new Date().getTime() - this.startTime) / 1000).toFixed(3);
+        this.matchingCameraData.push({
+          timestamp: `${elapsedTime}`,
+          'LSA Deg': `${Math.round(leftAngle)}`,
+          'RSA Deg': `${Math.round(rightAngle)}`
+        });
+
+        const withinTolerance = (
+          angle: number,
+          target: number,
+          tolerance: number
+        ) => angle >= target - tolerance && angle <= target + tolerance;
+
+        const currentVideoAngle = this.videoMinMax[this.currentVideoIndex]
+        this.rightMatching = withinTolerance(
+          rightAngle,
+          +currentVideoAngle.ClipDeg,
+          3
+        );
+        this.leftMatching = withinTolerance(
+          leftAngle,
+          +currentVideoAngle.ClipDeg,
+          3
+        )
+
+        if (
+          withinTolerance(
+            rightAngle,
+            +currentVideoAngle.ClipDeg,
+            3
+          ) && withinTolerance(
+            leftAngle,
+            +currentVideoAngle.ClipDeg,
+            3
+          )
+        ) {
+          const liveResults = this.matchClipAndPatientData(this.videoMinMax, this.matchingCameraData);
+          const updateComments = this.updateComments(liveResults);
+          // console.log(updateComments);
+
+          const lastCommentObj = updateComments
+            .filter(item => item.PatientTimestamp !== undefined)
+            .pop();
+
+          this.leftComment = lastCommentObj?.LeftComments;
+          this.rightComment = lastCommentObj?.RightComments;
+          const lastTimestamp = lastCommentObj?.ClipTimestamp;
+
+          if (lastTimestamp && !this.processedTimestamps.has(lastTimestamp)) {
+            this.currentVideoIndex++;
+            this.processedTimestamps.add(lastTimestamp);
+            console.log(lastTimestamp, this.processedTimestamps);
+            if (this.rightComment != 'Good') {
+              this.playCommentAudio();
+              // this.playAudio(`assets/st-audio/${this.rightComment}.mp3`);
+            }
+          }
+        }
+
+        this.cdr.detectChanges();
+
+        // Additional code to draw pose landmarks and connections on the canvas
+        results.poseLandmarks.forEach((landmark, index) => {
+          if (index === 11 || index === 12 || index === 13 || index === 14 || index === 15 || index === 16 || index === 23 || index === 24) {
+            canvasCtx.beginPath();
+            canvasCtx.arc(
+              landmark.x * canvasElement.width,
+              landmark.y * canvasElement.height,
+              7,
+              0,
+              2 * Math.PI
+            );
+            canvasCtx.fillStyle = 'rgba(255, 0, 0, 0.6)';
+            canvasCtx.fill();
+          }
+        });
+
+        POSE_CONNECTIONS.forEach(([start, end]) => {
+          // console.log('start', 'end');
+          if ((start === 11 && (end === 13 || end === 23)) || (start === 13 && end === 15) || (start === 12 && (end === 14 || end === 24)) || (start === 14 && end === 16)) {
+            const startLandmark = results.poseLandmarks[start];
+            const endLandmark = results.poseLandmarks[end];
+            canvasCtx.beginPath();
+            canvasCtx.moveTo(
+              startLandmark.x * canvasElement.width,
+              startLandmark.y * canvasElement.height
+            );
+            canvasCtx.lineTo(
+              endLandmark.x * canvasElement.width,
+              endLandmark.y * canvasElement.height
+            );
+            canvasCtx.lineWidth = 4;
+            canvasCtx.strokeStyle = 'rgba(128, 128, 128, 0.6)';
+            if (this.rightMatching && ((start === 12 && (end === 14 || end === 24)) || (start === 14 && end === 16))) {
+              canvasCtx.strokeStyle = this.rightComment === 'Good' ? 'rgba(0, 255, 0, 0.6)' : 'rgba(255, 0, 0, 0.6)';
+            }
+            if (this.leftMatching && ((start === 11 && (end === 13 || end === 23)) || (start === 13 && end === 15))) {
+              canvasCtx.strokeStyle = this.leftComment === 'Good' ? 'rgba(0, 255, 0, 0.6)' : 'rgba(255, 0, 0, 0.6)';
+            }
+            canvasCtx.stroke();
+          }
+        });
+      }
+    }
+  }
+
+  private updateAngleHistory(key: string, angle: number) {
+    const maxHistory = 3;
+    if (!this.lastAngles[key]) {
+      this.lastAngles[key] = [];
+    }
+    if (this.lastAngles[key].length >= maxHistory) {
+      this.lastAngles[key].shift();
+    }
+    this.lastAngles[key].push(angle);
+  }
+
+  private isAnglePeak(key: string): boolean {
+    const angles = this.lastAngles[key];
+    if (angles.length < 3) return false;
+
+    const [prev, current, next] = angles;
+    return (
+      (current > prev && current > next) || (current < prev && current < next)
+    );
+  }
+
+  private updateYPositionHistory(key: string, newY: number) {
+    const maxHistory = 3;
+    if (!this.lastYPositions[key]) {
+      this.lastYPositions[key] = [];
+    }
+    if (this.lastYPositions[key].length >= maxHistory) {
+      this.lastYPositions[key].shift();
+    }
+    this.lastYPositions[key].push(newY);
+  }
+
+  playAudio(filePath: string) {
+    const audio = new Audio(filePath);
+    audio.load(); // Ensure the audio file is loaded
+    audio.play(); // Play the audio
+  }
+
+  playCommentAudio() {
+    const speech = new SpeechSynthesisUtterance(this.rightComment);
+    speech.lang = 'en-US'; // Set language
+    speech.volume = 1; // Volume: 0 to 1
+    speech.rate = 1; // Speed: 0.1 to 10
+    speech.pitch = 1; // Pitch: 0 to 2
+    window.speechSynthesis.speak(speech);
+  }
+
+  private isPeakPosition(key: string): boolean {
+    const positions = this.lastYPositions[key];
+    console.log(`${key} ${positions}`);
+
+    if (positions.length < 3) return false;
+
+    // Check if the middle position is a peak (either max or min)
+    const [prev, current, next] = positions;
+    return (
+      (current > prev && current > next) || (current < prev && current < next)
+    );
   }
 }

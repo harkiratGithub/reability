@@ -5,13 +5,20 @@
 
 
 <div class="pose-container">
-  <video #videoElement src="assets/video.mp4" autoplay muted controls width="700"></video>
-  <video #cameraElement autoplay muted style="transform: scaleX(-1);"></video>
+  <video #videoElement src="assets/st-video/p1135.mp4" autoplay muted controls width="700" (ended)="generateCSV()"></video>
+  <!-- <iframe id="videoIframe" #videoIframe width="720" height="480" style="border:none;" srcdoc='<!DOCTYPE html>
+          <html>
+          <body>
+            <video id="videoElement" #videoElement src="assets/st-video/video.mp4" autoplay muted controls width="700"></video>
+          </body>
+          </html>'>
+  </iframe> -->
+  <video #cameraElement autoplay muted></video>
 </div>
 
 <div class="pose-container">
   <canvas #canvasElement1 width="640" height="480"></canvas>
-  <canvas #canvasElement2 width="640" height="480" style="transform: scaleX(-1);"></canvas>
+  <canvas #canvasElement2 width="640" height="480"></canvas>
 </div>
 <div class="pose-container">
   <div class="angle-display">
@@ -53,6 +60,7 @@
       <p class="not-matching" *ngIf="!rightMatching">
         Right Match: Right Wrist is not matching the video angle
       </p>
+      <p [ngClass]="{'matching': rightMatching, 'not-matching': !rightMatching}">{{rightComment}}</p>
     </div>
   </div>
 

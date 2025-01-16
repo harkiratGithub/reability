@@ -20,6 +20,7 @@ export default (() => {
 				host: process.env.HOST_DEV,
 				password: process.env.PASSWORD_DEV,
 				database: process.env.DB_DEV,
+				ssl: true,
 			});
 		} else if (process.env.NODE_ENV === 'test') {
 			pool = new Pool({
