@@ -293,7 +293,7 @@ export class PoseComparisonComponent implements OnInit, AfterViewInit {
       if (+entry['Deg'] < min) min = +entry['Deg'] > 3 ? +entry['Deg'] : 3;
       if (+entry['Deg'] > max) max = +entry['Deg'];
     });
-    min = 30;
+    // min = 90;
     // max = 180;
 
     const mid = (min + max) / 2;
@@ -549,6 +549,26 @@ export class PoseComparisonComponent implements OnInit, AfterViewInit {
     this.videoElement.nativeElement.onloadeddata = () => {
       this.processVideoFrames();
     };
+    // const iframe = document.getElementById('videoIframe') as HTMLIFrameElement;
+    // const iframeDocument = iframe.contentDocument || iframe.contentWindow?.document;
+
+    // const iframe = this.videoIframe.nativeElement;
+    // const iframeDocument = iframe.contentDocument || iframe.contentWindow?.document;
+
+    // if (iframeDocument) {
+    //   console.log('iframeDocument', iframeDocument);
+
+    //   // const videoElement = iframeDocument.querySelector('video');
+    //   const videoElement = iframeDocument.getElementById('videoElement') as HTMLVideoElement;
+
+    //   console.log('videoElement', videoElement);
+    //   if (videoElement) {
+
+    //     videoElement.onloadeddata = () => {
+    //       this.processVideoFrames(videoElement);
+    //     };
+    //   }
+    // }
   }
 
   private async processVideoFrames() {
@@ -614,15 +634,15 @@ export class PoseComparisonComponent implements OnInit, AfterViewInit {
     A: { x: number; y: number; z: number },
     B: { x: number; y: number; z: number }
   ): number {
-    const vectorAB = { x: B.x - A.x, y: B.y - A.y };
-    const verticalVector = { x: 0, y: 1 };
+    const vectorAB = { x: B.x - A.x, y: B.y - A.y, z: B.z - A.z };
+    const verticalVector = { x: 0, y: 0, z: 1 };
 
     const dotProduct =
-      vectorAB.x * verticalVector.x + vectorAB.y * verticalVector.y;
+      vectorAB.x * verticalVector.x + vectorAB.y * verticalVector.y + vectorAB.z * verticalVector.z;
 
-    const magnitudeAB = Math.sqrt(vectorAB.x ** 2 + vectorAB.y ** 2);
+    const magnitudeAB = Math.sqrt(vectorAB.x ** 2 + vectorAB.y ** 2 + vectorAB.z ** 2);
     const magnitudeVertical = Math.sqrt(
-      verticalVector.x ** 2 + verticalVector.y ** 2
+      verticalVector.x ** 2 + verticalVector.y ** 2 + verticalVector.z ** 2
     );
 
     const angleInRadians = Math.acos(
