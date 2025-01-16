@@ -18,7 +18,7 @@
 
 <div class="pose-container">
   <canvas #canvasElement1 width="640" height="480"></canvas>
-  <canvas #canvasElement2 width="640" height="480" style="transform: scaleX(-1);"></canvas>
+  <canvas #canvasElement2 width="640" height="480"></canvas>
 </div>
 <div class="pose-container">
   <div class="angle-display">
@@ -60,6 +60,7 @@
       <p class="not-matching" *ngIf="!rightMatching">
         Right Match: Right Wrist is not matching the video angle
       </p>
+      <p [ngClass]="{'matching': rightMatching, 'not-matching': !rightMatching}">{{rightComment}}</p>
     </div>
   </div>
 
