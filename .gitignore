@@ -48,3 +48,4 @@ Thumbs.db
 #newrelic log
 newrelic_agent.log
 /build
+/client/dist

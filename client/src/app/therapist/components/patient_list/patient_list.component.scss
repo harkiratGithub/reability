@@ -12,6 +12,7 @@
   .head-container {
     height: 80px;
     display: flex;
+    align-items: center;
     justify-content: space-between;
     border: 1px solid #e4e9ff;
     width: 100%;
@@ -54,6 +55,20 @@
         font-size: 20px;
         font-weight: bold;
         margin-top: 10px;
+      }
+    }
+
+    .patient-container {
+      display: flex;
+      align-items: center;
+      font-family: 'Roboto Bold';
+      font-size: 14px;
+      padding: 10px 12px;
+      background-color: #44d7b6;
+      border-radius: 20px;
+      cursor: pointer;
+      img{
+        margin-right: 8px;
       }
     }
 

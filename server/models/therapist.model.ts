@@ -174,7 +174,7 @@ export const addTherapistExpertises = (therapistData, expertises, client = null)
 };
 
 export const editTherapistExpertises = (therapistData, expertises, client = null) => {
-	const rows = expertises.map((expertise) => {
+	const rows = expertises?.map((expertise) => {
 		return { therapist_id: therapistData.id, expertise_id: expertise };
 	});
 	BaseModel.insertBulk(TABLE_NAME.THERAPIST_EXPERTISE, rows, client);

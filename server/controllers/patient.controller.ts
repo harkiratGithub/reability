@@ -32,6 +32,7 @@ const extractBodyParams = (body, patientId = null) => {
 		tech_issue,
 		tech_reason,
 		notification_email,
+		login_notification_email,
 		referral,
 		is_patient_video: isPatientVideo,
 		primary_contact_email,
@@ -51,6 +52,7 @@ const extractBodyParams = (body, patientId = null) => {
 		tech_issue,
 		tech_reason,
 		notification_email,
+		login_notification_email,
 		referral,
 		departmentsIds,
 		isPatientVideo,
@@ -88,7 +90,7 @@ export const createPatient = (req, res, next) => {
 		.then(async (createdPatient) => {
 			const encryptedPatientContacts = PatientHelper.flattenAndEncryptPatientContacts(patientContacts, true);
 			const encryptedPatient = EncryptHelper.encryptJson(createdPatient);
-			const { first_name, last_name, phone, suspend, tech_issue, tech_reason, notification_email, department_names } =
+			const { first_name, last_name, phone, suspend, tech_issue, tech_reason, notification_email,login_notification_email, department_names } =
 				encryptedPatient;
 			try {
 				if (lead_id) {
@@ -109,6 +111,7 @@ export const createPatient = (req, res, next) => {
 						tech_issue,
 						tech_reason,
 						notification_email,
+						login_notification_email,
 						department_names,
 						...encryptedPatientContacts,
 					}
@@ -125,7 +128,6 @@ export const editPatient = (req, res, next) => {
 	const { patientId } = req.body;
 	const { patientData, userData, patientContacts } = extractBodyParams(req.body.patient, patientId);
 	const user = req.user;
-	console.log("patient data: ", patientData, userData, patientContacts);
 	PatientHelper.editPatient({ ...patientData, patientId }, userData, patientContacts)
 		.then(([updatedPatient, patientChanges, oldPatientValues]) => {
 			ActivityLogHelper.createLog(

@@ -41,3 +41,9 @@ export const getAll = (req, res, next) => {
 		.then((institutes) => res.json(institutes))
 		.catch((err) => next(err));
 };
+
+export const getAllInstitutes = (req, res, next) => {
+	InstituteHelper.getAllInstitutes()
+		.then((institutes) => res.json(institutes))
+		.catch((err) => next(err));
+};

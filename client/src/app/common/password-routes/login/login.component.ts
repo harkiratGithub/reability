@@ -29,6 +29,7 @@ export class LoginPageComponent implements OnInit, OnDestroy {
   isMobile = false;
   mainMenu;
   ShowLoginErrorMobile = false;
+  patient_data: any = [];
 
   constructor(
     private formBuilder: FormBuilder,
@@ -111,9 +112,22 @@ export class LoginPageComponent implements OnInit, OnDestroy {
           localStorage.setItem('verified2FA', 'true');
           if (user?.role === 'patient' && user?.date_agreed_terms) {
             this.router.navigate([`${roleMainRoute('TERMS_CONDITIONS')}`]);
-          } else if (user?.role === 'patient' && user?.isPainModelOpen) {
+          }/*else if(this.isMobile ===true && user?.isRTM===true && user?.role === 'patient'  && user?.isMobileModelOpen) { 
+            this.router.navigate([`${roleMainRoute('MOBILE_POPUP')}`]);
+          } */else if (user?.role === 'patient' && user?.isPainModelOpen) {
             this.router.navigate([`${roleMainRoute('RTM')}`]);
           } else {
+            if (user?.role === 'patient' && user?.isPainModelOpen===false && user?.isRTM===true) {
+              this.patient_data =  this.ajax.getActivePatient(user?.patientId).subscribe((response)=>{
+                this.patient_data = response;
+                if (this.patient_data?.login_notification_email) {
+                  this.ajax.sendEmailAfterLogin(this.patient_data).subscribe((data) => {
+                    console.log("===Email sent===", data);
+                  });
+                }
+                //this.ajax.sendEmailAfterLogin(this.patient_data).subscribe((data) => { console.log("===data===",data)});   
+              }); 
+            }
             this.router.navigate([`${roleMainRoute(user.role)}`]);
           }
         }

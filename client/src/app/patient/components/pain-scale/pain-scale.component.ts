@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AjaxService } from 'src/app/therapist/services/ajax.service';
 import { AuthenticationService } from '../../../common/services/authentication.service';
+import { isMobileDevice, MOBILE_OR_SMALL_RESOLUTION } from '../../../common/utils';
 
 @Component({
   selector: 'app-pain-scale',
@@ -9,20 +10,28 @@ import { AuthenticationService } from '../../../common/services/authentication.s
   styleUrls: ['./pain-scale.component.scss'],
 })
 export class PainScaleComponent implements OnInit {
-  constructor(
-    private ajax: AjaxService,
-    private router: Router,
-    private authenticationService: AuthenticationService
-  ) {}
+
   painValue: number = 0;
   patient_note: string = '';
   patientId: number = -1;
   isPainModelOpen: boolean = false;
   isSaving: boolean = false; 
+  isMobileScreen: boolean = false; 
+  patient_data: any = [];
+  constructor(
+    private ajax: AjaxService,
+    private router: Router,
+    private authenticationService: AuthenticationService
+  ) {
+    this.isMobileScreen = MOBILE_OR_SMALL_RESOLUTION ? true : false;
+    window.addEventListener('resize', () => {
+      this.isMobileScreen = MOBILE_OR_SMALL_RESOLUTION ? true : false;
+    });
+  }
 
   async ngOnInit() {
     try {
-      const userData = await this.ajax.getUserData().toPromise();
+      const userData = await this.ajax.getUserData().toPromise();      
       if (userData?.isPainModelOpen) {
         this.isPainModelOpen = userData.isPainModelOpen;
         this.patientId = userData.patientId;
@@ -42,9 +51,19 @@ export class PainScaleComponent implements OnInit {
   savePainValue(): void {
     if (this.isSaving) return; 
     this.isSaving = true
-    try {
+    try {    
+      this.patient_data =  this.ajax.getActivePatient(this.patientId).subscribe((response)=>{
+        console.log("===response===",response);
+        this.patient_data = response;
+       });  
       this.ajax.sendPatientPainScale(this.patientId, this.painValue, this.patient_note).subscribe(
-        (response) => {
+        (response) => {          
+          //this.ajax.sendEmailAfterLogin(this.patient_data).subscribe((data) => { console.log("===data===",data)});   
+          if (this.patient_data?.login_notification_email) {
+            this.ajax.sendEmailAfterLogin(this.patient_data).subscribe((data) => {
+              console.log("===Email sent===", data);
+            });
+          }
           this.isPainModelOpen = false;
           this.isSaving = false;
           this.router.navigate(['/games_lobby']);

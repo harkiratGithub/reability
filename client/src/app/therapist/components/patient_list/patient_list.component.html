@@ -53,6 +53,15 @@
         </div>
       </div>
     </div>
+    <div class="patient-container">
+      <img
+        class="icon_back_office_plus_green"
+        src="assets/backoffice/icon_back_office_plus_green.svg"
+        (click)="onClickNew()"
+      />
+      <span (click)="onClickNew()">NEW PATIENT</span>
+    </div>
+
     <div class="search-container">
       <app-backoffice-search
         [data]="patientList"
@@ -62,7 +71,7 @@
     </div>
   </div>
 
-  <div class="table-container">
+  <div class="table-container" *ngIf="!isPatientViewEnable">
     <div class="table-header">
       <div class="status-header">Status</div>
       <div class="full-name-header">User Name</div>
@@ -116,39 +125,35 @@
           >
             <div class="patient-log-content">
               <h3 class="game-heading">Game Information</h3>
-
               <div class="logs-container">
                 <div *ngFor="let log of patientLog">
                   <div class="game-log">
                     <h3>Game Name: {{ log.gameName | titlecase }}</h3>
                     <div class="duration">
                       <p><strong>Duration:</strong></p>
-                      <p>{{ log.latestSession.duration }}</p>
-                    </div>
-                    <div class="game-summary">
-                      <p><strong>Game Summary:</strong></p>
-                      <div>
-                        <p *ngIf="log.latestSession.gameSummary.totalSquats !== undefined">
-                          Total Squats: {{ log.latestSession.gameSummary.totalSquats }}
-                        </p>
-                        <p *ngIf="log.latestSession.gameSummary.gameTimeSeconds !== undefined">
-                          Game Time (seconds): {{ log.latestSession.gameSummary.gameTimeSeconds }}
-                        </p>
-                        <p *ngIf="log.latestSession.gameSummary.difficult !== undefined">
-                          Difficulty: {{ log.latestSession.gameSummary.difficult }}
-                        </p>
-                        <p *ngIf="log.latestSession.gameSummary.gameScore !== undefined">
-                          Game Score: {{ log.latestSession.gameSummary.gameScore.join(', ') }}
-                        </p>
-                      </div>
+                      {{ log.latestSession.duration }}
                     </div>
 
-                    <!-- <p class="session-feedback"><strong>Session Feedback</strong></p>
-                    <ul>
-                      <li *ngFor="let feedback of log.latestSession.sessionFeedback">
-                        {{ feedback.question }} - {{ feedback.answer }}
-                      </li>
-                    </ul> -->
+                    <div
+                      class="game-summary"
+                      *ngIf="log.latestSession.gameSummary && hasValidProperties(log.latestSession.gameSummary)"
+                    >
+                      <p><strong>Game Summary:</strong></p>
+                      <div>
+                        <ng-container *ngFor="let key of getKeys(log.latestSession.gameSummary)">
+                          <p
+                            *ngIf="
+                              log.latestSession.gameSummary[key] !== null &&
+                              log.latestSession.gameSummary[key] !== undefined &&
+                              log.latestSession.gameSummary[key] !== '{}'
+                            "
+                          >
+                            <strong>{{ key | titlecase }}:</strong>
+                            {{ log.latestSession.gameSummary[key] }}
+                          </p>
+                        </ng-container>
+                      </div>
+                    </div>
 
                     <div class="button-container">
                       <button
@@ -165,30 +170,19 @@
                         <p><strong>Additional Session - Duration:</strong> {{ session.duration }}</p>
                         <hr />
                         <div class="additional-session">
-                          <p *ngIf="session.gameSummary.totalSquats !== undefined">
-                            Total Squats: {{ session.gameSummary.totalSquats }}
-                          </p>
-                          <p *ngIf="session.gameSummary.gameTimeSeconds !== undefined">
-                            Game Time (seconds): {{ session.gameSummary.gameTimeSeconds }}
-                          </p>
-                          <p *ngIf="session.gameSummary.difficult !== undefined">
-                            Difficulty: {{ session.gameSummary.difficult }}
-                          </p>
-                          <p *ngIf="session.gameSummary.gameScore !== undefined">
-                            Game Score: {{ session.gameSummary.gameScore.join(', ') }}
-                          </p>
+                          <ng-container *ngFor="let key of getKeys(session.gameSummary)">
+                            <p
+                              *ngIf="
+                                session.gameSummary[key] !== null &&
+                                session.gameSummary[key] !== undefined &&
+                                session.gameSummary[key] !== '{}'
+                              "
+                            >
+                              <strong>{{ key | titlecase }}:</strong>
+                              {{ session.gameSummary[key] }}
+                            </p>
+                          </ng-container>
                         </div>
-
-                        <!-- <p class="session-feedback" *ngIf="session?.sessionFeedback?.length > 0">
-                          <strong>Session Feedback:</strong>
-                        </p> -->
-
-                        <!-- <div *ngFor="let feedback of session.sessionFeedback">
-                          <ul class="ques-ans">
-                            <li>{{ feedback?.question }}</li>
-                            <p>{{ feedback?.answer }}</p>
-                          </ul>
-                        </div> -->
                       </div>
                     </div>
                   </div>
@@ -271,7 +265,7 @@
                 <div class="settings-icons show-rtm" (click)="showRTMMinutes(patient)"></div>
                 <div class="sub-show-label" (click)="showRTMMinutes(patient)">Show RTM</div>
               </div>
-              <div class="send-rtm-invitation" *ngIf="patient.isRTM" >
+              <div class="send-rtm-invitation" *ngIf="patient.isRTM">
                 <div class="settings-icons send-rtm" (click)="addRTMMinutes(patient)"></div>
                 <div class="sub-label" (click)="addRTMMinutes(patient)">Add to RTM(minutes)</div>
               </div>
@@ -285,5 +279,18 @@
       </div>
     </div>
   </div>
+
+  <ng-template [ngIf]="!isViewMode() && isPatientViewEnable">
+    <app-backoffice-add-edit
+      [currentTab]="getCurrentTab()"
+      [currentTabIndex]="currentTabIndex"
+      [editedEntity]="editedEntity"
+      [allInstitutes]="parsedInstitutes"
+      [allDepartments]="parsedDepartments"
+      (goBack)="onReturnFromAddEdit()"
+      [isPatient]="true"
+    >
+    </app-backoffice-add-edit>
+  </ng-template>
+  <div id="audio-container"></div>
 </div>
-<div id="audio-container"></div>

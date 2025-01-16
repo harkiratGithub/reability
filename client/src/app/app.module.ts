@@ -139,8 +139,10 @@ import { TwoFactorAuthVerifyComponent } from './common/password-routes/two-facto
 import { FeedbackFormComponent } from './patient/components/feedback-form/feedback-form.component';
 import { GameHistorySessionComponent } from './patient/components/game-history-session/game-history-session.component';
 import { PainScaleComponent } from './patient/components/pain-scale/pain-scale.component';
-import {MomentDateAdapter} from '@angular/material-moment-adapter';
+import { MomentDateAdapter} from '@angular/material-moment-adapter';
 import { TermsConditionsComponent } from './patient/components/terms-conditions/terms-conditions.component';
+import { MobilePopupComponent } from './patient/components/mobile-popup/mobile-popup.component';
+
 export const CUSTOM_MOMENT_FORMATS = {
   parse: {
     dateInput: 'l, LTS',
@@ -235,6 +237,7 @@ export const CUSTOM_MOMENT_FORMATS = {
     GameHistorySessionComponent,
     PainScaleComponent,
     TermsConditionsComponent,
+    MobilePopupComponent,
   ],
   imports: [
     RouterModule.forRoot(routes, { useHash: true }),

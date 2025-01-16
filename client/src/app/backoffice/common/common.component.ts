@@ -528,7 +528,7 @@ export class CommonComponent implements OnInit {
   }
   fetchTherapists() {
     this.http.getActiveTherapists().subscribe((data) => {
-      const rows = util.transformUsers(data);
+      const rows = util.transformUsers(data);      
       this.setTable(consts.tableColumns.therapists, rows);
       this.setLoading(false);
     });
@@ -1015,6 +1015,7 @@ export class CommonComponent implements OnInit {
         tech_issue,
         tech_reason,
         notification_email,
+        login_notification_email,
         referral,
         user_id,
         contactDetails,
@@ -1049,6 +1050,7 @@ export class CommonComponent implements OnInit {
         tech_issue,
         tech_reason,
         notification_email,
+        login_notification_email,
         referral,
         primary_contact_full_name,
         primary_contact_phone,

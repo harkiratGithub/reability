@@ -208,7 +208,6 @@ export const getActivities = async (therapistId, startTime, endTime) => {
 		const contactsByPatientId = groupBy(contacts, 'patient_id');
 		// const rtmList = await BaseModel.itemsInArray(TABLE_NAME.PATIENT_DEPARTMENTS, 'department_id', ['3', '172']);
 		const rtmList = await PatientModel.getRTMList();
-		console.log('RTMList', rtmList);
 		const newActivities = allPatients.map((patient) => {
 			const patientPeer = res[1].find((x) => patient.user_id === x.user_id);
 			const { duration, ...restPatient } = patient;
@@ -222,6 +221,7 @@ export const getActivities = async (therapistId, startTime, endTime) => {
 				...decryptedPatient,
 				duration: durationString,
 				full_name: `${decryptedPatient.first_name} ${decryptedPatient.last_name}`,
+				created_at: decryptedPatient.created_at
 			};
 			const isRTM = rtmList?.find((rtm) => rtm.patient_id == patient.id) ? true : false;
 			return patientPeer
@@ -339,6 +339,7 @@ const getCommonData = (patient, userId?) => {
 		tech_issue: patient.tech_issue,
 		tech_reason: patient.tech_reason,
 		notification_email: patient.notification_email,
+		login_notification_email: patient.login_notification_email,
 		suspend: patient.suspend,
 		referral: patient.referral,
 		...(userId && { user_id: userId }),

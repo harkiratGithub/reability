@@ -624,6 +624,19 @@ export class AjaxService {
   getFeedbackQuestions(): Observable<FeedbackQuestion[]> {
     return this.http.get<FeedbackQuestion[]>(`${this.baseUrl}/patient/feedback/questions`);
   }
+  
+  // patient create routes from therapist end
+  getAllInstitutes() {
+    return this.http.get<any[]>(`${this.baseUrl}/therapist/institute`);
+  }
+
+  getAllDepartments() {
+    return this.http.get<any[]>(`${this.baseUrl}/therapist/department`);
+  }
+
+  createPatient(patient) {
+    return this.http.post<any>(`${this.baseUrl}/therapist/patient/create`, { patient });
+  }
 // therapist rtm report
     getAllRtmReport(params: { month?: string; year?: string } = {}) {
       let httpParams = new HttpParams();
@@ -635,5 +648,22 @@ export class AjaxService {
       const url = `${this.baseUrl}/therapist/rtm-details`;
       return this.http.get<any>(url, { params: httpParams });
     }
+
+    getActivePatient = (patientId) => {
+      try {        
+        return this.http.get<any>(`${this.baseUrl}/patient/users/${patientId}`);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    sendEmailAfterLogin = (patient) => {
+      try {
+        return this.http.post<any>(`${this.baseUrl}/patient/users/sendEmail`, { patient });
+      } catch (err) {
+        console.error(err);
+      }
+    };  
+    
   
 }

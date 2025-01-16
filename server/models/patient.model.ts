@@ -284,6 +284,7 @@ export const getPatientsActivities = async (therapistId, startTime, endTime) => 
 		.field(`${TABLE_NAME.PATIENT}.last_name`)
 		.field(`${TABLE_NAME.PATIENT}.phone`)
 		.field(`${TABLE_NAME.USER}.user_name`)
+		.field(`${TABLE_NAME.USER}.created_at`)
 		.field('logged_in_at')
 		.field(`${TABLE_NAME.DEPARTMENT}.name`, 'department_name')
 		.from(TABLE_NAME.THERAPIST)
@@ -351,7 +352,7 @@ export const getPatientsActivitiesData = async (patientId, startTime, endTime) =
 		.left_join(TABLE_NAME.USER, null, `${TABLE_NAME.USER}.id = ${TABLE_NAME.PATIENT}.user_id`)
 		.where(`${TABLE_NAME.PATIENT}.id = ?`, patientId)
 		.where(`${TABLE_NAME.USER}.active = ?`, true)
-		.where(`LOWER(${TABLE_NAME.DEPARTMENT}.name) IN ?`, ['rtm'])
+		// .where(`LOWER(${TABLE_NAME.DEPARTMENT}.name) IN ?`, ['rtm'])
 		.toParam();
 	const patientDetails = await BaseModel.runQuery(getPatientDetails);
 	return patientDetails.rows;
@@ -418,6 +419,7 @@ export const getPatientById = async (id: number) => {
 		.field(`${TABLE_NAME.PATIENT}.tech_issue`)
 		.field(`${TABLE_NAME.PATIENT}.tech_reason`)
 		.field(`${TABLE_NAME.PATIENT}.notification_email`)
+		.field(`${TABLE_NAME.PATIENT}.login_notification_email`)
 		.field(`${TABLE_NAME.PATIENT}.referral`)
 		.field(`${TABLE_NAME.PATIENT}.has_camera`)
 		.field(`${TABLE_NAME.USER}.logged_in_at`)
@@ -572,7 +574,7 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 		.join(TABLE_NAME.INSTITUTE, 'institute', `rtm.institute_id = institute.id`);
 	// .join(TABLE_NAME.THERAPIST, null, `(rtm.data->>'therapist_id')::int = ${TABLE_NAME.THERAPIST}.id`)
 	// .join(TABLE_NAME.USER, 'therapist_user', `${TABLE_NAME.THERAPIST}.user_id = therapist_user.id`);
-	if (month !== null && year !== null) {
+	if (!sendMail && month !== null && year !== null) {
 		const parsedMonth = parseInt(month, 10);
 		const parsedYear = parseInt(year, 10);
 		if (isNaN(parsedMonth) || isNaN(parsedYear) || parsedMonth < 1 || parsedMonth > 12) {
@@ -632,9 +634,7 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 					.where(`id=?`, userDataSessionResult?.rows[0].user_id);
 				const therapistDataSessionResult = await BaseModel.runQuery(therapistDataQuery.toParam());
 				row.data.therapist.user_name = therapistDataSessionResult.rows[0]?.user_name;
-
 			}
-
 		}
 		return row;
 	});

@@ -17,6 +17,7 @@ import {
 } from '../../../types';
 import { getWeek } from '../../common/date-util';
 import { getFormattedOfferings } from '../../common/helpers/booking-utils';
+import { AjaxService } from 'src/app/therapist/services/ajax.service';
 
 interface IListItem {
   id: number;
@@ -39,6 +40,7 @@ export class AddEditComponent implements OnChanges, OnInit {
   @Input() allTherapists;
   @Input() allProfessions;
   @Input() allExpertises;
+  @Input() isPatient = false;
   @Output() goBack = new EventEmitter();
   @Output() openTherapistScheduler = new EventEmitter();
   @Output() refreshPatientDetails = new EventEmitter<number>();
@@ -58,6 +60,7 @@ export class AddEditComponent implements OnChanges, OnInit {
 
   constructor(
     private http: AjaxAdmin,
+    private patientHttp: AjaxService,
     private authenticationService: AuthenticationService,
     private snackBar: MatSnackBar
   ) {}
@@ -177,14 +180,25 @@ export class AddEditComponent implements OnChanges, OnInit {
       return;
     }
     if (this.editedEntity?.lead_id) {
-      this.http.createPatient({ ...state, lead_id: this.editedEntity.lead_id }).subscribe(() => {
-        this.onClickBack();
-      });
+      if (this.isPatient)
+        this.patientHttp.createPatient({ ...state, lead_id: this.editedEntity.lead_id }).subscribe(() => {
+          this.onClickBack();
+        });
+      else
+        this.http.createPatient({ ...state, lead_id: this.editedEntity.lead_id }).subscribe(() => {
+          this.onClickBack();
+        });
       return;
+    } else {
+      if (this.isPatient)
+        this.patientHttp.createPatient(state).subscribe(() => {
+          this.onClickBack();
+        });
+      else
+        this.http.createPatient(state).subscribe(() => {
+          this.onClickBack();
+        });
     }
-    this.http.createPatient(state).subscribe(() => {
-      this.onClickBack();
-    });
   }
 
   savePatient(state) {
