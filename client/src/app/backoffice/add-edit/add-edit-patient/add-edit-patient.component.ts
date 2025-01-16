@@ -22,7 +22,9 @@ import {
 })
 export class AddEditPatientComponent implements OnInit, OnDestroy {
   @Input() editedEntity;
-  @Input() institutes: [];
+  @Input() isPatient: boolean = false;
+  // @Input() institutes: [];
+  @Input() institutes: { id: number; name: string }[] = [];
   @Input() departments: [];
   @Input() professions: [];
   @Input() expertises: [];
@@ -46,7 +48,7 @@ export class AddEditPatientComponent implements OnInit, OnDestroy {
   viewType = PatientView;
   userLog: IUserLogEntry[] = [];
   currentRemark = '';
-
+  
   ngOnInit() {
     if (this.editedEntity) {
       this.userLog = this.editedEntity.userLog;
@@ -121,24 +123,37 @@ export class AddEditPatientComponent implements OnInit, OnDestroy {
     }
     return departments.filter((dep) => dep.institute_id === instituteId);
   }
-
   initDropDowns() {
-    this.institutes?.length > 0
-      ? this.customForm.controls.institute_id.enable()
-      : this.customForm.controls.institute_id.disable();
+    if (this.institutes?.length > 0) {
+      this.customForm.controls.institute_id.enable();
+      
+      if (this.isPatient) {
+        const firstInstituteId = this.institutes[0]?.id ?? null;
+        this.customForm.controls.institute_id.setValue(firstInstituteId);
+        this.customForm.controls.institute_id.disable();
+        this.filteredDepartments = this.filterDepartmentsByInstituteId(firstInstituteId, this.departments);
+      } else {
+        this.filteredDepartments = this.filterDepartmentsByInstituteId(
+          this.customForm.value.institute_id,
+          this.departments
+        );
+      }
+    } else {
+      this.customForm.controls.institute_id.disable();
+      this.filteredDepartments = [];
+    }
 
-    this.filteredDepartments = this.filterDepartmentsByInstituteId(
-      this.customForm.value.institute_id,
-      this.departments
-    );
-    this.filteredDepartments?.length > 0
-      ? this.customForm.controls.departments_ids.enable()
-      : this.customForm.controls.departments_ids.disable();
-
-    this.institutes?.length > 0
-      ? this.customForm.controls.institute_id.enable()
-      : this.customForm.controls.institute_id.disable();
+    if (this.editedEntity) {
+      this.customForm.controls.institute_id.disable();
+    }
+  
+    if (this.filteredDepartments.length > 0) {
+      this.customForm.controls.departments_ids.enable();
+    } else {
+      this.customForm.controls.departments_ids.disable();
+    }
   }
+  
 
   onChanges() {
     this.subscription.add(

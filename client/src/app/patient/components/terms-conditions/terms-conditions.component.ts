@@ -41,6 +41,7 @@ export class TermsConditionsComponent implements OnInit {
   }
 
   onLogout() {
+    this.logout();
     this.router.navigate(['/login']);
   }
 

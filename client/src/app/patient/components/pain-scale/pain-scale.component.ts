@@ -58,7 +58,12 @@ export class PainScaleComponent implements OnInit {
        });  
       this.ajax.sendPatientPainScale(this.patientId, this.painValue, this.patient_note).subscribe(
         (response) => {          
-          this.ajax.sendEmailAfterLogin(this.patient_data).subscribe((data) => { console.log("===data===",data)});   
+          //this.ajax.sendEmailAfterLogin(this.patient_data).subscribe((data) => { console.log("===data===",data)});   
+          if (this.patient_data?.login_notification_email) {
+            this.ajax.sendEmailAfterLogin(this.patient_data).subscribe((data) => {
+              console.log("===Email sent===", data);
+            });
+          }
           this.isPainModelOpen = false;
           this.isSaving = false;
           this.router.navigate(['/games_lobby']);

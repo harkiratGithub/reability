@@ -284,6 +284,7 @@ export const getPatientsActivities = async (therapistId, startTime, endTime) => 
 		.field(`${TABLE_NAME.PATIENT}.last_name`)
 		.field(`${TABLE_NAME.PATIENT}.phone`)
 		.field(`${TABLE_NAME.USER}.user_name`)
+		.field(`${TABLE_NAME.USER}.created_at`)
 		.field('logged_in_at')
 		.field(`${TABLE_NAME.DEPARTMENT}.name`, 'department_name')
 		.from(TABLE_NAME.THERAPIST)

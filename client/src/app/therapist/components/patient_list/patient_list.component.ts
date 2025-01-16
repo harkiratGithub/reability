@@ -1,7 +1,7 @@
+import moment from 'moment';
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { reduce, chain, filter, groupBy, capitalize, startsWith, head } from 'lodash';
-import moment from 'moment';
 import * as util from '../../../backoffice/backoffice-util';
 import {
   GeneralModalData,
@@ -18,12 +18,14 @@ import { ConfiguratorModalComponent } from '../configurator-modal/configurator-m
 import { ReCaptchaV3Service } from 'ng-recaptcha';
 import { setAudioStreamsToComponent } from '../../../common/utils';
 import { IGame, IPatientLog } from '../../../../types';
-import {
-  RTM_MODAL_CONTENT,
-  RTM_MODAL_STYLE,
-  RTMModalComponent,
-  RTMModalData,
-} from 'src/app/common/rtm-modal/rtm-modal.component';
+import { RTM_MODAL_CONTENT, RTM_MODAL_STYLE, RTMModalData } from 'src/app/common/rtm-modal/rtm-modal.component';
+import * as consts from '../../../backoffice/backoffice-constants';
+interface IListItem {
+  id: number;
+  name: string;
+  institute_id?: number;
+  profession_id?: number;
+}
 
 import {
   SHOW_RTM_MODAL_CONTENT,
@@ -61,14 +63,24 @@ export class PatientListComponent implements OnInit, OnDestroy {
   isLogModalOpen: boolean = false;
   selectedGame: any = {};
   selectedGameIndex: number = 0;
+  parsedInstitutes = [];
+  tabs = consts.tabsData;
+  parsedDepartments = [];
+  @Input() allInstitutes;
+  @Input() allDepartments;
+  currentView = consts.mode.view;
+  isPatientViewEnable: boolean = false;
+  currentTabIndex = consts.Tabs.patients;
+  isPatientData: boolean = false;
 
   constructor(
-    private ajax: AjaxService,
-    private authenticationService: AuthenticationService,
     public dialog: MatDialog,
+    private ajax: AjaxService,
     public appActions: AppActions,
-    private recaptchaV3Service: ReCaptchaV3Service
+    private recaptchaV3Service: ReCaptchaV3Service,
+    private authenticationService: AuthenticationService
   ) {}
+
   ngOnInit() {
     this.therapistId = this.authenticationService.currentUserValue.id;
     this.filterFunc = this.filterByName;
@@ -80,6 +92,8 @@ export class PatientListComponent implements OnInit, OnDestroy {
       this.gamesNames = this.allGames?.map((game) => game?.name);
       this.allGames?.map((game) => this.getGameIcon(game));
     });
+    this.loadInstitutes();
+    this.loadDepartments();
   }
 
   ngOnDestroy() {
@@ -169,6 +183,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
         userName: items[0].user_name,
         status: items[0].status,
         lastLogin: items[0].logged_in_at,
+        created_at: items[0].created_at,
         // gameSummaries: items
         //   ?.filter((item) => Object.keys(item?.game_summary || {})?.length)
         //   ?.map((item) => ({ start_time: item.start_time, game_summary: item?.game_summary }))
@@ -193,7 +208,15 @@ export class PatientListComponent implements OnInit, OnDestroy {
       }))
       .values()
       .uniqBy('id')
-      .orderBy([(p) => (p.status === 'online' ? 1 : 0), (p) => new Date(p.lastLogin)], ['desc', 'desc'])
+      // .orderBy([(p) => (p.status === 'online' ? 1 : 0), (p) => new Date(p.lastLogin)], ['desc', 'desc'])
+      .orderBy(
+        [
+          (p) => (new Date(p.created_at)), 
+          (p) => (p.status === 'online' ? 1 : 0), 
+          (p) => new Date(p.lastLogin),
+        ],
+        ['desc', 'desc', 'desc']
+      )
       .value();
 
     patients.forEach((patient) => {
@@ -222,13 +245,11 @@ export class PatientListComponent implements OnInit, OnDestroy {
             }
 
             if (!this?.allGames || this?.allGames.length === 0) {
-              console.log('No games available');
               return acc;
             }
 
             const game = this?.allGames.find((game) => game.id === a.game_id);
             if (!game) {
-              console.warn(`Game not found for game_id: ${a.game_id}`);
               return acc;
             }
             const gameSummary = a.game_summary;
@@ -324,8 +345,8 @@ export class PatientListComponent implements OnInit, OnDestroy {
     this.ajax.getValidGames(patient.id).subscribe((games) => {
       patient.games = games;
       const validGameIds = games.map((game: { id: any }) => game.id);
-      patient.allGames = this.allGames.map((game) => {
-        const isValid = validGameIds.includes(game.id);
+      patient.allGames = this?.allGames?.map((game) => {
+        const isValid = validGameIds?.includes(game.id);
         return { ...game, isValid };
       });
       patient.gameIds = [];
@@ -989,7 +1010,6 @@ export class PatientListComponent implements OnInit, OnDestroy {
       console.error('Failed to copy log to clipboard:', e.message || e);
     }
   }
-
   closeEraseLogModal = () => {
     this.isCopiedToClipboard = false;
   };
@@ -1096,4 +1116,68 @@ export class PatientListComponent implements OnInit, OnDestroy {
     const totalDurationFormatted = convertToTimeFormat(totalTimeInSeconds);
     return totalTimeInSeconds > 0 ? `* Total Time: ${totalDurationFormatted}\n${quesfeedbacks}` : quesfeedbacks;
   };
+
+  onClickNew() {
+    this.setCurrentView(consts.mode.create);
+    this.isPatientViewEnable = true;
+    this.isPatientData = true;
+  }
+
+  setCurrentView(view) {
+    this.currentView = view;
+  }
+
+  isViewMode() {
+    return this.currentView === consts.mode.view;
+  }
+
+  getCurrentTab() {
+    return this.tabs[this.currentTabIndex];
+  }
+
+  loadInstitutes(): void {
+    this.ajax.getAllInstitutes().subscribe((data) => {
+      this.allInstitutes = data;
+      this.parsedInstitutes = this.parseInstitutes(data);
+    });
+  }
+
+  loadDepartments(): void {
+    this.ajax.getAllDepartments().subscribe((data) => {
+      this.allDepartments = data;
+      this.parsedDepartments = this.parseDepartments(data);
+    });
+  }
+
+  parseInstitutes(data: any[]): IListItem[] {
+    const uniqueInstitutesMap = new Map<number, IListItem>();
+    data.forEach((institute) => {
+      if (!uniqueInstitutesMap.has(institute.id)) {
+        uniqueInstitutesMap.set(institute.id, {
+          id: institute.id,
+          name: institute.institute_name,
+        });
+      }
+    });
+    return Array.from(uniqueInstitutesMap.values());
+  }
+
+  parseDepartments(data: any[]): IListItem[] {
+    return (
+      data?.map((department) => ({
+        id: department?.id,
+        name: department?.name,
+        institute_id: department?.institute_id,
+      })) || []
+    );
+  }
+
+  onReturnFromAddEdit() {
+    this.isPatientViewEnable = false;
+    this.getPatientActivities();
+    // const currentUrl = this.router.url;
+    // this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+    //   this.router.navigate([currentUrl]);
+    // });
+  }
 }

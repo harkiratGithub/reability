@@ -53,6 +53,15 @@
         </div>
       </div>
     </div>
+    <div class="patient-container">
+      <img
+        class="icon_back_office_plus_green"
+        src="assets/backoffice/icon_back_office_plus_green.svg"
+        (click)="onClickNew()"
+      />
+      <span (click)="onClickNew()">NEW PATIENT</span>
+    </div>
+
     <div class="search-container">
       <app-backoffice-search
         [data]="patientList"
@@ -62,7 +71,7 @@
     </div>
   </div>
 
-  <div class="table-container">
+  <div class="table-container" *ngIf="!isPatientViewEnable">
     <div class="table-header">
       <div class="status-header">Status</div>
       <div class="full-name-header">User Name</div>
@@ -270,5 +279,18 @@
       </div>
     </div>
   </div>
+
+  <ng-template [ngIf]="!isViewMode() && isPatientViewEnable">
+    <app-backoffice-add-edit
+      [currentTab]="getCurrentTab()"
+      [currentTabIndex]="currentTabIndex"
+      [editedEntity]="editedEntity"
+      [allInstitutes]="parsedInstitutes"
+      [allDepartments]="parsedDepartments"
+      (goBack)="onReturnFromAddEdit()"
+      [isPatient]="true"
+    >
+    </app-backoffice-add-edit>
+  </ng-template>
   <div id="audio-container"></div>
 </div>

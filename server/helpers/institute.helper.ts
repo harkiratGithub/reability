@@ -109,3 +109,6 @@ export const deleteInstitute = async (id) => {
 export const getAll = async () => {
 	return InstituteModel.getAll();
 };
+export const getAllInstitutes = async () => {
+	return InstituteModel.getAllInstitutes();
+};
