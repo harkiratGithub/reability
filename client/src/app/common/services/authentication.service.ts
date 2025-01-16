@@ -75,14 +75,40 @@ export class AuthenticationService implements OnDestroy {
     return user;
   };
 
+  // logout = async () => {
+  //   try {
+  //     await this.ajax.logout().toPromise();
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  //   this.currentUserSubject.next(null);
+  //   this.closeHeartBeatInterval();
+  //   this.router.navigate([ROUTES.LOGIN]);
+  // };
+
   logout = async () => {
     try {
       await this.ajax.logout().toPromise();
+      if (window && (window as any).NREUM) {
+        (window as any).NREUM.addPageAction('LogoutSuccess', {
+          username: this.currentUserValue?.username,
+          isTherapist: this.currentUserValue?.isTherapist,
+          userRole: this.currentUserValue?.role,
+        });
+      }
     } catch (err) {
-      console.log(err);
+      console.log('Logout failed:', err);
+      if (window && (window as any).NREUM) {
+        (window as any).NREUM.addPageAction('LogoutError', {
+          username: this.currentUserValue?.username,
+          errorMessage: err.message || 'Unknown error',
+        });
+      }
+    } finally {
+      this.currentUserSubject.next(null);
+      this.closeHeartBeatInterval();
+      this.router.navigate([ROUTES.LOGIN]);
     }
-    this.currentUserSubject.next(null);
-    this.closeHeartBeatInterval();
-    this.router.navigate([ROUTES.LOGIN]);
   };
+    
 }
