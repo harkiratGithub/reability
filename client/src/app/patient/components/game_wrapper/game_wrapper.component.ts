@@ -75,9 +75,9 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
   currentTextIndex: number = 0;
   showCarouselText: boolean = false;
   isPopupVisible = false;
-  timer: any = null; 
-  elapsedTime: number = 0; 
-  currentVideoID="";
+  timer: any = null;
+  elapsedTime: number = 0;
+  currentVideoID = "";
   currentUser: User;
   currentGameSettings = null;
   constructor(
@@ -119,18 +119,18 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
       this.initPatientCallbacks();
       this.initPatientSubscriptions();
       const patientId =
-      this.connectedUser && this.connectedUser.patientId ? this.connectedUser.patientId : this.currentUser.id;
-    
-     if(patientId && this.gameId){
-        this.ajax.getGameSettings(this.gameId, patientId ).subscribe((gamesettings) => {
-          this.currentGameSettings=gamesettings.current_set;
+        this.connectedUser && this.connectedUser.patientId ? this.connectedUser.patientId : this.currentUser.id;
+
+      if (patientId && this.gameId) {
+        this.ajax.getGameSettings(this.gameId, patientId).subscribe((gamesettings) => {
+          this.currentGameSettings = gamesettings.current_set;
         });
       }
     } else {
       this.handleTherapistCallbacks();
     }
 
-    window.addEventListener('message', (event) => {      
+    window.addEventListener('message', (event) => {
       if (event.data) {
         const parsedResponse = JSON.parse(event.data);
         const type = parsedResponse.msg.type;
@@ -138,59 +138,59 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
         const shouldPlay = parsedResponse.msg.data.shouldPlay;
         const vidTime = parsedResponse.msg.data.currentPlayTime.vidTime;
         const sourceUrl = parsedResponse.msg.data.source;
-    
+
         const videoIdMatch = sourceUrl.match(/P\d+/);
         const videoId = videoIdMatch ? videoIdMatch[0] : null;
-    
+
         if (this.currentVideoID !== videoId) {
           this.resetTimer();
         }
-    
+
         const integerVidTime = Math.floor(vidTime);
         this.currentVideoID = videoId;
-        
-        
-        if (this.currentGameSettings[index]?.fileName === videoId) {          
+
+
+        if (this.currentGameSettings[index]?.fileName === videoId) {
           const additionalInfo = this.currentGameSettings[index]?.additionalInfo?.trim();
-          this.carouselText = additionalInfo ? [additionalInfo] : []; 
+          this.carouselText = additionalInfo ? [additionalInfo] : [];
         } else {
-          this.carouselText = []; 
+          this.carouselText = [];
         }
-    
-        
+
+
         if (type === 'sync_video_data') {
           if (this.isEmpty(this.carouselText)) {
-            this.isPopupVisible = false; 
+            this.isPopupVisible = false;
           }
-    
+
           if (!this.timer) {
             this.startTimer();
           }
-    
+
           if (this.elapsedTime >= 2 && integerVidTime >= 2 && !this.isPopupVisible && !this.isEmpty(this.carouselText)) {
             this.isPopupVisible = true;
             this.startCarousel();
           } else if (integerVidTime < 2 || this.isEmpty(this.carouselText)) {
-            this.isPopupVisible = false; 
+            this.isPopupVisible = false;
           }
         }
       }
-    });    
+    });
   }
 
   isEmpty(array: string[]): boolean {
     return !array || array.length === 0 || array.every(item => item.trim() === '');
   }
-  
+
   resetTimer() {
     clearInterval(this.timer);
     this.timer = null;
     this.elapsedTime = 0;
   }
-  
+
   startTimer() {
     this.timer = setInterval(() => {
-      this.elapsedTime += 1;  
+      this.elapsedTime += 1;
       if (this.elapsedTime >= 2 && !this.isPopupVisible && !this.isEmpty(this.carouselText)) {
         this.isPopupVisible = true;
         this.startCarousel();
@@ -262,7 +262,7 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
     communicationUtil.registerToCallback(
       MESSAGES.SESSION_FEEDBACK,
       debounce((gameFeedback) => {
-        this.ajax.updateGameFeedback(gameFeedback).subscribe(() => {});
+        this.ajax.updateGameFeedback(gameFeedback).subscribe(() => { });
       }, 5000)
     );
     communicationUtil.registerToCallback(MESSAGES.QUIT_GAME, (e) => {
@@ -788,7 +788,7 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
       this.dialogRef = null;
       this.isEndGameModalOpen = false;
     }
-  
+
     if (!this.isTherapist && !this.inTherapistSession) {
       this.dialogRef = this.dialog.open(GameHistorySessionComponent, {
         hasBackdrop: true,
@@ -805,29 +805,29 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
       if (this.dialogRef) {
         this.dialogRef.close();
         this.dialogRef = null;
-        this.isEndGameModalOpen = false; 
+        this.isEndGameModalOpen = false;
       }
-    }, 5000); 
-    
+    }, 5000);
+
     // let newdialogRef;
-      // newdialogRef.afterClosed().subscribe(() => {  
-      //   if (!this.isTherapist && !this.inTherapistSession) {
-      //     if (!this.dialogRef) {
-      //       this.dialogRef = this.dialog.open(FeedbackFormComponent, {
-      //         hasBackdrop: true,
-      //         id: this.peerId,
-      //         data: {
-      //           has_backdrop: false,
-      //           inTherapistSession: this.inTherapistSession,
-      //           isTherapist: this.isTherapist,
-      //         },
-      //       });
-      //     }
-      //   }
-      // });
-   
+    // newdialogRef.afterClosed().subscribe(() => {  
+    //   if (!this.isTherapist && !this.inTherapistSession) {
+    //     if (!this.dialogRef) {
+    //       this.dialogRef = this.dialog.open(FeedbackFormComponent, {
+    //         hasBackdrop: true,
+    //         id: this.peerId,
+    //         data: {
+    //           has_backdrop: false,
+    //           inTherapistSession: this.inTherapistSession,
+    //           isTherapist: this.isTherapist,
+    //         },
+    //       });
+    //     }
+    //   }
+    // });
+
   }
-  
+
 
   handleMediaStreamToIFrameSettingsChange = (settings) => {
     if (!this.isInitialMediaStreamHandled) {
@@ -871,19 +871,19 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
   };
 
   updateUserGameData = (userGameData) => {
-    this.ajax.updateUserGameData(userGameData, this.isTherapist).subscribe(() => {});
+    this.ajax.updateUserGameData(userGameData, this.isTherapist).subscribe(() => { });
   };
 
   updateUserGameDataStatus = (userGameDataIds, active) => {
-    this.ajax.setUserGameDataStatus(userGameDataIds, active).subscribe(() => {});
+    this.ajax.setUserGameDataStatus(userGameDataIds, active).subscribe(() => { });
   };
 
   changeUserGameDataDrawer = (userGameDataIds, drawer) => {
-    this.ajax.changeUserGameDataDrawer(userGameDataIds, drawer).subscribe(() => {});
+    this.ajax.changeUserGameDataDrawer(userGameDataIds, drawer).subscribe(() => { });
   };
 
   deleteUserGameData = (userGameDataIds) => {
-    this.ajax.deleteUserGameData(userGameDataIds, this.isTherapist).subscribe(() => {});
+    this.ajax.deleteUserGameData(userGameDataIds, this.isTherapist).subscribe(() => { });
   };
 
   getUserGameData = () => {
@@ -902,15 +902,15 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
   };
 
   updateGameData = (gameData) => {
-    this.ajax.updateGameData(gameData).subscribe(() => {});
+    this.ajax.updateGameData(gameData).subscribe(() => { });
   };
 
   updateGameDataStatus = (gameDataIds, active) => {
-    this.ajax.setGameDataStatus(gameDataIds, active).subscribe(() => {});
+    this.ajax.setGameDataStatus(gameDataIds, active).subscribe(() => { });
   };
 
   deleteGameData = (gameDataIds) => {
-    this.ajax.deleteGameData(gameDataIds).subscribe(() => {});
+    this.ajax.deleteGameData(gameDataIds).subscribe(() => { });
   };
 
   getShortGameData = () => {
@@ -935,7 +935,7 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
       [key]: +peerId,
       reported_by_user_id: +peerId,
     };
-    this.ajax.sendLogToServer(dataToServer).subscribe(() => {});
+    this.ajax.sendLogToServer(dataToServer).subscribe(() => { });
   };
 
   getGameDataByIds = (data: any) => {
@@ -955,11 +955,36 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
       return { gameId: this.gameIdTherapist, userId: this.peerId };
     }
   };
-  startCarousel(): void {
+  /*startCarousel(): void {
     if(this.isPopupVisible){
       setInterval(() => {
         this.currentTextIndex = (this.currentTextIndex + 1) % this.carouselText.length;
       }, 20000);
     } 
+  }*/
+
+  startCarousel(): void {
+    if (this.isPopupVisible) {
+      const baseSpeed = 200; // Base speed (ms) per character
+      const minInterval = 3000; // Minimum interval for very short text
+      const maxInterval = 20000; // Maximum interval for very long text
+
+      const calculateInterval = (text: string): number => {
+        const interval = text.length * baseSpeed;
+        return Math.min(Math.max(interval, minInterval), maxInterval);
+      };
+
+      const updateText = () => {
+        this.currentTextIndex = (this.currentTextIndex + 1) % this.carouselText.length;
+        const nextText = this.carouselText[this.currentTextIndex];
+        const nextInterval = calculateInterval(nextText);
+
+        setTimeout(() => updateText(), nextInterval);
+      };
+
+      // Start the first cycle
+      updateText();
+    }
   }
+
 }
