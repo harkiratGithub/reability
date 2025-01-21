@@ -7,6 +7,7 @@ export const INITIAL_BACK_OFFICE_STATE: IBackOfficeState = {
   entityId: null,
   userFilters: {
     departments: { isActive: false, data: [] },
+    institutes: { isActive: false, data: [] },
     suspend: { isActive: false, data: [] },
     pending: { isActive: false, data: [] },
     techIssue: { isActive: false },

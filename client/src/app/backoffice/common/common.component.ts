@@ -58,6 +58,7 @@ export class CommonComponent implements OnInit {
   currentProfessionId: number;
   lastPatientId: number;
   allDepartmentOptions: IMultiSelectOptions[];
+  allInstituteOptions: IMultiSelectOptions[];
   selectedUserFilters: IUserFilters;
   currentProfessionExpertise = [];
   activeItemsMode = true;
@@ -233,6 +234,22 @@ export class CommonComponent implements OnInit {
 
   activeItemsSharedFilters: IBackOfficeTabFilter[] = [
     {
+      displayText: 'Institute',
+      isActive: false,
+      filter: (data) => {
+        this.toggleSharedInstituteActivity('institutes');
+        this.filterFunc(data, this.filteredText);
+      },
+      setSelectedOptions: (options, data) => {
+        this.setFilterOptions('institutes', options);
+        const value = map(options, (o) => o.value);
+        this.http.setUserFilters('institutes', value).toPromise();
+        this.filterFunc(data, this.filteredText);
+      },
+      allOptions: [],
+      selectedOptions: [],
+    },
+    {
       displayText: 'Departments',
       isActive: false,
       filter: (data) => {
@@ -262,7 +279,7 @@ export class CommonComponent implements OnInit {
   //       console.log('234: ', options, data);
   //       this.setFilterOptions('institutes', options);
   //       const value = map(options, (o) => o.value);
-  //       console.log(value, 'values');
+  //       console.log('Institutes values: ', value);
   //       this.http.setUserFilters('institutes', value).toPromise();
   //       this.filterFunc(data, this.filteredText);
   //     },
@@ -368,6 +385,24 @@ export class CommonComponent implements OnInit {
       });
     }
   }
+
+  toggleSharedInstituteActivity(filterName: string) {
+    const filterDetailsInStore: IFilterDetails = this.selectedUserFilters.institutes;
+    const isActiveToUpdate = !filterDetailsInStore.isActive;
+    if (isActiveToUpdate === false) {
+      this.backOfficeActions.setUserFilter({
+        [filterName]: { data: [], isActive: isActiveToUpdate },
+      });
+      if (filterName === 'institutes') {
+        this.http.setUserFilters('institutes', []).toPromise();
+      }
+    }
+    if (isActiveToUpdate === true) {
+      this.backOfficeActions.setUserFilter({
+        [filterName]: { ...filterDetailsInStore, isActive: isActiveToUpdate },
+      });
+    }
+  }
   setFilterOptions(filterName: string, options: IMultiSelectOptions[]) {
     const filterDetailsInStore: IFilterDetails | undefined = this.selectedUserFilters[filterName];
     this.backOfficeActions.setUserFilter({
@@ -416,8 +451,11 @@ export class CommonComponent implements OnInit {
       e.isActive = active;
       e.selectedOptions = selectedOptions;
     });
-    this.sharedFilters[0].isActive = this.selectedUserFilters?.departments?.isActive;
-    this.sharedFilters[0].selectedOptions = this.selectedUserFilters?.departments?.data;
+
+    this.sharedFilters[0].isActive = this.selectedUserFilters?.institutes?.isActive;
+    this.sharedFilters[0].selectedOptions = this.selectedUserFilters?.institutes?.data;
+    this.sharedFilters[1].isActive = this.selectedUserFilters?.departments?.isActive;
+    this.sharedFilters[1].selectedOptions = this.selectedUserFilters?.departments?.data;
   }
 
   constructor(
@@ -528,7 +566,7 @@ export class CommonComponent implements OnInit {
   }
   fetchTherapists() {
     this.http.getActiveTherapists().subscribe((data) => {
-      const rows = util.transformUsers(data);      
+      const rows = util.transformUsers(data);
       this.setTable(consts.tableColumns.therapists, rows);
       this.setLoading(false);
     });
@@ -565,6 +603,7 @@ export class CommonComponent implements OnInit {
       ...followupColumns.slice(index + 1, followupColumns.length),
     ];
   }
+
   fetchFollowups() {
     this.http.getAllFollowups().subscribe((data) => {
       const rows = data;
@@ -578,6 +617,7 @@ export class CommonComponent implements OnInit {
       this.allTherapists = rows;
     });
   }
+
   fetchPatients() {
     this.http.getActivePatients().subscribe((data) => {
       const rows = util.transformUsers(data);
@@ -590,6 +630,8 @@ export class CommonComponent implements OnInit {
     this.http.getAllInstitutes().subscribe((data) => {
       const rows = util.transformInstitutes(data);
       this.allInstitutes = rows;
+      this.setAllPossibleFiltersOptions();
+      this.fetchInstituteFilter();
     });
     this.http.getAllDepartments().subscribe((data) => {
       this.allDepartments = data;
@@ -636,6 +678,26 @@ export class CommonComponent implements OnInit {
       }
     });
   }
+
+  fetchInstituteFilter() {
+    const userId = this.authenticationService.currentUserValue.id;
+    this.http.getUserFilters(userId).subscribe((userFilters: any) => {
+      const instituteIds = userFilters?.institute_ids;
+      if (isEmpty(instituteIds)) {
+        return;
+      }
+      const selectedInstitutes: IMultiSelectOptions[] = filter(this.allInstituteOptions, (institute) =>
+        includes(userFilters.institute_ids, institute.value)
+      );
+      if (!isEmpty(selectedInstitutes)) {
+        this.backOfficeActions.setUserFilter({
+          institutes: { isActive: true, data: selectedInstitutes },
+        });
+        this.filterPatientTable(this.table.filtered);
+      }
+    });
+  }
+
   fetchInstitutes() {
     this.http.getAllInstitutes().subscribe((data) => {
       const rows = util.transformInstitutes(data);
@@ -1163,7 +1225,7 @@ export class CommonComponent implements OnInit {
   filterTherapistTable = (data: [], filterText: string = '') => {
     const filteredData = data.filter((row: any): boolean => {
       return (
-        this.isTherapistInDepartment(row.departments_ids, this.sharedFilters[0].isActive) &&
+        this.isTherapistInDepartment(row.departments_ids, this.sharedFilters[1].isActive) &&
         this.isTextInRow(row, filterText)
       );
     });
@@ -1215,13 +1277,15 @@ export class CommonComponent implements OnInit {
     const isSuspendFilter = this.tabsAdditionalFilters[consts.Tabs.patients][0]?.isActive;
     const isTechFilterActive = this.tabsAdditionalFilters[consts.Tabs.patients][1]?.isActive;
     const isPendingBookingActive = this.tabsAdditionalFilters[consts.Tabs.patients][2]?.isActive;
-    const isDepartmentFilterActive = this.sharedFilters[0]?.isActive;
+    const isInstituteFilterActive = this.sharedFilters[0]?.isActive;
+    const isDepartmentFilterActive = this.sharedFilters[1]?.isActive;
 
     const filteredData = this.filterPatientData(
       data,
       isTechFilterActive,
       isSuspendFilter,
       isPendingBookingActive,
+      isInstituteFilterActive,
       isDepartmentFilterActive,
       filterText
     );
@@ -1233,6 +1297,7 @@ export class CommonComponent implements OnInit {
     isTechFilterActive: boolean,
     isSuspendFilter: boolean,
     isPendingBookingActive: boolean,
+    isInstituteFilterActive: boolean,
     isDepartmentFilterActive: boolean,
     filterText: string
   ): void => {
@@ -1253,6 +1318,7 @@ export class CommonComponent implements OnInit {
           row.suspend,
           isPendingBookingActive
         ) &&
+        this.isPatientInInstitute(row.institute_id, isInstituteFilterActive) &&
         this.isPatientInDepartment(row.departments_ids, isDepartmentFilterActive) &&
         this.isTextInRow(row, filterText)
       );
@@ -1362,6 +1428,25 @@ export class CommonComponent implements OnInit {
       : true;
   };
 
+  isPatientInInstitute = (instituteIds: number | number[], isActive: boolean) => {
+    const instituteIdsArray = Array.isArray(instituteIds) ? instituteIds : [instituteIds];
+    const subFilterInstitutes = this.selectedUserFilters.institutes?.data;
+    if (isEmpty(subFilterInstitutes)) {
+      return true;
+    }
+    return isActive
+    ? subFilterInstitutes.some((option) => instituteIdsArray.includes(option.value))
+    : false;
+  };
+
+  // isPatientInInstitute = (instituteIds: number, isActive: boolean) => {
+  //   const subFilterInstitutes = this.selectedUserFilters.institutes?.data;
+  //   if (isEmpty(subFilterInstitutes)) {
+  //     return true;
+  //   }
+  //   return isActive ? subFilterInstitutes.find((option) => option.value === instituteIds) : false;
+  // };
+
   onRefreshPatientDetails = (patientId: number) => {
     this.editPatient(patientId);
   };
@@ -1383,12 +1468,19 @@ export class CommonComponent implements OnInit {
   };
 
   setAllPossibleFiltersOptions = () => {
+    const instituteSelectOptions: IMultiSelectOptions[] = map(this.allInstitutes, (institute) => ({
+      value: institute.id,
+      displayName: institute.name,
+    }));
+    this.allInstituteOptions = instituteSelectOptions;
+    this.sharedFilters[0].allOptions = instituteSelectOptions;
+
     const departmentsSelectOptions: IMultiSelectOptions[] = map(this.allDepartments, (department) => ({
       value: department.id,
       displayName: department.name,
     }));
     this.allDepartmentOptions = departmentsSelectOptions;
-    this.sharedFilters[0].allOptions = departmentsSelectOptions;
+    this.sharedFilters[1].allOptions = departmentsSelectOptions;
 
     const suspendSelectOptions: IMultiSelectOptions[] = map(Object.keys(SuspendValues), (suspendValueKey) => ({
       value: suspendValueKey,

@@ -133,6 +133,6 @@ export const NO_AVAILABILITY: IAvailabilitySchedule = {
 
 export const PATIENT_AUTO_PASSWORD_LENGTH = 8;
 
-export const ARRAY_TO_POSTGRES_ARRAY_COLUMNS = ['departments'];
+export const ARRAY_TO_POSTGRES_ARRAY_COLUMNS = ['institutes','departments'];
 
 export const MAX_NUMBER_OF_PATIENT_CONTACTS = 2;
