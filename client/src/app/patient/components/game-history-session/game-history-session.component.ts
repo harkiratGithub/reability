@@ -88,9 +88,16 @@ export class GameHistorySessionComponent implements OnInit {
       });
   };
 
-  getKeys(obj: any): string[] {
-    return Object.keys(obj);
+  getKeys(object: any): string[] {
+    // console.log('Keys: ', object ? Object.keys(object) : []);
+    return object ? Object.keys(object) : [];
   }
+
+  hasValidProperties(object: any): boolean {
+    // console.log("Property: ", object, Object.values(object));
+    return Object.values(object).some((value) => value !== null && value !== undefined && typeof value !== 'object');
+  }
+
 
   setFilteredData = (filteredData: any[]) => (this.patientListFiltered = filteredData);
 

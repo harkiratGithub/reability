@@ -24,9 +24,9 @@ export const tableColumns: Record<string, ITableColumn[]> = {
   ],
   therapists: [
     { fieldName: 'full_name', displayName: 'Name', flex: 1 },
+    { fieldName: 'institute_name', displayName: 'Institute', flex: 1 },    
     { fieldName: 'email', displayName: 'Email', flex: 1.2, cellType: CellType.email },
     { fieldName: 'user_name', displayName: 'Username', flex: 1 },
-    { fieldName: 'institute_name', displayName: 'Institute', flex: 1 },
     { fieldName: 'departments_names', displayName: 'Departments', flex: 1 },
     {
       fieldName: 'last_login',
@@ -37,6 +37,7 @@ export const tableColumns: Record<string, ITableColumn[]> = {
   ],
   patients: [
     { fieldName: 'full_name', displayName: 'Name', flex: 1 },
+    { fieldName: 'institute_name', displayName: 'Institute', flex: 1 },
     { fieldName: 'email', displayName: 'Email', flex: 1.2, cellType: CellType.email },
     { fieldName: 'user_name', displayName: 'Username', flex: 1 },
     { fieldName: 'profession_name', displayName: 'Profession', flex: 1 },

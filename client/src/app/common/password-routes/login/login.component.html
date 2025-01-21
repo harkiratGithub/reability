@@ -29,7 +29,7 @@
             'login-tagline-error-mobile': submitted && f.username.errors && f.username.errors.errorName === 'not_valid'
           }"
         >
-          Login to Reability Online
+          Login to TheRPT
         </p>
         <form class="login-form-mobile" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
           <div class="form-inputs-mobile">
@@ -72,6 +72,8 @@
             />
           </div>
           <a href="/#/forgot_password" class="forgot-password-mobile">Forgot Password?</a>
+          <br>
+          <p class="helpline-mobile">For any issue, please call TheRPT team at: (212)-470-1452</p>
         </form>
       </div>
     </div>
@@ -122,7 +124,7 @@
             'login-tagline-error': submitted && f.username.errors && f.username.errors.errorName === 'not_valid'
           }"
         >
-          Login to Reability Online
+          Login to TheRPT
         </p>
         <form class="login-form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
           <div class="form-inputs">
@@ -163,6 +165,8 @@
             />
           </div>
           <a href="/#/forgot_password" class="forgot-password">Forgot Password?</a>
+          <br>
+          <p class="helpline">For any issue, please call TheRPT team at: (212)-470-1452</p>
         </form>
       </div>
     </div>
