@@ -294,7 +294,7 @@ export class PoseComparisonComponent implements OnInit, AfterViewInit {
       if (+entry['Deg'] < min) min = +entry['Deg'] > 3 ? +entry['Deg'] : 3;
       if (+entry['Deg'] > max) max = +entry['Deg'];
     });
-    // min = 90;
+    min = 30;
     // max = 180;
 
     const mid = (min + max) / 2;
@@ -635,15 +635,15 @@ export class PoseComparisonComponent implements OnInit, AfterViewInit {
     A: { x: number; y: number; z: number },
     B: { x: number; y: number; z: number }
   ): number {
-    const vectorAB = { x: B.x - A.x, y: B.y - A.y, z: B.z - A.z };
-    const verticalVector = { x: 0, y: 0, z: 1 };
+    const vectorAB = { x: B.x - A.x, y: B.y - A.y };
+    const verticalVector = { x: 0, y: 1 };
 
     const dotProduct =
-      vectorAB.x * verticalVector.x + vectorAB.y * verticalVector.y + vectorAB.z * verticalVector.z;
+      vectorAB.x * verticalVector.x + vectorAB.y * verticalVector.y;
 
-    const magnitudeAB = Math.sqrt(vectorAB.x ** 2 + vectorAB.y ** 2 + vectorAB.z ** 2);
+    const magnitudeAB = Math.sqrt(vectorAB.x ** 2 + vectorAB.y ** 2);
     const magnitudeVertical = Math.sqrt(
-      verticalVector.x ** 2 + verticalVector.y ** 2 + verticalVector.z ** 2
+      verticalVector.x ** 2 + verticalVector.y ** 2
     );
 
     const angleInRadians = Math.acos(
@@ -694,11 +694,12 @@ export class PoseComparisonComponent implements OnInit, AfterViewInit {
 
       if (results.poseLandmarks) {
         const tolerance = 3;
-        const leftShoulder = results.poseLandmarks[11];
-        const leftElbow = results.poseLandmarks[13];
+        const leftShoulder = results.poseLandmarks[13];
+        const leftElbow = results.poseLandmarks[11];
         const leftWrist = results.poseLandmarks[15];
         const rightShoulder = results.poseLandmarks[24];
         const rightWrist = results.poseLandmarks[26];
+        // console.log(leftShoulder, leftElbow, leftWrist);
 
         // const frameData = this.getCoordinatesForFrame(this.currentFrameIndex);
 
@@ -709,10 +710,15 @@ export class PoseComparisonComponent implements OnInit, AfterViewInit {
         // const leftAngle = this.calculateAngleBetweenPoints(leftShoulder, leftWrist);
         // const rightAngle = this.calculateAngleBetweenPoints(rightShoulder, rightWrist);
         // Calculate angles for left and right wrists
-        const leftAngle = this.calculateAngleBetweenThreePoints(
+        // const leftAngle = this.calculateAngleBetweenThreePoints(
+        //   { x: leftShoulder.x, y: leftShoulder.y, z: leftShoulder.z },
+        //   { x: leftElbow.x, y: leftElbow.y, z: leftElbow.z },
+        //   { x: leftWrist.x, y: leftWrist.y, z: leftWrist.z }
+        // );
+
+        const leftAngle = this.calculateAngleBetweenPoints(
           { x: leftShoulder.x, y: leftShoulder.y, z: leftShoulder.z },
-          { x: leftElbow.x, y: leftElbow.y, z: leftElbow.z },
-          { x: leftWrist.x, y: leftWrist.y, z: leftWrist.z }
+          { x: leftElbow.x, y: leftElbow.y, z: leftElbow.z }
         );
 
         const rightAngle = this.calculateAngleBetweenPoints(
