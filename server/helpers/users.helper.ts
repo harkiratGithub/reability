@@ -24,6 +24,7 @@ import qrcode from 'qrcode';
 
 export const onLogIn = async (user: {
 	id: number;
+	therapistId?: number;
 	role: string;
 	username: string;
 	isTherapist: boolean;
@@ -43,16 +44,17 @@ export const onLogIn = async (user: {
 				return { ...user, email };
 			case ROLE.THERAPIST:
 			case ROLE.VIDEO_PATIENT:
-				const userDetails = await UserModel.getUserDetails(user.id);
+				const userDetails = await UserModel.getUserDetails(user.id, user.therapistId || undefined);
 				const {
 					id,
 					first_name: firstName,
 					last_name: lastName,
 					is_two_factor_enabled: is_two_factor_enabled,
+					departments,
 				} = EncryptHelper.decryptJson(userDetails[0]);
-				return { ...user, id, firstName, lastName, is_two_factor_enabled };
+				return { ...user, id, firstName, lastName, is_two_factor_enabled, departments };
 			case ROLE.PATIENT:
-				const details = await UserModel.getUserDetails(user.id);
+				const details = await UserModel.getUserDetails(user.id, user.therapistId || undefined);
 				const {
 					id: patientId,
 					first_name: firstNameDetails,
@@ -65,7 +67,8 @@ export const onLogIn = async (user: {
 				const RTM = details?.some((ele: { department_name: string }) => ele.department_name.toLowerCase() === 'rtm');
 				const todayEntry = await UserModel.isPatientEntryForToday(patientId);
 				const isPainModelOpen = RTM && typeof todayEntry.painLevel === 'undefined' && !todayEntry.hasEntries;
-				const isMobileModelOpen = RTM &&  new Date().getTime() - new Date(timestamp).getTime() >= 24 * 60 * 60 * 1000 ? true : false;
+				const isMobileModelOpen =
+					RTM && new Date().getTime() - new Date(timestamp).getTime() >= 24 * 60 * 60 * 1000 ? true : false;
 				const isRTM = RTM;
 				const validGames = await GameModel.getValidGameForPatient(patientId);
 				const patient = await PatientModel.findPatientByUserId(user.id);
@@ -99,7 +102,7 @@ export const getPatientsByTherapist = async (therapistId: any) => {
 			patientId: decryptPatient.patient_id,
 			firstName: decryptPatient.first_name,
 			lastName: decryptPatient.last_name,
-			peerId: decryptPatient.peer_id.toString(),
+			peerId: decryptPatient?.peer_id?.toString(),
 			isTherapist: decryptPatient.role === ROLE.THERAPIST,
 			role: decryptPatient.role,
 			username: decryptPatient.user_name,
@@ -335,9 +338,9 @@ export const checkFastLoginToken = async (token: any) => {
 	}
 };
 
-export const getUserContactData = async (patientId: any) => {
+export const getUserContactData = async (patientId: any, therapistId?: any) => {
 	try {
-		const userDetails = await UserModel.getUserDetails(patientId);
+		const userDetails = await UserModel.getUserDetails(patientId, therapistId);
 		const { id, phone, email } = EncryptHelper.decryptJson(userDetails[0]);
 		return {
 			id,

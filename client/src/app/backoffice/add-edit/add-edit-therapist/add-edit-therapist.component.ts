@@ -85,6 +85,10 @@ export class AddEditTherapistComponent implements OnInit, OnDestroy {
 
     this.filteredExpertises = this.filterExpertisesByProfessionId(this.customForm.value.profession_id, this.expertises);
     this.setDropDownAvailability(this.filteredExpertises, 'expertises_ids');
+    
+    if (this.editedEntity) {
+      this.customForm.controls.institute_id.disable();
+    }
   }
 
   setDropDownAvailability(field: string[], fieldName: string): void {

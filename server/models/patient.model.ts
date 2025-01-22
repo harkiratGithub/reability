@@ -571,7 +571,12 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 		.from(TABLE_NAME.RTM, 'rtm')
 		.join(TABLE_NAME.PATIENT, null, `rtm.patient_id = ${TABLE_NAME.PATIENT}.id`)
 		.join(TABLE_NAME.USER, 'patient_user', `${TABLE_NAME.PATIENT}.user_id = patient_user.id`)
-		.join(TABLE_NAME.INSTITUTE, 'institute', `rtm.institute_id = institute.id`);
+		.join(TABLE_NAME.INSTITUTE, 'institute', `rtm.institute_id = institute.id`)
+		// Apply sorting conditions
+		.order(`${TABLE_NAME.INSTITUTE}.name`, true) // Ascending by institute name
+		.order(`patient_user.user_name`, true) // Ascending by patient unique ID
+		.order(`(rtm.data->>'therapist_id')::int`, false) // Descending by therapist ID
+		.order(`rtm.timestamp`, false); // Descending by date
 	// .join(TABLE_NAME.THERAPIST, null, `(rtm.data->>'therapist_id')::int = ${TABLE_NAME.THERAPIST}.id`)
 	// .join(TABLE_NAME.USER, 'therapist_user', `${TABLE_NAME.THERAPIST}.user_id = therapist_user.id`);
 	if (!sendMail && month !== null && year !== null) {
