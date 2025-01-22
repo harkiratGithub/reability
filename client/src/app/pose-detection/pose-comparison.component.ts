@@ -635,15 +635,15 @@ export class PoseComparisonComponent implements OnInit, AfterViewInit {
     A: { x: number; y: number; z: number },
     B: { x: number; y: number; z: number }
   ): number {
-    const vectorAB = { x: B.x - A.x, y: B.y - A.y, z: B.z - A.z };
-    const verticalVector = { x: 0, y: 0, z: 1 };
+    const vectorAB = { x: B.x - A.x, y: B.y - A.y };
+    const verticalVector = { x: 0, y: 1 };
 
     const dotProduct =
-      vectorAB.x * verticalVector.x + vectorAB.y * verticalVector.y + vectorAB.z * verticalVector.z;
+      vectorAB.x * verticalVector.x + vectorAB.y * verticalVector.y;
 
-    const magnitudeAB = Math.sqrt(vectorAB.x ** 2 + vectorAB.y ** 2 + vectorAB.z ** 2);
+    const magnitudeAB = Math.sqrt(vectorAB.x ** 2 + vectorAB.y ** 2);
     const magnitudeVertical = Math.sqrt(
-      verticalVector.x ** 2 + verticalVector.y ** 2 + verticalVector.z ** 2
+      verticalVector.x ** 2 + verticalVector.y ** 2
     );
 
     const angleInRadians = Math.acos(
