@@ -573,6 +573,7 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 		.join(TABLE_NAME.USER, 'patient_user', `${TABLE_NAME.PATIENT}.user_id = patient_user.id`)
 		.join(TABLE_NAME.INSTITUTE, 'institute', `rtm.institute_id = institute.id`)
 		// Apply sorting conditions
+		.order(`CASE WHEN rtm.data->>'therapist_id' IS NULL THEN 1 ELSE 2 END`, true) // Patients first, therapists second
 		.order(`${TABLE_NAME.INSTITUTE}.name`, true) // Ascending by institute name
 		.order(`patient_user.user_name`, true) // Ascending by patient unique ID
 		.order(`(rtm.data->>'therapist_id')::int`, false) // Descending by therapist ID
