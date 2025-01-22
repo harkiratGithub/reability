@@ -5,12 +5,12 @@
     </div>
     <div class="arrow"></div>
   </div>
-  <div class="content" #container *ngIf="isOpen">
+  <div class="content" #dropdownContent *ngIf="isOpen">
     <div
       class="item"
-      *ngFor="let item of items"
+      *ngFor="let item of items; let i = index"
       [class.selected]="isSelected(item)"
-      [class.scroll-visible]="isScrollVisible()"
+      #dropdownItem
       (click)="onSelect(item.id)"
     >
       {{ item.name }}

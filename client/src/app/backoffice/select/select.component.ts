@@ -1,4 +1,4 @@
-import { Component, Input, forwardRef } from '@angular/core';
+import { Component, ElementRef, Input, ViewChild, ViewChildren, forwardRef, Renderer2, QueryList } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 
 const MAX_ITEMS = 6;
@@ -23,6 +23,8 @@ export interface IDropItem {
 export class SelectComponent {
   @Input() items;
   @Input() multiSelect;
+  @ViewChild('dropdownContent', { static: false }) dropdownContent: ElementRef;
+  @ViewChildren('dropdownItem') dropdownItems: QueryList<ElementRef>;
   // tslint:disable-next-line: variable-name
   _value: any;
   isOpen = false;
@@ -89,8 +91,26 @@ export class SelectComponent {
     return 'Choose';
   }
 
-  setIsOpen(isOpen) {
+  setIsOpen(isOpen: boolean) {
     this.isOpen = isOpen;
+    if (this.isOpen) {
+      this.focusLastItem();
+    }
+  }
+
+  focusLastItem() {
+    setTimeout(() => {
+      if (this.dropdownContent && this.dropdownItems) {
+        const lastItem = this.dropdownItems.last;
+        if (lastItem) {
+          lastItem.nativeElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+            inline: 'start',
+          });
+        }
+      }
+    });
   }
 
   isSelected(item) {

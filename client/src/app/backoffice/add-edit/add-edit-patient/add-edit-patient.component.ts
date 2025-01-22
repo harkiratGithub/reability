@@ -14,6 +14,7 @@ import {
   IUserLogEntry,
   ICreateRemarkParams,
 } from '../../../../types';
+import { AjaxService } from 'src/app/therapist/services/ajax.service';
 
 @Component({
   selector: 'app-add-edit-patient',
@@ -48,7 +49,9 @@ export class AddEditPatientComponent implements OnInit, OnDestroy {
   viewType = PatientView;
   userLog: IUserLogEntry[] = [];
   currentRemark = '';
-  
+
+  constructor(private ajax: AjaxService) {}
+
   ngOnInit() {
     if (this.editedEntity) {
       this.userLog = this.editedEntity.userLog;
@@ -73,7 +76,9 @@ export class AddEditPatientComponent implements OnInit, OnDestroy {
       primary_contact_email: new FormControl(this.getDefaultValue(this.editedEntity, 'primary_contact_email')),
       referral: new FormControl(this.getDefaultValue(this.editedEntity, 'referral')),
       notification_email: new FormControl(this.getDefaultValue(this.editedEntity, 'notification_email')),
-      login_notification_email: new FormControl(this.getDefaultValue(this.editedEntity, 'login_notification_email') || ''),
+      login_notification_email: new FormControl(
+        this.getDefaultValue(this.editedEntity, 'login_notification_email') || ''
+      ),
       secondary_contact_full_name: new FormControl(
         this.getDefaultValue(this.editedEntity, 'secondary_contact_full_name')
       ),
@@ -117,18 +122,17 @@ export class AddEditPatientComponent implements OnInit, OnDestroy {
   }
 
   filterDepartmentsByInstituteId(instituteId, departments) {
-    console.log("Institute Id's: ", instituteId, departments);
     if (!instituteId) {
       return [];
     }
     return departments.filter((dep) => dep.institute_id === instituteId);
   }
-  initDropDowns() {
+  async initDropDowns() {
     if (this.institutes?.length > 0) {
       this.customForm.controls.institute_id.enable();
-      
       if (this.isPatient) {
-        const firstInstituteId = this.institutes[0]?.id ?? null;
+        const userDataResult = await this.ajax.getUserData().toPromise();
+        const firstInstituteId = userDataResult?.departments[0].institute_id;
         this.customForm.controls.institute_id.setValue(firstInstituteId);
         this.customForm.controls.institute_id.disable();
         this.filteredDepartments = this.filterDepartmentsByInstituteId(firstInstituteId, this.departments);
@@ -146,14 +150,13 @@ export class AddEditPatientComponent implements OnInit, OnDestroy {
     if (this.editedEntity) {
       this.customForm.controls.institute_id.disable();
     }
-  
+
     if (this.filteredDepartments.length > 0) {
       this.customForm.controls.departments_ids.enable();
     } else {
       this.customForm.controls.departments_ids.disable();
     }
   }
-  
 
   onChanges() {
     this.subscription.add(
