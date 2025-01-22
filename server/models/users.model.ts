@@ -95,7 +95,7 @@ export const isPatientEntryForToday = async (
 		return { hasEntries: false };
 	}
 };
-export const getUserDetails = async (userId, therapistId) => {
+export const getUserDetails = async (userId, therapistId = undefined) => {
 	const query = squelPostgres
 		.select()
 		.field(`${TABLE_NAME.PATIENT}.id`, 'id')
