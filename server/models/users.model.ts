@@ -95,7 +95,7 @@ export const isPatientEntryForToday = async (
 		return { hasEntries: false };
 	}
 };
-export const getUserDetails = async (userId) => {
+export const getUserDetails = async (userId, therapistId) => {
 	const query = squelPostgres
 		.select()
 		.field(`${TABLE_NAME.PATIENT}.id`, 'id')
@@ -153,8 +153,42 @@ export const getUserDetails = async (userId) => {
 		)
 		.toParam();
 	const result = await BaseModel.runQuery(query);
+	if (result.rows.some((row) => row.department_name)) {
+		const departments = await getTherapistDepartments(therapistId);
+		return result.rows.map((row) => ({ ...row, departments }));
+	}
 	return result.rows;
 };
+
+
+export const getTherapistDepartments = async (therapistId) => {
+	const query = squelPostgres
+	  .select()
+	  .field(`${TABLE_NAME.DEPARTMENT}.id`, 'department_id')
+	  .field(`${TABLE_NAME.DEPARTMENT}.name`, 'department_name')
+	  .field(`${TABLE_NAME.DEPARTMENT}.institute_id`, 'institute_id') 
+	  .field(`${TABLE_NAME.INSTITUTE}.name`, 'institute_name')
+	  .from(TABLE_NAME.THERAPIST_DEPARTMENTS)
+	  .left_join(
+		TABLE_NAME.DEPARTMENT,
+		null,
+		`${TABLE_NAME.THERAPIST_DEPARTMENTS}.department_id = ${TABLE_NAME.DEPARTMENT}.id`
+	  )
+	  .left_join(
+		TABLE_NAME.INSTITUTE,
+		null,
+		`${TABLE_NAME.DEPARTMENT}.institute_id = ${TABLE_NAME.INSTITUTE}.id`
+	  )
+	  .where(`${TABLE_NAME.THERAPIST_DEPARTMENTS}.therapist_id = ?`, therapistId)
+	  .toParam();
+	const result = await BaseModel.runQuery(query);
+	return result.rows.map(department => ({
+	  department_id: department.department_id,
+	  department_name: department.department_name,
+	  institute_id: department.institute_id,
+	  institute_name: department.institute_name
+	}));
+  };
 
 export const getAdminDetails = async (userId: number) => {
 	const query = squelPostgres
