@@ -35,9 +35,10 @@ import { isNil, isBoolean, throttle } from 'lodash';
 import { setCameraFrameRate } from '../../../common/helpers/webRTC-common-utils';
 import { IOrganAngle, IScore } from '../../../../types';
 import { IGameAppData } from '../../../../app/app.state';
-import { Pose, POSE_CONNECTIONS, Results } from '@mediapipe/pose';
 import { Camera } from '@mediapipe/camera_utils';
-import { SkeltonVideoService } from 'src/app/common/services/skelton-video.service';
+import { Pose, POSE_CONNECTIONS, Results } from '@mediapipe/pose';
+import * as XLSX from 'xlsx';
+import { SkeltonVideoService } from '../../../common/services/skelton-video.service';
 
 let therapistToPatientConnection = null;
 declare var MediaRecorder: any;
