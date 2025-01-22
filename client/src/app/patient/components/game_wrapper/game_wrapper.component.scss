@@ -314,11 +314,9 @@
   overflow: hidden;
   position: relative;
 }
-.carousel-text {
-  position: absolute;
+.carousel-text {  
   white-space: nowrap;
-  font-size: 40px;  
-  animation: scroll-left 10s linear infinite;
+  font-size: 40px; 
 }
 /* Keyframes for scrolling text */
 @keyframes scroll-left {
