@@ -134,62 +134,74 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   private videoSeconds: number = 0;
   private currentVideoIndex: number = 0;
   videoMinMax = [{
-    "ClipMinMax": "Max Value",
-    "ClipTimestamp": 6.012,
-    "ClipDeg": 178
+    ClipValue: "Mid Value",
+    ClipTimestamp: 1.485,
+    ClipDeg: 91
   }, {
-    "ClipMinMax": "Min Value",
-    "ClipTimestamp": 10.744,
-    "ClipDeg": 6
+    ClipValue: "Max Value",
+    ClipTimestamp: 6.325,
+    ClipDeg: 180
   }, {
-    "ClipMinMax": "Max Value",
-    "ClipTimestamp": 15.522,
-    "ClipDeg": 177
+    ClipValue: "Min Value",
+    ClipTimestamp: 24.816,
+    ClipDeg: 6
   }, {
-    "ClipMinMax": "Min Value",
-    "ClipTimestamp": 19.577,
-    "ClipDeg": 7
+    ClipValue: "Max Value",
+    ClipTimestamp: 26.263,
+    ClipDeg: 180
   }, {
-    "ClipMinMax": "Max Value",
-    "ClipTimestamp": 23.986,
-    "ClipDeg": 176
+    ClipValue: "Mid Value",
+    ClipTimestamp: 27.588,
+    ClipDeg: 88
   }, {
-    "ClipMinMax": "Min Value",
-    "ClipTimestamp": 28.765,
-    "ClipDeg": 7
+    ClipValue: "Max Value",
+    ClipTimestamp: 35.844,
+    ClipDeg: 179
   }, {
-    "ClipMinMax": "Max Value",
-    "ClipTimestamp": 33.42,
-    "ClipDeg": 176
+    ClipValue: "Mid Value",
+    ClipTimestamp: 37.081,
+    ClipDeg: 92
   }, {
-    "ClipMinMax": "Min Value",
-    "ClipTimestamp": 38.314,
-    "ClipDeg": 7
+    ClipValue: "Min Value",
+    ClipTimestamp: 38.679,
+    ClipDeg: 5
   }, {
-    "ClipMinMax": "Max Value",
-    "ClipTimestamp": 42.881,
-    "ClipDeg": 176
+    ClipValue: "Max Value",
+    ClipTimestamp: 44.701,
+    ClipDeg: 180
   }, {
-    "ClipMinMax": "Min Value",
-    "ClipTimestamp": 47.993,
-    "ClipDeg": 6
+    ClipValue: "Mid Value",
+    ClipTimestamp: 46.204,
+    ClipDeg: 92
   }, {
-    "ClipMinMax": "Max Value",
-    "ClipTimestamp": 52.187,
-    "ClipDeg": 177
+    ClipValue: "Min Value",
+    ClipTimestamp: 48.354,
+    ClipDeg: 5
   }, {
-    "ClipMinMax": "Min Value",
-    "ClipTimestamp": 57.337,
-    "ClipDeg": 7
+    ClipValue: "Max Value",
+    ClipTimestamp: 54.646,
+    ClipDeg: 180
   }, {
-    "ClipMinMax": "Max Value",
-    "ClipTimestamp": 61.772,
-    "ClipDeg": 176
+    ClipValue: "Mid Value",
+    ClipTimestamp: 55.902,
+    ClipDeg: 94
   }, {
-    "ClipMinMax": "Min Value",
-    "ClipTimestamp": 66.646,
-    "ClipDeg": 7
-  }]
+    ClipValue: "Min Value",
+    ClipTimestamp: 58.028,
+    ClipDeg: 2
+  }, {
+    ClipValue: "Max Value",
+    ClipTimestamp: 63.983,
+    ClipDeg: 179
+  }, {
+    ClipValue: "Mid Value",
+    ClipTimestamp: 65.287,
+    ClipDeg: 90
+  }, {
+    ClipValue: "Min Value",
+    ClipTimestamp: 70.697,
+    ClipDeg: 0
+  }];
 
   rightComment = '';
   leftComment = '';
