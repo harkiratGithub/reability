@@ -964,7 +964,7 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
   }*/
 
   startCarousel(): void {
-    if (this.isPopupVisible) {
+    /*if (this.isPopupVisible) {
       const baseSpeed = 200; // Base speed (ms) per character
       const minInterval = 3000; // Minimum interval for very short text
       const maxInterval = 20000; // Maximum interval for very long text
@@ -985,6 +985,7 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
       // Start the first cycle
       updateText();
     }
+      */
   }
 
 }
