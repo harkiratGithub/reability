@@ -135,7 +135,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   private videoIndex: number;
   private videoSeconds: number = 0;
   private currentVideoIndex: number = 0;
-  videoMinMax = [{
+  videoMinMax = [[{
     ClipValue: "Mid Value",
     ClipTimestamp: 1.485,
     ClipDeg: 91
@@ -203,7 +203,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     ClipValue: "Min Value",
     ClipTimestamp: 70.697,
     ClipDeg: 0
-  }];
+  }]];
 
   rightComment = '';
   leftComment = '';
@@ -321,13 +321,20 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       if (typeof iframeaction === 'string') {
         const action = JSON.parse(iframeaction);
         console.log("action.msg.data.currentPlayTime.vidTime===", action);
+        if (action.msg && action.msg.gameSummaryContent == "Session Ended") {
+          const results = this.matchClipAndPatientData(this.videoMinMax[this.videoIndex], this.matchingCameraData);
+          const updateComments = this.updateComments(results);
+          this.saveToCSV(updateComments, 'min_max_matches.csv');
+        }
         if (action.msg && action.msg.data && action.msg.data.shouldPlay) {
           const videoTime = action.msg.data.currentPlayTime.vidTime;
           const currentPlayTime = new Date(action.msg.data.currentPlayTime.sysTime).getSeconds();
+          console.log("currentPlayTime===", currentPlayTime);
+
           if (this.videoSeconds == 0) {
             this.videoSeconds = currentPlayTime
           }
-          if (this.videoSeconds < currentPlayTime || videoTime > 0) {
+          if (Math.abs(this.videoSeconds - currentPlayTime) > 1 || videoTime > 0) {
             this.initializeCameraPoseModels()
             if (!this.startTime) {
               this.startTime = new Date().getTime(); // Save the initial timestamp
@@ -339,7 +346,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
               this.startTime = new Date().getTime();
 
               if (this.videoIndex > 1) {
-                const results = this.matchClipAndPatientData(this.videoMinMax, this.matchingCameraData);
+                const results = this.matchClipAndPatientData(this.videoMinMax[this.videoIndex - 1], this.matchingCameraData);
                 const updateComments = this.updateComments(results);
                 this.saveToCSV(updateComments, 'min_max_matches.csv');
               }
@@ -574,7 +581,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     // getIframeUrl
     this.skeltonVideoService.gameVideoElement$.subscribe((iframeaction) => {
       // const action = JSON.parse(iframeaction);
-      console.log(" in webrtccomponents iframeaction===", iframeaction);
+      // console.log(" in webrtccomponents iframeaction===", iframeaction);
       // if (action.msg.shouldPlay) {
       //   this.initializePoseModels
       // }
@@ -1569,8 +1576,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       // Store the comparison data
       results.push({
         ClipDeg: clipEntry.ClipDeg,
-        ClipMinMax: clipEntry.ClipMinMax,
-        PatientMinMax: clipEntry.ClipMinMax,
+        ClipValue: clipEntry.ClipValue,
+        PatientValue: clipEntry.ClipValue,
         ClipTimestamp: clipEntry.ClipTimestamp,
         LeftComments: isLeftGood ? "Good" : "Not Good",
         RightComments: isRightGood ? "Good" : "Not Good",
@@ -1996,7 +2003,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         this.cameraAngle['leftWrist'] = leftAngle;
         this.cameraAngle['rightWrist'] = rightAngle;
 
-        const elapsedTime = ((new Date().getTime() - this.startTime) / 1000).toFixed(3);
+        const elapsedTime = +((new Date().getTime() - this.startTime) / 1000).toFixed(3);
         this.matchingCameraData.push({
           timestamp: `${elapsedTime}`,
           'LSA Deg': `${Math.round(leftAngle)}`,
@@ -2015,7 +2022,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           tolerance: number
         ) => time >= target - tolerance && time <= target + tolerance;
 
-        const currentVideoAngle = this.videoMinMax[this.currentVideoIndex]
+        const currentVideoAngle = this.videoMinMax[this.videoIndex][this.currentVideoIndex]
         this.rightMatching = withinTolerance(
           rightAngle,
           +currentVideoAngle.ClipDeg,
@@ -2027,19 +2034,20 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           3
         )
         this.timeMatching = withinTimeTolerance(
-          this.startTime,
+          elapsedTime,
           currentVideoAngle.ClipTimestamp,
           2
         )
 
         if (
           withinTimeTolerance(
-            this.startTime,
+            elapsedTime,
             currentVideoAngle.ClipTimestamp,
             2
           )
         ) {
-          const liveResults = this.matchClipAndPatientData(this.videoMinMax, this.matchingCameraData);
+          this.currentVideoIndex++;
+          const liveResults = this.matchClipAndPatientData(this.videoMinMax[this.videoIndex], this.matchingCameraData);
           const updateComments = this.updateComments(liveResults);
           // console.log(updateComments);
 
@@ -2052,7 +2060,6 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           const lastTimestamp = lastCommentObj?.ClipTimestamp;
 
           if (lastTimestamp && !this.processedTimestamps.has(lastTimestamp)) {
-            this.currentVideoIndex++;
             this.processedTimestamps.add(lastTimestamp);
             console.log(lastTimestamp, this.processedTimestamps);
             if (this.rightComment != 'Good') {
