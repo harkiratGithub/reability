@@ -1,15 +1,8 @@
-<div
-  id="skeleton-border-wrap"
-  class="skeleton-border-wrap"
-  [ngClass]="[
+<div id="skeleton-border-wrap" class="skeleton-border-wrap" [ngClass]="[
     isBodyTrackingReady() || trackBody ? '' : 'skeleton-border-loading',
     isInGame ? 'skeleton-border-wrap-hide' : '',
     isBodyTrackingReady() && trackBody ? 'skeleton-border-wrap-active' : ''
-  ]"
-  title="{{ getSkeletonTitle() }}"
-  (click)="handleBodyTracking()"
-  *ngIf="!videoSessionDisplay && !isMobile"
->
+  ]" title="{{ getSkeletonTitle() }}" (click)="handleBodyTracking()" (touchstart)="handleBodyTracking()" *ngIf="!videoSessionDisplay && !isMobile">
   <div [ngClass]="[isBodyTrackingReady() || trackBody ? 'skeleton-ready' : 'skeleton-loading']">
     <div *ngIf="!isBodyTrackingReady()" class="skeleton-loading-section">
       <div class="skeleton-loading-percentage">
@@ -36,51 +29,37 @@
 </div>
 
 <div class="videos-wrapper">
-  <div
-    class="video-content-container"
-    id="web-rtc-wrapper"
-    [ngClass]="{
+  <div class="video-content-container" id="web-rtc-wrapper" [ngClass]="{
       'video-content-container-regular-video': !enlargeVideo,
       'video-content-container-enlarge-video': enlargeVideo
-    }"
-  >
-
-  <!--<video #videoElement src="assets/video.mp4" autoplay muted controls width="333" height="299"></video>-->
-  
+    }">
     <div id="remoteVideo" class="remoteVideo">
       <div *ngIf="therapistBusy && !isMobile" class="therapist-busy-message">
         <div class="therapist-busy-message-text">Therapist<br />on mute</div>
       </div>
-      <div
-        *ngIf="therapistBusy && isMobile"
-        class="therapist-video therapist-video-regular-video-mobile mobile-view not-active mute-message"
-      >
+      <div *ngIf="therapistBusy && isMobile" class="therapist-video therapist-video-regular-video-mobile mobile-view not-active mute-message">
         Therapist<br />on mute
       </div>
     </div>
-    <div
-      class="video-content-container-inner"
-      [ngClass]="{
+    <div class="video-content-container-inner" [ngClass]="{
         'video-content-container-inner-enlarge-video': enlargeVideo
-      }"
-    >
+      }">
       <!-- <div *ngIf="isCameraCheckComplete && !userHasCamera" class="no-camera-div">
         <p class="no-camera-div-text">{{ PATIENT_CAMERA_ERROR }}</p>
         <div class="dark-background"></div>
         <img src="../../../../assets/main-menu/no_camera.svg" />
       </div> -->
 
-      <div class="distance-warning">
+      <div class="distance-warning" style="justify-content: space-between;">
         <div class="icon">
           <img src="../../../../assets/game-icons/camera-icon.svg" alt="Camera Icon" />
         </div>
-        <span class="message">Please maintain distance from the camera.</span>
+        <span class="message">Left Hand: {{leftComment}}</span>
+        <span class="message">Right Hand:{{rightComment}}</span>
+        <!-- <button (click)="playCommentAudio()">Play Audio</button> -->
       </div>
 
-      <video
-        *ngIf="!isDepthCameraConnected()"
-        id="patient-video"
-        [ngClass]="{
+      <video id="patient-video" [ngClass]="{
           'patient-video-regular-video': !enlargeVideo,
           'patient-video-enlarge-video': enlargeVideo,
           'hide-video':
@@ -89,32 +68,13 @@
             (trackBody && !bodyTrackingLoading),
           'disabled-skeleton': this.currentUser.disabledSkeleton || trackBody,
           'ios-hide': isIosDevice()
-        }"
-        class="patient-video"
-        width="291"
-        height="290"
-        muted
-        autoplay
-        playsinline
-        #cameraElement
-      ></video>
-      <video
-        *ngIf="isDepthCameraConnected()"
-        id="patient-video"
-        [ngClass]="{
+        }" class="patient-video" width="291" height="290" style="display: none;" muted autoplay playsinline #cameraElement></video>
+      <!-- <video *ngIf="isDepthCameraConnected()" id="patient-video" [ngClass]="{
           'patient-video-regular-video': !enlargeVideo,
           'patient-video-enlarge-video': enlargeVideo,
           'hide-video': !showLocalVideo || !this.currentUser.disabledSkeleton,
           'disabled-skeleton': this.currentUser.disabledSkeleton
-        }"
-        class="patient-video"
-        width="347"
-        height="227"
-        muted
-        autoplay
-        playsinline
-        #cameraElement
-      ></video>
+        }" class="patient-video" width="347" height="227" style="display: none;" muted autoplay playsinline #cameraElement></video> -->
 
       <div *ngIf="receivedRemoteVideo && connectionLost" class="no-camera-message">{{ connection_error_message }}</div>
       <div *ngIf="isCameraCheckComplete && !userHasCamera" class="patient-no-camera-message">
@@ -122,65 +82,34 @@
           {{ PATIENT_CAMERA_ERROR }}
         </div>
       </div>
-      <!--<canvas 
-        id="patient-canvas"
-        [ngClass]="{
+      <canvas id="patient-canvas" [ngClass]="{
           'patient-video-regular-video': !enlargeVideo,
           'patient-video-enlarge-video': enlargeVideo,
           'hide-video': !showLocalVideo || showPatientVideo || !trackBody
-        }"
-        width="347"
-        height="227"
-        class="patient-canvas"
-        #canvasElement2
-      ></canvas>
-      <canvas
-        id="patient-canvas-skeleton"
-        [ngClass]="{
+        }" width="257" height="192" class="patient-canvas"></canvas>
+      <canvas id="patient-canvas-skeleton" [ngClass]="{
           'patient-video-regular-video': !enlargeVideo,
           'patient-video-enlarge-video': enlargeVideo,
           'hide-video': !showLocalVideo || !showPatientVideo || !displaySkeleton
-        }"
-        width="347"
-        height="227"
-        class="patient-canvas"
-        #canvasElement2
-      ></canvas> -->
+        }" width="257" height="192" class="patient-canvas"></canvas>
 
+      <canvas #canvasElement2 width="291" height="290" style="transform: scaleX(-1); width: 100%;"></canvas>
 
       <div class="text-container">
-        <span class="text-group">LS:14</span>
-        <span class="text-group">   LE:176</span>
+        <span class="text-group">LS: {{cameraAngle.leftWrist | number: '1.2-2'}}</span>
+        <!-- <span class="text-group"> LE:176</span> -->
         <span class="separator">|</span>
-        <span class="text-group">  RS:42</span>
-        <span class="text-group">   RS:160</span>
+        <span class="text-group">RS: {{cameraAngle.rightWrist | number: '1.2-2'}}</span>
+        <!-- <span class="text-group"> RS:160</span> -->
       </div>
-      
-      <canvas #canvasElement2 width="640" height="480" style="transform: scaleX(-1);"></canvas>
 
       <div *ngIf="trackBody && showAngles" class="angles">
-        <div
-          *ngFor="let organAngle of organAngles; let i = index"
-          [ngClass]="{ 'angle-left': i % 2 === 0, 'angle-right': i % 2 !== 0 }"
-        >
+        <div *ngFor="let organAngle of organAngles; let i = index" [ngClass]="{ 'angle-left': i % 2 === 0, 'angle-right': i % 2 !== 0 }">
           {{ organAngle.organName }}: {{ organAngle.angle }}
         </div>
       </div>
     </div>
   </div>
 
-  <video
-    id="patient-video-skeleton"
-    class="hidden-video"
-    [ngClass]="{ 'hide-video': true }"
-    muted
-    autoplay
-    playsinline
-    #cameraElement
-  ></video>
-
-  
-
-  
-
+  <!-- <video id="patient-video-skeleton" class="hidden-video" [ngClass]="{ 'hide-video': true }" muted autoplay playsinline #cameraElement></video> -->
 </div>
