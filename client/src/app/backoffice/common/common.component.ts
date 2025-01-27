@@ -241,6 +241,9 @@ export class CommonComponent implements OnInit {
         this.filterFunc(data, this.filteredText);
       },
       setSelectedOptions: (options, data) => {
+        this.backOfficeActions.setUserFilter({
+          ['departments']: { data: [], isActive: false },
+        });
         this.setFilterOptions('institutes', options);
         const value = map(options, (o) => o.value);
         this.http.setUserFilters('institutes', value).toPromise();
@@ -379,12 +382,30 @@ export class CommonComponent implements OnInit {
         this.http.setUserFilters('departments', []).toPromise();
       }
     }
-    if (isActiveToUpdate === true) {
+    if (isActiveToUpdate === true && this.selectedUserFilters.institutes?.data?.length > 0) {
       this.backOfficeActions.setUserFilter({
         [filterName]: { ...filterDetailsInStore, isActive: isActiveToUpdate },
       });
     }
   }
+
+  // toggleSharedInstituteActivity(filterName: string) {
+  //   const filterDetailsInStore: IFilterDetails = this.selectedUserFilters.institutes;
+  //   const isActiveToUpdate = !filterDetailsInStore.isActive;
+  //   if (isActiveToUpdate === false) {
+  //     this.backOfficeActions.setUserFilter({
+  //       [filterName]: { data: [], isActive: isActiveToUpdate },
+  //     });
+  //     if (filterName === 'institutes') {
+  //       this.http.setUserFilters('institutes', []).toPromise();
+  //     }
+  //   }
+  //   if (isActiveToUpdate === true) {
+  //     this.backOfficeActions.setUserFilter({
+  //       [filterName]: { ...filterDetailsInStore, isActive: isActiveToUpdate },
+  //     });
+  //   }
+  // }
 
   toggleSharedInstituteActivity(filterName: string) {
     const filterDetailsInStore: IFilterDetails = this.selectedUserFilters.institutes;
@@ -393,21 +414,39 @@ export class CommonComponent implements OnInit {
       this.backOfficeActions.setUserFilter({
         [filterName]: { data: [], isActive: isActiveToUpdate },
       });
-      if (filterName === 'institutes') {
-        this.http.setUserFilters('institutes', []).toPromise();
-      }
-    }
-    if (isActiveToUpdate === true) {
+    } else {
+      const selectedInstitutes = filterDetailsInStore.data;
       this.backOfficeActions.setUserFilter({
         [filterName]: { ...filterDetailsInStore, isActive: isActiveToUpdate },
       });
+      this.updateDepartments(selectedInstitutes);
+    
     }
   }
+
+  updateDepartments(selectedInstitutes: IMultiSelectOptions[]) {
+    if (!selectedInstitutes || selectedInstitutes.length === 0) {
+      this.allDepartmentOptions = this.allDepartments;
+    } else {
+      const selectedIds = selectedInstitutes.map((institute) => institute.value);
+      this.allDepartmentOptions = this.allDepartments.filter((department) =>
+        selectedIds.includes(department.institute_id)
+      );
+    }
+    this.sharedFilters[1].allOptions = map(this.allDepartmentOptions, (department: any) => ({
+      value: department.id,
+      displayName: department.name,
+    }));
+  }
+
   setFilterOptions(filterName: string, options: IMultiSelectOptions[]) {
     const filterDetailsInStore: IFilterDetails | undefined = this.selectedUserFilters[filterName];
     this.backOfficeActions.setUserFilter({
       [filterName]: { ...filterDetailsInStore, data: options },
     });
+    if (filterName === 'institutes') {
+      this.updateDepartments(options);
+    }
   }
 
   toggleFilterActivity(tab: consts.Tabs, filterIndex: number, filterName: string) {
@@ -584,6 +623,7 @@ export class CommonComponent implements OnInit {
     this.http.getAllExpertises().subscribe((data) => {
       this.allExpertises = data;
     });
+    // this.sharedFilters = this.activeItemsSharedFilters;
   }
 
   fetchAdmins() {
@@ -1434,9 +1474,7 @@ export class CommonComponent implements OnInit {
     if (isEmpty(subFilterInstitutes)) {
       return true;
     }
-    return isActive
-    ? subFilterInstitutes.some((option) => instituteIdsArray.includes(option.value))
-    : false;
+    return isActive ? subFilterInstitutes.some((option) => instituteIdsArray.includes(option.value)) : false;
   };
 
   // isPatientInInstitute = (instituteIds: number, isActive: boolean) => {
