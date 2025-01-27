@@ -1,6 +1,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
+<script> window.parent.postMessage('Hello from iframe', '*');  </script>
 <div
   *ngIf="!isMobile"
   id="{{ 'gameWrapper-' + connectionId }}"
@@ -25,6 +26,7 @@
         <div class="iframes-container" *ngIf="(isTherapist && gameUrl) || currentGameUrl">
           <app-end-game *ngIf="isEndGameModalOpen"></app-end-game>
           <iframe
+            #iframeRef
             id="{{ 'games-iframe-' + connectionId }}"
             allow="autoplay *"
             crossorigin="anonymous"
@@ -34,7 +36,7 @@
             [src]="getIframeSrc() | urlSanitaizer"
             (load)="handleIframeLoad()"
           >
-          </iframe>
+          </iframe>         
         </div>
       </div>
     </div>
@@ -43,6 +45,7 @@
 <div *ngIf="isMobile" id="{{ 'gameWrapper-' + connectionId }}" class="game-wrapper-mobile">
   <div class="iframes-container" *ngIf="(isTherapist && gameUrl) || currentGameUrl">
     <iframe
+     #iframeRef
       id="{{ 'games-iframe-' + connectionId }}"
       allow="autoplay *"
       [ngClass]="['game-iframe']"

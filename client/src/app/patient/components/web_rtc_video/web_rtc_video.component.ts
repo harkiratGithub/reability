@@ -37,6 +37,7 @@ import { IOrganAngle, IScore } from '../../../../types';
 import { IGameAppData } from '../../../../app/app.state';
 import { Camera } from '@mediapipe/camera_utils';
 import { Pose, POSE_CONNECTIONS, Results } from '@mediapipe/pose';
+import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 import { SkeltonVideoService } from '../../../common/services/skelton-video.service';
 
@@ -93,6 +94,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   };
   leftMatching = false;
   rightMatching = false;
+  timeMatching = false;
   private peakDetectionThreshold = 0.01;
   private lastAngles: { [key: string]: number[] } = {
     leftWrist: [],
@@ -335,6 +337,13 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
               this.videoIndex = action.msg.data.index
               this.processedTimestamps = new Set();
               this.startTime = new Date().getTime();
+
+              if (this.videoIndex > 1) {
+                const results = this.matchClipAndPatientData(this.videoMinMax, this.matchingCameraData);
+                const updateComments = this.updateComments(results);
+                this.saveToCSV(updateComments, 'min_max_matches.csv');
+              }
+
             }
           }
         }
@@ -1677,6 +1686,16 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     return JSON.parse(localStorage.getItem('matchingData') || '[]');
   }
 
+  private saveToCSV(matchingData: any[], csvName: string) {
+    const csv = Papa.unparse(matchingData);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = csvName;
+    link.click();
+  }
+
   private initializePoseModels() {
     // this.videoPose = new Pose({
     //   locateFile: (file) =>
@@ -1990,6 +2009,12 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           tolerance: number
         ) => angle >= target - tolerance && angle <= target + tolerance;
 
+        const withinTimeTolerance = (
+          time: number,
+          target: number,
+          tolerance: number
+        ) => time >= target - tolerance && time <= target + tolerance;
+
         const currentVideoAngle = this.videoMinMax[this.currentVideoIndex]
         this.rightMatching = withinTolerance(
           rightAngle,
@@ -2001,16 +2026,17 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           +currentVideoAngle.ClipDeg,
           3
         )
+        this.timeMatching = withinTimeTolerance(
+          this.startTime,
+          currentVideoAngle.ClipTimestamp,
+          2
+        )
 
         if (
-          withinTolerance(
-            rightAngle,
-            +currentVideoAngle.ClipDeg,
-            3
-          ) && withinTolerance(
-            leftAngle,
-            +currentVideoAngle.ClipDeg,
-            3
+          withinTimeTolerance(
+            this.startTime,
+            currentVideoAngle.ClipTimestamp,
+            2
           )
         ) {
           const liveResults = this.matchClipAndPatientData(this.videoMinMax, this.matchingCameraData);
@@ -2070,10 +2096,10 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
             );
             canvasCtx.lineWidth = 4;
             canvasCtx.strokeStyle = 'rgba(128, 128, 128, 0.6)';
-            if (this.rightMatching && ((start === 12 && (end === 14 || end === 24)) || (start === 14 && end === 16))) {
+            if (this.timeMatching && ((start === 12 && (end === 14 || end === 24)) || (start === 14 && end === 16))) {
               canvasCtx.strokeStyle = this.rightComment === 'Good' ? 'rgba(0, 255, 0, 0.6)' : 'rgba(255, 0, 0, 0.6)';
             }
-            if (this.leftMatching && ((start === 11 && (end === 13 || end === 23)) || (start === 13 && end === 15))) {
+            if (this.timeMatching && ((start === 11 && (end === 13 || end === 23)) || (start === 13 && end === 15))) {
               canvasCtx.strokeStyle = this.leftComment === 'Good' ? 'rgba(0, 255, 0, 0.6)' : 'rgba(255, 0, 0, 0.6)';
             }
             canvasCtx.stroke();

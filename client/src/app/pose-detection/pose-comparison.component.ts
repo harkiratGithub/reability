@@ -10,6 +10,7 @@ import {
 import { Camera } from '@mediapipe/camera_utils';
 import { Pose, POSE_CONNECTIONS, Results } from '@mediapipe/pose';
 import Papa from 'papaparse';
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-pose-comparison',
@@ -25,9 +26,24 @@ export class PoseComparisonComponent implements OnInit, AfterViewInit {
   private videoPose!: Pose;
   private cameraPose!: Pose;
   private camera!: Camera;
+  rightComment = '';
+  private angleCalculationInterval = 5000; // 5 seconds
+  private lastCalculationTime = 0;
+  private lastYPositions: { [key: string]: number[] } = {
+    leftWrist: [],
+    rightWrist: [],
+  };
   leftMatching = false;
   rightMatching = false;
-  rightComment = '';
+  private peakDetectionThreshold = 0.01;
+  private lastAngles: { [key: string]: number[] } = {
+    leftWrist: [],
+    rightWrist: [],
+  };
+  private peakLogged: { [key: string]: boolean } = {
+    leftWrist: false,
+    rightWrist: false,
+  };
   public minVideoAngle: { [key: string]: number } = {
     leftWrist: Infinity,
     rightWrist: Infinity,

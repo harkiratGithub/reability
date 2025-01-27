@@ -170,6 +170,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnInit() {
+    console.log( "we are under ngoninit function ");
     this.appActions.setCurrentGame({ url: 'menu-options', gameId: undefined });
     const canvas: any = document.getElementById('patient-canvas') as HTMLCanvasElement;
     if (canvas) {
@@ -341,7 +342,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
             );
             if (this.showAngles) {
               const organAngles = getOrganAnglesFromBuffer(skeleton_buffer);
-              this.appActions.setOrganAngles(organAngles);
+              this.appActions.setOrganAngles(organAngles);  
             }
             this.patientWebRtcService.setSkeletonBufferFromWebCamBuffer(
               handleWebCamBuffer(skeleton_buffer, false, this.authenticationService.currentUserValue.peerId)
@@ -411,6 +412,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
+    console.log( "we are under ngOnChanges function ");
     if (changes.showPercentageScoreForTherapist?.currentValue) {
       this.showPercentageScoreForTherapist = changes.showPercentageScoreForTherapist.currentValue;
     }
@@ -518,6 +520,8 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   navigate(index) {
+    console.log("we are in navigate function");
+   
     if (!this.currentMenuApps[index].url) {
       return;
     }
@@ -550,9 +554,11 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
       this.appActions.toggleBodyTracking(false);
     }
     this.menuOptionsActions.setIsInGame(true);
+    console.log("setappaction==", this.appActions)
   }
 
   handleNewGameFromTherapist(url) {
+    console.log("we are in handleNewGameFromTherapist function", url);
     const newGame = this.menuApps.find((game) => game.url === url);
     if (newGame) {
       this.isInGame = true;
@@ -572,6 +578,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   toggleVideoSessionView = () => {
+    console.log("we are in toggleVideoSessionView function");
     this.videoSessionDisplay = !this.videoSessionDisplay;
     if (!this.videoSessionDisplay) {
       this.patientWebRtcService.setShouldPauseGameState(false);
@@ -620,6 +627,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   gameReadyToStart(status) {
+    console.log("we are in gameReadyToStart function",status);
     this.isGameReadyToStart = status;
   }
 
@@ -688,7 +696,9 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
+ 
   handleIframeLoad = () => {
+   
     this.onIframeLoad.emit();
   };
 
@@ -720,6 +730,8 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   getUrlGame(url) {
+    console.log("we are in getUrlGame function==",url);
+    
     return url + 'index.html';
   }
 

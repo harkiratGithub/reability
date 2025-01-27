@@ -142,9 +142,9 @@ import { PainScaleComponent } from './patient/components/pain-scale/pain-scale.c
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { TermsConditionsComponent } from './patient/components/terms-conditions/terms-conditions.component';
 import { MobilePopupComponent } from './patient/components/mobile-popup/mobile-popup.component';
-import { PoseComparisonComponent } from './pose-detection/pose-comparison.component';
 import { CommonModule } from '@angular/common';
-
+import { PoseComparisonComponent } from './pose-detection/pose-comparison.component';
+import { GametimerSkeltonComponent } from './patient/components/gametimer-skelton/gametimer-skelton.component';
 export const CUSTOM_MOMENT_FORMATS = {
   parse: {
     dateInput: 'l, LTS',
@@ -240,7 +240,8 @@ export const CUSTOM_MOMENT_FORMATS = {
     PainScaleComponent,
     TermsConditionsComponent,
     MobilePopupComponent,
-    PoseComparisonComponent
+    PoseComparisonComponent,
+    GametimerSkeltonComponent
   ],
   imports: [
     RouterModule.forRoot(routes, { useHash: true }),

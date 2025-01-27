@@ -58,7 +58,6 @@ export const addUploadedGameRelatedImage = async (file) => {
 //     }
 // };
 
-
 export const addAdminRelatedImage = async (file, name) => {
     const extention = file.substring('data:image/'.length, file.indexOf(';base64'));
     const fileName = `${uuidv4()}.${extention}`;
@@ -74,7 +73,6 @@ export const addAdminRelatedImage = async (file, name) => {
         throw err;
     }
 };
-
 
 // export const addAdminRelatedImage = async (file, name) => {
 //     // Extract the extension and generate a unique file name
