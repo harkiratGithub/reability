@@ -2159,10 +2159,22 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       );
 
       if (results.poseLandmarks && showMarker) {
-        const leftShoulder = results.poseLandmarks[11];
-        const leftWrist = results.poseLandmarks[15];
-        const rightShoulder = results.poseLandmarks[12];
-        const rightWrist = results.poseLandmarks[16];
+        let leftShoulder
+        let leftWrist
+        let rightShoulder
+        let rightWrist
+
+        if (this.videoIndex == 1 || this.videoIndex == 2) {
+          leftShoulder = results.poseLandmarks[23];
+          leftWrist = results.poseLandmarks[15];
+          rightShoulder = results.poseLandmarks[24];
+          rightWrist = results.poseLandmarks[16];
+        } else {
+          leftShoulder = results.poseLandmarks[11];
+          leftWrist = results.poseLandmarks[15];
+          rightShoulder = results.poseLandmarks[12];
+          rightWrist = results.poseLandmarks[16];
+        }
 
         // Calculate angles for left and right wrists
         const leftAngle = this.calculateAngleBetweenPoints(
