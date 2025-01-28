@@ -15,6 +15,15 @@
       Select all
       <input type="checkbox" id="uniqId" [(ngModel)]="isToggleAllChecked" />
     </label>
+
+    <label 
+    class="dropdown-item ellipsis" 
+    (click)="toggleAll($event)" 
+    *ngIf="sharedFilter?.displayText === 'Institute'">
+      Select all
+      <input type="checkbox" id="uniqId" [(ngModel)]="isToggleAllChecked" />
+    </label>
+
     <label
       class="dropdown-item"
       *ngFor="let option of options"
