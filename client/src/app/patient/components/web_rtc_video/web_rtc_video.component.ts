@@ -135,211 +135,220 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   private videoIndex: number;
   private videoSeconds: number = 0;
   private currentVideoIndex: number = 0;
-  videoMinMax = [[{
-    ClipValue: "Mid Value",
-    ClipTimestamp: 1.485,
-    ClipDeg: 91
-  }, {
-    ClipValue: "Max Value",
-    ClipTimestamp: 6.325,
-    ClipDeg: 180
-  }, {
-    ClipValue: "Min Value",
-    ClipTimestamp: 24.816,
-    ClipDeg: 6
-  }, {
-    ClipValue: "Max Value",
-    ClipTimestamp: 26.263,
-    ClipDeg: 180
-  }, {
-    ClipValue: "Mid Value",
-    ClipTimestamp: 27.588,
-    ClipDeg: 88
-  }, {
-    ClipValue: "Max Value",
-    ClipTimestamp: 35.844,
-    ClipDeg: 179
-  }, {
-    ClipValue: "Mid Value",
-    ClipTimestamp: 37.081,
-    ClipDeg: 92
-  }, {
-    ClipValue: "Min Value",
-    ClipTimestamp: 38.679,
-    ClipDeg: 5
-  }, {
-    ClipValue: "Max Value",
-    ClipTimestamp: 44.701,
-    ClipDeg: 180
-  }, {
-    ClipValue: "Mid Value",
-    ClipTimestamp: 46.204,
-    ClipDeg: 92
-  }, {
-    ClipValue: "Min Value",
-    ClipTimestamp: 48.354,
-    ClipDeg: 5
-  }, {
-    ClipValue: "Max Value",
-    ClipTimestamp: 54.646,
-    ClipDeg: 180
-  }, {
-    ClipValue: "Mid Value",
-    ClipTimestamp: 55.902,
-    ClipDeg: 94
-  }, {
-    ClipValue: "Min Value",
-    ClipTimestamp: 58.028,
-    ClipDeg: 2
-  }, {
-    ClipValue: "Max Value",
-    ClipTimestamp: 63.983,
-    ClipDeg: 179
-  }, {
-    ClipValue: "Mid Value",
-    ClipTimestamp: 65.287,
-    ClipDeg: 90
-  }, {
-    ClipValue: "Min Value",
-    ClipTimestamp: 70.697,
-    ClipDeg: 0
-  }], [{
-    ClipValue: "Min Value",
-    ClipTimestamp: 13.691,
-    ClipDeg: 4
-  }, {
-    ClipValue: "Mid Value",
-    ClipTimestamp: 18.192,
-    ClipDeg: 51
-  }, {
-    ClipValue: "Max Value",
-    ClipTimestamp: 20.99,
-    ClipDeg: 106
-  }, {
-    ClipValue: "Mid Value",
-    ClipTimestamp: 29.391,
-    ClipDeg: 58
-  }, {
-    ClipValue: "Min Value",
-    ClipTimestamp: 31.152,
-    ClipDeg: 3
-  }, {
-    ClipValue: "Max Value",
-    ClipTimestamp: 37.229,
-    ClipDeg: 103
-  }, {
-    ClipValue: "Mid Value",
-    ClipTimestamp: 43.505,
-    ClipDeg: 59
-  }, {
-    ClipValue: "Min Value",
-    ClipTimestamp: 45.408,
-    ClipDeg: 4
-  }, {
-    ClipValue: "Max Value",
-    ClipTimestamp: 51.294,
-    ClipDeg: 104
-  }, {
-    ClipValue: "Mid Value",
-    ClipTimestamp: 54.505,
-    ClipDeg: 59
-  }, {
-    ClipValue: "Min Value",
-    ClipTimestamp: 56.338,
-    ClipDeg: 4
-  }, {
-    ClipValue: "Max Value",
-    ClipTimestamp: 62.833,
-    ClipDeg: 104
-  }, {
-    ClipValue: "Mid Value",
-    ClipTimestamp: 64.302,
-    ClipDeg: 57
-  }, {
-    ClipValue: "Min Value",
-    ClipTimestamp: 65.482,
-    ClipDeg: 4
-  }, {
-    ClipValue: "Max Value",
-    ClipTimestamp: 69.985,
-    ClipDeg: 107
-  }, {
-    ClipValue: "Mid Value",
-    ClipTimestamp: 76.254,
-    ClipDeg: 57
-  }, {
-    ClipValue: "Min Value",
-    ClipTimestamp: 78.077,
-    ClipDeg: 4
-  }], [{
-    ClipValue: "Min Value",
-    ClipTimestamp: 15.437,
-    ClipDeg: 5
-  }, {
-    ClipValue: "Mid Value",
-    ClipTimestamp: 20.434,
-    ClipDeg: 55
-  }, {
-    ClipValue: "Max Value",
-    ClipTimestamp: 23.622,
-    ClipDeg: 111
-  }, {
-    ClipValue: "Mid Value",
-    ClipTimestamp: 30.105,
-    ClipDeg: 63
-  }, {
-    ClipValue: "Min Value",
-    ClipTimestamp: 32.194,
-    ClipDeg: 1
-  }, {
-    ClipValue: "Max Value",
-    ClipTimestamp: 39.867,
-    ClipDeg: 111
-  }, {
-    ClipValue: "Mid Value",
-    ClipTimestamp: 44.658,
-    ClipDeg: 63
-  }, {
-    ClipValue: "Min Value",
-    ClipTimestamp: 48.562,
-    ClipDeg: 1
-  }, {
-    ClipValue: "Max Value",
-    ClipTimestamp: 51.542,
-    ClipDeg: 112
-  }, {
-    ClipValue: "Mid Value",
-    ClipTimestamp: 56.136,
-    ClipDeg: 55
-  }, {
-    ClipValue: "Min Value",
-    ClipTimestamp: 57.755,
-    ClipDeg: 2
-  }, {
-    ClipValue: "Max Value",
-    ClipTimestamp: 63.725,
-    ClipDeg: 111
-  }, {
-    ClipValue: "Mid Value",
-    ClipTimestamp: 67.567,
-    ClipDeg: 61
-  }, {
-    ClipValue: "Min Value",
-    ClipTimestamp: 69.073,
-    ClipDeg: 1
-  }, {
-    ClipValue: "Max Value",
-    ClipTimestamp: 75.379,
-    ClipDeg: 115
-  }, {
-    ClipValue: "Mid Value",
-    ClipTimestamp: 77.656,
-    ClipDeg: 62
-  }, {
-    ClipValue: "Min Value",
-    ClipTimestamp: 78.949,
-    ClipDeg: 1
-  }]
+  videoMinMax = [
+    [{
+      ClipValue: "Mid Value",
+      ClipTimestamp: 1.485,
+      ClipDeg: 91
+    }, {
+      ClipValue: "Max Value",
+      ClipTimestamp: 6.325,
+      ClipDeg: 180
+    }, {
+      ClipValue: "Min Value",
+      ClipTimestamp: 24.816,
+      ClipDeg: 6
+    }, {
+      ClipValue: "Max Value",
+      ClipTimestamp: 26.263,
+      ClipDeg: 180
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 27.588,
+      ClipDeg: 88
+    }, {
+      ClipValue: "Max Value",
+      ClipTimestamp: 35.844,
+      ClipDeg: 179
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 37.081,
+      ClipDeg: 92
+    }, {
+      ClipValue: "Min Value",
+      ClipTimestamp: 38.679,
+      ClipDeg: 5
+    }, {
+      ClipValue: "Max Value",
+      ClipTimestamp: 44.701,
+      ClipDeg: 180
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 46.204,
+      ClipDeg: 92
+    }, {
+      ClipValue: "Min Value",
+      ClipTimestamp: 48.354,
+      ClipDeg: 5
+    }, {
+      ClipValue: "Max Value",
+      ClipTimestamp: 54.646,
+      ClipDeg: 180
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 55.902,
+      ClipDeg: 94
+    }, {
+      ClipValue: "Min Value",
+      ClipTimestamp: 58.028,
+      ClipDeg: 2
+    }, {
+      ClipValue: "Max Value",
+      ClipTimestamp: 63.983,
+      ClipDeg: 179
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 65.287,
+      ClipDeg: 90
+    }, {
+      ClipValue: "Min Value",
+      ClipTimestamp: 70.697,
+      ClipDeg: 0
+    }], [{
+      ClipValue: "Min Value",
+      ClipTimestamp: 0.859,
+      ClipDeg: 2
+    }, {
+      ClipValue: "Min Value",
+      ClipTimestamp: 8.878,
+      ClipDeg: 4
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 17.769,
+      ClipDeg: 37
+    }, {
+      ClipValue: "Max Value",
+      ClipTimestamp: 20.44,
+      ClipDeg: 78
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 28.358,
+      ClipDeg: 47
+    }, {
+      ClipValue: "Min Value",
+      ClipTimestamp: 31.543,
+      ClipDeg: 4
+    }, {
+      ClipValue: "Max Value",
+      ClipTimestamp: 35.928,
+      ClipDeg: 77
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 43.05,
+      ClipDeg: 47
+    }, {
+      ClipValue: "Min Value",
+      ClipTimestamp: 46.313,
+      ClipDeg: 3
+    }, {
+      ClipValue: "Max Value",
+      ClipTimestamp: 49.698,
+      ClipDeg: 78
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 54.171,
+      ClipDeg: 47
+    }, {
+      ClipValue: "Min Value",
+      ClipTimestamp: 57.453,
+      ClipDeg: 3
+    }, {
+      ClipValue: "Max Value",
+      ClipTimestamp: 60.694,
+      ClipDeg: 79
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 64.242,
+      ClipDeg: 46
+    }, {
+      ClipValue: "Min Value",
+      ClipTimestamp: 65.741,
+      ClipDeg: 3
+    }, {
+      ClipValue: "Max Value",
+      ClipTimestamp: 69.459,
+      ClipDeg: 81
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 75.919,
+      ClipDeg: 46
+    }, {
+      ClipValue: "Min Value",
+      ClipTimestamp: 78.452,
+      ClipDeg: 2
+    }], [{
+      ClipValue: "Min Value",
+      ClipTimestamp: 1.102,
+      ClipDeg: 3
+    }, {
+      ClipValue: "Min Value",
+      ClipTimestamp: 15.079,
+      ClipDeg: 3
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 20.491,
+      ClipDeg: 39
+    }, {
+      ClipValue: "Max Value",
+      ClipTimestamp: 21.565,
+      ClipDeg: 81
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 31.175,
+      ClipDeg: 41
+    }, {
+      ClipValue: "Min Value",
+      ClipTimestamp: 33.483,
+      ClipDeg: 6
+    }, {
+      ClipValue: "Max Value",
+      ClipTimestamp: 36.884,
+      ClipDeg: 83
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 44.714,
+      ClipDeg: 48
+    }, {
+      ClipValue: "Min Value",
+      ClipTimestamp: 47.633,
+      ClipDeg: 4
+    }, {
+      ClipValue: "Max Value",
+      ClipTimestamp: 50.72,
+      ClipDeg: 82
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 55.821,
+      ClipDeg: 47
+    }, {
+      ClipValue: "Min Value",
+      ClipTimestamp: 59.625,
+      ClipDeg: 3
+    }, {
+      ClipValue: "Max Value",
+      ClipTimestamp: 61.776,
+      ClipDeg: 82
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 67.485,
+      ClipDeg: 47
+    }, {
+      ClipValue: "Min Value",
+      ClipTimestamp: 70.583,
+      ClipDeg: 3
+    }, {
+      ClipValue: "Max Value",
+      ClipTimestamp: 73.417,
+      ClipDeg: 82
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 77.722,
+      ClipDeg: 48
+    }, {
+      ClipValue: "Min Value",
+      ClipTimestamp: 81.011,
+      ClipDeg: 6
+    }]
   ];
 
   rightComment = '';
@@ -1713,15 +1722,15 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
 
       // Store the comparison data
       results.push({
-        ClipDeg: clipEntry.ClipDeg,
         ClipValue: clipEntry.ClipValue,
         PatientValue: clipEntry.ClipValue,
-        ClipTimestamp: clipEntry.ClipTimestamp,
-        LeftComments: isLeftGood ? "Good" : "Not Good",
-        RightComments: isRightGood ? "Good" : "Not Good",
+        ClipDeg: clipEntry.ClipDeg,
         PatientLeftDeg: closestPatient?.patientEntry['LSA Deg'],
         PatientRightDeg: closestPatient?.patientEntry['RSA Deg'],
+        ClipTimestamp: clipEntry.ClipTimestamp,
         PatientTimestamp: closestPatient?.patientEntry.timestamp,
+        LeftComments: isLeftGood ? "Good" : "Not Good",
+        RightComments: isRightGood ? "Good" : "Not Good",
       });
     });
 
@@ -1929,19 +1938,35 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
 
   private calculateAngleBetweenPoints(
     A: { x: number; y: number; z: number },
-    B: { x: number; y: number; z: number }
+    B: { x: number; y: number; z: number },
   ): number {
-    const vectorAB = { x: B.x - A.x, y: B.y - A.y };
-    const verticalVector = { x: 0, y: 1 };
+    let dotProduct
+    let magnitudeAB
+    let magnitudeVertical
+    if (this.videoIndex == 1 || this.videoIndex == 2) {
+      const vectorAB = { x: B.x - A.x, y: B.y - A.y, z: B.z - A.z };
+      const verticalVector = { x: 0, y: 1, z: 0 };
 
-    const dotProduct =
-      vectorAB.x * verticalVector.x + vectorAB.y * verticalVector.y;
+      dotProduct =
+        vectorAB.x * verticalVector.x + vectorAB.y * verticalVector.y + vectorAB.z * verticalVector.z;
 
-    const magnitudeAB = Math.sqrt(vectorAB.x ** 2 + vectorAB.y ** 2);
-    const magnitudeVertical = Math.sqrt(
-      verticalVector.x ** 2 + verticalVector.y ** 2
-    );
+      magnitudeAB = Math.sqrt(vectorAB.x ** 2 + vectorAB.y ** 2 + vectorAB.z ** 2);
+      magnitudeVertical = Math.sqrt(
+        verticalVector.x ** 2 + verticalVector.y ** 2 + verticalVector.z ** 2
+      );
 
+    } else {
+      const vectorAB = { x: B.x - A.x, y: B.y - A.y };
+      const verticalVector = { x: 0, y: 1 };
+
+      dotProduct =
+        vectorAB.x * verticalVector.x + vectorAB.y * verticalVector.y;
+
+      magnitudeAB = Math.sqrt(vectorAB.x ** 2 + vectorAB.y ** 2);
+      magnitudeVertical = Math.sqrt(
+        verticalVector.x ** 2 + verticalVector.y ** 2
+      );
+    }
     const angleInRadians = Math.acos(
       dotProduct / (magnitudeAB * magnitudeVertical)
     );
@@ -1964,10 +1989,22 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       );
 
       if (results.poseLandmarks) {
-        const leftShoulder = results.poseLandmarks[11];
-        const leftWrist = results.poseLandmarks[15];
-        const rightShoulder = results.poseLandmarks[12];
-        const rightWrist = results.poseLandmarks[16];
+        let leftShoulder
+        let leftWrist
+        let rightShoulder
+        let rightWrist
+
+        if (this.videoIndex == 1 || this.videoIndex == 2) {
+          leftShoulder = results.poseLandmarks[23];
+          leftWrist = results.poseLandmarks[15];
+          rightShoulder = results.poseLandmarks[24];
+          rightWrist = results.poseLandmarks[16];
+        } else {
+          leftShoulder = results.poseLandmarks[11];
+          leftWrist = results.poseLandmarks[15];
+          rightShoulder = results.poseLandmarks[12];
+          rightWrist = results.poseLandmarks[16];
+        }
 
         // Calculate angles for left and right wrists
         const leftAngle = this.calculateAngleBetweenPoints(
@@ -2161,6 +2198,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         ) => time >= target - tolerance && time <= target + tolerance;
 
         const currentVideoAngle = this.videoMinMax[this.videoIndex][this.currentVideoIndex]
+        console.log(currentVideoAngle);
+
         if (currentVideoAngle) {
           this.rightMatching = withinTolerance(
             rightAngle,
