@@ -281,6 +281,7 @@ export interface ITherapistAvailabilityFromServer {
 
 export interface IUserFilters {
   departments?: IFilterDetails;
+  institutes?: IFilterDetails;
   suspend?: IFilterDetails;
   pending?: IFilterDetails;
   techIssue?: IFilterDetails;
