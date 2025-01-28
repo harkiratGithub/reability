@@ -166,7 +166,7 @@ export const isTherapistUserCanUpdatePatient = async (userId, patientId) => {
 };
 
 export const addTherapistExpertises = (therapistData, expertises, client = null) => {
-	const rows = expertises.map((expertise) => {
+	const rows = expertises?.map((expertise) => {
 		return { therapist_id: therapistData.id, expertise_id: expertise };
 	});
 

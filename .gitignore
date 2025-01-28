@@ -44,7 +44,9 @@ Thumbs.db
 .env.local
 .env.demo
 .env.prod
+.env.us
 
 #newrelic log
 newrelic_agent.log
 /build
+/client/dist
