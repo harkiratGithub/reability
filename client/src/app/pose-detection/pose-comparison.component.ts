@@ -310,14 +310,14 @@ export class PoseComparisonComponent implements OnInit, AfterViewInit {
       if (+entry['Deg'] < min) min = +entry['Deg'] > 3 ? +entry['Deg'] : 3;
       if (+entry['Deg'] > max) max = +entry['Deg'];
     });
-    min = 30;
+    // min = 30;
     // max = 180;
 
     const mid = (min + max) / 2;
 
     // Define thresholds
     const threshold = 5;
-    const timeThreshold = 8; // in seconds
+    const timeThreshold = 3; // in seconds
 
     // Initialize tracking variables for timestamps
     const lastTimestamps = {
@@ -710,11 +710,11 @@ export class PoseComparisonComponent implements OnInit, AfterViewInit {
 
       if (results.poseLandmarks) {
         const tolerance = 3;
-        const leftShoulder = results.poseLandmarks[13];
-        const leftElbow = results.poseLandmarks[11];
+        const leftShoulder = results.poseLandmarks[11];
+        const leftElbow = results.poseLandmarks[15];
         const leftWrist = results.poseLandmarks[15];
         const rightShoulder = results.poseLandmarks[24];
-        const rightWrist = results.poseLandmarks[26];
+        const rightWrist = results.poseLandmarks[16];
         // console.log(leftShoulder, leftElbow, leftWrist);
 
         // const frameData = this.getCoordinatesForFrame(this.currentFrameIndex);
