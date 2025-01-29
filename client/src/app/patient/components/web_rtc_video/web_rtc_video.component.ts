@@ -1945,7 +1945,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     let magnitudeVertical
     if (this.videoIndex == 1 || this.videoIndex == 2) {
       const vectorAB = { x: B.x - A.x, y: B.y - A.y, z: B.z - A.z };
-      const verticalVector = { x: 0, y: 1, z: 0 };
+      const verticalVector = { x: 0, y: 0, z: -1 };
 
       dotProduct =
         vectorAB.x * verticalVector.x + vectorAB.y * verticalVector.y + vectorAB.z * verticalVector.z;
@@ -2193,6 +2193,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         const elapsedTime = +((new Date().getTime() - this.startTime) / 1000).toFixed(3);
         this.matchingCameraData.push({
           timestamp: `${elapsedTime}`,
+
           'LSA Deg': `${Math.round(leftAngle)}`,
           'RSA Deg': `${Math.round(rightAngle)}`
         });
