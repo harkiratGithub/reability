@@ -68,6 +68,7 @@ export const sendPatientCredentialsEmail = async (userEmail, userName, password)
 		<p><strong>Note: On your first login, the browser will ask your permission to use the microphone and camera. Please confirm. The browser will also ask you to confirm saving the username and password. Please confirm.</strong></p>
 		<p>We also suggest adding the site to the bookmarks and/or the Desktop for easy access.</p>
 		<p>If you have any questions or concerns, don’t hesitate to reach out to us—we’re here to help!</p>
+		<p>A self-explanatory video is available <a href="https://mediaus.blob.core.windows.net/videos/WelcomeEmailVideo.mp4" target="_blank">here</a></p>
 		<p>Best regards,</p>
 		<p style="font-weight: bold;">Arthur Shevardnadze<br>COO, TheRPT</p>
 		<p>212-470-1452</p>
