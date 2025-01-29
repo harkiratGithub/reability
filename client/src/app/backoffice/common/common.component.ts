@@ -420,7 +420,6 @@ export class CommonComponent implements OnInit {
         [filterName]: { ...filterDetailsInStore, isActive: isActiveToUpdate },
       });
       this.updateDepartments(selectedInstitutes);
-    
     }
   }
 
@@ -1266,6 +1265,7 @@ export class CommonComponent implements OnInit {
     const filteredData = data.filter((row: any): boolean => {
       return (
         this.isTherapistInDepartment(row.departments_ids, this.sharedFilters[1].isActive) &&
+        this.isTherapistInInstitute(row.institute_id, this.sharedFilters[0].isActive) &&
         this.isTextInRow(row, filterText)
       );
     });
@@ -1286,6 +1286,15 @@ export class CommonComponent implements OnInit {
             })
         )
       : true;
+  };
+
+  isTherapistInInstitute = (instituteIds: number | number[], isActive: boolean) => {
+    const instituteIdsArray = Array.isArray(instituteIds) ? instituteIds : [instituteIds];
+    const subFilterInstitutes = this.selectedUserFilters.institutes?.data;
+    if (isEmpty(subFilterInstitutes)) {
+      return true;
+    }
+    return isActive ? subFilterInstitutes.some((option) => instituteIdsArray.includes(option.value)) : false;
   };
 
   setFilteredData(filteredData): void {
