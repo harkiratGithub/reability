@@ -135,75 +135,221 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   private videoIndex: number;
   private videoSeconds: number = 0;
   private currentVideoIndex: number = 0;
-  videoMinMax = [[{
-    ClipValue: "Mid Value",
-    ClipTimestamp: 1.485,
-    ClipDeg: 91
-  }, {
-    ClipValue: "Max Value",
-    ClipTimestamp: 6.325,
-    ClipDeg: 180
-  }, {
-    ClipValue: "Min Value",
-    ClipTimestamp: 24.816,
-    ClipDeg: 6
-  }, {
-    ClipValue: "Max Value",
-    ClipTimestamp: 26.263,
-    ClipDeg: 180
-  }, {
-    ClipValue: "Mid Value",
-    ClipTimestamp: 27.588,
-    ClipDeg: 88
-  }, {
-    ClipValue: "Max Value",
-    ClipTimestamp: 35.844,
-    ClipDeg: 179
-  }, {
-    ClipValue: "Mid Value",
-    ClipTimestamp: 37.081,
-    ClipDeg: 92
-  }, {
-    ClipValue: "Min Value",
-    ClipTimestamp: 38.679,
-    ClipDeg: 5
-  }, {
-    ClipValue: "Max Value",
-    ClipTimestamp: 44.701,
-    ClipDeg: 180
-  }, {
-    ClipValue: "Mid Value",
-    ClipTimestamp: 46.204,
-    ClipDeg: 92
-  }, {
-    ClipValue: "Min Value",
-    ClipTimestamp: 48.354,
-    ClipDeg: 5
-  }, {
-    ClipValue: "Max Value",
-    ClipTimestamp: 54.646,
-    ClipDeg: 180
-  }, {
-    ClipValue: "Mid Value",
-    ClipTimestamp: 55.902,
-    ClipDeg: 94
-  }, {
-    ClipValue: "Min Value",
-    ClipTimestamp: 58.028,
-    ClipDeg: 2
-  }, {
-    ClipValue: "Max Value",
-    ClipTimestamp: 63.983,
-    ClipDeg: 179
-  }, {
-    ClipValue: "Mid Value",
-    ClipTimestamp: 65.287,
-    ClipDeg: 90
-  }, {
-    ClipValue: "Min Value",
-    ClipTimestamp: 70.697,
-    ClipDeg: 0
-  }]];
+  videoMinMax = [
+    [{
+      ClipValue: "Mid Value",
+      ClipTimestamp: 1.485,
+      ClipDeg: 91
+    }, {
+      ClipValue: "Max Value",
+      ClipTimestamp: 6.325,
+      ClipDeg: 180
+    }, {
+      ClipValue: "Min Value",
+      ClipTimestamp: 24.816,
+      ClipDeg: 6
+    }, {
+      ClipValue: "Max Value",
+      ClipTimestamp: 26.263,
+      ClipDeg: 180
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 27.588,
+      ClipDeg: 88
+    }, {
+      ClipValue: "Max Value",
+      ClipTimestamp: 35.844,
+      ClipDeg: 179
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 37.081,
+      ClipDeg: 92
+    }, {
+      ClipValue: "Min Value",
+      ClipTimestamp: 38.679,
+      ClipDeg: 5
+    }, {
+      ClipValue: "Max Value",
+      ClipTimestamp: 44.701,
+      ClipDeg: 180
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 46.204,
+      ClipDeg: 92
+    }, {
+      ClipValue: "Min Value",
+      ClipTimestamp: 48.354,
+      ClipDeg: 5
+    }, {
+      ClipValue: "Max Value",
+      ClipTimestamp: 54.646,
+      ClipDeg: 180
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 55.902,
+      ClipDeg: 94
+    }, {
+      ClipValue: "Min Value",
+      ClipTimestamp: 58.028,
+      ClipDeg: 2
+    }, {
+      ClipValue: "Max Value",
+      ClipTimestamp: 63.983,
+      ClipDeg: 179
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 65.287,
+      ClipDeg: 90
+    }, {
+      ClipValue: "Min Value",
+      ClipTimestamp: 70.697,
+      ClipDeg: 0
+    }], [{
+      ClipValue: "Min Value",
+      ClipTimestamp: 0.859,
+      ClipDeg: 2
+    }, {
+      ClipValue: "Min Value",
+      ClipTimestamp: 8.878,
+      ClipDeg: 4
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 17.769,
+      ClipDeg: 37
+    }, {
+      ClipValue: "Max Value",
+      ClipTimestamp: 20.44,
+      ClipDeg: 78
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 28.358,
+      ClipDeg: 47
+    }, {
+      ClipValue: "Min Value",
+      ClipTimestamp: 31.543,
+      ClipDeg: 4
+    }, {
+      ClipValue: "Max Value",
+      ClipTimestamp: 35.928,
+      ClipDeg: 77
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 43.05,
+      ClipDeg: 47
+    }, {
+      ClipValue: "Min Value",
+      ClipTimestamp: 46.313,
+      ClipDeg: 3
+    }, {
+      ClipValue: "Max Value",
+      ClipTimestamp: 49.698,
+      ClipDeg: 78
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 54.171,
+      ClipDeg: 47
+    }, {
+      ClipValue: "Min Value",
+      ClipTimestamp: 57.453,
+      ClipDeg: 3
+    }, {
+      ClipValue: "Max Value",
+      ClipTimestamp: 60.694,
+      ClipDeg: 79
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 64.242,
+      ClipDeg: 46
+    }, {
+      ClipValue: "Min Value",
+      ClipTimestamp: 65.741,
+      ClipDeg: 3
+    }, {
+      ClipValue: "Max Value",
+      ClipTimestamp: 69.459,
+      ClipDeg: 81
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 75.919,
+      ClipDeg: 46
+    }, {
+      ClipValue: "Min Value",
+      ClipTimestamp: 78.452,
+      ClipDeg: 2
+    }], [{
+      ClipValue: "Min Value",
+      ClipTimestamp: 1.102,
+      ClipDeg: 3
+    }, {
+      ClipValue: "Min Value",
+      ClipTimestamp: 15.079,
+      ClipDeg: 3
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 20.491,
+      ClipDeg: 39
+    }, {
+      ClipValue: "Max Value",
+      ClipTimestamp: 21.565,
+      ClipDeg: 81
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 31.175,
+      ClipDeg: 41
+    }, {
+      ClipValue: "Min Value",
+      ClipTimestamp: 33.483,
+      ClipDeg: 6
+    }, {
+      ClipValue: "Max Value",
+      ClipTimestamp: 36.884,
+      ClipDeg: 83
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 44.714,
+      ClipDeg: 48
+    }, {
+      ClipValue: "Min Value",
+      ClipTimestamp: 47.633,
+      ClipDeg: 4
+    }, {
+      ClipValue: "Max Value",
+      ClipTimestamp: 50.72,
+      ClipDeg: 82
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 55.821,
+      ClipDeg: 47
+    }, {
+      ClipValue: "Min Value",
+      ClipTimestamp: 59.625,
+      ClipDeg: 3
+    }, {
+      ClipValue: "Max Value",
+      ClipTimestamp: 61.776,
+      ClipDeg: 82
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 67.485,
+      ClipDeg: 47
+    }, {
+      ClipValue: "Min Value",
+      ClipTimestamp: 70.583,
+      ClipDeg: 3
+    }, {
+      ClipValue: "Max Value",
+      ClipTimestamp: 73.417,
+      ClipDeg: 82
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 77.722,
+      ClipDeg: 48
+    }, {
+      ClipValue: "Min Value",
+      ClipTimestamp: 81.011,
+      ClipDeg: 6
+    }]
+  ];
 
   rightComment = '';
   leftComment = '';
@@ -330,11 +476,11 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           const videoTime = action.msg.data.currentPlayTime.vidTime;
           const currentPlayTime = new Date(action.msg.data.currentPlayTime.sysTime).getSeconds();
           console.log("currentPlayTime===", currentPlayTime);
-
           if (this.videoSeconds == 0) {
             this.videoSeconds = currentPlayTime
           }
-          if (Math.abs(this.videoSeconds - currentPlayTime) > 1 || videoTime > 0) {
+          if (Math.abs(this.videoSeconds - currentPlayTime) > 1 || videoTime > 0 || action.msg.data.index > 0) {
+            // if (!this.videoIndex)
             this.initializeCameraPoseModels()
             if (!this.startTime) {
               this.startTime = new Date().getTime(); // Save the initial timestamp
@@ -344,8 +490,9 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
               this.videoIndex = action.msg.data.index
               this.processedTimestamps = new Set();
               this.startTime = new Date().getTime();
+              this.currentVideoIndex = 0;
 
-              if (this.videoIndex > 1) {
+              if (this.videoIndex > 0) {
                 const results = this.matchClipAndPatientData(this.videoMinMax[this.videoIndex - 1], this.matchingCameraData);
                 const updateComments = this.updateComments(results);
                 this.saveToCSV(updateComments, 'min_max_matches.csv');
@@ -1575,15 +1722,15 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
 
       // Store the comparison data
       results.push({
-        ClipDeg: clipEntry.ClipDeg,
         ClipValue: clipEntry.ClipValue,
         PatientValue: clipEntry.ClipValue,
-        ClipTimestamp: clipEntry.ClipTimestamp,
-        LeftComments: isLeftGood ? "Good" : "Not Good",
-        RightComments: isRightGood ? "Good" : "Not Good",
+        ClipDeg: clipEntry.ClipDeg,
         PatientLeftDeg: closestPatient?.patientEntry['LSA Deg'],
         PatientRightDeg: closestPatient?.patientEntry['RSA Deg'],
+        ClipTimestamp: clipEntry.ClipTimestamp,
         PatientTimestamp: closestPatient?.patientEntry.timestamp,
+        LeftComments: isLeftGood ? "Good" : "Not Good",
+        RightComments: isRightGood ? "Good" : "Not Good",
       });
     });
 
@@ -1599,7 +1746,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       const angleLeftDiff = +entry.ClipDeg - +entry.PatientLeftDeg;
       const angleRightDiff = +entry.ClipDeg - +entry.PatientRightDeg;
 
-      if (timestampDiff > timestampThreshold) {
+      if (timestampDiff > timestampThreshold && Math.abs(angleRightDiff) <= angleThreshold) {
         entry.RightComments = "Too Late";
       } else if (angleRightDiff > angleThreshold) {
         entry.RightComments = "Too Low";
@@ -1607,7 +1754,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         entry.RightComments = "Too High";
       }
 
-      if (timestampDiff > timestampThreshold) {
+      if (timestampDiff > timestampThreshold && Math.abs(angleLeftDiff) <= angleThreshold) {
         entry.LeftComments = "Too Late";
       } else if (angleLeftDiff > angleThreshold) {
         entry.LeftComments = "Too Low";
@@ -1791,19 +1938,35 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
 
   private calculateAngleBetweenPoints(
     A: { x: number; y: number; z: number },
-    B: { x: number; y: number; z: number }
+    B: { x: number; y: number; z: number },
   ): number {
-    const vectorAB = { x: B.x - A.x, y: B.y - A.y };
-    const verticalVector = { x: 0, y: 1 };
+    let dotProduct
+    let magnitudeAB
+    let magnitudeVertical
+    if (this.videoIndex == 1 || this.videoIndex == 2) {
+      const vectorAB = { x: B.x - A.x, y: B.y - A.y, z: B.z - A.z };
+      const verticalVector = { x: 0, y: 1, z: 0 };
 
-    const dotProduct =
-      vectorAB.x * verticalVector.x + vectorAB.y * verticalVector.y;
+      dotProduct =
+        vectorAB.x * verticalVector.x + vectorAB.y * verticalVector.y + vectorAB.z * verticalVector.z;
 
-    const magnitudeAB = Math.sqrt(vectorAB.x ** 2 + vectorAB.y ** 2);
-    const magnitudeVertical = Math.sqrt(
-      verticalVector.x ** 2 + verticalVector.y ** 2
-    );
+      magnitudeAB = Math.sqrt(vectorAB.x ** 2 + vectorAB.y ** 2 + vectorAB.z ** 2);
+      magnitudeVertical = Math.sqrt(
+        verticalVector.x ** 2 + verticalVector.y ** 2 + verticalVector.z ** 2
+      );
 
+    } else {
+      const vectorAB = { x: B.x - A.x, y: B.y - A.y };
+      const verticalVector = { x: 0, y: 1 };
+
+      dotProduct =
+        vectorAB.x * verticalVector.x + vectorAB.y * verticalVector.y;
+
+      magnitudeAB = Math.sqrt(vectorAB.x ** 2 + vectorAB.y ** 2);
+      magnitudeVertical = Math.sqrt(
+        verticalVector.x ** 2 + verticalVector.y ** 2
+      );
+    }
     const angleInRadians = Math.acos(
       dotProduct / (magnitudeAB * magnitudeVertical)
     );
@@ -1826,10 +1989,22 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       );
 
       if (results.poseLandmarks) {
-        const leftShoulder = results.poseLandmarks[11];
-        const leftWrist = results.poseLandmarks[15];
-        const rightShoulder = results.poseLandmarks[12];
-        const rightWrist = results.poseLandmarks[16];
+        let leftShoulder
+        let leftWrist
+        let rightShoulder
+        let rightWrist
+
+        if (this.videoIndex == 1 || this.videoIndex == 2) {
+          leftShoulder = results.poseLandmarks[23];
+          leftWrist = results.poseLandmarks[15];
+          rightShoulder = results.poseLandmarks[24];
+          rightWrist = results.poseLandmarks[16];
+        } else {
+          leftShoulder = results.poseLandmarks[11];
+          leftWrist = results.poseLandmarks[15];
+          rightShoulder = results.poseLandmarks[12];
+          rightWrist = results.poseLandmarks[16];
+        }
 
         // Calculate angles for left and right wrists
         const leftAngle = this.calculateAngleBetweenPoints(
@@ -1984,10 +2159,22 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       );
 
       if (results.poseLandmarks && showMarker) {
-        const leftShoulder = results.poseLandmarks[11];
-        const leftWrist = results.poseLandmarks[15];
-        const rightShoulder = results.poseLandmarks[12];
-        const rightWrist = results.poseLandmarks[16];
+        let leftShoulder
+        let leftWrist
+        let rightShoulder
+        let rightWrist
+
+        if (this.videoIndex == 1 || this.videoIndex == 2) {
+          leftShoulder = results.poseLandmarks[23];
+          leftWrist = results.poseLandmarks[15];
+          rightShoulder = results.poseLandmarks[24];
+          rightWrist = results.poseLandmarks[16];
+        } else {
+          leftShoulder = results.poseLandmarks[11];
+          leftWrist = results.poseLandmarks[15];
+          rightShoulder = results.poseLandmarks[12];
+          rightWrist = results.poseLandmarks[16];
+        }
 
         // Calculate angles for left and right wrists
         const leftAngle = this.calculateAngleBetweenPoints(
@@ -2023,95 +2210,99 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         ) => time >= target - tolerance && time <= target + tolerance;
 
         const currentVideoAngle = this.videoMinMax[this.videoIndex][this.currentVideoIndex]
-        this.rightMatching = withinTolerance(
-          rightAngle,
-          +currentVideoAngle.ClipDeg,
-          3
-        );
-        this.leftMatching = withinTolerance(
-          leftAngle,
-          +currentVideoAngle.ClipDeg,
-          3
-        )
-        this.timeMatching = withinTimeTolerance(
-          elapsedTime,
-          currentVideoAngle.ClipTimestamp,
-          2
-        )
+        console.log(currentVideoAngle);
 
-        if (
-          withinTimeTolerance(
+        if (currentVideoAngle) {
+          this.rightMatching = withinTolerance(
+            rightAngle,
+            +currentVideoAngle.ClipDeg,
+            3
+          );
+          this.leftMatching = withinTolerance(
+            leftAngle,
+            +currentVideoAngle.ClipDeg,
+            3
+          )
+          this.timeMatching = withinTimeTolerance(
             elapsedTime,
             currentVideoAngle.ClipTimestamp,
             2
           )
-        ) {
-          this.currentVideoIndex++;
-          const liveResults = this.matchClipAndPatientData(this.videoMinMax[this.videoIndex], this.matchingCameraData);
-          const updateComments = this.updateComments(liveResults);
-          // console.log(updateComments);
 
-          const lastCommentObj = updateComments
-            .filter(item => item.PatientTimestamp !== undefined)
-            .pop();
+          if (
+            withinTimeTolerance(
+              elapsedTime,
+              currentVideoAngle.ClipTimestamp,
+              2
+            )
+          ) {
+            this.currentVideoIndex++;
+            const liveResults = this.matchClipAndPatientData(this.videoMinMax[this.videoIndex], this.matchingCameraData);
+            const updateComments = this.updateComments(liveResults);
+            // console.log(updateComments);
 
-          this.leftComment = lastCommentObj?.LeftComments;
-          this.rightComment = lastCommentObj?.RightComments;
-          const lastTimestamp = lastCommentObj?.ClipTimestamp;
+            const lastCommentObj = updateComments
+              .filter(item => item.PatientTimestamp !== undefined)
+              .pop();
 
-          if (lastTimestamp && !this.processedTimestamps.has(lastTimestamp)) {
-            this.processedTimestamps.add(lastTimestamp);
-            console.log(lastTimestamp, this.processedTimestamps);
-            if (this.rightComment != 'Good') {
-              this.playCommentAudio();
-              // this.playAudio(`assets/st-audio/${this.rightComment}.mp3`);
+            this.leftComment = lastCommentObj?.LeftComments;
+            this.rightComment = lastCommentObj?.RightComments;
+            const lastTimestamp = lastCommentObj?.ClipTimestamp;
+
+            if (lastTimestamp && !this.processedTimestamps.has(lastTimestamp)) {
+              this.processedTimestamps.add(lastTimestamp);
+              console.log(lastTimestamp, this.processedTimestamps);
+              if (this.rightComment != 'Good') {
+                this.playCommentAudio();
+                // this.playAudio(`assets/st-audio/${this.rightComment}.mp3`);
+              }
             }
           }
+
+          this.cdr.detectChanges();
+
+          // Additional code to draw pose landmarks and connections on the canvas
+          results.poseLandmarks.forEach((landmark, index) => {
+            if (index === 11 || index === 12 || index === 13 || index === 14 || index === 15 || index === 16 || index === 23 || index === 24) {
+              canvasCtx.beginPath();
+              canvasCtx.arc(
+                landmark.x * canvasElement.width,
+                landmark.y * canvasElement.height,
+                7,
+                0,
+                2 * Math.PI
+              );
+              canvasCtx.fillStyle = 'rgba(255, 0, 0, 0.6)';
+              canvasCtx.fill();
+            }
+          });
+
+          POSE_CONNECTIONS.forEach(([start, end]) => {
+            // console.log('start', 'end');
+            if ((start === 11 && (end === 13 || end === 23)) || (start === 13 && end === 15) || (start === 12 && (end === 14 || end === 24)) || (start === 14 && end === 16)) {
+              const startLandmark = results.poseLandmarks[start];
+              const endLandmark = results.poseLandmarks[end];
+              canvasCtx.beginPath();
+              canvasCtx.moveTo(
+                startLandmark.x * canvasElement.width,
+                startLandmark.y * canvasElement.height
+              );
+              canvasCtx.lineTo(
+                endLandmark.x * canvasElement.width,
+                endLandmark.y * canvasElement.height
+              );
+              canvasCtx.lineWidth = 4;
+              canvasCtx.strokeStyle = 'rgba(128, 128, 128, 0.6)';
+              if (this.timeMatching && ((start === 12 && (end === 14 || end === 24)) || (start === 14 && end === 16))) {
+                canvasCtx.strokeStyle = this.rightComment === 'Good' ? 'rgba(0, 255, 0, 0.6)' : 'rgba(255, 0, 0, 0.6)';
+              }
+              if (this.timeMatching && ((start === 11 && (end === 13 || end === 23)) || (start === 13 && end === 15))) {
+                canvasCtx.strokeStyle = this.leftComment === 'Good' ? 'rgba(0, 255, 0, 0.6)' : 'rgba(255, 0, 0, 0.6)';
+              }
+              canvasCtx.stroke();
+            }
+          });
         }
-
-        this.cdr.detectChanges();
-
-        // Additional code to draw pose landmarks and connections on the canvas
-        results.poseLandmarks.forEach((landmark, index) => {
-          if (index === 11 || index === 12 || index === 13 || index === 14 || index === 15 || index === 16 || index === 23 || index === 24) {
-            canvasCtx.beginPath();
-            canvasCtx.arc(
-              landmark.x * canvasElement.width,
-              landmark.y * canvasElement.height,
-              7,
-              0,
-              2 * Math.PI
-            );
-            canvasCtx.fillStyle = 'rgba(255, 0, 0, 0.6)';
-            canvasCtx.fill();
-          }
-        });
-
-        POSE_CONNECTIONS.forEach(([start, end]) => {
-          // console.log('start', 'end');
-          if ((start === 11 && (end === 13 || end === 23)) || (start === 13 && end === 15) || (start === 12 && (end === 14 || end === 24)) || (start === 14 && end === 16)) {
-            const startLandmark = results.poseLandmarks[start];
-            const endLandmark = results.poseLandmarks[end];
-            canvasCtx.beginPath();
-            canvasCtx.moveTo(
-              startLandmark.x * canvasElement.width,
-              startLandmark.y * canvasElement.height
-            );
-            canvasCtx.lineTo(
-              endLandmark.x * canvasElement.width,
-              endLandmark.y * canvasElement.height
-            );
-            canvasCtx.lineWidth = 4;
-            canvasCtx.strokeStyle = 'rgba(128, 128, 128, 0.6)';
-            if (this.timeMatching && ((start === 12 && (end === 14 || end === 24)) || (start === 14 && end === 16))) {
-              canvasCtx.strokeStyle = this.rightComment === 'Good' ? 'rgba(0, 255, 0, 0.6)' : 'rgba(255, 0, 0, 0.6)';
-            }
-            if (this.timeMatching && ((start === 11 && (end === 13 || end === 23)) || (start === 13 && end === 15))) {
-              canvasCtx.strokeStyle = this.leftComment === 'Good' ? 'rgba(0, 255, 0, 0.6)' : 'rgba(255, 0, 0, 0.6)';
-            }
-            canvasCtx.stroke();
-          }
-        });
       }
     }
   }
