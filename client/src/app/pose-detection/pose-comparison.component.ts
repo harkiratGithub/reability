@@ -317,7 +317,7 @@ export class PoseComparisonComponent implements OnInit, AfterViewInit {
 
     // Define thresholds
     const threshold = 5;
-    const timeThreshold = 8; // in seconds
+    const timeThreshold = 3; // in seconds
 
     // Initialize tracking variables for timestamps
     const lastTimestamps = {
@@ -651,15 +651,15 @@ export class PoseComparisonComponent implements OnInit, AfterViewInit {
     A: { x: number; y: number; z: number },
     B: { x: number; y: number; z: number }
   ): number {
-    const vectorAB = { x: B.x - A.x, y: B.y - A.y, z: B.z - A.z };
-    const verticalVector = { x: 0, y: 0, z: -1 };
+    const vectorAB = { x: B.x - A.x, y: B.y - A.y };
+    const verticalVector = { x: 0, y: 1 };
 
     const dotProduct =
-      vectorAB.x * verticalVector.x + vectorAB.y * verticalVector.y + vectorAB.z * verticalVector.z;
+      vectorAB.x * verticalVector.x + vectorAB.y * verticalVector.y;
 
-    const magnitudeAB = Math.sqrt(vectorAB.x ** 2 + vectorAB.y ** 2 + vectorAB.z ** 2);
+    const magnitudeAB = Math.sqrt(vectorAB.x ** 2 + vectorAB.y ** 2);
     const magnitudeVertical = Math.sqrt(
-      verticalVector.x ** 2 + verticalVector.y ** 2 + verticalVector.z ** 2
+      verticalVector.x ** 2 + verticalVector.y ** 2
     );
 
     const angleInRadians = Math.acos(
@@ -710,7 +710,7 @@ export class PoseComparisonComponent implements OnInit, AfterViewInit {
 
       if (results.poseLandmarks) {
         const tolerance = 3;
-        const leftShoulder = results.poseLandmarks[23];
+        const leftShoulder = results.poseLandmarks[11];
         const leftElbow = results.poseLandmarks[15];
         const leftWrist = results.poseLandmarks[15];
         const rightShoulder = results.poseLandmarks[24];
@@ -744,7 +744,7 @@ export class PoseComparisonComponent implements OnInit, AfterViewInit {
         const elapsedTime = ((new Date().getTime() - this.startTime) / 1000).toFixed(3);
         this.matchingVideoData.push({
           timestamp: `${elapsedTime}`,
-          'Deg': `${Math.round(rightAngle)}`,
+          'Deg': `${Math.round(leftAngle)}`,
         });
 
         const liveVideoResults = this.getLivePatientData(this.matchingVideoData);
