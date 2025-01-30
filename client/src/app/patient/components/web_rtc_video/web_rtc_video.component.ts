@@ -609,6 +609,78 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       ClipValue: "Min Value",
       ClipTimestamp: 53.464,
       ClipDeg: 85
+    }], [{
+      ClipValue: "Min Value",
+      ClipTimestamp: 3.711,
+      ClipDeg: 100
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 5.289,
+      ClipDeg: 124
+    }, {
+      ClipValue: "Max Value",
+      ClipTimestamp: 11.002,
+      ClipDeg: 154
+    }, {
+      ClipValue: "Min Value",
+      ClipTimestamp: 12.187,
+      ClipDeg: 100
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 14.39,
+      ClipDeg: 125
+    }, {
+      ClipValue: "Max Value",
+      ClipTimestamp: 15.713,
+      ClipDeg: 154
+    }, {
+      ClipValue: "Min Value",
+      ClipTimestamp: 21.416,
+      ClipDeg: 100
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 23.625,
+      ClipDeg: 124
+    }, {
+      ClipValue: "Max Value",
+      ClipTimestamp: 29.134,
+      ClipDeg: 154
+    }, {
+      ClipValue: "Min Value",
+      ClipTimestamp: 30.414,
+      ClipDeg: 100
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 32.469,
+      ClipDeg: 123
+    }, {
+      ClipValue: "Max Value",
+      ClipTimestamp: 33.664,
+      ClipDeg: 156
+    }, {
+      ClipValue: "Min Value",
+      ClipTimestamp: 39.851,
+      ClipDeg: 100
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 41.606,
+      ClipDeg: 124
+    }, {
+      ClipValue: "Max Value",
+      ClipTimestamp: 42.709,
+      ClipDeg: 154
+    }, {
+      ClipValue: "Min Value",
+      ClipTimestamp: 47.919,
+      ClipDeg: 100
+    }, {
+      ClipValue: "Mid Value",
+      ClipTimestamp: 49.617,
+      ClipDeg: 124
+    }, {
+      ClipValue: "Max Value",
+      ClipTimestamp: 50.798,
+      ClipDeg: 155
     }]
   ];
 
@@ -2270,6 +2342,11 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           leftWrist = results.poseLandmarks[26];
           rightShoulder = results.poseLandmarks[23];
           rightWrist = results.poseLandmarks[25];
+        } else if (this.videoIndex == 5) {
+          leftShoulder = results.poseLandmarks[26];
+          leftWrist = results.poseLandmarks[28];
+          rightShoulder = results.poseLandmarks[25];
+          rightWrist = results.poseLandmarks[27];
         } else {
           leftShoulder = results.poseLandmarks[11];
           leftWrist = results.poseLandmarks[15];
@@ -2374,7 +2451,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                 canvasCtx.fillStyle = 'rgba(255, 0, 0, 0.6)';
                 canvasCtx.fill();
               }
-            } else if (this.videoIndex == 4) {
+            } else if (this.videoIndex == 4 || this.videoIndex == 5) {
               if (index === 24 || index === 26 || index == 28 || index === 23 || index === 25 || index === 27) {
                 canvasCtx.beginPath();
                 canvasCtx.arc(
@@ -2425,7 +2502,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                 }
                 canvasCtx.stroke();
               }
-            } else if (this.videoIndex == 4) {
+            } else if (this.videoIndex == 4 || this.videoIndex == 5) {
               if ((start === 24 && end === 26) || (start === 26 && end === 28) || (start === 23 && end === 25) || (start === 25 && end === 27)) {
                 const startLandmark = results.poseLandmarks[start];
                 const endLandmark = results.poseLandmarks[end];
