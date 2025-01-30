@@ -651,15 +651,15 @@ export class PoseComparisonComponent implements OnInit, AfterViewInit {
     A: { x: number; y: number; z: number },
     B: { x: number; y: number; z: number }
   ): number {
-    const vectorAB = { x: B.x - A.x, y: B.y - A.y };
-    const verticalVector = { x: 0, y: 1 };
+    const vectorAB = { x: B.x - A.x, y: B.y - A.y, z: B.z - A.z };
+    const verticalVector = { x: 0, y: 0, z: -1 };
 
     const dotProduct =
-      vectorAB.x * verticalVector.x + vectorAB.y * verticalVector.y;
+      vectorAB.x * verticalVector.x + vectorAB.y * verticalVector.y + vectorAB.z * verticalVector.z;
 
-    const magnitudeAB = Math.sqrt(vectorAB.x ** 2 + vectorAB.y ** 2);
+    const magnitudeAB = Math.sqrt(vectorAB.x ** 2 + vectorAB.y ** 2 + vectorAB.z ** 2);
     const magnitudeVertical = Math.sqrt(
-      verticalVector.x ** 2 + verticalVector.y ** 2
+      verticalVector.x ** 2 + verticalVector.y ** 2 + verticalVector.z ** 2
     );
 
     const angleInRadians = Math.acos(
@@ -710,11 +710,11 @@ export class PoseComparisonComponent implements OnInit, AfterViewInit {
 
       if (results.poseLandmarks) {
         const tolerance = 3;
-        const leftShoulder = results.poseLandmarks[11];
-        const leftElbow = results.poseLandmarks[15];
+        const leftShoulder = results.poseLandmarks[24];
+        const leftElbow = results.poseLandmarks[26];
         const leftWrist = results.poseLandmarks[15];
-        const rightShoulder = results.poseLandmarks[24];
-        const rightWrist = results.poseLandmarks[16];
+        const rightShoulder = results.poseLandmarks[23];
+        const rightWrist = results.poseLandmarks[25];
         // console.log(leftShoulder, leftElbow, leftWrist);
 
         // const frameData = this.getCoordinatesForFrame(this.currentFrameIndex);
@@ -846,37 +846,37 @@ export class PoseComparisonComponent implements OnInit, AfterViewInit {
         // Additional code to draw pose landmarks and connections on the canvas
 
         results.poseLandmarks.forEach((landmark, index) => {
-          // if (index === 23 || index === 24 || index === 25 || index === 26 || index == 27 || index == 28) {
-          canvasCtx.beginPath();
-          canvasCtx.arc(
-            landmark.x * canvasElement.width,
-            landmark.y * canvasElement.height,
-            5,
-            0,
-            2 * Math.PI
-          );
-          canvasCtx.fillStyle = 'rgba(255, 0, 0, 0.6)';
-          canvasCtx.fill();
-          // }
+          if (index === 24 || index === 26 || index == 28 || index === 23 || index === 25 || index == 27) {
+            canvasCtx.beginPath();
+            canvasCtx.arc(
+              landmark.x * canvasElement.width,
+              landmark.y * canvasElement.height,
+              5,
+              0,
+              2 * Math.PI
+            );
+            canvasCtx.fillStyle = 'rgba(255, 0, 0, 0.6)';
+            canvasCtx.fill();
+          }
         });
 
         POSE_CONNECTIONS.forEach(([start, end]) => {
-          // if ((start === 24 && end === 26) || (start === 26 && end === 28) || (start === 23 && end === 25) || (start === 25 && end === 27)) {
-          const startLandmark = results.poseLandmarks[start];
-          const endLandmark = results.poseLandmarks[end];
-          canvasCtx.beginPath();
-          canvasCtx.moveTo(
-            startLandmark.x * canvasElement.width,
-            startLandmark.y * canvasElement.height
-          );
-          canvasCtx.lineTo(
-            endLandmark.x * canvasElement.width,
-            endLandmark.y * canvasElement.height
-          );
-          canvasCtx.lineWidth = 2;
-          canvasCtx.strokeStyle = 'rgba(0, 255, 0, 0.6)';
-          canvasCtx.stroke();
-          // }
+          if ((start === 24 && end === 26) || (start === 26 && end === 28) || (start === 23 && end === 25) || (start === 25 && end === 27)) {
+            const startLandmark = results.poseLandmarks[start];
+            const endLandmark = results.poseLandmarks[end];
+            canvasCtx.beginPath();
+            canvasCtx.moveTo(
+              startLandmark.x * canvasElement.width,
+              startLandmark.y * canvasElement.height
+            );
+            canvasCtx.lineTo(
+              endLandmark.x * canvasElement.width,
+              endLandmark.y * canvasElement.height
+            );
+            canvasCtx.lineWidth = 2;
+            canvasCtx.strokeStyle = 'rgba(0, 255, 0, 0.6)';
+            canvasCtx.stroke();
+          }
         });
       }
     }
