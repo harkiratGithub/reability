@@ -1,6 +1,7 @@
 import moment from 'moment';
 import crypto from 'crypto';
 import { padStart } from 'lodash';
+import { DateTime } from 'luxon';
 
 import { emailRegex, passwordRegex } from '../const';
 
@@ -94,3 +95,55 @@ export const getTimeString = (time: number): string => {
 		.filter((v, i) => v !== '00' || i > 0)
 		.join(':');
 };
+
+	/*// Converts UTC time to the specified timezone
+	export const convertUtcToTimezone = (utcTime, timezone) => {
+		if (!utcTime || !timezone) {
+		throw new Error('Both UTC time and timezone are required.');
+		}
+		return momentTimezone.utc(utcTime).tz(timezone).format('YYYY-MM-DD HH:mm:ss');
+	};*/
+	
+	// Converts UTC time to the specified timezone
+	export const convertUtcToTimezoneOffset = (utcTime, timezoneOffset) => {
+		if (!utcTime || !timezoneOffset) {
+			throw new Error('Both UTC time and timezone offset are required.');
+		}
+		const timezoneRegex = /^[+-]\d{2}:\d{2}$/;
+		if (!timezoneRegex.test(timezoneOffset)) {
+			throw new Error(`Invalid timezone offset format: ${timezoneOffset}`);
+		}
+		// Normalize UTC time to ensure three-digit milliseconds
+		const normalizedUtcTime = normalizeMilliseconds(utcTime);
+	
+		const [hoursOffset, minutesOffset] = parseTimezoneOffset(timezoneOffset);
+	
+		const dateTimeUtc = DateTime.fromFormat(normalizedUtcTime, 'yyyy-MM-dd HH:mm:ss.SSS', { zone: 'utc' });
+	
+		if (!dateTimeUtc.isValid) {
+			throw new Error(`Invalid UTC time format: ${normalizedUtcTime}`);
+		}
+	
+		const convertedDateTime = dateTimeUtc.plus({ hours: hoursOffset, minutes: minutesOffset });
+		console.log("Converted DateTime:", convertedDateTime.toISO());
+		return convertedDateTime.toFormat('yyyy-MM-dd HH:mm:ss');
+	};
+	
+	const normalizeMilliseconds = (utcTime) => {
+		const parts = utcTime.split('.');
+		if (parts.length === 2 && parts[1].length < 3) {
+			parts[1] = parts[1].padEnd(3, '0'); 
+			return parts.join('.');
+		}
+		if (parts.length === 1) {
+			return `${utcTime}.000`; // Add milliseconds if missing
+		}
+		return utcTime;
+	};
+	
+	const parseTimezoneOffset = (offset) => {
+		const sign = offset.charAt(0);
+		const [hours, minutes] = offset.slice(1).split(':').map(Number);
+	
+		return sign === '+' ? [hours, minutes] : [-hours, -minutes];
+	};
