@@ -565,8 +565,6 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 		.field(`rtm.timestamp`, 'since')
 		.field(`${TABLE_NAME.INSTITUTE}.name`, 'institute_name')
 		.field(`${TABLE_NAME.INSTITUTE}.id`, 'institute_id')
-		.field(`patient_user.user_last_login`,'user_last_login')
-		.field(`to_char(patient_user.user_last_login, 'TZH:TZM')`, 'timezone')
 		// .field(`${TABLE_NAME.THERAPIST}.first_name`, 'therapist_first_name')
 		// .field(`${TABLE_NAME.THERAPIST}.last_name`, 'therapist_last_name')
 		// .field(`therapist_user.user_name`, 'therapist_username')
@@ -602,10 +600,7 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 
 	const decryptedData = decryptedRows?.map(async (row) => {
 		const patientId = row.patient_id;
-		const rtmData = row.data;		
-		if(row.since!==null && row.timezone!==null){
-			row.since = Helper.convertUtcToTimezoneOffset(row.since, row.timezone);	
-		}	
+		const rtmData = row.data;
 		if (rtmData.therapist) {
 			const therapistSessionQuery = squelPostgres
 				.select()
@@ -798,7 +793,7 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 						// event_note: entry.data.note,
 						// minutes_spent: entry.data.minutes_spent,
 						// therapist_session_minutes: entry.data.therapist_session_minutes,
-						patient_pain_level: entry.data.patient?.pain_level ,
+						patient_pain_level: entry.data.patient?.pain_level,
 						patient_note: entry.data.patient?.note || '--',
 						therapist_id: entry.data.therapist?.therapist_id || '--',
 						therapist_user_name: entry.data.therapist?.user_name || '--',

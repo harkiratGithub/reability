@@ -32,12 +32,10 @@ export const onLogIn = async (user: {
 	email: string;
 	is_two_factor_enabled: boolean;
 }): Promise<any> => {
-	try {
-		const currentTimestamp =  new Date();
+	try {		
 		await UserModel.updateById(user.id, {
 			logged_in_at: Helper.createTimeForDb(),
-			logged_out_at: Helper.createTimeForDb(),
-			user_last_login: currentTimestamp.toISOString(),
+			logged_out_at: Helper.createTimeForDb(),			
 		});
 		switch (user.role) {
 			case ROLE.ADMIN:
@@ -65,11 +63,9 @@ export const onLogIn = async (user: {
 					pain_level: pain_level,
 					timestamp: timestamp,
 					date_agreed_terms: date_agreed_terms,
-					user_last_login :user_last_login,
-					timezone:timezone,
 				} = EncryptHelper.decryptJson(details[0]);
 				const RTM = details?.some((ele: { department_name: string }) => ele.department_name.toLowerCase() === 'rtm');
-				const todayEntry = await UserModel.isPatientEntryForToday(patientId,timezone);
+				const todayEntry = await UserModel.isPatientEntryForToday(patientId);
 				const isPainModelOpen = RTM && typeof todayEntry.painLevel === 'undefined' && !todayEntry.hasEntries;
 				const isMobileModelOpen =
 					RTM && new Date().getTime() - new Date(timestamp).getTime() >= 24 * 60 * 60 * 1000 ? true : false;
@@ -78,7 +74,7 @@ export const onLogIn = async (user: {
 				const patient = await PatientModel.findPatientByUserId(user.id);
 				const disabledSkeleton = patient.disabled_skeleton;
 				const requiresTermsAgreement = date_agreed_terms === null;
-
+				
 				return {
 					...user,
 					id: patientId,
