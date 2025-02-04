@@ -5,6 +5,8 @@ import * as EmailHelper from '../helpers/email.helper';
 export const authenticate = async (req, res, next) => {
 	try {
 		const user = req.user;
+		const userTimezone = req.userTimezone; 
+		user.timezone = userTimezone;
 		const userDetails = await UserHelper.onLogIn(user);
 		res.json(userDetails);
 	} catch (err) {

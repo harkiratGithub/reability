@@ -86,8 +86,9 @@ export class LoginPageComponent implements OnInit, OnDestroy {
         this.submitted = true;
         this.loading = true;
         this.f.username.setErrors(null);
+        const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
         const token = await this.recaptchaV3Service.execute('login').toPromise();
-        const user = await this.ajax.login(this.f.username.value, this.f.password.value, token).toPromise();
+        const user = await this.ajax.login(this.f.username.value, this.f.password.value, token,userTimezone).toPromise();
         if (window && (window as any).NREUM) {
           (window as any).NREUM.addPageAction('LoginSuccess', {
             username: this.f.username.value,

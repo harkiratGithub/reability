@@ -73,6 +73,7 @@ export const usersValidator = (usersObject) => {
 // 	const result = await BaseModel.runQuery(query);
 // 	return result.rows;
 // };
+/*
 export const isPatientEntryForToday = async (
 	patientId: number
 ): Promise<{ hasEntries: boolean; painLevel?: number }> => {
@@ -94,6 +95,39 @@ export const isPatientEntryForToday = async (
 		return { hasEntries: false };
 	}
 };
+*/
+export const isPatientEntryForToday = async (
+	patientId: number, 
+	timezone: string
+  ): Promise<{ hasEntries: boolean; painLevel?: number }> => {
+	try {
+	  const query = squelPostgres
+		.select()
+		.field(`${TABLE_NAME.RTM}.timestamp`, 'timestamp')
+		.field(`${TABLE_NAME.RTM}.data->'patient'->>'pain_level'`, 'pain_level')
+		.from(TABLE_NAME.RTM)
+		.where('patient_id = ?', patientId)
+		.where(`DATE(${TABLE_NAME.RTM}.timestamp AT TIME ZONE ?) = CURRENT_DATE`, timezone) 
+		.toParam();
+	  console.log("=====query===",query);
+	  const result = await BaseModel.runQuery(query);
+	  console.log("=========result=",result);
+	  console.log("======tiemstamp========",result.rows[0]?.timestamp);
+	  console.log("=======timezone==========",timezone);
+	  const now = Helper.currentTimeofTimezone(timezone);
+	  console.log("=now==",now);
+	  const convertedTime = Helper.convertUtcToTimezone(result.rows[0]?.timestamp, timezone);
+	  console.log(`Converted Time=========: ${convertedTime}`);
+	  const hoursPassed = now.diff(convertedTime, 'hours');
+	  console.log(`Hours Passed: ${hoursPassed}`)
+	  const hasEntries = result.rows.length > 0;
+	  const painLevel = hasEntries ? result.rows[0]?.pain_level : undefined;
+	  return { hasEntries, painLevel };
+	} catch (error) {
+	  return { hasEntries: false };
+	}
+};
+
 export const getUserDetails = async (userId, therapistId = undefined) => {
 	const query = squelPostgres
 		.select()
@@ -108,6 +142,8 @@ export const getUserDetails = async (userId, therapistId = undefined) => {
 		.field(`${TABLE_NAME.RTM}.data->'patient'->>'pain_level'`, 'pain_level')
 		.field(`${TABLE_NAME.RTM}.timestamp`, 'timestamp')
 		.field(`${TABLE_NAME.USER}.date_agreed_terms`)
+		.field(`${TABLE_NAME.USER}.user_last_login`)
+		.field(`${TABLE_NAME.USER}.timezone`)
 		.from(TABLE_NAME.PATIENT)
 		.left_join(TABLE_NAME.USER, null, `${TABLE_NAME.PATIENT}.user_id = ${TABLE_NAME.USER}.id`)
 		.left_join(
@@ -136,6 +172,8 @@ export const getUserDetails = async (userId, therapistId = undefined) => {
 				.field(`NULL`, 'pain_level')
 				.field(`NULL`, 'timestamp')
 				.field(`NULL::timestamp with time zone`, 'date_agreed_terms')
+				.field(`${TABLE_NAME.USER}.user_last_login`)
+				.field(`${TABLE_NAME.USER}.timezone`)
 				.from(TABLE_NAME.THERAPIST)
 				.left_join(TABLE_NAME.USER, null, `${TABLE_NAME.THERAPIST}.user_id = ${TABLE_NAME.USER}.id`)
 				.left_join(
@@ -234,13 +272,47 @@ export const getPatientsByTherapistId = async (therapistId) => {
 	return result.rows;
 };
 
-
+/*
 export const updateById = async (user_id, object, client = null) => {
 	// we not allow to update user_name
 	if (object.hasOwnProperty('user_name')) {
 		delete object['user_name'];
 	}
 	return BaseModel.updateRowByField(TABLE_NAME.USER, EncryptHelper.encryptJson(object), 'id', user_id, client);
+};
+*/
+
+export const updateById = async (user_id, object, client = null) => {
+    if (object.hasOwnProperty('user_name')) {
+        delete object['user_name'];
+    }
+    try {
+        const encryptedObject = EncryptHelper.encryptJson(object);
+        console.log('Encrypted Object:', encryptedObject);
+        // Sanitize the encrypted object
+        const sanitizedObject = {};
+        for (const key in encryptedObject) {
+            const value = encryptedObject[key];
+            if (value === null || typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+                sanitizedObject[key] = value;
+            } else {
+                console.warn(`Invalid value type for field "${key}":`, value);
+            }
+        }
+        console.log('Sanitized Object:', sanitizedObject);
+        const result = await BaseModel.updateRowByField(
+            TABLE_NAME.USER,
+            sanitizedObject,
+            'id',
+            user_id,
+            client
+        );
+        console.log('Update Result:', result);
+        return result;
+    } catch (error) {
+        console.error('Error in updateById:', error);
+        throw error; // Rethrow the error for further handling
+    }
 };
 
 export const create = (user, client = null) => {
