@@ -28,12 +28,14 @@ export class AjaxService {
     }
   };
 
-  login = (username, password, captchaToken) => {
+  login = (username, password, captchaToken,userTimezone) => {
+    console.log("====userTimezone=====",userTimezone);
     try {
       return this.http.post<any>(`${this.baseUrl}/login`, {
         username,
         password,
         captchaToken,
+        userTimezone,
       });
     } catch (err) {
       console.error(err);
