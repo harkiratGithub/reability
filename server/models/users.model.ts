@@ -73,11 +73,25 @@ export const usersValidator = (usersObject) => {
 // 	const result = await BaseModel.runQuery(query);
 // 	return result.rows;
 // };
-/*export const isPatientEntryForToday = async (
+/*
+export const isPatientEntryForToday = async (
 	patientId: number
 ): Promise<{ hasEntries: boolean; painLevel?: number }> => {
 	try {
-@@ -95,6 +95,30 @@ export const isPatientEntryForToday = async (
+		const query = squelPostgres
+			.select()
+			.field(`${TABLE_NAME.RTM}.timestamp`, 'timestamp')
+			.field(`${TABLE_NAME.RTM}.data->'patient'->>'pain_level'`, 'pain_level')
+			.from(TABLE_NAME.RTM)
+			.where('patient_id = ?', patientId)
+			.where('DATE(timestamp) = CURRENT_DATE')
+			.toParam();
+
+		const result = await BaseModel.runQuery(query);
+		const hasEntries = result.rows.length > 0;
+		const painLevel = hasEntries ? result.rows[0]?.pain_level : undefined;
+		return { hasEntries, painLevel };
+	} catch (error) {
 		return { hasEntries: false };
 	}
 };
@@ -95,9 +109,17 @@ export const isPatientEntryForToday = async (
 		.where('patient_id = ?', patientId)
 		.where(`DATE(${TABLE_NAME.RTM}.timestamp AT TIME ZONE ?) = CURRENT_DATE`, timezone) 
 		.toParam();
+	  console.log("=====query===",query);
 	  const result = await BaseModel.runQuery(query);
-	  const convertedTime = Helper.convertUtcToTimezoneOffset(result.rows[0]?.timestamp, timezone);
-		console.log(`Converted Time: ${convertedTime}`);
+	  console.log("=========result=",result);
+	  console.log("======tiemstamp========",result.rows[0]?.timestamp);
+	  console.log("=======timezone==========",timezone);
+	  const now = Helper.currentTimeofTimezone(timezone);
+	  console.log("=now==",now);
+	  const convertedTime = Helper.convertUtcToTimezone(result.rows[0]?.timestamp, timezone);
+	  console.log(`Converted Time=========: ${convertedTime}`);
+	  const hoursPassed = now.diff(convertedTime, 'hours');
+	  console.log(`Hours Passed: ${hoursPassed}`)
 	  const hasEntries = result.rows.length > 0;
 	  const painLevel = hasEntries ? result.rows[0]?.pain_level : undefined;
 	  return { hasEntries, painLevel };
@@ -105,6 +127,7 @@ export const isPatientEntryForToday = async (
 	  return { hasEntries: false };
 	}
 };
+
 export const getUserDetails = async (userId, therapistId = undefined) => {
 	const query = squelPostgres
 		.select()
@@ -120,7 +143,7 @@ export const getUserDetails = async (userId, therapistId = undefined) => {
 		.field(`${TABLE_NAME.RTM}.timestamp`, 'timestamp')
 		.field(`${TABLE_NAME.USER}.date_agreed_terms`)
 		.field(`${TABLE_NAME.USER}.user_last_login`)
-  		.field(`to_char(${TABLE_NAME.USER}.user_last_login, 'TZH:TZM')`, 'timezone')
+		.field(`${TABLE_NAME.USER}.timezone`)
 		.from(TABLE_NAME.PATIENT)
 		.left_join(TABLE_NAME.USER, null, `${TABLE_NAME.PATIENT}.user_id = ${TABLE_NAME.USER}.id`)
 		.left_join(
@@ -150,7 +173,7 @@ export const getUserDetails = async (userId, therapistId = undefined) => {
 				.field(`NULL`, 'timestamp')
 				.field(`NULL::timestamp with time zone`, 'date_agreed_terms')
 				.field(`${TABLE_NAME.USER}.user_last_login`)
-      			.field(`to_char(${TABLE_NAME.USER}.user_last_login, 'TZH:TZM')`, 'timezone') 
+				.field(`${TABLE_NAME.USER}.timezone`)
 				.from(TABLE_NAME.THERAPIST)
 				.left_join(TABLE_NAME.USER, null, `${TABLE_NAME.THERAPIST}.user_id = ${TABLE_NAME.USER}.id`)
 				.left_join(
@@ -258,6 +281,7 @@ export const updateById = async (user_id, object, client = null) => {
 	return BaseModel.updateRowByField(TABLE_NAME.USER, EncryptHelper.encryptJson(object), 'id', user_id, client);
 };
 */
+
 export const updateById = async (user_id, object, client = null) => {
     if (object.hasOwnProperty('user_name')) {
         delete object['user_name'];
@@ -276,7 +300,6 @@ export const updateById = async (user_id, object, client = null) => {
             }
         }
         console.log('Sanitized Object:', sanitizedObject);
-
         const result = await BaseModel.updateRowByField(
             TABLE_NAME.USER,
             sanitizedObject,

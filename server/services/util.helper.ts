@@ -1,7 +1,9 @@
 import moment from 'moment';
 import crypto from 'crypto';
 import { padStart } from 'lodash';
-import { DateTime } from 'luxon';
+//import { DateTime } from 'luxon';
+import momentTimezone from 'moment-timezone';
+
 
 import { emailRegex, passwordRegex } from '../const';
 
@@ -96,14 +98,24 @@ export const getTimeString = (time: number): string => {
 		.join(':');
 };
 
-	/*// Converts UTC time to the specified timezone
+	// Converts UTC time to the specified timezone
 	export const convertUtcToTimezone = (utcTime, timezone) => {
 		if (!utcTime || !timezone) {
 		throw new Error('Both UTC time and timezone are required.');
 		}
 		return momentTimezone.utc(utcTime).tz(timezone).format('YYYY-MM-DD HH:mm:ss');
-	};*/
+	};
+
+
+	export const currentTimeofTimezone = (timezone)=>{
+		if ( !timezone) {
+			throw new Error('timezone are required.');
+		}
+		return  momentTimezone().tz(timezone);
+	};
 	
+
+	/*
 	// Converts UTC time to the specified timezone
 	export const convertUtcToTimezoneOffset = (utcTime, timezoneOffset) => {
 		if (!utcTime || !timezoneOffset) {
@@ -147,3 +159,4 @@ export const getTimeString = (time: number): string => {
 	
 		return sign === '+' ? [hours, minutes] : [-hours, -minutes];
 	};
+	*/

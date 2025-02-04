@@ -67,9 +67,7 @@ export const updateRTM = async (patient_id, data, type = 'patient', client = nul
 	if (isNaN(currentTimestamp.getTime())) {
 		throw new Error('Invalid timestamp provided');
 	}
-	const institute_id = await getInstituteIdByPatientId(patient_id);
-	const formattedTimestamp = currentTimestamp.toISOString().replace('T', ' ').replace('Z', '');
-	console.log('formattedTimestamp: ', formattedTimestamp);
+	const institute_id = await getInstituteIdByPatientId(patient_id);	
 	// console.log("currentTimestamp: ",timestamp, currentTimestamp)
 	const currentMonth = currentTimestamp.getMonth() + 1;
 	const currentYear = currentTimestamp.getFullYear();
@@ -89,7 +87,9 @@ export const updateRTM = async (patient_id, data, type = 'patient', client = nul
 		.select()
 		.from(TABLE_NAME.RTM)
 		.where(
-			`patient_id = ? AND DATE(timestamp) = ${timestamp ? `'${formattedTimestamp.split(' ')[0]}'` : 'CURRENT_DATE'}`,
+			`patient_id = ? AND DATE(timestamp)  = ${
+				timestamp ? `${new Date(timestamp).toISOString().split('T')[0]}` : 'CURRENT_DATE'
+			}`,
 			patient_id
 		)
 		.toParam();
@@ -115,7 +115,7 @@ export const updateRTM = async (patient_id, data, type = 'patient', client = nul
 					// patient_note: data?.patient_note,
 					// daysDataTransmittedInMonth
 				}),
-				timestamp: formattedTimestamp,
+				timestamp: currentTimestamp.toISOString(),
 			},
 			rtmValidator,
 			client
@@ -155,7 +155,7 @@ export const updateRTM = async (patient_id, data, type = 'patient', client = nul
 					},
 				}),
 				institute_id: institute_id,
-				timestamp: formattedTimestamp,
+				timestamp: currentTimestamp.toISOString(),
 			},
 			rtmValidator,
 			client
