@@ -86,52 +86,14 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   private videoPose!: Pose;
   private cameraPose!: Pose;
   private camera!: Camera;
-  private angleCalculationInterval = 5000; // 5 seconds
-  private lastCalculationTime = 0;
-  private lastYPositions: { [key: string]: number[] } = {
-    leftWrist: [],
-    rightWrist: [],
-  };
-  leftMatching = false;
-  rightMatching = false;
   timeMatching = false;
   lastTimeMatching = false;
   timeLog: any = []
-  private peakDetectionThreshold = 0.01;
-  private lastAngles: { [key: string]: number[] } = {
-    leftWrist: [],
-    rightWrist: [],
-  };
-  private peakLogged: { [key: string]: boolean } = {
-    leftWrist: false,
-    rightWrist: false,
-  };
-  public minVideoAngle: { [key: string]: number } = {
-    leftWrist: Infinity,
-    rightWrist: Infinity,
-  };
-  public maxVideoAngle: { [key: string]: number } = {
-    leftWrist: -Infinity,
-    rightWrist: -Infinity,
-  };
   public cameraAngle: { [key: string]: number } = {
     leftWrist: Infinity,
     rightWrist: Infinity,
   };
-  public videoAngle: { [key: string]: number } = {
-    leftWrist: Infinity,
-    rightWrist: Infinity,
-  };
-  public minCameraAngle: { [key: string]: number } = {
-    leftWrist: Infinity,
-    rightWrist: Infinity,
-  };
-  public maxCameraAngle: { [key: string]: number } = {
-    leftWrist: -Infinity,
-    rightWrist: -Infinity,
-  };
   private matchingData: { timestamp: string; wrist: string; status: string }[] = [];
-  private csvFilePath = 'matching_results.xlsx';
   private matchingCameraData: { timestamp: string; 'LSA Deg': string; 'RSA Deg': string; }[] = [];
   private startTime: number;
   private videoIndex: number;
@@ -879,6 +841,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
 
   rightComment = '';
   leftComment = '';
+  rightCondition = '';
+  leftCondition = '';
   lastComment = '';
   processedTimestamps: Set<string> = new Set();
   receivedRemoteVideo: boolean = false;
@@ -998,7 +962,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           const results = this.matchClipAndPatientData(this.videoMinMax[this.videoIndex], this.matchingCameraData);
           const updateComments = this.updateComments(results);
           this.saveToCSV(updateComments, 'min_max_matches.csv');
-          // this.saveToCSV(this.timeLog, 'time_matching.csv');
+          this.saveToCSV(this.timeLog, 'time_matching.csv');
         }
         if (action.msg && action.msg.data && action.msg.data.shouldPlay) {
           // this.currentVideoIndex = 0;
@@ -2276,19 +2240,35 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       const angleRightDiff = +entry.ClipDeg - +entry.PatientRightDeg;
 
       if (timestampDiff > timestampThreshold && Math.abs(angleRightDiff) <= angleThreshold) {
-        entry.RightComments = "Too Late";
+        entry.RightComments = "Faster";
       } else if (angleRightDiff > angleThreshold) {
-        entry.RightComments = "Too Low";
+        entry.RightComments = "Higher";
       } else if (angleRightDiff < -angleThreshold) {
-        entry.RightComments = "Too High";
+        entry.RightComments = "Lower";
+      } else {
+        if (Math.abs(angleRightDiff) <= 2) {
+          entry.RightComments = "Perfect";
+        } else if (Math.abs(angleRightDiff) <= 4) {
+          entry.RightComments = "Nice";
+        } else {
+          entry.RightComments = "Great";
+        }
       }
 
       if (timestampDiff > timestampThreshold && Math.abs(angleLeftDiff) <= angleThreshold) {
-        entry.LeftComments = "Too Late";
+        entry.LeftComments = "Faster";
       } else if (angleLeftDiff > angleThreshold) {
-        entry.LeftComments = "Too Low";
+        entry.LeftComments = "Higher";
       } else if (angleLeftDiff < -angleThreshold) {
-        entry.LeftComments = "Too High";
+        entry.LeftComments = "Lower";
+      } else {
+        if (Math.abs(angleLeftDiff) <= 2) {
+          entry.LeftComments = "Perfect";
+        } else if (Math.abs(angleLeftDiff) <= 4) {
+          entry.LeftComments = "Nice";
+        } else {
+          entry.LeftComments = "Great";
+        }
       }
     });
 
@@ -2593,60 +2573,69 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         // console.log(currentVideoAngle, this.currentVideoIndex);
 
         if (currentVideoAngle) {
-          this.rightMatching = withinTolerance(
-            rightAngle,
-            +currentVideoAngle.ClipDeg,
-            4
-          );
-          this.leftMatching = withinTolerance(
-            leftAngle,
-            +currentVideoAngle.ClipDeg,
-            4
-          )
           this.timeMatching = withinTimeTolerance(
             elapsedTime,
             currentVideoAngle.ClipTimestamp,
-            1.2
+            .75
           )
 
           if (!this.timeMatching && this.timeMatching != this.lastTimeMatching) {
             this.currentVideoIndex++;
           }
+          if (this.timeMatching != this.lastTimeMatching) {
+            this.lastComment = 'Bad';
+          }
           this.lastTimeMatching = this.timeMatching;
 
-          const angleThreshold = 15;
+          const angleThreshold = 30;
           const timestampThreshold = 2;
 
           const timeDiff = Math.abs(currentVideoAngle.ClipTimestamp - elapsedTime);
           const angleLeftDiff = currentVideoAngle.ClipDeg - +leftAngle;
           const angleRightDiff = currentVideoAngle.ClipDeg - +rightAngle;
 
+          this.leftCondition = 'Bad';
+          this.rightCondition = 'Bad';
           if (timeDiff > timestampThreshold && Math.abs(angleRightDiff) <= angleThreshold) {
-            this.rightComment = "Too Late";
+            this.rightComment = "Faster";
           } else if (angleRightDiff > angleThreshold) {
-            this.rightComment = "Too Low";
+            this.rightComment = "Higher";
           } else if (angleRightDiff < -angleThreshold) {
-            this.rightComment = "Too High";
+            this.rightComment = "Lower";
           } else {
-            this.rightComment = "Good";
+            this.rightCondition = 'Good';
+            if (Math.abs(angleRightDiff) <= 2) {
+              this.rightComment = "Perfect";
+            } else if (Math.abs(angleRightDiff) <= 4) {
+              this.rightComment = "Nice";
+            } else {
+              this.rightComment = "Great";
+            }
           }
 
           if (timeDiff > timestampThreshold && Math.abs(angleLeftDiff) <= angleThreshold) {
-            this.leftComment = "Too Late";
+            this.leftComment = "Faster";
           } else if (angleLeftDiff > angleThreshold) {
-            this.leftComment = "Too Low";
+            this.leftComment = "Higher";
           } else if (angleLeftDiff < -angleThreshold) {
-            this.leftComment = "Too High";
+            this.leftComment = "Lower";
           } else {
-            this.leftComment = "Good";
+            this.leftCondition = 'Good';
+            if (Math.abs(angleLeftDiff) <= 2) {
+              this.leftComment = "Perfect";
+            } else if (Math.abs(angleLeftDiff) <= 4) {
+              this.leftComment = "Nice";
+            } else {
+              this.leftComment = "Great";
+            }
           }
 
-          if (this.lastComment && this.timeMatching && this.lastComment != this.leftComment && this.lastComment == 'Good') {
+          if (this.lastComment && this.timeMatching && this.lastComment != this.rightCondition && this.lastComment == 'Good') {
             this.currentVideoIndex++;
             this.lastTimeMatching = false;
           }
-          this.lastComment = this.leftComment
-          this.timeLog.push({ elapsedTime, currentVideoTime: currentVideoAngle.ClipTimestamp, currentVideoAngle: currentVideoAngle.ClipDeg, rightAngle, timeMatching: this.timeMatching, rightComment: this.rightComment });
+          this.lastComment = this.rightCondition
+          this.timeLog.push({ elapsedTime, currentVideoTime: currentVideoAngle.ClipTimestamp, currentVideoAngle: currentVideoAngle.ClipDeg, rightAngle, timeMatching: this.timeMatching, rightComment: this.rightComment, lastComment: this.lastComment });
 
           this.cdr.detectChanges();
 
@@ -2712,7 +2701,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                 canvasCtx.strokeStyle = 'rgba(128, 128, 128, 0.6)';
 
                 if (this.timeMatching) {
-                  canvasCtx.strokeStyle = this.leftComment === 'Good' ? 'rgba(0, 255, 0, 0.6)' : 'rgba(255, 0, 0, 0.6)';
+                  canvasCtx.strokeStyle = this.leftCondition === 'Good' ? 'rgba(0, 255, 0, 0.6)' : 'rgba(255, 0, 0, 0.6)';
                 }
                 canvasCtx.stroke();
               }
@@ -2733,10 +2722,10 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                 canvasCtx.strokeStyle = 'rgba(128, 128, 128, 0.6)';
 
                 if (this.timeMatching && ((start === 24 && end === 26) || (start === 26 && end === 28))) {
-                  canvasCtx.strokeStyle = this.leftComment === 'Good' ? 'rgba(0, 255, 0, 0.6)' : 'rgba(255, 0, 0, 0.6)';
+                  canvasCtx.strokeStyle = this.leftCondition === 'Good' ? 'rgba(0, 255, 0, 0.6)' : 'rgba(255, 0, 0, 0.6)';
                 }
                 if (this.timeMatching && ((start === 23 && end === 25) || (start === 25 && end === 27))) {
-                  canvasCtx.strokeStyle = this.rightComment === 'Good' ? 'rgba(0, 255, 0, 0.6)' : 'rgba(255, 0, 0, 0.6)';
+                  canvasCtx.strokeStyle = this.rightCondition === 'Good' ? 'rgba(0, 255, 0, 0.6)' : 'rgba(255, 0, 0, 0.6)';
                 }
                 canvasCtx.stroke();
               }
@@ -2757,10 +2746,10 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                 canvasCtx.strokeStyle = 'rgba(128, 128, 128, 0.6)';
 
                 if (this.timeMatching && ((start === 11 && (end === 13 || end === 23)) || (start === 13 && end === 15))) {
-                  canvasCtx.strokeStyle = this.leftComment === 'Good' ? 'rgba(0, 255, 0, 0.6)' : 'rgba(255, 0, 0, 0.6)';
+                  canvasCtx.strokeStyle = this.leftCondition === 'Good' ? 'rgba(0, 255, 0, 0.6)' : 'rgba(255, 0, 0, 0.6)';
                 }
                 if (this.timeMatching && ((start === 12 && (end === 14 || end === 24)) || (start === 14 && end === 16))) {
-                  canvasCtx.strokeStyle = this.rightComment === 'Good' ? 'rgba(0, 255, 0, 0.6)' : 'rgba(255, 0, 0, 0.6)';
+                  canvasCtx.strokeStyle = this.rightCondition === 'Good' ? 'rgba(0, 255, 0, 0.6)' : 'rgba(255, 0, 0, 0.6)';
                 }
                 canvasCtx.stroke();
               }
@@ -2784,18 +2773,5 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     speech.rate = 1; // Speed: 0.1 to 10
     speech.pitch = 1; // Pitch: 0 to 2
     window.speechSynthesis.speak(speech);
-  }
-
-  private isPeakPosition(key: string): boolean {
-    const positions = this.lastYPositions[key];
-    console.log(`${key} ${positions}`);
-
-    if (positions.length < 3) return false;
-
-    // Check if the middle position is a peak (either max or min)
-    const [prev, current, next] = positions;
-    return (
-      (current > prev && current > next) || (current < prev && current < next)
-    );
   }
 }
