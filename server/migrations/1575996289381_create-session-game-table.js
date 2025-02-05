@@ -21,7 +21,8 @@ exports.up = pgm => {
     },
     ended_at: {
       type: 'timestamp'
-    }
+    },
+    session_feedback: { type: 'jsonb', notNull: 'true', default: '{}' },
   });
 };
 
