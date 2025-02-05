@@ -101,19 +101,38 @@ export const isPatientEntryForToday = async (
 	timezone: string
   ): Promise<{ hasEntries: boolean; painLevel?: number }> => {
 	try {
+	 /* const query = squelPostgres
+		.select()
+		.field(`${TABLE_NAME.RTM}.timestamp`, 'timestamp')
+		.field(`${TABLE_NAME.RTM}.data->'patient'->>'pain_level'`, 'pain_level')
+		.field(`${TABLE_NAME.RTM}.timezone`, 'timezone')
+		.from(TABLE_NAME.RTM)
+		.where('patient_id = ?', patientId)
+		.where(`DATE(${TABLE_NAME.RTM}.timestamp AT TIME ZONE ?) = CURRENT_DATE`, timezone) 
+		.toParam();	  
+	  const result = await BaseModel.runQuery(query);
+	  */
 	  const query = squelPostgres
 		.select()
 		.field(`${TABLE_NAME.RTM}.timestamp`, 'timestamp')
 		.field(`${TABLE_NAME.RTM}.data->'patient'->>'pain_level'`, 'pain_level')
+		.field(`${TABLE_NAME.RTM}.timezone`, 'timezone')
+		.field(
+			`${TABLE_NAME.RTM}.timestamp + INTERVAL '1 minute' * ${TABLE_NAME.RTM}.timezone`,
+			'date'
+		)
 		.from(TABLE_NAME.RTM)
 		.where('patient_id = ?', patientId)
-		.where(`DATE(${TABLE_NAME.RTM}.timestamp AT TIME ZONE ?) = CURRENT_DATE`, timezone) 
+		.where(
+			`DATE(${TABLE_NAME.RTM}.timestamp + INTERVAL '1 minute' * ${TABLE_NAME.RTM}.timezone) = CURRENT_DATE`
+		)
 		.toParam();
-	  console.log("=====query===",query);
 	  const result = await BaseModel.runQuery(query);
-	  console.log("=========result=",result);
+	  console.log("=========result====",result);
 	  console.log("======tiemstamp========",result.rows[0]?.timestamp);
 	  console.log("=======timezone==========",timezone);
+	  const timezoneinMinutes = Helper.convertTimezoneToMinutes(timezone);
+	  console.log("=====timezoneinMinutes===",timezoneinMinutes);
 	  const now = Helper.currentTimeofTimezone(timezone);
 	  console.log("=now==",now);
 	  const convertedTime = Helper.convertUtcToTimezone(result.rows[0]?.timestamp, timezone);

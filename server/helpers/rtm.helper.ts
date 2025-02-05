@@ -1,10 +1,12 @@
 import * as BaseModel from '../services/BaseModel.service';
 import { updateRTM } from '../models/rtm.model';
+import * as Helper from '../services/util.helper';
 
-export const updatePatientSession = async (patient_id, painValue, patient_note) => {
+export const updatePatientSession = async (patient_id, painValue, patient_note,userTimezone) => {
+	const timezoneinMinutes = Helper.convertTimezoneToMinutes(userTimezone);
 	const rtmCreationFunc = async (client = null) => {
 		try {
-			const updatePatientSession = await updateRTM(patient_id, { painValue , patient_note }, 'patient');
+			const updatePatientSession = await updateRTM(patient_id, { painValue , patient_note }, 'patient','','',timezoneinMinutes);
 			return updatePatientSession;
 		} catch (err) {
 			throw err;
@@ -14,10 +16,11 @@ export const updatePatientSession = async (patient_id, painValue, patient_note) 
 };
 
 
-export const updateTherapistSession = async (patient_id, data, timestamp) => {
+export const updateTherapistSession = async (patient_id, data, timestamp,userTimezone) => {
+	const timezoneinMinutes = Helper.convertTimezoneToMinutes(userTimezone);
 	const rtmCreationFunc = async (client = null) => {
 		try {
-			const updatePatientSession = await updateRTM(patient_id, data, 'therapist', null, timestamp);
+			const updatePatientSession = await updateRTM(patient_id, data, 'therapist', null, timestamp,timezoneinMinutes);
 			return updatePatientSession;
 		} catch (err) {
 			throw err;
