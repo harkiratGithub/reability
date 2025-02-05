@@ -113,6 +113,15 @@ export const getTimeString = (time: number): string => {
 		}
 		return  momentTimezone().tz(timezone);
 	};
+
+	export const convertTimezoneToMinutes=(timezone)=>{
+		const currentOffset = momentTimezone.tz(timezone).format("Z"); 
+		console.log(`Current Offset: ${currentOffset}`);		
+		const [hours, minutes] = currentOffset.split(":").map(Number);
+		const totalMinutes = hours * 60 + Math.sign(hours) * minutes; 
+		console.log(`Total Minutes Offset: ${totalMinutes} minutes`);
+		return totalMinutes;
+	}
 	
 
 	/*
