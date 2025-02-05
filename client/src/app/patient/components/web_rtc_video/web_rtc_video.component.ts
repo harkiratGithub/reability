@@ -962,7 +962,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           const results = this.matchClipAndPatientData(this.videoMinMax[this.videoIndex], this.matchingCameraData);
           const updateComments = this.updateComments(results);
           this.saveToCSV(updateComments, 'min_max_matches.csv');
-          this.saveToCSV(this.timeLog, 'time_matching.csv');
+          // this.saveToCSV(this.timeLog, 'time_matching.csv');
         }
         if (action.msg && action.msg.data && action.msg.data.shouldPlay) {
           // this.currentVideoIndex = 0;
