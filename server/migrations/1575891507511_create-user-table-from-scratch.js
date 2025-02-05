@@ -22,7 +22,7 @@ exports.up = (pgm) => {
 			default: pgm.func('current_timestamp'),
 		},
 		is_two_factor_enabled: { type: 'boolean', notNull: true, default: false },
-		two_facor_secret: { type: 'varchar(255)', notNull: false },
+		two_factor_secret: { type: 'varchar(255)', notNull: false },
 		date_agreed_terms: {
 			type: 'timestamp',
 			notNull: true,
@@ -33,6 +33,7 @@ exports.up = (pgm) => {
 			notNull: true,
 			default: pgm.func('current_timestamp'),
 		},
+		// timezone: { type: 'text', notNull: false },
 	});
 	pgm.createTrigger('users', 'update_time_user', {
 		when: 'BEFORE',
