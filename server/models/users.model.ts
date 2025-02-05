@@ -121,6 +121,8 @@ export const isPatientEntryForToday = async (
 			`${TABLE_NAME.RTM}.timestamp + INTERVAL '1 minute' * ${TABLE_NAME.RTM}.timezone`,
 			'date'
 		)
+		.field(`CURRENT_DATE`, 'current_date_system')
+		.field(`DATE(${TABLE_NAME.RTM}.timestamp + INTERVAL '1 minute' * ${TABLE_NAME.RTM}.timezone)`, 'current_date_table')
 		.from(TABLE_NAME.RTM)
 		.where('patient_id = ?', patientId)
 		.where(
