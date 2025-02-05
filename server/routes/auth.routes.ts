@@ -10,7 +10,7 @@ function attachUserTimezone(req, res, next) {
 	if (userTimezone) {
 	  req.userTimezone = userTimezone;
 	}
-	next(); // Proceed to the next middleware or route handler
+	next();
   }
 
 router.post(

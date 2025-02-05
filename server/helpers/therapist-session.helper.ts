@@ -34,7 +34,8 @@ export const createTherapistSession = async (userId, therapistId) => {
 			review_activity: 'Video Call',
 			therapist_id: therapistId,
 		},
-		new Date()
+		new Date(),
+		null,
 	);
 	return therapistSessionData;
 };
