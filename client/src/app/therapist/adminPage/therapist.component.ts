@@ -257,8 +257,8 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
         content: 'You need to connect a web camera to make calls',
         acceptBtnImg: '../../../assets/buttons/btn_accept_hover.png',
         acceptBtnImgHover: '../../../assets/buttons/btn_accept_hover.png',
-        approveCallback: () => {},
-        declineCallback: () => {},
+        approveCallback: () => { },
+        declineCallback: () => { },
         timeout: 60000,
       },
       false
@@ -780,7 +780,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
 
   sendEmailAfterConnection = (user) => {
     this.sendEmailTimeoutConnection = setTimeout(() => {
-      this.ajax.sendEmailAfterConnection(user, this.connectedTherapist).subscribe((data) => {});
+      this.ajax.sendEmailAfterConnection(user, this.connectedTherapist).subscribe((data) => { });
     }, this.EMAIL_CONNECTION_MESSAGE_DELAY);
   };
 
@@ -1148,7 +1148,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       (activeCall) => activeCall['call'].peer === peer_id
     );
     if (currStream && currStream.stream) {
-      return currStream.stream.getAudioTracks()[0].enabled ? false : true;
+      return currStream.stream.getAudioTracks()[0]?.enabled ? false : true;
     }
   };
 
