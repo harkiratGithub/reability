@@ -155,7 +155,6 @@ export const isPatientEntryForToday = async (
 	patientId: number
   ): Promise<{ hasEntries: boolean; painLevel?: number }> => {
 	try {
-	  // Fetch the latest entry for the patient
 	  let hasEntries= true;
 	  const query = squelPostgres
 		.select()
@@ -172,8 +171,7 @@ export const isPatientEntryForToday = async (
 		console.log("======result=======",result);	   
 	  // Convert the timestamp to the patient's timezone
 	  const timestamp = result.rows[0]?.timestamp;
-	  const timezoneinMinutes = result.rows[0]?.timezone;
-	  console.log("=======result.rows[0]?.timezone=======", result.rows[0]?.timezone);
+	  const timezoneinMinutes = result.rows[0]?.timezone;	  
 	  console.log("=======timezoneinMinutes=======", timezoneinMinutes);
 	  const timezone = Helper.convertMinutesToTimezonestring(timezoneinMinutes);
 	  console.log("=======timezone=======", timezone);
