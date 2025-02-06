@@ -85,8 +85,8 @@ export const isPatientEntryForToday = async (
 			.from(TABLE_NAME.RTM)
 			.where('patient_id = ?', patientId)
 			.where('DATE(timestamp) = CURRENT_DATE')
+			.where("data->'patient' IS NOT NULL")      
 			.toParam();
-
 		const result = await BaseModel.runQuery(query);
 		const hasEntries = result.rows.length > 0;
 		const painLevel = hasEntries ? result.rows[0]?.pain_level : undefined;
