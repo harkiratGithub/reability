@@ -164,10 +164,10 @@ export const isPatientEntryForToday = async (
 		.field(`${TABLE_NAME.RTM}.timezone`, 'timezone')
 		.from(TABLE_NAME.RTM)
 		.where('patient_id = ?', patientId)
+		.where("data->'patient' IS NOT NULL")
 		.order(`${TABLE_NAME.RTM}.timestamp`,false) 
 		.limit(1)
-		.toParam();
-		
+		.toParam();		
 		const result = await BaseModel.runQuery(query); 
 		console.log("======result=======",result);	   
 	  // Convert the timestamp to the patient's timezone
