@@ -70,7 +70,7 @@ export const onLogIn = async (user: {
 					timezone:timezone,
 				} = EncryptHelper.decryptJson(details[0]);
 				const RTM = details?.some((ele: { department_name: string }) => ele.department_name.toLowerCase() === 'rtm');
-				const todayEntry = await UserModel.isPatientEntryForToday(patientId,timezone);
+				const todayEntry = await UserModel.isPatientEntryForToday(patientId);
 				const isPainModelOpen = RTM && typeof todayEntry.painLevel === 'undefined' && !todayEntry.hasEntries;
 				const isMobileModelOpen =
 					RTM && new Date().getTime() - new Date(timestamp).getTime() >= 24 * 60 * 60 * 1000 ? true : false;

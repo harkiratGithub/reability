@@ -1,7 +1,7 @@
 import moment from 'moment';
 import crypto from 'crypto';
 import { padStart } from 'lodash';
-//import { DateTime } from 'luxon';
+import { DateTime } from 'luxon';
 import momentTimezone from 'moment-timezone';
 
 
@@ -122,6 +122,47 @@ export const getTimeString = (time: number): string => {
 		console.log(`Total Minutes Offset: ${totalMinutes} minutes`);
 		return totalMinutes;
 	}
+
+	export const convertMinutesToTimezone = (minutes: number): string => {
+		const sign = minutes >= 0 ? '+' : '-';
+		const absoluteMinutes = Math.abs(minutes);
+		const hours = Math.floor(absoluteMinutes / 60);
+		const remainingMinutes = absoluteMinutes % 60;
+	  
+		// Format the time zone as +HH:mm or -HH:mm
+		const formattedTimezone = `${sign}${String(hours).padStart(2, '0')}:${String(remainingMinutes).padStart(2, '0')}`;
+	  
+		console.log(`Converted Timezone: ${formattedTimezone}`);
+		return formattedTimezone;
+	};
+
+	export const convertMinutesToTimezonestring = (minutes: number): string => {
+		const sign = minutes >= 0 ? '+' : '-';
+		const absoluteMinutes = Math.abs(minutes);
+		const hours = Math.floor(absoluteMinutes / 60);
+		const remainingMinutes = absoluteMinutes % 60;
+		
+		// Format the time zone offset as +HH:mm or -HH:mm
+		const formattedTimezone = `${sign}${String(hours).padStart(2, '0')}:${String(remainingMinutes).padStart(2, '0')}`;
+	  
+		// Get a list of all timezones
+		const timezones = momentTimezone.tz.names();
+		
+		// Find the first timezone that matches the offset
+		for (const timezone of timezones) {
+		  const offset = momentTimezone.tz(timezone).utcOffset();
+		  const offsetInMinutes = offset;
+		  const offsetFormatted = `${offsetInMinutes >= 0 ? '+' : '-'}${String(Math.abs(Math.floor(offsetInMinutes / 60))).padStart(2, '0')}:${String(Math.abs(offsetInMinutes % 60)).padStart(2, '0')}`;
+		  
+		  if (offsetFormatted === formattedTimezone) {
+			console.log(`Found timezone for offset ${formattedTimezone}: ${timezone}`);
+			return timezone;
+		  }
+		}
+	  
+		// If no matching time zone is found, return a default
+		return 'Unknown Timezone';
+	  };
 	
 
 	/*

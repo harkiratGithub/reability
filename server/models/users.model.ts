@@ -3,6 +3,7 @@ import * as BaseModel from '../services/BaseModel.service';
 import * as Helper from '../services/util.helper';
 import * as EncryptHelper from '../services/encrypt.helper';
 import { TABLE_NAME } from '../const';
+import moment from 'moment';
 
 import squel from 'squel';
 
@@ -96,22 +97,23 @@ export const isPatientEntryForToday = async (
 	}
 };
 */
+/*
 export const isPatientEntryForToday = async (
 	patientId: number, 
 	timezone: string
   ): Promise<{ hasEntries: boolean; painLevel?: number }> => {
 	try {
-	 /* const query = squelPostgres
-		.select()
-		.field(`${TABLE_NAME.RTM}.timestamp`, 'timestamp')
-		.field(`${TABLE_NAME.RTM}.data->'patient'->>'pain_level'`, 'pain_level')
-		.field(`${TABLE_NAME.RTM}.timezone`, 'timezone')
-		.from(TABLE_NAME.RTM)
-		.where('patient_id = ?', patientId)
-		.where(`DATE(${TABLE_NAME.RTM}.timestamp AT TIME ZONE ?) = CURRENT_DATE`, timezone) 
-		.toParam();	  
-	  const result = await BaseModel.runQuery(query);
-	  */
+	 //const query = squelPostgres
+		//.select()
+		//.field(`${TABLE_NAME.RTM}.timestamp`, 'timestamp')
+		//.field(`${TABLE_NAME.RTM}.data->'patient'->>'pain_level'`, 'pain_level')
+		//.field(`${TABLE_NAME.RTM}.timezone`, 'timezone')
+		//.from(TABLE_NAME.RTM)
+		//.where('patient_id = ?', patientId)
+		//.where(`DATE(${TABLE_NAME.RTM}.timestamp AT TIME ZONE ?) = CURRENT_DATE`, timezone) 
+		//.toParam();	  
+	  //const result = await BaseModel.runQuery(query);
+	  
 	  const query = squelPostgres
 		.select()
 		.field(`${TABLE_NAME.RTM}.timestamp`, 'timestamp')
@@ -147,7 +149,54 @@ export const isPatientEntryForToday = async (
 	} catch (error) {
 	  return { hasEntries: false };
 	}
-};
+};*/
+
+export const isPatientEntryForToday = async (
+	patientId: number
+  ): Promise<{ hasEntries: boolean; painLevel?: number }> => {
+	try {
+	  let hasEntries= true;
+	  const query = squelPostgres
+		.select()
+		.field(`${TABLE_NAME.RTM}.timestamp`, 'timestamp')
+		.field(`${TABLE_NAME.RTM}.data->'patient'->>'pain_level'`, 'pain_level')
+		.field(`${TABLE_NAME.RTM}.timezone`, 'timezone')
+		.from(TABLE_NAME.RTM)
+		.where('patient_id = ?', patientId)
+		.where("data->'patient' IS NOT NULL")
+		.order(`${TABLE_NAME.RTM}.timestamp`,false) 
+		.limit(1)
+		.toParam();		
+		const result = await BaseModel.runQuery(query); 
+		console.log("======result=======",result);	   
+	  // Convert the timestamp to the patient's timezone
+	  const timestamp = result.rows[0]?.timestamp;
+	  const timezoneinMinutes = result.rows[0]?.timezone;	  
+	  console.log("=======timezoneinMinutes=======", timezoneinMinutes);
+	  const timezone = Helper.convertMinutesToTimezonestring(timezoneinMinutes);
+	  console.log("=======timezone=======", timezone);
+	  const convertedTime = Helper.convertUtcToTimezone(timestamp, timezone);
+	  console.log("=======convertedTime=======", convertedTime);	  
+	  const now = Helper.currentTimeofTimezone(timezone);	  
+	  const convertedDate = moment(convertedTime).format('YYYY-MM-DD');
+	  console.log("=======convertedDate=======", convertedDate);
+	  const currentDate = moment(now).format('YYYY-MM-DD');	  
+	  console.log("=======currentDate=======", currentDate);
+	  // If the dates are different, show the pain scale popup
+	  const isNewDay = convertedDate !== currentDate;	  
+	  if (isNewDay || (result.rows.length == 0)) {
+		console.log('Show Pain Scale Popup');
+		hasEntries = false;
+	  }  
+	  const painLevel = hasEntries ? result.rows[0]?.pain_level : undefined;	  
+	  console.log("===hasEntries===",hasEntries);
+	  console.log("===painLevel===",painLevel);
+	  return { hasEntries, painLevel };
+	} catch (error) {
+	  console.error('Error in isPatientEntryForToday:', error);
+	  return { hasEntries: false };
+	}
+  };
 
 export const getUserDetails = async (userId, therapistId = undefined) => {
 	const query = squelPostgres
