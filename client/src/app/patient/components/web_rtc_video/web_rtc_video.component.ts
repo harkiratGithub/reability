@@ -2576,9 +2576,11 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           this.timeMatching = withinTimeTolerance(
             elapsedTime,
             currentVideoAngle.ClipTimestamp,
-            .75
+            1
           )
-
+          if (this.lastComment == 'Good' && this.lastTimeMatching) {
+            this.timeMatching = true;
+          }
           if (!this.timeMatching && this.timeMatching != this.lastTimeMatching) {
             this.currentVideoIndex++;
           }
