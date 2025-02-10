@@ -33,7 +33,7 @@ exports.up = (pgm) => {
 			notNull: true,
 			default: pgm.func('current_timestamp'),
 		},
-		// timezone: { type: 'text', notNull: false },
+		timezone: { type: 'text', notNull: false },
 	});
 	pgm.createTrigger('users', 'update_time_user', {
 		when: 'BEFORE',
