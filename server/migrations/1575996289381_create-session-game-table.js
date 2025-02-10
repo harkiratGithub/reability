@@ -21,7 +21,7 @@ exports.up = pgm => {
     },
     ended_at: {
       type: 'timestamp'
-    }
+    },
   });
 };
 

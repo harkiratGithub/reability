@@ -1,6 +1,9 @@
 import moment from 'moment';
 import crypto from 'crypto';
 import { padStart } from 'lodash';
+import { DateTime } from 'luxon';
+import momentTimezone from 'moment-timezone';
+
 
 import { emailRegex, passwordRegex } from '../const';
 
@@ -94,3 +97,116 @@ export const getTimeString = (time: number): string => {
 		.filter((v, i) => v !== '00' || i > 0)
 		.join(':');
 };
+
+	// Converts UTC time to the specified timezone
+	export const convertUtcToTimezone = (utcTime, timezone) => {
+		if (!utcTime || !timezone) {
+		throw new Error('Both UTC time and timezone are required.');
+		}
+		return momentTimezone.utc(utcTime).tz(timezone).format('YYYY-MM-DD HH:mm:ss');
+	};
+
+
+	export const currentTimeofTimezone = (timezone)=>{
+		if ( !timezone) {
+			throw new Error('timezone are required.');
+		}
+		return  momentTimezone().tz(timezone);
+	};
+
+	export const convertTimezoneToMinutes=(timezone)=>{
+		const currentOffset = momentTimezone.tz(timezone).format("Z"); 
+		console.log(`Current Offset: ${currentOffset}`);		
+		const [hours, minutes] = currentOffset.split(":").map(Number);
+		const totalMinutes = hours * 60 + Math.sign(hours) * minutes; 
+		console.log(`Total Minutes Offset: ${totalMinutes} minutes`);
+		return totalMinutes;
+	}
+
+	export const convertMinutesToTimezone = (minutes: number): string => {
+		const sign = minutes >= 0 ? '+' : '-';
+		const absoluteMinutes = Math.abs(minutes);
+		const hours = Math.floor(absoluteMinutes / 60);
+		const remainingMinutes = absoluteMinutes % 60;
+	  
+		// Format the time zone as +HH:mm or -HH:mm
+		const formattedTimezone = `${sign}${String(hours).padStart(2, '0')}:${String(remainingMinutes).padStart(2, '0')}`;
+	  
+		console.log(`Converted Timezone: ${formattedTimezone}`);
+		return formattedTimezone;
+	};
+
+	export const convertMinutesToTimezonestring = (minutes: number): string => {
+		const sign = minutes >= 0 ? '+' : '-';
+		const absoluteMinutes = Math.abs(minutes);
+		const hours = Math.floor(absoluteMinutes / 60);
+		const remainingMinutes = absoluteMinutes % 60;
+		
+		// Format the time zone offset as +HH:mm or -HH:mm
+		const formattedTimezone = `${sign}${String(hours).padStart(2, '0')}:${String(remainingMinutes).padStart(2, '0')}`;
+	  
+		// Get a list of all timezones
+		const timezones = momentTimezone.tz.names();
+		
+		// Find the first timezone that matches the offset
+		for (const timezone of timezones) {
+		  const offset = momentTimezone.tz(timezone).utcOffset();
+		  const offsetInMinutes = offset;
+		  const offsetFormatted = `${offsetInMinutes >= 0 ? '+' : '-'}${String(Math.abs(Math.floor(offsetInMinutes / 60))).padStart(2, '0')}:${String(Math.abs(offsetInMinutes % 60)).padStart(2, '0')}`;
+		  
+		  if (offsetFormatted === formattedTimezone) {
+			console.log(`Found timezone for offset ${formattedTimezone}: ${timezone}`);
+			return timezone;
+		  }
+		}
+	  
+		// If no matching time zone is found, return a default
+		return 'Unknown Timezone';
+	  };
+	
+
+	/*
+	// Converts UTC time to the specified timezone
+	export const convertUtcToTimezoneOffset = (utcTime, timezoneOffset) => {
+		if (!utcTime || !timezoneOffset) {
+			throw new Error('Both UTC time and timezone offset are required.');
+		}
+		const timezoneRegex = /^[+-]\d{2}:\d{2}$/;
+		if (!timezoneRegex.test(timezoneOffset)) {
+			throw new Error(`Invalid timezone offset format: ${timezoneOffset}`);
+		}
+		// Normalize UTC time to ensure three-digit milliseconds
+		const normalizedUtcTime = normalizeMilliseconds(utcTime);
+	
+		const [hoursOffset, minutesOffset] = parseTimezoneOffset(timezoneOffset);
+	
+		const dateTimeUtc = DateTime.fromFormat(normalizedUtcTime, 'yyyy-MM-dd HH:mm:ss.SSS', { zone: 'utc' });
+	
+		if (!dateTimeUtc.isValid) {
+			throw new Error(`Invalid UTC time format: ${normalizedUtcTime}`);
+		}
+	
+		const convertedDateTime = dateTimeUtc.plus({ hours: hoursOffset, minutes: minutesOffset });
+		console.log("Converted DateTime:", convertedDateTime.toISO());
+		return convertedDateTime.toFormat('yyyy-MM-dd HH:mm:ss');
+	};
+	
+	const normalizeMilliseconds = (utcTime) => {
+		const parts = utcTime.split('.');
+		if (parts.length === 2 && parts[1].length < 3) {
+			parts[1] = parts[1].padEnd(3, '0'); 
+			return parts.join('.');
+		}
+		if (parts.length === 1) {
+			return `${utcTime}.000`; // Add milliseconds if missing
+		}
+		return utcTime;
+	};
+	
+	const parseTimezoneOffset = (offset) => {
+		const sign = offset.charAt(0);
+		const [hours, minutes] = offset.slice(1).split(':').map(Number);
+	
+		return sign === '+' ? [hours, minutes] : [-hours, -minutes];
+	};
+	*/

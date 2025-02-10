@@ -62,12 +62,12 @@ const getInstituteIdByPatientId = async (patient_id) => {
 	return institute_id;
 };
 
-export const updateRTM = async (patient_id, data, type = 'patient', client = null, timestamp = null) => {
+export const updateRTM = async (patient_id, data, type = 'patient', client = null, timestamp = null, timezone=0) => {
 	const currentTimestamp = timestamp ? new Date(timestamp) : new Date();
 	if (isNaN(currentTimestamp.getTime())) {
 		throw new Error('Invalid timestamp provided');
 	}
-	const institute_id = await getInstituteIdByPatientId(patient_id);
+	const institute_id = await getInstituteIdByPatientId(patient_id);	
 	// console.log("currentTimestamp: ",timestamp, currentTimestamp)
 	const currentMonth = currentTimestamp.getMonth() + 1;
 	const currentYear = currentTimestamp.getFullYear();
@@ -116,6 +116,7 @@ export const updateRTM = async (patient_id, data, type = 'patient', client = nul
 					// daysDataTransmittedInMonth
 				}),
 				timestamp: currentTimestamp.toISOString(),
+				timezone:timezone,
 			},
 			rtmValidator,
 			client
@@ -156,6 +157,7 @@ export const updateRTM = async (patient_id, data, type = 'patient', client = nul
 				}),
 				institute_id: institute_id,
 				timestamp: currentTimestamp.toISOString(),
+				timezone:timezone,
 			},
 			rtmValidator,
 			client

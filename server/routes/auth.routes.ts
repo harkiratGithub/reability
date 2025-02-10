@@ -3,13 +3,21 @@ import passport from 'passport';
 import { permitAccess, permitTherapistAccessToPatient, removeOldSessionAndPeers, verifyRecaptcha } from '../services/middleware';
 import * as UserController from '../controllers/user.controller';
 import { ROLE } from '../const';
-
 const router = express.Router();
+
+function attachUserTimezone(req, res, next) {
+	const { userTimezone } = req.body;
+	if (userTimezone) {
+	  req.userTimezone = userTimezone;
+	}
+	next();
+  }
 
 router.post(
 	'/login',
 	verifyRecaptcha(),
 	passport.authenticate('login'),
+	attachUserTimezone, 
 	removeOldSessionAndPeers(),
 	UserController.authenticate
 );
