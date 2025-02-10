@@ -62,6 +62,34 @@ const getInstituteIdByPatientId = async (patient_id) => {
 	return institute_id;
 };
 
+export const getInstituteLogoById = async (patient_id) => {
+	try {
+	  const institute_id = await getInstituteIdByPatientId(patient_id);
+  
+	  const imageQuery = squelPostgres
+		.select()
+		.field('i.url')
+		.from(TABLE_NAME.INSTITUTE, 'inst')
+		.join(TABLE_NAME.IMAGE, 'i', 'i.id = inst.image_id')
+		.where('inst.id = ?', institute_id)
+		.toParam();
+  
+	  const imageResult = await BaseModel.runQuery(imageQuery);
+  
+	  // Check if result is valid and has rows
+	  if (imageResult && imageResult.rows && imageResult.rows[0]?.url) {
+		console.log("Institute Logo URL Found:", imageResult.rows[0].url);
+		return imageResult.rows[0].url; // Return the logo URL
+	  } else {
+		console.warn("Institute Logo URL not found, using default.");
+		return 'assets/therapist/therapist_logo.png'; // Return a default image URL
+	  }
+	} catch (error) {
+	  console.error("Error fetching institute logo:", error);
+	  return 'assets/therapist/therapist_logo.png'; // Return a default image URL in case of error
+	}
+  };
+
 export const updateRTM = async (patient_id, data, type = 'patient', client = null, timestamp = null, timezone=0) => {
 	const currentTimestamp = timestamp ? new Date(timestamp) : new Date();
 	if (isNaN(currentTimestamp.getTime())) {

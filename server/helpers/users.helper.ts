@@ -3,6 +3,7 @@ import { map, findLast } from 'lodash';
 import * as UserModel from '../models/users.model';
 import * as PatientModel from '../models/patient.model';
 import * as GameModel from '../models/game.model';
+import * as RtmModel from '../models/rtm.model';
 import * as TherapistSessionModel from '../models/therapist-session.model';
 
 import * as GameSessionHelper from '../helpers/game-session.helper';
@@ -77,6 +78,7 @@ export const onLogIn = async (user: {
 				const isRTM = RTM;
 				const validGames = await GameModel.getValidGameForPatient(patientId);
 				const patient = await PatientModel.findPatientByUserId(user.id);
+				const instituteLogo = await RtmModel.getInstituteLogoById(patientId);
 				const disabledSkeleton = patient.disabled_skeleton;
 				const requiresTermsAgreement = date_agreed_terms === null;
 				
@@ -91,6 +93,7 @@ export const onLogIn = async (user: {
 					isPainModelOpen,
 					isMobileModelOpen,
 					isRTM,
+					instituteLogo,
 					date_agreed_terms: requiresTermsAgreement,
 				};
 		}

@@ -9,7 +9,7 @@ export const createInstitute = async (institute, departments, file = undefined) 
 		try {
 			let imgId;
 			if (file) {
-				imgId = await ImageHelper.createImage(`${file.originalname}`, file, process.env.AWS_IMAGE_BUCKET_PATH, client);
+				imgId = await ImageHelper.createImage(`${file.originalname}`, file, process.env.AZURE_IMAGE_BUCKET_PATH, client);
 			}
 			const createdInstitute = await InstituteModel.create(
 				{
@@ -36,16 +36,17 @@ export const handleEditImage = async (file, existingImageId, client = null) => {
 	if (file) {
 		// if already has image delete it
 		if (existingImageId && existingImageId !== 'null') {
-			await ImageHelper.deleteImage(existingImageId, process.env.AWS_IMAGE_BUCKET_PATH, client);
+			await ImageHelper.deleteImage(existingImageId, process.env.AZURE_IMAGE_BUCKET_PATH, client);
 		}
 		// upload the new image
 		updatedImgId = await ImageHelper.createImage(
 			`${file.originalname}`,
 			file,
-			process.env.AWS_IMAGE_BUCKET_PATH,
+			process.env.AZURE_IMAGE_BUCKET_PATH,
 			client
 		);
 	}
+	console.log("=updatedImgId==========",updatedImgId);
 	return updatedImgId;
 };
 
@@ -72,6 +73,7 @@ function getEditedInstituteDepartments(departments, instituteId) {
 export const editInstitute = async (institute, file, imageId, departments) => {
 	const instituteEditFunc = async (client = null) => {
 		const updatedImgId = await handleEditImage(file, imageId, client);
+		console.log("=updatedImgId==",updatedImgId);
 		const { id, ...data } = institute;
 		const instituteToUpdate = {
 			...data,
@@ -100,7 +102,7 @@ export const deleteInstitute = async (id) => {
 			client
 		);
 		if (process.env.NODE_ENV !== 'test') {
-			await ImageHelper.deleteImage(institute.image_id, process.env.AWS_IMAGE_BUCKET_PATH, client);
+			await ImageHelper.deleteImage(institute.image_id, process.env.AZURE_IMAGE_BUCKET_PATH, client);
 		}
 	};
 	return BaseModel.runAsTransaction(instituteDeleteFunc);

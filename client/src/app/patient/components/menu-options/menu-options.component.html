@@ -21,11 +21,12 @@
           (!showTimer && isInGame) || (isTherapistMode && isConnectedUserInGame && !showTimerForTherapist)
       }"
     >
-      <div class="header-left-container">
-              <!-- <img class="shiba-logo" src="assets/main-menu/beyond.png" /> -->
-        <img class="logo" src="assets/therapist/therapist_logo.png
-" />
-      </div>
+    <div class="header-left-container" *ngIf="!InstituteLogo">
+      <img class="logo" src="assets/therapist/therapist_logo.png" />
+    </div>
+    <div class="header-left-container" *ngIf="InstituteLogo">
+      <img class="logo" [src]="InstituteLogo" />
+    </div>
       <div *ngIf="!isTherapistMode && !isInGame" class="header-right-container" (click)="logout()">
         <img class="log-out-image" src="assets/main-menu/svg-cards/log_out_new.svg" />
         <p class="log-out-text">Log out</p>
