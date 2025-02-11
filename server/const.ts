@@ -32,6 +32,7 @@ export const TABLE_NAME = {
 	USER_FILTERS: 'user_filters',
 	USER_GAME_DATA: 'user_game_data',
 	GAME_DATA: 'game_data',
+	GAME_METADATA: 'game_metadata',
 	SERVER_LOG: 'server_log',
 	RTM: 'rtm'
 };
@@ -133,6 +134,6 @@ export const NO_AVAILABILITY: IAvailabilitySchedule = {
 
 export const PATIENT_AUTO_PASSWORD_LENGTH = 8;
 
-export const ARRAY_TO_POSTGRES_ARRAY_COLUMNS = ['institutes','departments'];
+export const ARRAY_TO_POSTGRES_ARRAY_COLUMNS = ['institutes', 'departments'];
 
 export const MAX_NUMBER_OF_PATIENT_CONTACTS = 2;
