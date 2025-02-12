@@ -7,12 +7,14 @@ import * as UtilModel from './util.model';
 
 const squelPostgres = squel.useFlavour('postgres');
 
-export const createGameMetaData = async (gameData: any[], client = null) => {
-	// const data = map(gameData, (item) => UtilModel.convertKeysToSnakeCase(item));
-	const createdGameMetaData = await BaseModel.insertBulk(TABLE_NAME.GAME_METADATA, gameData, client);
-	console.log(createdGameMetaData, gameData);
-
-	return map(createdGameMetaData, (item) => UtilModel.convertKeysToCamelCase(item));
+export const createGameMetaData = async (gameData: any) => {
+	return BaseModel.insertRow(TABLE_NAME.GAME_METADATA, {
+		...gameData,
+		settings: JSON.stringify(gameData.settings),
+		landmarks: JSON.stringify(gameData.landmarks),
+		landmarks_pointer: JSON.stringify(gameData.landmarks_pointer),
+		landmarks_line_pointer: JSON.stringify(gameData.landmarks_line_pointer),
+	});
 };
 
 export const editGameMetaData = (gameDataId, gameData, client = null) =>
@@ -36,18 +38,6 @@ export const deleteGameMetaData = async (gameDataIds: number[]) => {
 	return map(result.rows, (item) => UtilModel.convertKeysToCamelCase(item));
 };
 
-export const updateGameMetaDataStatus = async (gameDataIds: number[], active: boolean, client = null) => {
-	const query = squelPostgres
-		.update()
-		.table(TABLE_NAME.GAME_METADATA)
-		.set('active', active)
-		.where(`id IN (${gameDataIds.join(',')})`)
-		.returning('*')
-		.toParam();
-	const result = await BaseModel.runQuery(query);
-	return map(result.rows, (item) => UtilModel.convertKeysToCamelCase(item));
-};
-
 export const getGameMetaDataByIds = async (gameDataIds: number[]): Promise<any[]> => {
 	const query = squelPostgres
 		.select()
@@ -57,31 +47,6 @@ export const getGameMetaDataByIds = async (gameDataIds: number[]): Promise<any[]
 		.toParam();
 	const result = await BaseModel.runQuery(query);
 	return map(result.rows, (item) => UtilModel.convertKeysToCamelCase(item));
-};
-
-export const getShortGameMetaData = async (gameId: number): Promise<any[]> => {
-	const query = squelPostgres
-		.select()
-		.field(`${TABLE_NAME.GAME_METADATA}.id`)
-		.field(`${TABLE_NAME.GAME_METADATA}.worksheet`)
-		.field(`${TABLE_NAME.GAME_METADATA}.tags`)
-		.from(TABLE_NAME.GAME_METADATA)
-		.where(`${TABLE_NAME.GAME_METADATA}.game_id = ? AND  active = true`, gameId)
-		.toParam();
-	const result = await BaseModel.runQuery(query);
-	return map(result.rows, (item) => UtilModel.convertKeysToCamelCase(item));
-};
-
-export const getAllGames = async () => {
-	const query = squelPostgres.select().from(TABLE_NAME.GAME).toParam();
-	const result = await BaseModel.runQuery(query);
-	return result.rows;
-};
-
-export const getAllEndGames = async () => {
-	const query = squelPostgres.select().from(TABLE_NAME.GAME).toParam();
-	const result = await BaseModel.runQuery(query);
-	return result.rows;
 };
 
 export const clearGameMetaData = async () => {
