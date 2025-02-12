@@ -2,7 +2,7 @@ import * as GameMetaDataModel from '../models/game-metadata.model';
 
 export const createGameMetaData = (req, res, next) => {
 	let { gameData } = req.body;
-	GameMetaDataModel.createGameMetaData(gameData)
+	GameMetaDataModel.createGameMetaData(req.body)
 		.then((createdGameMetaData) => res.json(createdGameMetaData))
 		.catch((err) => next(err));
 };

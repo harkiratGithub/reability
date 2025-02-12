@@ -5,7 +5,7 @@ exports.shorthands = undefined;
 exports.up = (pgm) => {
 	pgm.createTable('game_metadata', {
 		id: 'id',
-		video_name: { type: 'integer', onDelete: 'SET NULL' },
+		video_name: { type: 'varchar(255)', onDelete: 'SET NULL' },
 		video_index: { type: 'integer', onDelete: 'SET NULL' },
 		game_id: { type: 'integer', references: 'game', onDelete: 'SET NULL' },
 		settings: { type: 'jsonb', notNull: 'true', default: '{}' },

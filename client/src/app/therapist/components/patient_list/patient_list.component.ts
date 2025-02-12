@@ -421,6 +421,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
       content: RTM_MODAL_CONTENT.SEND_FAST_LOGIN,
       patient,
       approveCallback: async (modalValues: OuterModalInterface) => {
+        const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
         const timestamp = modalValues.dataFromInnerForm.innerModalValue.date_time;
         const payload = {
           therapist_id: this.therapistId,
@@ -431,7 +432,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
           therapist_session_minutes: null,
         };
         await this.ajax
-          .sendRtmTherapistSessions(patient.id, payload, timestamp)
+          .sendRtmTherapistSessions(patient.id, payload, timestamp,userTimezone)
           .toPromise()
           .then((res) => {
             const successMessage = timestamp

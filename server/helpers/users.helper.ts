@@ -31,11 +31,15 @@ export const onLogIn = async (user: {
 	peerId: string;
 	email: string;
 	is_two_factor_enabled: boolean;
+	timezone:string;
 }): Promise<any> => {
-	try {
+	try {	
+		const currentTimestamp =  new Date();	
 		await UserModel.updateById(user.id, {
 			logged_in_at: Helper.createTimeForDb(),
 			logged_out_at: Helper.createTimeForDb(),
+			user_last_login: currentTimestamp.toISOString(),
+			timezone: user.timezone,			
 		});
 		switch (user.role) {
 			case ROLE.ADMIN:
@@ -63,6 +67,7 @@ export const onLogIn = async (user: {
 					pain_level: pain_level,
 					timestamp: timestamp,
 					date_agreed_terms: date_agreed_terms,
+					timezone:timezone,
 				} = EncryptHelper.decryptJson(details[0]);
 				const RTM = details?.some((ele: { department_name: string }) => ele.department_name.toLowerCase() === 'rtm');
 				const todayEntry = await UserModel.isPatientEntryForToday(patientId);
@@ -74,7 +79,7 @@ export const onLogIn = async (user: {
 				const patient = await PatientModel.findPatientByUserId(user.id);
 				const disabledSkeleton = patient.disabled_skeleton;
 				const requiresTermsAgreement = date_agreed_terms === null;
-
+				
 				return {
 					...user,
 					id: patientId,

@@ -28,12 +28,14 @@ export class AjaxService {
     }
   };
 
-  login = (username, password, captchaToken) => {
+  login = (username, password, captchaToken,userTimezone) => {
+    console.log("====userTimezone=====",userTimezone);
     try {
       return this.http.post<any>(`${this.baseUrl}/login`, {
         username,
         password,
         captchaToken,
+        userTimezone,
       });
     } catch (err) {
       console.error(err);
@@ -309,9 +311,9 @@ export class AjaxService {
   };
 
   // patient RTM routes
-  sendPatientPainScale = (patientId, painValue, patient_note) => {
+  sendPatientPainScale = (patientId, painValue, patient_note,userTimezone) => {
     try {
-      return this.http.post<any>(`${this.baseUrl}/patient/rtmSession`, { patientId, painValue, patient_note });
+      return this.http.post<any>(`${this.baseUrl}/patient/rtmSession`, { patientId, painValue, patient_note,userTimezone });
     } catch (err) {
       console.error(err);
     }
@@ -336,9 +338,9 @@ export class AjaxService {
     }
   };
 
-  sendRtmTherapistSessions = (patientId, data, timestamp) => {
+  sendRtmTherapistSessions = (patientId, data, timestamp,userTimezone) => {
     try {
-      return this.http.post<any>(`${this.baseUrl}/therapist/rtmSession`, { patientId, data, timestamp });
+      return this.http.post<any>(`${this.baseUrl}/therapist/rtmSession`, { patientId, data, timestamp ,userTimezone});
     } catch (err) {
       console.error(err, 'message');
     }

@@ -53,10 +53,10 @@ export class PainScaleComponent implements OnInit {
     this.isSaving = true
     try {    
       this.patient_data =  this.ajax.getActivePatient(this.patientId).subscribe((response)=>{
-        console.log("===response===",response);
         this.patient_data = response;
        });  
-      this.ajax.sendPatientPainScale(this.patientId, this.painValue, this.patient_note).subscribe(
+      const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      this.ajax.sendPatientPainScale(this.patientId, this.painValue, this.patient_note,userTimezone).subscribe(
         (response) => {          
           //this.ajax.sendEmailAfterLogin(this.patient_data).subscribe((data) => { console.log("===data===",data)});   
           if (this.patient_data?.login_notification_email) {

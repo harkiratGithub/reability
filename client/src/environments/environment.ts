@@ -6,7 +6,7 @@ const MY_IP = '192.168.12.220';
 //const MY_IP = '192.168.50.40'; // EREZ Office ip
 // const MY_IP = '192.168.50.68'; // UZI Office ip
 //const MY_IP = '192.168.0.51'; // UZI HOME
-//const MY_IP = '192.168.43.245'; // UZI CELLPHONE
+//const MY_IP = '192.168.43.245'; // UZI CELLPHONE 
 
 export const environment = {
   production: false,

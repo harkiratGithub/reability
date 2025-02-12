@@ -793,7 +793,7 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 						// event_note: entry.data.note,
 						// minutes_spent: entry.data.minutes_spent,
 						// therapist_session_minutes: entry.data.therapist_session_minutes,
-						patient_pain_level: entry.data.patient?.pain_level || '--',
+						patient_pain_level: entry.data.patient?.pain_level,
 						patient_note: entry.data.patient?.note || '--',
 						therapist_id: entry.data.therapist?.therapist_id || '--',
 						therapist_user_name: entry.data.therapist?.user_name || '--',

@@ -39,14 +39,7 @@ export const sendPatientCredentialsEmail = async (userEmail, userName, password)
 	let subject;
 	let html;
 	if (process.env.EMAIL_LANGUAGE === 'english') {
-		subject = 'Welcome to TheRPT';
-		/*html = `<div style="direction:ltl">Congratulations on joining remote rehabilitation, TheRPT. <br><br> Here are the instructions for connecting to our application website:<br><br> Use a PC or laptop with a webcam, a microphone (usually integrated in the camera), speakers. We recommend Google Chrome browser. <br><br>
-   		<div style="font-weight:bold;font-size:20px;">Link:<a href="${url}">${process.env.SERVER_URL}</a></div>
-		<div style="font-weight:bold;font-size:20px;">Username:${userName}<br>Password:${password}</div><br><div></div>
-		<div style="font-weight:bold;font-size:20px;">Note: on your first login the browser will ask your permission to use the microphone and camera. Please confirm. The browser will also ask you to confirm saving the username and password. Please confirm.</div>
-		<br><br>We also suggest adding the site to the bookmarks and/or the Desktop for easy access.<div style="font-weight:bold;"><br>Good luck and enjoy,<br>
-		<br>TheRPT team </div>
-		</div></div>`;*/
+		subject = 'Welcome to TheRPT';		
 		html = `<div style="direction:ltr; font-family: Arial, sans-serif; font-size: 16px; line-height: 1.5; color: #333;">
 		<p>Hello,</p>
 		<p>We’re excited to have you on board and look forward to supporting you on your journey to better health.</p>
@@ -68,6 +61,7 @@ export const sendPatientCredentialsEmail = async (userEmail, userName, password)
 		<p><strong>Note: On your first login, the browser will ask your permission to use the microphone and camera. Please confirm. The browser will also ask you to confirm saving the username and password. Please confirm.</strong></p>
 		<p>We also suggest adding the site to the bookmarks and/or the Desktop for easy access.</p>
 		<p>If you have any questions or concerns, don’t hesitate to reach out to us—we’re here to help!</p>
+		<p>A self-explanatory video is available <a href="https://mediaus.blob.core.windows.net/videos/WelcomeEmailVideo.mp4" target="_blank">here</a></p>
 		<p>Best regards,</p>
 		<p style="font-weight: bold;">Arthur Shevardnadze<br>COO, TheRPT</p>
 		<p>212-470-1452</p>
@@ -80,7 +74,6 @@ export const sendPatientCredentialsEmail = async (userEmail, userName, password)
 		<div style="font-weight:bold;">*לכניסה מהירה מומלץ לאשר לשמור את שם המשתמש והסיסמא וכמו כן לשמור את הלינק לאתר שלנו ב"סרגל הסימניות" של כרום או באמצעות קישור על שולחן העבודה</div>
 		<br><div style="font-weight:bold;"><div style="text-decoration:underline; margin-top:10px;">נא להכין תעודת זהות להצגה בתחילת הטיפול</div><br>בהצלחה,<br><br>שיקום מרחוק, שיבא ביונד<br>03-5309661</div></div>`;
 	}
-	//await EmailHelper.sendMail(userEmail, subject, html, therapistEmail);
 	await EmailHelper.sendMail(userEmail, subject, html, therapistEmail,null, bccEmail);
 };
 

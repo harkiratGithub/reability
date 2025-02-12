@@ -8,8 +8,10 @@ import * as UtilModel from './util.model';
 const squelPostgres = squel.useFlavour('postgres');
 
 export const createGameMetaData = async (gameData: any[], client = null) => {
-	const data = map(gameData, (item) => UtilModel.convertKeysToSnakeCase(item));
-	const createdGameMetaData = await BaseModel.insertBulk(TABLE_NAME.GAME_METADATA, data, client);
+	// const data = map(gameData, (item) => UtilModel.convertKeysToSnakeCase(item));
+	const createdGameMetaData = await BaseModel.insertBulk(TABLE_NAME.GAME_METADATA, gameData, client);
+	console.log(createdGameMetaData, gameData);
+
 	return map(createdGameMetaData, (item) => UtilModel.convertKeysToCamelCase(item));
 };
 

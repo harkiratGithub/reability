@@ -101,741 +101,741 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   private currentVideoIndex: number = 0;
   videoMinMax = [
     [{
-      ClipValue: "Mid Value",
-      ClipTimestamp: 3.761,
-      ClipDeg: 87
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 3.761,
+      "ClipDeg": 87
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 6.147,
-      ClipDeg: 180
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 6.147,
+      "ClipDeg": 180
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 8.654,
-      ClipDeg: 96
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 8.654,
+      "ClipDeg": 96
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 11.159,
-      ClipDeg: 4
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 11.159,
+      "ClipDeg": 4
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 13.529,
-      ClipDeg: 92
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 13.529,
+      "ClipDeg": 92
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 15.366,
-      ClipDeg: 180
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 15.366,
+      "ClipDeg": 180
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 18.14,
-      ClipDeg: 92
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 18.14,
+      "ClipDeg": 92
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 19.525,
-      ClipDeg: 5
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 19.525,
+      "ClipDeg": 5
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 22.289,
-      ClipDeg: 94
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 22.289,
+      "ClipDeg": 94
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 23.994,
-      ClipDeg: 180
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 23.994,
+      "ClipDeg": 180
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 27.422,
-      ClipDeg: 92
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 27.422,
+      "ClipDeg": 92
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 28.914,
-      ClipDeg: 5
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 28.914,
+      "ClipDeg": 5
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 31.738,
-      ClipDeg: 90
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 31.738,
+      "ClipDeg": 90
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 33.362,
-      ClipDeg: 180
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 33.362,
+      "ClipDeg": 180
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 36.875,
-      ClipDeg: 95
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 36.875,
+      "ClipDeg": 95
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 38.477,
-      ClipDeg: 5
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 38.477,
+      "ClipDeg": 5
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 40.914,
-      ClipDeg: 87
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 40.914,
+      "ClipDeg": 87
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 42.992,
-      ClipDeg: 180
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 42.992,
+      "ClipDeg": 180
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 46.018,
-      ClipDeg: 92
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 46.018,
+      "ClipDeg": 92
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 48.051,
-      ClipDeg: 5
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 48.051,
+      "ClipDeg": 5
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 50.42,
-      ClipDeg: 91
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 50.42,
+      "ClipDeg": 91
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 52.131,
-      ClipDeg: 180
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 52.131,
+      "ClipDeg": 180
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 55.763,
-      ClipDeg: 94
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 55.763,
+      "ClipDeg": 94
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 57.824,
-      ClipDeg: 2
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 57.824,
+      "ClipDeg": 2
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 60.128,
-      ClipDeg: 88
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 60.128,
+      "ClipDeg": 88
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 61.613,
-      ClipDeg: 180
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 61.613,
+      "ClipDeg": 180
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 65.148,
-      ClipDeg: 93
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 65.148,
+      "ClipDeg": 93
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 69.202,
-      ClipDeg: 1
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 69.202,
+      "ClipDeg": 1
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 70.435,
-      ClipDeg: 0
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 70.435,
+      "ClipDeg": 0
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 72.578,
-      ClipDeg: 2
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 72.578,
+      "ClipDeg": 2
     }], [{
-      ClipValue: "Min Value",
-      ClipTimestamp: 0.859,
-      ClipDeg: 2
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 0.859,
+      "ClipDeg": 2
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 8.878,
-      ClipDeg: 4
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 8.878,
+      "ClipDeg": 4
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 17.769,
-      ClipDeg: 37
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 17.769,
+      "ClipDeg": 37
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 20.44,
-      ClipDeg: 78
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 20.44,
+      "ClipDeg": 78
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 28.358,
-      ClipDeg: 47
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 28.358,
+      "ClipDeg": 47
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 31.543,
-      ClipDeg: 4
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 31.543,
+      "ClipDeg": 4
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 35.928,
-      ClipDeg: 77
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 35.928,
+      "ClipDeg": 77
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 43.05,
-      ClipDeg: 47
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 43.05,
+      "ClipDeg": 47
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 46.313,
-      ClipDeg: 3
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 46.313,
+      "ClipDeg": 3
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 49.698,
-      ClipDeg: 78
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 49.698,
+      "ClipDeg": 78
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 54.171,
-      ClipDeg: 47
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 54.171,
+      "ClipDeg": 47
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 57.453,
-      ClipDeg: 3
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 57.453,
+      "ClipDeg": 3
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 60.694,
-      ClipDeg: 79
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 60.694,
+      "ClipDeg": 79
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 64.242,
-      ClipDeg: 46
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 64.242,
+      "ClipDeg": 46
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 65.741,
-      ClipDeg: 3
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 65.741,
+      "ClipDeg": 3
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 69.459,
-      ClipDeg: 81
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 69.459,
+      "ClipDeg": 81
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 75.919,
-      ClipDeg: 46
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 75.919,
+      "ClipDeg": 46
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 78.452,
-      ClipDeg: 2
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 78.452,
+      "ClipDeg": 2
     }], [{
-      ClipValue: "Min Value",
-      ClipTimestamp: 1.102,
-      ClipDeg: 3
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 1.102,
+      "ClipDeg": 3
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 15.079,
-      ClipDeg: 3
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 15.079,
+      "ClipDeg": 3
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 20.491,
-      ClipDeg: 39
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 20.491,
+      "ClipDeg": 39
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 21.565,
-      ClipDeg: 81
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 21.565,
+      "ClipDeg": 81
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 31.175,
-      ClipDeg: 41
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 31.175,
+      "ClipDeg": 41
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 33.483,
-      ClipDeg: 6
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 33.483,
+      "ClipDeg": 6
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 36.884,
-      ClipDeg: 83
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 36.884,
+      "ClipDeg": 83
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 44.714,
-      ClipDeg: 48
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 44.714,
+      "ClipDeg": 48
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 47.633,
-      ClipDeg: 4
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 47.633,
+      "ClipDeg": 4
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 50.72,
-      ClipDeg: 82
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 50.72,
+      "ClipDeg": 82
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 55.821,
-      ClipDeg: 47
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 55.821,
+      "ClipDeg": 47
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 59.625,
-      ClipDeg: 3
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 59.625,
+      "ClipDeg": 3
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 61.776,
-      ClipDeg: 82
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 61.776,
+      "ClipDeg": 82
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 67.485,
-      ClipDeg: 47
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 67.485,
+      "ClipDeg": 47
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 70.583,
-      ClipDeg: 3
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 70.583,
+      "ClipDeg": 3
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 73.417,
-      ClipDeg: 82
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 73.417,
+      "ClipDeg": 82
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 77.722,
-      ClipDeg: 48
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 77.722,
+      "ClipDeg": 48
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 81.011,
-      ClipDeg: 6
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 81.011,
+      "ClipDeg": 6
     }], [{
-      ClipValue: "Min Value",
-      ClipTimestamp: 1.464,
-      ClipDeg: 82
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 1.464,
+      "ClipDeg": 82
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 3.053,
-      ClipDeg: 124
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 3.053,
+      "ClipDeg": 124
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 3.907,
-      ClipDeg: 164
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 3.907,
+      "ClipDeg": 164
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 6.327,
-      ClipDeg: 85
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 6.327,
+      "ClipDeg": 85
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 7.725,
-      ClipDeg: 122
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 7.725,
+      "ClipDeg": 122
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 10.895,
-      ClipDeg: 86
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 10.895,
+      "ClipDeg": 86
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 11.992,
-      ClipDeg: 122
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 11.992,
+      "ClipDeg": 122
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 13.28,
-      ClipDeg: 169
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 13.28,
+      "ClipDeg": 169
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 15.844,
-      ClipDeg: 85
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 15.844,
+      "ClipDeg": 85
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 16.932,
-      ClipDeg: 123
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 16.932,
+      "ClipDeg": 123
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 18.143,
-      ClipDeg: 168
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 18.143,
+      "ClipDeg": 168
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 20.529,
-      ClipDeg: 85
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 20.529,
+      "ClipDeg": 85
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 21.445,
-      ClipDeg: 122
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 21.445,
+      "ClipDeg": 122
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 22.493,
-      ClipDeg: 165
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 22.493,
+      "ClipDeg": 165
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 25.225,
-      ClipDeg: 85
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 25.225,
+      "ClipDeg": 85
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 26.029,
-      ClipDeg: 121
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 26.029,
+      "ClipDeg": 121
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 27.164,
-      ClipDeg: 167
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 27.164,
+      "ClipDeg": 167
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 29.859,
-      ClipDeg: 85
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 29.859,
+      "ClipDeg": 85
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 30.764,
-      ClipDeg: 125
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 30.764,
+      "ClipDeg": 125
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 31.995,
-      ClipDeg: 166
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 31.995,
+      "ClipDeg": 166
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 34.179,
-      ClipDeg: 84
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 34.179,
+      "ClipDeg": 84
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 35.262,
-      ClipDeg: 124
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 35.262,
+      "ClipDeg": 124
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 36.295,
-      ClipDeg: 166
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 36.295,
+      "ClipDeg": 166
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 38.647,
-      ClipDeg: 85
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 38.647,
+      "ClipDeg": 85
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 39.601,
-      ClipDeg: 124
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 39.601,
+      "ClipDeg": 124
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 40.713,
-      ClipDeg: 164
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 40.713,
+      "ClipDeg": 164
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 42.795,
-      ClipDeg: 85
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 42.795,
+      "ClipDeg": 85
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 43.966,
-      ClipDeg: 124
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 43.966,
+      "ClipDeg": 124
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 47.309,
-      ClipDeg: 85
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 47.309,
+      "ClipDeg": 85
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 48.343,
-      ClipDeg: 124
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 48.343,
+      "ClipDeg": 124
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 49.364,
-      ClipDeg: 166
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 49.364,
+      "ClipDeg": 166
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 51.627,
-      ClipDeg: 85
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 51.627,
+      "ClipDeg": 85
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 52.769,
-      ClipDeg: 123
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 52.769,
+      "ClipDeg": 123
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 56.149,
-      ClipDeg: 83
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 56.149,
+      "ClipDeg": 83
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 58.39,
-      ClipDeg: 84
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 58.39,
+      "ClipDeg": 84
     }], [{
-      ClipValue: "Min Value",
-      ClipTimestamp: 1.791,
-      ClipDeg: 85
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 1.791,
+      "ClipDeg": 85
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 4.11,
-      ClipDeg: 179
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 4.11,
+      "ClipDeg": 179
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 5.386,
-      ClipDeg: 135
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 5.386,
+      "ClipDeg": 135
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 10.777,
-      ClipDeg: 86
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 10.777,
+      "ClipDeg": 86
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 12.377,
-      ClipDeg: 179
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 12.377,
+      "ClipDeg": 179
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 15.996,
-      ClipDeg: 136
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 15.996,
+      "ClipDeg": 136
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 19.847,
-      ClipDeg: 85
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 19.847,
+      "ClipDeg": 85
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 22.538,
-      ClipDeg: 178
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 22.538,
+      "ClipDeg": 178
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 25.905,
-      ClipDeg: 130
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 25.905,
+      "ClipDeg": 130
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 28.503,
-      ClipDeg: 89
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 28.503,
+      "ClipDeg": 89
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 32.287,
-      ClipDeg: 177
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 32.287,
+      "ClipDeg": 177
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 39.494,
-      ClipDeg: 85
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 39.494,
+      "ClipDeg": 85
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 41.647,
-      ClipDeg: 177
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 41.647,
+      "ClipDeg": 177
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 41.783,
-      ClipDeg: 138
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 41.783,
+      "ClipDeg": 138
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 45.27,
-      ClipDeg: 85
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 45.27,
+      "ClipDeg": 85
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 53.215,
-      ClipDeg: 179
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 53.215,
+      "ClipDeg": 179
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 53.464,
-      ClipDeg: 85
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 53.464,
+      "ClipDeg": 85
     }], [{
-      ClipValue: "Min Value",
-      ClipTimestamp: 3.711,
-      ClipDeg: 100
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 3.711,
+      "ClipDeg": 100
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 5.289,
-      ClipDeg: 124
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 5.289,
+      "ClipDeg": 124
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 11.002,
-      ClipDeg: 154
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 11.002,
+      "ClipDeg": 154
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 12.187,
-      ClipDeg: 100
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 12.187,
+      "ClipDeg": 100
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 14.39,
-      ClipDeg: 125
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 14.39,
+      "ClipDeg": 125
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 15.713,
-      ClipDeg: 154
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 15.713,
+      "ClipDeg": 154
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 21.416,
-      ClipDeg: 100
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 21.416,
+      "ClipDeg": 100
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 23.625,
-      ClipDeg: 124
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 23.625,
+      "ClipDeg": 124
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 29.134,
-      ClipDeg: 154
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 29.134,
+      "ClipDeg": 154
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 30.414,
-      ClipDeg: 100
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 30.414,
+      "ClipDeg": 100
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 32.469,
-      ClipDeg: 123
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 32.469,
+      "ClipDeg": 123
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 33.664,
-      ClipDeg: 156
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 33.664,
+      "ClipDeg": 156
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 39.851,
-      ClipDeg: 100
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 39.851,
+      "ClipDeg": 100
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 41.606,
-      ClipDeg: 124
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 41.606,
+      "ClipDeg": 124
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 42.709,
-      ClipDeg: 154
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 42.709,
+      "ClipDeg": 154
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 47.919,
-      ClipDeg: 100
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 47.919,
+      "ClipDeg": 100
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 49.617,
-      ClipDeg: 124
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 49.617,
+      "ClipDeg": 124
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 50.798,
-      ClipDeg: 155
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 50.798,
+      "ClipDeg": 155
     }], [{
-      ClipValue: "Max Value",
-      ClipTimestamp: 23.343,
-      ClipDeg: 85
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 23.343,
+      "ClipDeg": 85
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 24.227,
-      ClipDeg: 52
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 24.227,
+      "ClipDeg": 52
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 25.708,
-      ClipDeg: 16
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 25.708,
+      "ClipDeg": 16
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 27.303,
-      ClipDeg: 88
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 27.303,
+      "ClipDeg": 88
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 29.368,
-      ClipDeg: 48
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 29.368,
+      "ClipDeg": 48
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 30.561,
-      ClipDeg: 19
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 30.561,
+      "ClipDeg": 19
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 31.489,
-      ClipDeg: 88
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 31.489,
+      "ClipDeg": 88
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 33.779,
-      ClipDeg: 47
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 33.779,
+      "ClipDeg": 47
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 35.117,
-      ClipDeg: 15
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 35.117,
+      "ClipDeg": 15
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 36.01,
-      ClipDeg: 88
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 36.01,
+      "ClipDeg": 88
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 39.508,
-      ClipDeg: 15
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 39.508,
+      "ClipDeg": 15
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 40.032,
-      ClipDeg: 49
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 40.032,
+      "ClipDeg": 49
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 40.203,
-      ClipDeg: 88
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 40.203,
+      "ClipDeg": 88
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 43.528,
-      ClipDeg: 15
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 43.528,
+      "ClipDeg": 15
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 44.341,
-      ClipDeg: 50
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 44.341,
+      "ClipDeg": 50
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 44.501,
-      ClipDeg: 88
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 44.501,
+      "ClipDeg": 88
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 47.242,
-      ClipDeg: 16
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 47.242,
+      "ClipDeg": 16
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 48.192,
-      ClipDeg: 44
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 48.192,
+      "ClipDeg": 44
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 48.31,
-      ClipDeg: 88
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 48.31,
+      "ClipDeg": 88
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 51.213,
-      ClipDeg: 15
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 51.213,
+      "ClipDeg": 15
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 52.277,
-      ClipDeg: 88
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 52.277,
+      "ClipDeg": 88
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 54.098,
-      ClipDeg: 52
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 54.098,
+      "ClipDeg": 52
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 55.282,
-      ClipDeg: 13
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 55.282,
+      "ClipDeg": 13
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 56.071,
-      ClipDeg: 87
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 56.071,
+      "ClipDeg": 87
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 58.774,
-      ClipDeg: 14
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 58.774,
+      "ClipDeg": 14
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 59.472,
-      ClipDeg: 50
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 59.472,
+      "ClipDeg": 50
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 59.623,
-      ClipDeg: 86
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 59.623,
+      "ClipDeg": 86
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 62.264,
-      ClipDeg: 11
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 62.264,
+      "ClipDeg": 11
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 63.024,
-      ClipDeg: 49
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 63.024,
+      "ClipDeg": 49
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 63.278,
-      ClipDeg: 88
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 63.278,
+      "ClipDeg": 88
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 65.925,
-      ClipDeg: 12
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 65.925,
+      "ClipDeg": 12
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 66.685,
-      ClipDeg: 88
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 66.685,
+      "ClipDeg": 88
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 69.507,
-      ClipDeg: 12
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 69.507,
+      "ClipDeg": 12
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 70.267,
-      ClipDeg: 88
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 70.267,
+      "ClipDeg": 88
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 72.219,
-      ClipDeg: 49
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 72.219,
+      "ClipDeg": 49
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 73.161,
-      ClipDeg: 13
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 73.161,
+      "ClipDeg": 13
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 73.951,
-      ClipDeg: 87
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 73.951,
+      "ClipDeg": 87
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 75.646,
-      ClipDeg: 46
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 75.646,
+      "ClipDeg": 46
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 76.38,
-      ClipDeg: 12
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 76.38,
+      "ClipDeg": 12
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 77.348,
-      ClipDeg: 87
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 77.348,
+      "ClipDeg": 87
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 79.201,
-      ClipDeg: 53
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 79.201,
+      "ClipDeg": 53
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 79.985,
-      ClipDeg: 12
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 79.985,
+      "ClipDeg": 12
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 80.765,
-      ClipDeg: 87
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 80.765,
+      "ClipDeg": 87
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 83.233,
-      ClipDeg: 13
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 83.233,
+      "ClipDeg": 13
     }, {
-      ClipValue: "Mid Value",
-      ClipTimestamp: 83.791,
-      ClipDeg: 50
+      "ClipValue": "Mid Value",
+      "ClipTimestamp": 83.791,
+      "ClipDeg": 50
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 83.958,
-      ClipDeg: 85
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 83.958,
+      "ClipDeg": 85
     }, {
-      ClipValue: "Min Value",
-      ClipTimestamp: 86.757,
-      ClipDeg: 12
+      "ClipValue": "Min Value",
+      "ClipTimestamp": 86.757,
+      "ClipDeg": 12
     }, {
-      ClipValue: "Max Value",
-      ClipTimestamp: 87.681,
-      ClipDeg: 86
+      "ClipValue": "Max Value",
+      "ClipTimestamp": 87.681,
+      "ClipDeg": 86
     }]
   ];
 
@@ -2215,9 +2215,9 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
 
       // Store the comparison data
       results.push({
-        ClipValue: clipEntry.ClipValue,
-        PatientValue: clipEntry.ClipValue,
-        ClipDeg: clipEntry.ClipDeg,
+        "ClipValue": clipEntry.ClipValue,
+        "PatientValue": clipEntry.ClipValue,
+        "ClipDeg": clipEntry.ClipDeg,
         PatientLeftDeg: closestPatient?.patientEntry['LSA Deg'],
         PatientRightDeg: closestPatient?.patientEntry['RSA Deg'],
         ClipTimestamp: clipEntry.ClipTimestamp,
