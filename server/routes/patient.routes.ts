@@ -7,6 +7,7 @@ import * as UserGameDataController from '../controllers/user-game-data.controlle
 import * as ServerLogController from '../controllers/server-log.controller';
 import * as GameDataController from '../controllers/game-data.controller';
 import * as UserController from '../controllers/user.controller';
+import * as GameMetaDataController from '../controllers/game-metadata.controller';
 
 import express from 'express';
 import multer from 'multer';
@@ -14,6 +15,9 @@ import multer from 'multer';
 const router = express.Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
+
+router.get('/gameMetaData/get/:videoName', GameMetaDataController.getShortGameMetaData);
+router.post('/metaData/create', PatientController.createPatientMetaData);
 
 router.post('/gameSession/startGameSession', GameSessionController.startGameSession);
 router.post('/gameSession/updateSession', GameSessionController.endGameSession);

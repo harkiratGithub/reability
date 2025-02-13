@@ -3,10 +3,11 @@
 exports.shorthands = undefined;
 
 exports.up = (pgm) => {
-	pgm.createTable('patient_game_metadata', {
+	pgm.createTable('patient_metadata', {
 		id: 'id',
-		video_name: { type: 'integer', onDelete: 'SET NULL' },
+		video_name: { type: 'varchar(255)', onDelete: 'SET NULL' },
 		game_id: { type: 'integer', references: 'game', onDelete: 'SET NULL' },
+		game_settings_id: { type: 'integer', references: 'game_settings', onDelete: 'SET NULL' },
 		patient_id: { type: 'integer', references: 'patient', onDelete: 'SET NULL' },
 		settings: { type: 'jsonb', notNull: 'true', default: '{}' },
 		created_at: {
@@ -20,7 +21,7 @@ exports.up = (pgm) => {
 			default: pgm.func('current_timestamp'),
 		},
 	});
-	pgm.createTrigger('patient_game_metadata', 'update_time_patient_game_metadata', {
+	pgm.createTrigger('patient_metadata', 'update_time_patient_metadata', {
 		when: 'BEFORE',
 		operation: 'UPDATE',
 		function: 'update_timestamp',
@@ -29,6 +30,6 @@ exports.up = (pgm) => {
 };
 
 exports.down = (pgm) => {
-	pgm.dropTrigger('patient_game_metadata', 'update_time_patient_game_metadata', { ifExist: true });
-	pgm.dropTable('patient_game_metadata', { ifExist: true });
+	pgm.dropTrigger('patient_metadata', 'update_time_patient_metadata', { ifExist: true });
+	pgm.dropTable('patient_metadata', { ifExist: true });
 };

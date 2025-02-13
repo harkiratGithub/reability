@@ -7,18 +7,6 @@ export const createGameMetaData = (req, res, next) => {
 		.catch((err) => next(err));
 };
 
-export const getAllGames = (req, res, next) => {
-	GameMetaDataModel.getAllGames()
-		.then((allGames) => res.json(allGames))
-		.catch((err) => next(err));
-};
-
-export const getAllEndGames = (req, res, next) => {
-	GameMetaDataModel.getAllEndGames()
-		.then((allGames) => res.json(allGames))
-		.catch((err) => next(err));
-};
-
 export const editGameMetaData = (req, res, next) => {
 	const { gameData } = req.body;
 	GameMetaDataModel.editGameMetaData(gameData.id, gameData)
@@ -41,16 +29,9 @@ export const getGameMetaDataByIds = (req, res, next) => {
 };
 
 export const getShortGameMetaData = (req, res, next) => {
-	const { gameId } = req.params;
-	GameMetaDataModel.getShortGameMetaData(gameId)
+	const { videoName } = req.params;
+	GameMetaDataModel.getShortGameMetaData(videoName)
 		.then((gameData) => res.json(gameData))
-		.catch((err) => next(err));
-};
-
-export const updateGameMetaDataStatus = (req, res, next) => {
-	const { gameDataIds, active } = req.body;
-	GameMetaDataModel.updateGameMetaDataStatus(gameDataIds, active)
-		.then((result) => res.json(result))
 		.catch((err) => next(err));
 };
 

@@ -49,6 +49,16 @@ export const getGameMetaDataByIds = async (gameDataIds: number[]): Promise<any[]
 	return map(result.rows, (item) => UtilModel.convertKeysToCamelCase(item));
 };
 
+export const getShortGameMetaData = async (videoName: string): Promise<any[]> => {
+	const query = squelPostgres
+		.select()
+		.from(TABLE_NAME.GAME_METADATA)
+		.where(`${TABLE_NAME.GAME_METADATA}.video_name = ?`, videoName)
+		.toParam();
+	const result = await BaseModel.runQuery(query);
+	return map(result.rows, (item) => UtilModel.convertKeysToCamelCase(item));
+};
+
 export const clearGameMetaData = async () => {
 	const query = squelPostgres.delete().from(TABLE_NAME.GAME_METADATA).toParam();
 	const result = await BaseModel.runQuery(query);

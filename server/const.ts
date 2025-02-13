@@ -33,6 +33,7 @@ export const TABLE_NAME = {
 	USER_GAME_DATA: 'user_game_data',
 	GAME_DATA: 'game_data',
 	GAME_METADATA: 'game_metadata',
+	PATIENT_METADATA: 'patient_metadata',
 	SERVER_LOG: 'server_log',
 	RTM: 'rtm'
 };

@@ -127,8 +127,6 @@ router.post('/gameData/getbyids', GameDataController.getGameDataByIds);
 router.post('/gameMetaData/create', GameMetaDataController.createGameMetaData);
 router.put('/gameMetaData/update', GameMetaDataController.editGameMetaData);
 router.put('/gameMetaData/delete', GameMetaDataController.deleteGameMetaData);
-router.put('/gameMetaData/updatestatus', GameMetaDataController.updateGameMetaDataStatus);
-router.get('/gameMetaData/get/:gameId', GameMetaDataController.getShortGameMetaData);
 router.post('/gameMetaData/getbyids', GameMetaDataController.getGameMetaDataByIds);
 
 router.get('/serverLogs', ServerLogController.getServerLogs);
