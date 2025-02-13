@@ -54,39 +54,49 @@ const getInstituteIdByPatientId = async (patient_id) => {
 		.join(TABLE_NAME.DEPARTMENT, 'd', 'd.id = pd.department_id')
 		.where('pd.patient_id = ?', patient_id)
 		.toParam();
-
 	const result = await BaseModel.runQuery(query);
-
 	const institute_id = result?.rows?.[0]?.institute_id;
-
+	return institute_id;
+};
+const getInstituteIdByTherapistId = async (therapist_id) => {
+	const query = squelPostgres
+		.select()
+		.field('d.institute_id')
+		.from(TABLE_NAME.THERAPIST_DEPARTMENTS, 'pd')
+		.join(TABLE_NAME.DEPARTMENT, 'd', 'd.id = pd.department_id')
+		.where('pd.therapist_id = ?', therapist_id)
+		.toParam();
+	const result = await BaseModel.runQuery(query);
+	const institute_id = result?.rows?.[0]?.institute_id;
 	return institute_id;
 };
 
-export const getInstituteLogoById = async (patient_id) => {
+export const getInstituteLogoById = async (idForLogo, role) => {
 	try {
-	  const institute_id = await getInstituteIdByPatientId(patient_id);
-  
-	  const imageQuery = squelPostgres
+		let institute_id=0;
+		if(role==='therapist'){			
+			institute_id = await getInstituteIdByTherapistId(idForLogo);
+		}else if(role==='patient'){
+			institute_id = await getInstituteIdByPatientId(idForLogo);  
+		}	 
+		const imageQuery = squelPostgres
 		.select()
 		.field('i.url')
 		.from(TABLE_NAME.INSTITUTE, 'inst')
 		.join(TABLE_NAME.IMAGE, 'i', 'i.id = inst.image_id')
 		.where('inst.id = ?', institute_id)
-		.toParam();
-  
-	  const imageResult = await BaseModel.runQuery(imageQuery);
-  
-	  // Check if result is valid and has rows
-	  if (imageResult && imageResult.rows && imageResult.rows[0]?.url) {
-		console.log("Institute Logo URL Found:", imageResult.rows[0].url);
-		return imageResult.rows[0].url; // Return the logo URL
-	  } else {
-		console.warn("Institute Logo URL not found, using default.");
-		return 'assets/therapist/therapist_logo.png'; // Return a default image URL
-	  }
+		.toParam();  
+	  	const imageResult = await BaseModel.runQuery(imageQuery);
+		if (imageResult && imageResult.rows && imageResult.rows[0]?.url) {
+			console.log("Institute Logo URL Found:", imageResult.rows[0].url);
+			return imageResult.rows[0].url; 
+		} else {
+			console.warn("Institute Logo URL not found, using default.");
+			return 'assets/therapist/therapist_logo.png'; 
+		}
 	} catch (error) {
-	  console.error("Error fetching institute logo:", error);
-	  return 'assets/therapist/therapist_logo.png'; // Return a default image URL in case of error
+	console.error("Error fetching institute logo:", error);
+	return 'assets/therapist/therapist_logo.png'; 
 	}
   };
 

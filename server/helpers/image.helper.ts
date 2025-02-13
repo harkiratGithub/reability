@@ -23,37 +23,59 @@ export const deleteImage = async (id, bucketName, client = null) => {
 };
 */
 
-import { SharedKeyCredential, StorageURL, ServiceURL, ContainerURL, BlockBlobURL, Aborter } from '@azure/storage-blob';
+import sharp from "sharp";
+import { v4 as uuidv4 } from "uuid";
+import { SharedKeyCredential, StorageURL, ServiceURL, ContainerURL, BlockBlobURL, Aborter } from "@azure/storage-blob";
 import * as ImageModel from '../models/image.model';
-import { v4 as uuidv4 } from 'uuid';
 
 export const createImage = async (imageKey, imageContent, bucketName, client = null) => {
     try {
         const extension = imageContent.mimetype.split('/')[1];
         const fileName = `${uuidv4()}.${extension}`;
-		const fileBuffer = imageContent.buffer; 
+        let fileBuffer = imageContent.buffer;
+
+        if (bucketName === 'gertner-images') {
+            const croppedBuffer = await sharp(fileBuffer)
+                .resize({
+                    width: 800,
+                    height: 800,
+                    fit: 'inside', // inside, cover Ensures the image fills the 800x800 canvas, cropping the excess
+                    position: 'center', // Centers the crop
+                    background: { r: 0, g: 0, b: 0, alpha: 1 }, // Black background for the resized part
+                })
+                .toBuffer();                
+            fileBuffer = croppedBuffer;
+        }
+
+        // Step 3: Azure Blob Storage configuration
         const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
         const accountKey = process.env.AZURE_STORAGE_ACCOUNT_KEY;
-        const containerName = bucketName;
         const sharedKeyCredential = new SharedKeyCredential(accountName, accountKey);
         const pipeline = StorageURL.newPipeline(sharedKeyCredential);
         const serviceURL = new ServiceURL(
             `https://${accountName}.blob.core.windows.net`,
             pipeline
         );
-        const containerURL = ContainerURL.fromServiceURL(serviceURL, containerName);
+        const containerURL = ContainerURL.fromServiceURL(serviceURL, bucketName);
 
         const blockBlobURL = BlockBlobURL.fromContainerURL(containerURL, fileName);
         const aborter = Aborter.timeout(30 * 60 * 1000); // 30 minutes timeout
-        await blockBlobURL.upload(aborter, fileBuffer, fileBuffer.length);
 
-        // Construct the URL for the uploaded file
-        const fileURL = `https://${accountName}.blob.core.windows.net/${containerName}/${fileName}`;
-		console.log("======fileurl=====",fileURL);
+        // Step 4: Upload the processed file to Azure Blob Storage
+        await blockBlobURL.upload(aborter, fileBuffer, fileBuffer.length, {
+            blobHTTPHeaders: {
+                blobContentType: imageContent.mimetype, // Sets the correct MIME type
+            },
+        });
 
-        // Add the image record to the database (ImageModel)
+        // Step 5: Construct the file URL
+        const fileURL = `https://${accountName}.blob.core.windows.net/${bucketName}/${fileName}`;
+        console.log("Uploaded File URL:", fileURL);
+
+        // Step 6: Save the image metadata to the database
         const row = await ImageModel.addImage(imageKey, fileURL, client);
-		console.log("======row.id=====",row.id);
+        console.log("Database Record ID:", row.id);
+
         return row.id;
     } catch (err) {
         console.error("Error creating image:", err.message);
@@ -61,6 +83,7 @@ export const createImage = async (imageKey, imageContent, bucketName, client = n
     }
 };
 
+/*
 export const deleteImage = async (id, bucketName, client = null) => {
     try {
         // Fetch image record from the database
@@ -85,6 +108,44 @@ export const deleteImage = async (id, bucketName, client = null) => {
         const blockBlobURL = BlockBlobURL.fromContainerURL(containerURL, fileName);
         await blockBlobURL.delete(Aborter.none); // Delete the file
 
+    } catch (err) {
+        console.error("Error deleting image:", err.message);
+        throw err;
+    }
+};
+*/
+export const deleteImage = async (id, bucketName, client = null) => {
+    try {
+        const rows = await ImageModel.deleteImage(id, client);
+        const fileURL = rows[0]?.url;
+        if (!fileURL) {
+            throw new Error("File URL is missing from the database.");
+        }
+
+        const fileName = fileURL.split('/').pop();
+        const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
+        const accountKey = process.env.AZURE_STORAGE_ACCOUNT_KEY;
+        const containerName = bucketName;
+
+        const sharedKeyCredential = new SharedKeyCredential(accountName, accountKey);
+        const pipeline = StorageURL.newPipeline(sharedKeyCredential);
+        const serviceURL = new ServiceURL(
+            `https://${accountName}.blob.core.windows.net`,
+            pipeline
+        );
+        const containerURL = ContainerURL.fromServiceURL(serviceURL, containerName);
+        const blockBlobURL = BlockBlobURL.fromContainerURL(containerURL, fileName);
+
+        try {
+            await blockBlobURL.delete(Aborter.none);
+            console.log("Blob deleted successfully:", fileName);
+        } catch (err) {
+            if (err.statusCode === 404) {
+                console.warn("Blob not found, skipping deletion:", fileName);
+            } else {
+                throw err;
+            }
+        }
     } catch (err) {
         console.error("Error deleting image:", err.message);
         throw err;

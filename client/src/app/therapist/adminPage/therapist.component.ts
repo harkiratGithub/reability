@@ -110,7 +110,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
   hangupConfirmBtn: boolean = false;
   enlarge: boolean = false;
   sendEmailTimeoutConnection;
-
+  InstituteLogo: string ;
   constructor(
     private authenticationService: AuthenticationService,
     private webRtcService: WebRtcService,
@@ -122,7 +122,8 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
     private ref: ChangeDetectorRef,
     public appActions: AppActions
   ) {
-    this.connectedTherapist = this.authenticationService.currentUserValue;
+    this.connectedTherapist = this.authenticationService.currentUserValue;   
+    this.InstituteLogo = this.connectedTherapist?.instituteLogo || '';
     this.subscription.add(
       this.keyUp
         .pipe(
@@ -224,7 +225,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     if (!this.isPatientVideoInSession && user.hasCamera) {
-      this.selectedUser = user;
+      this.selectedUser = user;      
       const connectedPaitent = this.connectedPaitents.find(
         (paitent) => paitent.connection.peer === this.selectedUser.peerId
       );
