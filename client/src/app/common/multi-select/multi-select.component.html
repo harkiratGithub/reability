@@ -16,10 +16,7 @@
       <input type="checkbox" id="uniqId" [(ngModel)]="isToggleAllChecked" />
     </label>
 
-    <label 
-    class="dropdown-item ellipsis" 
-    (click)="toggleAll($event)" 
-    *ngIf="sharedFilter?.displayText === 'Institute'">
+    <label class="dropdown-item ellipsis" (click)="toggleAll($event)" *ngIf="sharedFilter?.displayText === 'Institute'">
       Select all
       <input type="checkbox" id="uniqId" [(ngModel)]="isToggleAllChecked" />
     </label>
@@ -30,7 +27,12 @@
       for="{{ option.displayName }}"
       title="{{ option.displayName }}"
     >
-      <span class="ellipsis"> {{ option.displayName }}</span>
+      <span class="ellipsis" *ngIf="sharedFilter?.displayText != 'Departments'" > {{ option.displayName }}</span>
+      <span class="ellipsis" *ngIf="sharedFilter?.displayText === 'Departments'">
+        <span class="ellipsis display-name">{{ option.displayName }}</span>
+        <span class="separator">:</span>
+        <span class="ellipsis selected-value">{{ option.selectedValueName }}</span>
+    </span>
       <input type="checkbox" id="{{ option.displayName }}" (change)="toggleSelection(option)" #checkboxes />
     </label>
     <div class="actions">

@@ -27,7 +27,6 @@ export const getUserFilters = async (userId: number): Promise<IUserFilters> => {
 		.where(`${TABLE_NAME.USER_FILTERS}.user_id = ?`, userId)
 		.toParam();
 	const result = await BaseModel.runQuery(query);
-	console.log("getUserFilters result: ", result.rows?.[0])
 	return result.rows?.[0];
 };
 
