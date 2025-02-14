@@ -28,23 +28,35 @@ import { v4 as uuidv4 } from "uuid";
 import { SharedKeyCredential, StorageURL, ServiceURL, ContainerURL, BlockBlobURL, Aborter } from "@azure/storage-blob";
 import * as ImageModel from '../models/image.model';
 
+// Function to resize and crop the image
+const resizeAndCropImage = async (imageBuffer, width, height, fit = 'inside', position = 'center') => {
+    try {
+        const resizedBuffer = await sharp(imageBuffer)
+            .resize({
+                width,
+                height,
+                fit,
+                position,
+                background: { r: 0, g: 0, b: 0, alpha: 1 }, // Black background for empty areas
+            })
+            .toBuffer();
+
+        return resizedBuffer;
+    } catch (err) {
+        console.error("Error resizing and cropping image:", err.message);
+        throw err;
+    }
+};
+
+
 export const createImage = async (imageKey, imageContent, bucketName, client = null) => {
     try {
         const extension = imageContent.mimetype.split('/')[1];
         const fileName = `${uuidv4()}.${extension}`;
         let fileBuffer = imageContent.buffer;
-
         if (bucketName === 'gertner-images') {
-            const croppedBuffer = await sharp(fileBuffer)
-                .resize({
-                    width: 800,
-                    height: 800,
-                    fit: 'inside', // inside, cover Ensures the image fills the 800x800 canvas, cropping the excess
-                    position: 'center', // Centers the crop
-                    background: { r: 0, g: 0, b: 0, alpha: 1 }, // Black background for the resized part
-                })
-                .toBuffer();                
-            fileBuffer = croppedBuffer;
+            // Call the resizeAndCropImage function
+            fileBuffer = await resizeAndCropImage(fileBuffer, 800, 800);
         }
 
         // Step 3: Azure Blob Storage configuration
