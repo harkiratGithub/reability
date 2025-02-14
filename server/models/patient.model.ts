@@ -450,7 +450,6 @@ export const getPatientById = async (id: number) => {
 		.group(`${TABLE_NAME.INSTITUTE}.id`)
 		.toParam();
 	const result = await BaseModel.runQuery(query);
-	console.log("===========result222=======",result);
 	return result.rows?.[0];
 };
 
