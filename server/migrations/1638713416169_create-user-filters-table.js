@@ -20,6 +20,8 @@ exports.up = (pgm) => {
 			notNull: true,
 			default: pgm.func('current_timestamp'),
 		},
+		institute_ids: { type: 'integer[]' },
+
 	});
 
 	pgm.createTrigger('user_filters', 'update_time_user_filter', {

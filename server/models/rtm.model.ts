@@ -54,13 +54,51 @@ const getInstituteIdByPatientId = async (patient_id) => {
 		.join(TABLE_NAME.DEPARTMENT, 'd', 'd.id = pd.department_id')
 		.where('pd.patient_id = ?', patient_id)
 		.toParam();
-
 	const result = await BaseModel.runQuery(query);
-
 	const institute_id = result?.rows?.[0]?.institute_id;
-
 	return institute_id;
 };
+const getInstituteIdByTherapistId = async (therapist_id) => {
+	const query = squelPostgres
+		.select()
+		.field('d.institute_id')
+		.from(TABLE_NAME.THERAPIST_DEPARTMENTS, 'pd')
+		.join(TABLE_NAME.DEPARTMENT, 'd', 'd.id = pd.department_id')
+		.where('pd.therapist_id = ?', therapist_id)
+		.toParam();
+	const result = await BaseModel.runQuery(query);
+	const institute_id = result?.rows?.[0]?.institute_id;
+	return institute_id;
+};
+
+export const getInstituteLogoById = async (idForLogo, role) => {
+	try {
+		let institute_id=0;
+		if(role==='therapist'){			
+			institute_id = await getInstituteIdByTherapistId(idForLogo);
+		}else if(role==='patient'){
+			institute_id = await getInstituteIdByPatientId(idForLogo);  
+		}	 
+		const imageQuery = squelPostgres
+		.select()
+		.field('i.url')
+		.from(TABLE_NAME.INSTITUTE, 'inst')
+		.join(TABLE_NAME.IMAGE, 'i', 'i.id = inst.image_id')
+		.where('inst.id = ?', institute_id)
+		.toParam();  
+	  	const imageResult = await BaseModel.runQuery(imageQuery);
+		if (imageResult && imageResult.rows && imageResult.rows[0]?.url) {
+			console.log("Institute Logo URL Found:", imageResult.rows[0].url);
+			return imageResult.rows[0].url; 
+		} else {
+			console.warn("Institute Logo URL not found, using default.");
+			return 'assets/therapist/therapist_logo.png'; 
+		}
+	} catch (error) {
+	console.error("Error fetching institute logo:", error);
+	return 'assets/therapist/therapist_logo.png'; 
+	}
+  };
 
 export const updateRTM = async (patient_id, data, type = 'patient', client = null, timestamp = null, timezone=0) => {
 	const currentTimestamp = timestamp ? new Date(timestamp) : new Date();

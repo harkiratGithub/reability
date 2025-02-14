@@ -130,6 +130,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
   currentGameDescription: string = '';
   gameMessage: string = '';
   therapistPeerId: string = '';
+  InstituteLogo: string ;
 
   constructor(
     private authenticationService: AuthenticationService,
@@ -153,6 +154,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
     this.subscription.add(
       this.authenticationService.currentUser.subscribe((user) => {
         this.currentUser = user;
+        this.InstituteLogo = this.currentUser?.instituteLogo || '';
       })
     );
     if (!this.isTherapistMode) {
@@ -408,7 +410,8 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
           this.toggleVideoSessionView();
         }
       })
-    );
+    ); 
+    
   }
 
   ngOnChanges(changes: SimpleChanges) {
