@@ -10,6 +10,7 @@ exports.up = (pgm) => {
     notNull: true,
     default: pgm.func('current_timestamp'),
     },
+    timezone: { type: 'integer', notNull: true ,default:0},
     });
     
     pgm.addConstraint('rtm', 'unique_patient_institute', {
