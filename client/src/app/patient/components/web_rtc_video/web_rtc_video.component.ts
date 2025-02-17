@@ -229,7 +229,6 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           this.videoSeconds = 0;
           const results = this.matchClipAndPatientData(this.videoMinMax, this.matchingCameraData);
           const updateComments = this.updateComments(results);
-          console.log(updateComments);
 
           this.ajaxService.savePatientMetaData({
             game_id: this.gameId,
@@ -238,7 +237,6 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           }).subscribe((gamesettings) => {
             console.log("gamesettings===", gamesettings);
           });
-          // this.gameId
           // this.saveToCSV(updateComments, 'min_max_matches.csv');
           // this.saveToCSV(this.timeLog, 'time_matching.csv');
         }
@@ -1872,7 +1870,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           this.timeMatching = withinTimeTolerance(
             elapsedTime,
             currentVideoAngle.ClipTimestamp,
-            1
+            .75
           )
           if (this.lastComment == 'Good' && this.lastTimeMatching) {
             this.timeMatching = true;
@@ -1885,8 +1883,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           }
           this.lastTimeMatching = this.timeMatching;
 
-          const angleThreshold = 30;
-          const timestampThreshold = 2;
+          const angleThreshold = 35;
+          const timestampThreshold = 1.5;
 
           const timeDiff = Math.abs(currentVideoAngle.ClipTimestamp - elapsedTime);
           const angleLeftDiff = currentVideoAngle.ClipDeg - +leftAngle;
