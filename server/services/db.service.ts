@@ -5,6 +5,7 @@ export default (() => {
 		const { Pool } = require('pg');
 		require('dotenv').config();
 		let pool;
+		console.log(process.env.NODE_ENV);
 
 		if (
 			process.env.NODE_ENV === 'production' ||
