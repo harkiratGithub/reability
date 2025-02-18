@@ -563,6 +563,7 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 		.field(`rtm.patient_id`)
 		.field(`rtm.data`)
 		.field(`rtm.timestamp`, 'since')
+		.field(`rtm.timezone`, 'tzminutes')
 		.field(`${TABLE_NAME.INSTITUTE}.name`, 'institute_name')
 		.field(`${TABLE_NAME.INSTITUTE}.id`, 'institute_id')
 		// .field(`${TABLE_NAME.THERAPIST}.first_name`, 'therapist_first_name')
@@ -596,7 +597,19 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 		// throw new Error(`No data found for the specified date range.`);
 	}
 
-	const decryptedRows = result.rows.map((row) => EncryptHelper.decryptJson(row));
+	//const decryptedRows = result.rows.map((row) => EncryptHelper.decryptJson(row));
+	const decryptedRows = result.rows.map((row) => {
+		const decryptedRow = EncryptHelper.decryptJson(row);
+	
+		// Adjust the `since` field based on `tzminutes`
+		if (decryptedRow.since && decryptedRow.tzminutes !== undefined) {
+			const sinceDate = new Date(decryptedRow.since);
+			sinceDate.setMinutes(sinceDate.getMinutes() + decryptedRow.tzminutes); // Adjusting based on tzminutes
+			decryptedRow.since = sinceDate.toISOString(); // Convert back to string if required
+		}
+	
+		return decryptedRow;
+	});
 
 	const decryptedData = decryptedRows?.map(async (row) => {
 		const patientId = row.patient_id;
