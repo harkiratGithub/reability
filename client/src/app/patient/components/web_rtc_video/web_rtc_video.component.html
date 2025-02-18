@@ -49,8 +49,7 @@
         <div class="dark-background"></div>
         <img src="../../../../assets/main-menu/no_camera.svg" />
       </div> -->
-
-      <div class="distance-warning" style="justify-content: space-between;">
+      <div class="distance-warning" style="justify-content: space-between;" *ngIf="this.currentUser.id == 1802 || this.currentUser.id == 1793">
         <div class="icon">
           <img src="../../../../assets/game-icons/camera-icon.svg" alt="Camera Icon" />
         </div>
@@ -59,7 +58,19 @@
         <!-- <button (click)="playCommentAudio()">Play Audio</button> -->
       </div>
 
-      <video id="patient-video" [ngClass]="{
+      <video *ngIf="this.currentUser.id == 1802 || this.currentUser.id == 1793" id="patient-video" [ngClass]="{
+                'patient-video-regular-video': !enlargeVideo,
+                'patient-video-enlarge-video': enlargeVideo,
+                'hide-video':
+                  (!isIosDevice() && !showLocalVideo) ||
+                  !this.currentUser.disabledSkeleton ||
+                  (trackBody && !bodyTrackingLoading),
+                'disabled-skeleton': this.currentUser.disabledSkeleton || trackBody,
+                'ios-hide': isIosDevice()
+              }" class="patient-video" width="291" height="290" style="display: none;" muted autoplay playsinline #cameraElement></video>
+
+      <ng-template *ngIf="this.currentUser.id != 1802 || this.currentUser.id != 1793">
+        <video *ngIf="!isDepthCameraConnected()" id="patient-video" [ngClass]="{
           'patient-video-regular-video': !enlargeVideo,
           'patient-video-enlarge-video': enlargeVideo,
           'hide-video':
@@ -68,13 +79,14 @@
             (trackBody && !bodyTrackingLoading),
           'disabled-skeleton': this.currentUser.disabledSkeleton || trackBody,
           'ios-hide': isIosDevice()
-        }" class="patient-video" width="291" height="290" style="display: none;" muted autoplay playsinline #cameraElement></video>
-      <!-- <video *ngIf="isDepthCameraConnected()" id="patient-video" [ngClass]="{
+        }" class="patient-video" width="200" height="200" muted autoplay playsinline></video>
+        <video *ngIf="isDepthCameraConnected()" id="patient-video" [ngClass]="{
           'patient-video-regular-video': !enlargeVideo,
           'patient-video-enlarge-video': enlargeVideo,
           'hide-video': !showLocalVideo || !this.currentUser.disabledSkeleton,
           'disabled-skeleton': this.currentUser.disabledSkeleton
-        }" class="patient-video" width="347" height="227" style="display: none;" muted autoplay playsinline #cameraElement></video> -->
+        }" class="patient-video" width="257" height="200" muted autoplay playsinline></video>
+      </ng-template>
 
       <div *ngIf="receivedRemoteVideo && connectionLost" class="no-camera-message">{{ connection_error_message }}</div>
       <div *ngIf="isCameraCheckComplete && !userHasCamera" class="patient-no-camera-message">
@@ -93,9 +105,9 @@
           'hide-video': !showLocalVideo || !showPatientVideo || !displaySkeleton
         }" width="257" height="192" class="patient-canvas"></canvas>
 
-      <canvas #canvasElement2 width="291" height="290" style="width: 100%;"></canvas>
+      <canvas *ngIf="this.currentUser.id == 1802 || this.currentUser.id == 1793" #canvasElement2 width="291" height="290" style="width: 100%;"></canvas>
 
-      <div class="text-container">
+      <div class="text-container" *ngIf="this.currentUser.id == 1802 || this.currentUser.id == 1793">
         <span class="text-group">LS: {{cameraAngle.leftWrist | number: '1.2-2'}}</span>
         <!-- <span class="text-group"> LE:176</span> -->
         <span class="separator">|</span>
@@ -111,5 +123,5 @@
     </div>
   </div>
 
-  <!-- <video id="patient-video-skeleton" class="hidden-video" [ngClass]="{ 'hide-video': true }" muted autoplay playsinline #cameraElement></video> -->
+  <!-- <video id="patient-video-skeleton" class="hidden-video" [ngClass]="{ 'hide-video': true }" muted autoplay playsinline></video> -->
 </div>

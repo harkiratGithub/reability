@@ -1739,6 +1739,12 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     this.camera.start();
   }
 
+  private getAngleBetweenPoints(start, middle, end) {
+    const radians = Math.atan2(end.y - middle.y, end.x - middle.x) - Math.atan2(start.y - middle.y, start.x - middle.x);
+    const angle = Math.abs((radians * 180.0) / Math.PI);
+    return angle > 180.0 ? 360 - angle : angle;
+  };
+
   private calculateAngleBetweenPoints(
     A: { x: number; y: number; z: number },
     B: { x: number; y: number; z: number },
@@ -1796,6 +1802,12 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         // let leftWrist
         // let rightShoulder
         // let rightWrist
+        // const leftShoulder = results.poseLandmarks[23];
+        // const leftWrist = results.poseLandmarks[11];
+        // const leftElbow = results.poseLandmarks[13];
+        // const rightShoulder = results.poseLandmarks[24];
+        // const rightWrist = results.poseLandmarks[12];
+        // const rightElbow = results.poseLandmarks[14];
 
         // if (this.videoIndex == 1) {
         const leftShoulder = results.poseLandmarks[this.landmarks[0]];
@@ -1839,6 +1851,18 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           { x: rightShoulder.x, y: rightShoulder.y, z: rightShoulder.z },
           { x: rightWrist.x, y: rightWrist.y, z: rightWrist.z }
         );
+
+        // const leftAngle = this.getAngleBetweenPoints(
+        //   leftShoulder,
+        //   leftWrist,
+        //   leftElbow
+        // );
+
+        // const rightAngle = this.getAngleBetweenPoints(
+        //   rightShoulder,
+        //   rightWrist,
+        //   rightElbow
+        // );
 
         this.cameraAngle['leftWrist'] = leftAngle;
         this.cameraAngle['rightWrist'] = rightAngle;
