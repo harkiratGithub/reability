@@ -527,8 +527,11 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   ngAfterViewInit() {
     this.skeletonBtn = document.getElementById('skeleton-border-wrap');
     this.skeletonLoadingBar();
-    this.initializeCamera();
-    this.initializePoseModels();
+
+    if (this.currentUser.id == 1802 || this.currentUser.id == 1793) {
+      this.initializeCamera();
+      this.initializePoseModels();
+    }
   }
 
   handleCameraAvailability() {
