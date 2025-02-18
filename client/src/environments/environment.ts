@@ -17,5 +17,4 @@ export const environment = {
   serverUrl: `https://${MY_IP}:8080`,
   secretKey: 'gertner-little-secret',
   recaptchaKey: '6LfH9NQZAAAAAHwE5RHsubonW58QHvqMWQJXwMzf',
-  // recaptchaKey: '6Lc-udQZAAAAAIkxjUJNnu5xTV8Fcdq_xlqXcmiZ',
 };
