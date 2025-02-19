@@ -597,7 +597,7 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 		// throw new Error(`No data found for the specified date range.`);
 	}
 
-	const decryptedRows = result.rows.map((row) => {
+	/*const decryptedRows = result.rows.map((row) => {
 		const decryptedRow = EncryptHelper.decryptJson(row);
 	
 		// Adjust the `since` field based on `tzminutes`
@@ -607,6 +607,25 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 			decryptedRow.since = sinceDate.toISOString(); // Convert back to string if required
 		}
 	
+		return decryptedRow;
+	});
+	*/
+	const decryptedRows = result.rows.map((row) => {
+		const decryptedRow = EncryptHelper.decryptJson(row);
+		if (decryptedRow.since && decryptedRow.tzminutes !== undefined) {
+			const sinceDate = new Date(decryptedRow.since);
+			sinceDate.setMinutes(sinceDate.getMinutes() + decryptedRow.tzminutes); // Adjusting based on tzminutes
+	
+			// Format the date to 'YYYY-DD-MM h:m:S'
+			const year = sinceDate.getFullYear();
+			const day = String(sinceDate.getDate()).padStart(2, '0'); // Zero-padded day
+			const month = String(sinceDate.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+			const hours = String(sinceDate.getHours()).padStart(2, '0'); // Zero-padded hours
+			const minutes = String(sinceDate.getMinutes()).padStart(2, '0'); // Zero-padded minutes
+			const seconds = String(sinceDate.getSeconds()).padStart(2, '0'); // Zero-padded seconds
+	
+			decryptedRow.since = `${year}-${day}-${month} ${hours}:${minutes}:${seconds}`;
+		}	
 		return decryptedRow;
 	});
 	const decryptedData = decryptedRows?.map(async (row) => {
