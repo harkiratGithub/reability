@@ -400,7 +400,7 @@ export class CommonComponent implements OnInit {
       return {
         value: department.id,
         displayName: department.name,
-        selectedValueName: institute ? `[${institute.name}]` : '["-"]',
+        selectedValueName: institute ? `(${institute.name})` : '("-")',
       };
     });
   }
