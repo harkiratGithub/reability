@@ -624,7 +624,7 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 			const minutes = String(sinceDate.getMinutes()).padStart(2, '0'); // Zero-padded minutes
 			const seconds = String(sinceDate.getSeconds()).padStart(2, '0'); // Zero-padded seconds
 	
-			decryptedRow.since = `${year}-${day}-${month} ${hours}:${minutes}:${seconds}`;
+			decryptedRow.since = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 		}	
 		return decryptedRow;
 	});
