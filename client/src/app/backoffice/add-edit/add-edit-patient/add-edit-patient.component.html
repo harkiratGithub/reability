@@ -16,11 +16,7 @@
       <label class="field-container">
         <span class="description">Email</span>
         <input type="email" formControlName="email" required />
-      </label>
-      <label class="field-container">
-        <span class="description">Username</span>
-        <input type="text" formControlName="username" [class.disabled]="true" />
-      </label>
+      </label>      
       <label class="field-container">
         <span class="description">Institute</span>
         <app-select formControlName="institute_id" required [items]="institutes"> </app-select>
@@ -34,6 +30,10 @@
           [multiSelect]="true"
         ></app-select
       ></label>
+      <label class="field-container" [hidden]="true">
+        <span class="description">Username</span>
+        <input type="text" formControlName="username" [class.disabled]="true" />
+      </label>
     </div>
     <div class="column">
       <label class="field-container">
