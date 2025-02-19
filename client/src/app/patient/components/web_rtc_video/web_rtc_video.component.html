@@ -119,5 +119,5 @@
     </div>
   </div>
 
-  <!-- <video id="patient-video-skeleton" class="hidden-video" [ngClass]="{ 'hide-video': true }" muted autoplay playsinline></video> -->
+  <video id="patient-video-skeleton" *ngIf="this.currentUser.id != 1802 && this.currentUser.id != 1793" class="hidden-video" [ngClass]="{ 'hide-video': true }" muted autoplay playsinline></video>
 </div>
