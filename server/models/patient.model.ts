@@ -597,21 +597,11 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 		// throw new Error(`No data found for the specified date range.`);
 	}
 
-	/*const decryptedRows = result.rows.map((row) => {
+	//const decryptedRows = result.rows.map((row) => EncryptHelper.decryptJson(row));
+	const decryptedRows = result.rows.map((row) => {
 		const decryptedRow = EncryptHelper.decryptJson(row);
 	
 		// Adjust the `since` field based on `tzminutes`
-		if (decryptedRow.since && decryptedRow.tzminutes !== undefined) {
-			const sinceDate = new Date(decryptedRow.since);
-			sinceDate.setMinutes(sinceDate.getMinutes() + decryptedRow.tzminutes); // Adjusting based on tzminutes
-			decryptedRow.since = sinceDate.toISOString(); // Convert back to string if required
-		}
-	
-		return decryptedRow;
-	});
-	*/
-	const decryptedRows = result.rows.map((row) => {
-		const decryptedRow = EncryptHelper.decryptJson(row);
 		if (decryptedRow.since && decryptedRow.tzminutes !== undefined) {
 			const sinceDate = new Date(decryptedRow.since);
 			sinceDate.setMinutes(sinceDate.getMinutes() + decryptedRow.tzminutes); // Adjusting based on tzminutes
@@ -627,7 +617,8 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 			decryptedRow.since = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 		}	
 		return decryptedRow;
-	});
+	})
+
 	const decryptedData = decryptedRows?.map(async (row) => {
 		const patientId = row.patient_id;
 		const rtmData = row.data;
