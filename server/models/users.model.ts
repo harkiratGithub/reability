@@ -168,20 +168,18 @@ export const isPatientEntryForToday = async (
 		.limit(1)
 		.toParam();		
 		const result = await BaseModel.runQuery(query); 
-		console.log("======result=======",result);	   
-	  // Convert the timestamp to the patient's timezone
-	  const timestamp = result.rows[0]?.timestamp;
+		const timestamp = result.rows[0]?.timestamp;
 	  const timezoneinMinutes = result.rows[0]?.timezone;	  
-	  console.log("=======timezoneinMinutes=======", timezoneinMinutes);
+	 // console.log("=======timezoneinMinutes=======", timezoneinMinutes);
 	  const timezone = Helper.convertMinutesToTimezonestring(timezoneinMinutes);
-	  console.log("=======timezone=======", timezone);
+	  //console.log("=======timezone=======", timezone);
 	  const convertedTime = Helper.convertUtcToTimezone(timestamp, timezone);
-	  console.log("=======convertedTime=======", convertedTime);	  
+	 // console.log("=======convertedTime=======", convertedTime);	  
 	  const now = Helper.currentTimeofTimezone(timezone);	  
 	  const convertedDate = moment(convertedTime).format('YYYY-MM-DD');
-	  console.log("=======convertedDate=======", convertedDate);
+	  //console.log("=======convertedDate=======", convertedDate);
 	  const currentDate = moment(now).format('YYYY-MM-DD');	  
-	  console.log("=======currentDate=======", currentDate);
+	  //console.log("=======currentDate=======", currentDate);
 	  // If the dates are different, show the pain scale popup
 	  const isNewDay = convertedDate !== currentDate;	  
 	  if (isNewDay || (result.rows.length == 0)) {
@@ -189,8 +187,8 @@ export const isPatientEntryForToday = async (
 		hasEntries = false;
 	  }  
 	  const painLevel = hasEntries ? result.rows[0]?.pain_level : undefined;	  
-	  console.log("===hasEntries===",hasEntries);
-	  console.log("===painLevel===",painLevel);
+	  //console.log("===hasEntries===",hasEntries);
+	 // console.log("===painLevel===",painLevel);
 	  return { hasEntries, painLevel };
 	} catch (error) {
 	  console.error('Error in isPatientEntryForToday:', error);
@@ -358,8 +356,7 @@ export const updateById = async (user_id, object, client = null) => {
     }
     try {
         const encryptedObject = EncryptHelper.encryptJson(object);
-        console.log('Encrypted Object:', encryptedObject);
-        // Sanitize the encrypted object
+        
         const sanitizedObject = {};
         for (const key in encryptedObject) {
             const value = encryptedObject[key];
@@ -377,7 +374,7 @@ export const updateById = async (user_id, object, client = null) => {
             user_id,
             client
         );
-        console.log('Update Result:', result);
+        
         return result;
     } catch (error) {
         console.error('Error in updateById:', error);
