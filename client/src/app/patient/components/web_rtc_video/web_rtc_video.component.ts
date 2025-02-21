@@ -924,6 +924,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         this.appActions.toggleEnlargeVideo(data.enlargeVideo);
         break;
       case MESSAGES.REDIRECT_TO_HOME:
+        console.log("========MESSAGES.REDIRECT_TO_HOME=====",MESSAGES.REDIRECT_TO_HOME);
         this.redirectToHome();
         break;
       case MESSAGES.REQUEST_APP_GAME_DATA:
