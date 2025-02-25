@@ -257,7 +257,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
           }
         }*/
 
-        // If in mobile view, filter to show only "studio" game
+          // If in mobile view, filter to show only "studio" game
         if (this.isMobile) {
           this.currentMenuApps = this.menuApps.filter((app) => app.name === 'studio');
         } else {
