@@ -371,7 +371,6 @@
 
     <div class="game-screen-mobile" *ngIf="isInGame || (isTherapistMode && isConnectedUserInGame)">
       <app-game-wrapper
-      *ngIf="isStudioGame && isMobile"
         #gameWrapper
         [therapistPeerId]="therapistPeerId"
         [currentGameName]="currentGameName"
