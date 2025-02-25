@@ -617,10 +617,12 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
       } else {
         this.quitGame();
         /*if (this.isMobile) {
-          this.authenticationService.logout();
+          this.gameReadyToStart.emit(true);
+          //this.authenticationService.logout();
         } else {
           this.quitGame();
-        }*/
+        }
+          */
       }
     }
   };

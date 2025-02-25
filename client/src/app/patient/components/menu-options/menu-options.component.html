@@ -282,9 +282,96 @@
       (sendShowTimerForTherapist)="sendShowTimerForTherapist($event)"
       [isMobile]="isMobile"
     ></app-game-intro>
+    <div class="middle-section">
+      <div class="content-background">
+        <div id="menu-container" class="menu-container movingRightAnimation">
+          <div *ngFor="let app of currentMenuApps; let i = index" class="menu-item">
+            <div class="img-wrapper">
+              <span *ngIf="!app.isEnabled">
+                <div class="enabled disabled">
+                  <img [src]="app.image" />
+                  <div class="gradient-overlay"></div>
+                  <p class="app-name">{{ app.name }}</p>
+                </div>
+              </span>
+              <span *ngIf="app.isEnabled">
+                <div
+                  *ngIf="!isTherapistMode"
+                  appHand
+                  [clickOnlyOnCenter]="true"
+                  [hoverClass]="'pressed'"
+                  [delayAnimation]="500"
+                  [timeToWait]="2000"
+                  [selectable]="app.isEnabled"
+                  (click)="navigate(i)"
+                  (outputFunc)="navigate(i)"
+                  class="enabled"
+                >
+                  <div class="opacity-layer">
+                    <div>
+                      <svg viewBox="0 0 36 36" class="loader">
+                        <path
+                          class="loader-bg"
+                          d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                        />
+                        <path
+                          class="circle"
+                          stroke-dasharray="100, 100"
+                          d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                  <div class="skeleton-game-icon-wrapper">
+                    <div class="bodytrack-icon-background" *ngIf="app.bodyTrackRequired"></div>
+                    <img
+                      class="skeleton-image"
+                      src="../../../../assets/skel/waving_hand_black_24dp.svg"
+                      *ngIf="app.bodyTrackRequired"
+                    />
+                  </div>
+                  <img class="game-image" [src]="app.image" />
+                  <div class="gradient-overlay"></div>
+                  <p class="app-name">{{ app.name }}</p>
+                </div>
+                <div *ngIf="isTherapistMode" class="enabled" (click)="navigate(i)">
+                  <div class="opacity-layer">
+                    <div>
+                      <svg viewBox="0 0 36 36" class="loader">
+                        <path
+                          class="loader-bg"
+                          d="M18 2.0845
+                      a 15.9155 15.9155 0 0 1 0 31.831
+                      a 15.9155 15.9155 0 0 1 0 -31.831"
+                        />
+                        <path
+                          class="circle"
+                          stroke-dasharray="100, 100"
+                          d="M18 2.0845
+                      a 15.9155 15.9155 0 0 1 0 31.831
+                      a 15.9155 15.9155 0 0 1 0 -31.831"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                  <img class="game-image" [src]="app.image" />
+                  <div class="gradient-overlay"></div>
+                  <p class="app-name">{{ app.name }}</p>
+                </div>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <div class="game-screen-mobile" *ngIf="isInGame || (isTherapistMode && isConnectedUserInGame)">
       <app-game-wrapper
+      *ngIf="isStudioGame && isMobile"
         #gameWrapper
         [therapistPeerId]="therapistPeerId"
         [currentGameName]="currentGameName"
