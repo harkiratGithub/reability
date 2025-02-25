@@ -249,12 +249,20 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
           })
         );
         //this.currentMenuApps = this.menuApps.slice(this.currentPageIndex, MAX_GAMES_IN_PAGE);
-        this.currentMenuApps = this.menuApps;
+        /*this.currentMenuApps = this.menuApps;
         if (this.isMobile) {
           const studioIndex = this.currentMenuApps.findIndex((app) => app.name === 'studio');
           if (studioIndex > -1) {
-            this.navigate(studioIndex);
+            //this.navigate(studioIndex);
           }
+        }*/
+
+        // If in mobile view, filter to show only "studio" game
+        if (this.isMobile) {
+          this.currentMenuApps = this.menuApps.filter((app) => app.name === 'studio');
+        } else {
+          // Show all games for non-mobile views
+          this.currentMenuApps = this.menuApps;
         }
 
         this.checkRightButton();
