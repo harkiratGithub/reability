@@ -307,25 +307,7 @@
                   (outputFunc)="navigate(i)"
                   class="enabled"
                 >
-                  <div class="opacity-layer">
-                    <div>
-                      <svg viewBox="0 0 36 36" class="loader">
-                        <path
-                          class="loader-bg"
-                          d="M18 2.0845
-                        a 15.9155 15.9155 0 0 1 0 31.831
-                        a 15.9155 15.9155 0 0 1 0 -31.831"
-                        />
-                        <path
-                          class="circle"
-                          stroke-dasharray="100, 100"
-                          d="M18 2.0845
-                        a 15.9155 15.9155 0 0 1 0 31.831
-                        a 15.9155 15.9155 0 0 1 0 -31.831"
-                        />
-                      </svg>
-                    </div>
-                  </div>
+                  
                   <div class="skeleton-game-icon-wrapper">
                     <div class="bodytrack-icon-background" *ngIf="app.bodyTrackRequired"></div>
                     <img
@@ -339,25 +321,7 @@
                   <p class="app-name">{{ app.name }}</p>
                 </div>
                 <div *ngIf="isTherapistMode" class="enabled" (click)="navigate(i)">
-                  <div class="opacity-layer">
-                    <div>
-                      <svg viewBox="0 0 36 36" class="loader">
-                        <path
-                          class="loader-bg"
-                          d="M18 2.0845
-                      a 15.9155 15.9155 0 0 1 0 31.831
-                      a 15.9155 15.9155 0 0 1 0 -31.831"
-                        />
-                        <path
-                          class="circle"
-                          stroke-dasharray="100, 100"
-                          d="M18 2.0845
-                      a 15.9155 15.9155 0 0 1 0 31.831
-                      a 15.9155 15.9155 0 0 1 0 -31.831"
-                        />
-                      </svg>
-                    </div>
-                  </div>
+                  
                   <img class="game-image" [src]="app.image" />
                   <div class="gradient-overlay"></div>
                   <p class="app-name">{{ app.name }}</p>
