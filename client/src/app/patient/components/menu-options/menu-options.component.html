@@ -153,7 +153,7 @@
       (sendShowTimerForTherapist)="sendShowTimerForTherapist($event)"
       [isMobile]="isMobile"
     ></app-game-intro>
-    <div class="middle-section">
+    <div class="middle-section mobile">
       <div class="content-background">
         <div id="menu-container" class="menu-container movingRightAnimation">
           <div *ngFor="let app of currentMenuApps; let i = index" class="menu-item">
@@ -177,8 +177,7 @@
                   (click)="navigate(i)"
                   (outputFunc)="navigate(i)"
                   class="enabled"
-                >
-                  
+                >                 
                   <div class="skeleton-game-icon-wrapper">
                     <div class="bodytrack-icon-background" *ngIf="app.bodyTrackRequired"></div>
                     <img
@@ -191,8 +190,7 @@
                   <div class="gradient-overlay"></div>
                   <p class="app-name">{{ app.name }}</p>
                 </div>
-                <div *ngIf="isTherapistMode" class="enabled" (click)="navigate(i)">
-                  
+                <div *ngIf="isTherapistMode" class="enabled" (click)="navigate(i)">                  
                   <img class="game-image" [src]="app.image" />
                   <div class="gradient-overlay"></div>
                   <p class="app-name">{{ app.name }}</p>

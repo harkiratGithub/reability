@@ -328,4 +328,24 @@
   }
 }
 
+/* CSS for Portrait Mode - Works fine, so no changes */
+@media (orientation: portrait) {
+  iframe {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16/9; /* Maintain video aspect ratio */
+  }
+}
+
+/* CSS for Landscape Mode - Fixes for mobile and tablet devices */
+@media (orientation: landscape) {
+  iframe {
+    width: 100vw; /* Use the full viewport width */
+    height: 56.25vw; /* Maintain 16:9 aspect ratio (width * 9 / 16) */
+    max-height: 100vh; /* Ensure it doesn’t overflow vertically */
+    max-width: 100%; /* Limit to container width if necessary */
+    object-fit: cover; /* Ensure it covers the space nicely */
+  }
+}
+
 
