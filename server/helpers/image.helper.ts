@@ -56,7 +56,7 @@ export const createImage = async (imageKey, imageContent, bucketName, client = n
         let fileBuffer = imageContent.buffer;
         if (bucketName === 'gertner-images') {
             // Call the resizeAndCropImage function
-            fileBuffer = await resizeAndCropImage(fileBuffer, 800, 800);
+            fileBuffer = await resizeAndCropImage(fileBuffer, 960, 560);
         }
 
         // Step 3: Azure Blob Storage configuration

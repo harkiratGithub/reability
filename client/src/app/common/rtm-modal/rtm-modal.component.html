@@ -117,7 +117,15 @@
   <div class="actions-section" *ngIf="!isRtmModel(rtmModelContent.MSG)">
     <div class="buttons" *ngIf="isRtmModel(rtmModelContent.SEND_FAST_LOGIN)">
       <div class="cancel" (click)="handleDecline()">Cancel</div>
-      <div class="send-invitation" (click)="handleApprove()">Add Record</div>
+      <!-- Bind [class.disabled] and disable button when isValid is false -->
+      <div
+        class="send-invitation"
+        [class.disabled]="!dataFromInnerForm?.isValid"
+        (click)="handleApprove()"
+        [attr.disabled]="!dataFromInnerForm?.isValid ? true : null"
+      >
+        Add Record
+      </div>
     </div>
   </div>
 </div>
