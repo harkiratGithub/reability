@@ -263,6 +263,7 @@ export const getPatientsByTherapistId = async (therapistId) => {
 		.field(`${TABLE_NAME.PATIENT}.user_id as peer_id`)
 		.field(`${TABLE_NAME.PATIENT}.disabled_skeleton`)
 		.field(`${TABLE_NAME.PATIENT}.has_camera`)
+		.field(`${TABLE_NAME.PATIENT}.is_mobile`)
 		.field(`${TABLE_NAME.PATIENT}.notification_email`)
 		.field(`${TABLE_NAME.USER}.role`)
 		.field(`${TABLE_NAME.USER}.id as peer_id`)
@@ -383,6 +384,7 @@ export const getPeersByTherapistId = async (therapistId) => {
 		.field(`${TABLE_NAME.USER}.active`)
 		.field(`${TABLE_NAME.PATIENT}.id`, 'patient_id')
 		.field(`${TABLE_NAME.PATIENT}.has_camera`)
+		.field(`${TABLE_NAME.PATIENT}.is_mobile`)
 		.from(TABLE_NAME.THERAPIST)
 		.left_join(
 			TABLE_NAME.THERAPIST_DEPARTMENTS,

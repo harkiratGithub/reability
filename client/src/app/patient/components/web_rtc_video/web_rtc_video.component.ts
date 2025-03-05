@@ -317,7 +317,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   async ngOnInit() {
     if (this.isMobile) {
       this.THERAPIST_REGULAR_VIDEO_CLASS = 'therapist-video-regular-video-mobile';
-      this.THERAPIST_ENLARGE_VIDEO_CLASS = 'therapist-video-enlarge-video-mobile';
+      this.THERAPIST_ENLARGE_VIDEO_CLASS = 'therapist-video-enlarge-video-mobile';      
     }
     this.searchCameraInterval = setInterval(async () => {
       this.userHasCamera = await this.hasUserCamera();
@@ -330,6 +330,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         this.handleCameraAvailability();
       }
     }, this.NO_CAMERA_MESSAGE_DELAY);
+    console.log("======going to set mobile device =========",this.isMobile);
+      this.handleMobileAvailability(this.isMobile);
 
     this.localVideo = document.getElementById('patient-video');
 
@@ -538,6 +540,11 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     clearInterval(this.searchCameraInterval);
     this.ajaxService.updatePatientCameraAvailability(this.currentUser.patientId, this.userHasCamera);
     this.isCameraCheckComplete = true;
+  }
+
+  handleMobileAvailability(isMobile) {
+    console.log("going to save mobile device",isMobile);
+    this.ajaxService.updatePatientMobileAvailability(this.currentUser.patientId, isMobile);    
   }
 
   skeletonLoadingBar = () => {

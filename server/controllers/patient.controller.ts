@@ -214,6 +214,16 @@ export const updatePatientCameraAvailability = (req, res, next) => {
 		});
 };
 
+export const updatePatientMobileAvailability = (req, res, next) => {
+	const { patientId, hasMobile } = req.body;
+
+	PatientHelper.updatePatientMobileAvailability(patientId, hasMobile)
+		.then((updatedPatient) => res.json(updatedPatient))
+		.catch((err) => {
+			next(err);
+		});
+};
+
 export const getActive = (req: Request, res: Response, next: NextFunction) => {
 	const { id } = req.params;
 	PatientHelper.getPatientById(+id)
