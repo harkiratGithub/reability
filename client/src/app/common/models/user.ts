@@ -20,4 +20,5 @@ export class User {
   notification_email?: string;
   login_notification_email?: string;
   instituteLogo?: string; 
+  isMobile: boolean;
 }
