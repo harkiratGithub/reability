@@ -132,7 +132,6 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
   gameMessage: string = '';
   therapistPeerId: string = '';
   InstituteLogo: string ;
-  patientdevice: string;
 
   constructor(
     private authenticationService: AuthenticationService,
@@ -170,9 +169,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
           this.isMobile = false;
         }
       });
-    }    
-    console.log("======this.currentUser===",this.currentUser);
-    console.log("=== this.authenticationService.currentUserValue=========", this.authenticationService.currentUserValue);
+    } 
   }
 
   ngOnInit() {
