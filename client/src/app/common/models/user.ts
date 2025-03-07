@@ -19,4 +19,6 @@ export class User {
   hasCamera: boolean;
   notification_email?: string;
   login_notification_email?: string;
+  instituteLogo?: string; 
+  isMobile: boolean;
 }

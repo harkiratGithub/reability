@@ -395,10 +395,14 @@ export class CommonComponent implements OnInit {
         selectedIds.includes(department.institute_id)
       );
     }
-    this.sharedFilters[1].allOptions = map(this.allDepartmentOptions, (department: any) => ({
-      value: department.id,
-      displayName: department.name,
-    }));
+    this.sharedFilters[1].allOptions = map(this.allDepartmentOptions, (department: any) => {
+      const institute = this.allInstitutes.find((inst) => inst.id === department.institute_id);
+      return {
+        value: department.id,
+        displayName: department.name,
+        selectedValueName: institute ? `${institute.name}` : '-',
+      };
+    });
   }
 
   setFilterOptions(filterName: string, options: IMultiSelectOptions[]) {

@@ -9,7 +9,7 @@ export const createInstitute = async (institute, departments, file = undefined) 
 		try {
 			let imgId;
 			if (file) {
-				imgId = await ImageHelper.createImage(`${file.originalname}`, file, process.env.AWS_IMAGE_BUCKET_PATH, client);
+				imgId = await ImageHelper.createImage(`${file.originalname}`, file, process.env.AZURE_IMAGE_BUCKET_PATH, client);
 			}
 			const createdInstitute = await InstituteModel.create(
 				{
@@ -36,13 +36,13 @@ export const handleEditImage = async (file, existingImageId, client = null) => {
 	if (file) {
 		// if already has image delete it
 		if (existingImageId && existingImageId !== 'null') {
-			await ImageHelper.deleteImage(existingImageId, process.env.AWS_IMAGE_BUCKET_PATH, client);
+			await ImageHelper.deleteImage(existingImageId, process.env.AZURE_IMAGE_BUCKET_PATH, client);
 		}
 		// upload the new image
 		updatedImgId = await ImageHelper.createImage(
 			`${file.originalname}`,
 			file,
-			process.env.AWS_IMAGE_BUCKET_PATH,
+			process.env.AZURE_IMAGE_BUCKET_PATH,
 			client
 		);
 	}
@@ -100,7 +100,7 @@ export const deleteInstitute = async (id) => {
 			client
 		);
 		if (process.env.NODE_ENV !== 'test') {
-			await ImageHelper.deleteImage(institute.image_id, process.env.AWS_IMAGE_BUCKET_PATH, client);
+			await ImageHelper.deleteImage(institute.image_id, process.env.AZURE_IMAGE_BUCKET_PATH, client);
 		}
 	};
 	return BaseModel.runAsTransaction(instituteDeleteFunc);

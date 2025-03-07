@@ -3,6 +3,7 @@ import { map, findLast } from 'lodash';
 import * as UserModel from '../models/users.model';
 import * as PatientModel from '../models/patient.model';
 import * as GameModel from '../models/game.model';
+import * as RtmModel from '../models/rtm.model';
 import * as TherapistSessionModel from '../models/therapist-session.model';
 
 import * as GameSessionHelper from '../helpers/game-session.helper';
@@ -32,8 +33,12 @@ export const onLogIn = async (user: {
 	email: string;
 	is_two_factor_enabled: boolean;
 	timezone:string;
+	instituteLogo?: string;
 }): Promise<any> => {
-	try {	
+	try {
+		let instituteLogo = '';
+
+			
 		const currentTimestamp =  new Date();	
 		await UserModel.updateById(user.id, {
 			logged_in_at: Helper.createTimeForDb(),
@@ -45,8 +50,12 @@ export const onLogIn = async (user: {
 			case ROLE.ADMIN:
 				const adminDetails = await UserModel.getAdminDetails(user.id);
 				const { email } = EncryptHelper.decryptJson(adminDetails[0]);
-				return { ...user, email };
+				return { ...user, email, };
 			case ROLE.THERAPIST:
+				const therapistDetails = await UserModel.getUserDetails(user.id, user.therapistId || undefined);
+				const therapistInfo = EncryptHelper.decryptJson(therapistDetails[0]);
+				instituteLogo = await RtmModel.getInstituteLogoById(user.therapistId,user.role);
+				return { ...user, instituteLogo, ...therapistInfo };
 			case ROLE.VIDEO_PATIENT:
 				const userDetails = await UserModel.getUserDetails(user.id, user.therapistId || undefined);
 				const {
@@ -56,7 +65,7 @@ export const onLogIn = async (user: {
 					is_two_factor_enabled: is_two_factor_enabled,
 					departments,
 				} = EncryptHelper.decryptJson(userDetails[0]);
-				return { ...user, id, firstName, lastName, is_two_factor_enabled, departments };
+				return { ...user, id, firstName, lastName, is_two_factor_enabled, departments, };
 			case ROLE.PATIENT:
 				const details = await UserModel.getUserDetails(user.id, user.therapistId || undefined);
 				const {
@@ -77,6 +86,7 @@ export const onLogIn = async (user: {
 				const isRTM = RTM;
 				const validGames = await GameModel.getValidGameForPatient(patientId);
 				const patient = await PatientModel.findPatientByUserId(user.id);
+				instituteLogo = await RtmModel.getInstituteLogoById(patientId,user.role);
 				const disabledSkeleton = patient.disabled_skeleton;
 				const requiresTermsAgreement = date_agreed_terms === null;
 				
@@ -91,6 +101,7 @@ export const onLogIn = async (user: {
 					isPainModelOpen,
 					isMobileModelOpen,
 					isRTM,
+					instituteLogo,
 					date_agreed_terms: requiresTermsAgreement,
 				};
 		}
@@ -115,6 +126,7 @@ export const getPatientsByTherapist = async (therapistId: any) => {
 			login_notification_email: decryptPatient.login_notification_email,
 			disabledSkeleton: decryptPatient.disabled_skeleton,
 			hasCamera: decryptPatient.has_camera,
+			isMobile: decryptPatient.is_mobile,
 			phone: decryptPatient.phone,
 		};
 	});

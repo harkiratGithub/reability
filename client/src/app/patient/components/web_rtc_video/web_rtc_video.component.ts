@@ -204,6 +204,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       }
     }, this.NO_CAMERA_MESSAGE_DELAY);
 
+    console.log("======going to set mobile device =========",this.isMobile);
+    this.handleMobileAvailability(this.isMobile);
     this.localVideo = document.getElementById('patient-video');
 
     if (this.showLocalVideo) {
@@ -388,6 +390,11 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     clearInterval(this.searchCameraInterval);
     this.ajaxService.updatePatientCameraAvailability(this.currentUser.patientId, this.userHasCamera);
     this.isCameraCheckComplete = true;
+  }
+
+  handleMobileAvailability(isMobile) {
+    console.log("going to save mobile device",isMobile);
+    this.ajaxService.updatePatientMobileAvailability(this.currentUser.patientId, isMobile);    
   }
 
   skeletonLoadingBar = () => {

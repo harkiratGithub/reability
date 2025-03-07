@@ -23,7 +23,14 @@ export const updateTherapistSession = async (patient_id, data, timestamp,userTim
 			const updatePatientSession = await updateRTM(patient_id, data, 'therapist', null, timestamp,timezoneinMinutes);
 			return updatePatientSession;
 		} catch (err) {
+			if (err.status === 400) {
+				throw {
+					status: 400,
+					message: err.message, // Pass the "Duplicate entry" message
+				};
+			}
 			throw err;
+			// throw err;
 		}
 	};
 	return BaseModel.runAsTransaction(rtmCreationFunc);
