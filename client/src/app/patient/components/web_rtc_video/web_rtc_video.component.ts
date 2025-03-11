@@ -41,6 +41,7 @@ import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 import { SkeltonVideoService } from '../../../common/services/skelton-video.service';
 import { SkeletonProgressBarService } from 'src/app/common/services/skeleton-progress-bar.service';
+declare var LivekitClient: any;
 
 let therapistToPatientConnection = null;
 declare var MediaRecorder: any;
@@ -221,20 +222,44 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
      });
      */
 
-    this.skeltonVideoService.gameVideoElement$.subscribe((iframeaction) => {
+    this.skeltonVideoService.gameVideoElement$.subscribe(async (iframeaction) => {
       // console.log(" in webrtccomponents iframeaction===", iframeaction);
       if (typeof iframeaction === 'string') {
         this.landmarks = [];
         const action = JSON.parse(iframeaction);
-        // console.log("action.msg.data.currentPlayTime.vidTime===", action);
+        console.log("action.msg.data.currentPlayTime.vidTime===", action);
         if (action.msg && action.msg.gameSummaryContent == "Session Ended") {
-          // this.heygenAPIService = new HeygenAPIService();
-          // this.heygenAPIService.onStart();
-          // this.heygenAPIService.sendText("hello");
           this.videoIndex = -1;
           this.videoSeconds = 0;
           const results = this.matchClipAndPatientData(this.videoMinMax, this.matchingCameraData);
           const updateComments = this.updateComments(results);
+
+          const apiKey = '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'
+          const body = {
+            model: 'gpt-4o-mini', // Or 'gpt-3.5-turbo'
+            messages: [{
+              role: 'user',
+              content: `
+              JSON Array: ${updateComments},
+              Based on above array, give a 2 liner description on how the patient has perform the exercise.
+              `
+            }]
+          };
+
+          const response = await fetch(`https://api.openai.com/v1/chat/completions`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${apiKey}`,
+            },
+            body: JSON.stringify(body)
+          });
+
+          const data = await response.json();
+          this.heygenAPIService.sendText(data?.choices[0].message?.content);
+          setTimeout(() => {
+            this.heygenAPIService.onClose()
+          }, 5000);
 
           this.ajaxService.savePatientMetaData({
             game_id: this.gameId,
@@ -251,7 +276,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           this.landmarksPointer = [];
           this.landmarksLinePointer = [];
           const videoName = action.msg?.data?.source?.split('/')[4];
-          this.ajaxService.getGameMetaData(videoName).subscribe((gamesettings) => {
+          this.ajaxService.getGameMetaData(videoName).subscribe(async (gamesettings) => {
             if (gamesettings.length > 0) {
               setInterval(() => {
                 const results = this.matchClipAndPatientData(this.videoMinMax, this.matchingCameraData);
@@ -278,9 +303,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
               if (Math.abs(this.videoSeconds - currentPlayTime) > 1 || videoTime > 0 || action.msg.data.index > 0) {
                 this.videoSeconds = currentPlayTime
                 this.initializeCameraPoseModels()
-                this.heygenAPIService = new HeygenAPIService();
                 this.heygenAPIService.onStart();
-                this.heygenAPIService.sendText("hello");
                 if (!this.startTime) {
                   this.startTime = new Date().getTime(); // Save the initial timestamp
                 }
@@ -294,6 +317,31 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                   if (this.videoIndex > 0) {
                     const results = this.matchClipAndPatientData(this.videoMinMax, this.matchingCameraData);
                     const updateComments = this.updateComments(results);
+
+                    const apiKey = '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'
+                    const body = {
+                      model: 'gpt-4o-mini', // Or 'gpt-3.5-turbo'
+                      messages: [{
+                        role: 'user',
+                        content: `
+                          JSON Array: ${updateComments},
+                          Based on above array, give a 2 liner description on how the patient has perform the exercise.
+                        `
+                      }]
+                    };
+
+                    const response = await fetch(`https://api.openai.com/v1/chat/completions`, {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${apiKey}`,
+                      },
+                      body: JSON.stringify(body)
+                    });
+
+                    const data = await response.json();
+                    this.heygenAPIService.sendText(data?.choices[0].message?.content);
+
                     this.ajaxService.savePatientMetaData({
                       game_id: this.gameId,
                       settings: updateComments,
@@ -334,6 +382,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   }
 
   async ngOnInit() {
+    this.heygenAPIService = new HeygenAPIService();
     if (this.isMobile) {
       this.THERAPIST_REGULAR_VIDEO_CLASS = 'therapist-video-regular-video-mobile';
       this.THERAPIST_ENLARGE_VIDEO_CLASS = 'therapist-video-enlarge-video-mobile';
@@ -2136,12 +2185,12 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
 
 export class HeygenAPIService {
   API_CONFIG = {
-    apiKey: "MTZkNDJlNmEzNzBjNDc1N2I5ZTUzNjY1NDA0ODEzMzAtMTczOTQzMzY4Mw==",
+    apiKey: "NmU1MGQyNGE4YzZjNDQyZjllODM3Y2JjZDljMjY4NWUtMTczNTIwNzQ1Nw==", // Yoram
+    // apiKey: "ZThmY2JiZWQ0MDUxNGYzNmEwZmFlYTdhOWE2ZTBiN2MtMTcxMTEwMTQ1NQ==", // Raghav
     // apiKey: "ZWE1NjlmOGZmNGIzNDg1M2FjYWY3Mzg",
     serverUrl: "https://api.heygen.com",
   };
 
-  LivekitClient: any;
   newSessionInfo: any = null;
   private room: any = null;
   mediaStream: MediaStream | null = null;
@@ -2156,6 +2205,8 @@ export class HeygenAPIService {
   updateNewStatus(message: string) {
     const timestamp = new Date().toLocaleTimeString();
     this.statusMessages.push(`[${timestamp}] ${message}`);
+    console.log(this.statusMessages);
+
   }
 
   async getSessionToken() {
@@ -2214,24 +2265,24 @@ export class HeygenAPIService {
     });
 
     const data = await response.json();
-    console.warn("data : ", data)
+    console.log("data : ", data)
     this.newSessionInfo = data.data;
 
-    this.room = new this.LivekitClient.Room({
+    this.room = new LivekitClient.Room({
       adaptiveStream: true,
       dynacast: true,
       videoCaptureDefaults: {
-        resolution: this.LivekitClient.VideoPresets.h720.resolution,
+        resolution: LivekitClient.VideoPresets.h720.resolution,
       },
     });
 
-    this.room.on(this.LivekitClient.RoomEvent.DataReceived, (message: any) => {
+    this.room.on(LivekitClient.RoomEvent.DataReceived, (message: any) => {
       const data = new TextDecoder().decode(message);
       // console.log("Room message:", JSON.parse(data));
     });
 
     this.mediaStream = new MediaStream();
-    this.room.on(this.LivekitClient.RoomEvent.TrackSubscribed, (track: any) => {
+    this.room.on(LivekitClient.RoomEvent.TrackSubscribed, (track: any) => {
       if (track.kind === "video" || track.kind === "audio") {
         this.mediaStream!.addTrack(track.mediaStreamTrack);
         if (this.mediaStream!.getVideoTracks().length > 0 && this.mediaStream!.getAudioTracks().length > 0) {
@@ -2242,14 +2293,14 @@ export class HeygenAPIService {
       }
     });
 
-    this.room.on(this.LivekitClient.RoomEvent.TrackUnsubscribed, (track: any) => {
+    this.room.on(LivekitClient.RoomEvent.TrackUnsubscribed, (track: any) => {
       const mediaTrack = track.mediaStreamTrack;
       if (mediaTrack) {
         this.mediaStream!.removeTrack(mediaTrack);
       }
     });
 
-    this.room.on(this.LivekitClient.RoomEvent.Disconnected, (reason: any) => {
+    this.room.on(LivekitClient.RoomEvent.Disconnected, (reason: any) => {
       this.updateNewStatus(`Room disconnected: ${reason}`);
     });
 
@@ -2276,7 +2327,7 @@ export class HeygenAPIService {
     this.updateNewStatus("Connected to room");
   }
 
-  async sendText(text: string, taskType: string = "talk") {
+  async sendText(text: string, taskType: string = "repeat") {
     if (!this.newSessionInfo) {
       this.updateNewStatus("No active session");
       return;
