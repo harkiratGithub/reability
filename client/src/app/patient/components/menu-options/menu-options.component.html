@@ -30,6 +30,7 @@
     <app-game-intro *ngIf="(!showTimer && isInGame) || (isTherapistMode && isConnectedUserInGame && !showTimerForTherapist)" [currentGameName]="currentGameName" (onClickHomeButton)="onClickHomeButton()" [isGameReadyToStart]="isGameReadyToStart" (introductionProgressEnded)="introductionProgressEnded($event)" [connectionId]="connectionId" [isTherapistMode]="isTherapistMode" [initGameSettingsForTherapist]="initGameSettingsForTherapist" (sendShowTimerForTherapist)="sendShowTimerForTherapist($event)" [isMobile]="isMobile"></app-game-intro>
 
     <div class="game-screen" *ngIf="isInGame || (isTherapistMode && isConnectedUserInGame)">
+      <mat-slider thumbLabel [ngClass]="{ 'thumbs-up': showThumbUp }" [displayWith]="formatLabel" min="0" tickInterval="10" (focusin)="hoverSlider()" (focusout)="blurSlider()" [vertical]="true" max="100" [value]="sliderValue"> </mat-slider>
       <app-game-wrapper #gameWrapper [therapistPeerId]="therapistPeerId" [currentGameName]="currentGameName" [isInSplitScreen]="isInSplitScreen" [connectedUser]="connectedUser" [isSwappedScreen]="isSwappedScreen" [peerId]="connectedUser && connectedUser.peerId" [isTherapist]="isTherapistMode" [gameIdTherapist]="gameIdTherapist" [gameUrl]="connectedPatientGameUrl" [connectionId]="connectionId" (closeGame)="handleQuitGame()" (onIframeLoad)="handleIframeLoad()" [isMobile]="isMobile" [inTherapistSession]="inTherapistSession" [isIntroductionProgressEnded]="isIntroductionProgressEnded" (gameReadyToStart)="gameReadyToStart($event)" (introductionProgressEnded)="introductionProgressEnded($event)" (showGameMessage)="showGameMessageToUser($event)" (hideGameMessage)="hideGameMessageFromUser()" (sendInitGameSettingsForTherapist)="sendInitGameSettingsForTherapist($event)" (sendShowTimerForTherapist)="sendShowTimerForTherapist($event)" (setInitGameSettingsForTherapist)="setInitGameSettingsForTherapist($event)"></app-game-wrapper>
     </div>
     <div *ngIf="!isInGame && !isConnectedUserInGame" class="outlet-container">
@@ -141,18 +142,7 @@
   <div class="left-section-mobile">
     <app-full-screen-video-session-component *ngIf="videoSessionDisplay" [currSession]="currentCall" [isMirrorVideo]="shouldMirrorVideoFullScreen" (leaveFullScreenVideo)="toggleVideoSessionView()" [isTherapist]="false" [isTherapistScreenShared]="isShareScreen">
     </app-full-screen-video-session-component>
-    <app-game-intro
-      *ngIf="(!showTimer && isInGame) || (isTherapistMode && isConnectedUserInGame && !showTimerForTherapist)"
-      [currentGameName]="currentGameName"
-      (onClickHomeButton)="onClickHomeButton()"
-      [isGameReadyToStart]="isGameReadyToStart"
-      (introductionProgressEnded)="introductionProgressEnded($event)"
-      [connectionId]="connectionId"
-      [isTherapistMode]="isTherapistMode"
-      [initGameSettingsForTherapist]="initGameSettingsForTherapist"
-      (sendShowTimerForTherapist)="sendShowTimerForTherapist($event)"
-      [isMobile]="isMobile"
-    ></app-game-intro>
+    <app-game-intro *ngIf="(!showTimer && isInGame) || (isTherapistMode && isConnectedUserInGame && !showTimerForTherapist)" [currentGameName]="currentGameName" (onClickHomeButton)="onClickHomeButton()" [isGameReadyToStart]="isGameReadyToStart" (introductionProgressEnded)="introductionProgressEnded($event)" [connectionId]="connectionId" [isTherapistMode]="isTherapistMode" [initGameSettingsForTherapist]="initGameSettingsForTherapist" (sendShowTimerForTherapist)="sendShowTimerForTherapist($event)" [isMobile]="isMobile"></app-game-intro>
     <div class="middle-section">
       <div class="content-background">
         <div id="menu-container" class="menu-container movingRightAnimation">
@@ -166,44 +156,22 @@
                 </div>
               </span>
               <span *ngIf="app.isEnabled">
-                <div
-                  *ngIf="!isTherapistMode"
-                  appHand
-                  [clickOnlyOnCenter]="true"
-                  [hoverClass]="'pressed'"
-                  [delayAnimation]="500"
-                  [timeToWait]="2000"
-                  [selectable]="app.isEnabled"
-                  (click)="navigate(i)"
-                  (outputFunc)="navigate(i)"
-                  class="enabled"
-                >
+                <div *ngIf="!isTherapistMode" appHand [clickOnlyOnCenter]="true" [hoverClass]="'pressed'" [delayAnimation]="500" [timeToWait]="2000" [selectable]="app.isEnabled" (click)="navigate(i)" (outputFunc)="navigate(i)" class="enabled">
                   <div class="opacity-layer">
                     <div>
                       <svg viewBox="0 0 36 36" class="loader">
-                        <path
-                          class="loader-bg"
-                          d="M18 2.0845
+                        <path class="loader-bg" d="M18 2.0845
                         a 15.9155 15.9155 0 0 1 0 31.831
-                        a 15.9155 15.9155 0 0 1 0 -31.831"
-                        />
-                        <path
-                          class="circle"
-                          stroke-dasharray="100, 100"
-                          d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path class="circle" stroke-dasharray="100, 100" d="M18 2.0845
                         a 15.9155 15.9155 0 0 1 0 31.831
-                        a 15.9155 15.9155 0 0 1 0 -31.831"
-                        />
+                        a 15.9155 15.9155 0 0 1 0 -31.831" />
                       </svg>
                     </div>
                   </div>
                   <div class="skeleton-game-icon-wrapper">
                     <div class="bodytrack-icon-background" *ngIf="app.bodyTrackRequired"></div>
-                    <img
-                      class="skeleton-image"
-                      src="../../../../assets/skel/waving_hand_black_24dp.svg"
-                      *ngIf="app.bodyTrackRequired"
-                    />
+                    <img class="skeleton-image" src="../../../../assets/skel/waving_hand_black_24dp.svg" *ngIf="app.bodyTrackRequired" />
                   </div>
                   <img class="game-image" [src]="app.image" />
                   <div class="gradient-overlay"></div>
@@ -213,19 +181,12 @@
                   <div class="opacity-layer">
                     <div>
                       <svg viewBox="0 0 36 36" class="loader">
-                        <path
-                          class="loader-bg"
-                          d="M18 2.0845
+                        <path class="loader-bg" d="M18 2.0845
                       a 15.9155 15.9155 0 0 1 0 31.831
-                      a 15.9155 15.9155 0 0 1 0 -31.831"
-                        />
-                        <path
-                          class="circle"
-                          stroke-dasharray="100, 100"
-                          d="M18 2.0845
+                      a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path class="circle" stroke-dasharray="100, 100" d="M18 2.0845
                       a 15.9155 15.9155 0 0 1 0 31.831
-                      a 15.9155 15.9155 0 0 1 0 -31.831"
-                        />
+                      a 15.9155 15.9155 0 0 1 0 -31.831" />
                       </svg>
                     </div>
                   </div>
@@ -241,32 +202,7 @@
     </div>
 
     <div class="game-screen-mobile" *ngIf="isInGame || (isTherapistMode && isConnectedUserInGame)">
-      <app-game-wrapper
-      *ngIf="isStudioGame && isMobile"
-        #gameWrapper
-        [therapistPeerId]="therapistPeerId"
-        [currentGameName]="currentGameName"
-        [isInSplitScreen]="isInSplitScreen"
-        [connectedUser]="connectedUser"
-        [isSwappedScreen]="isSwappedScreen"
-        [peerId]="connectedUser && connectedUser.peerId"
-        [isTherapist]="isTherapistMode"
-        [gameIdTherapist]="gameIdTherapist"
-        [gameUrl]="connectedPatientGameUrl"
-        [connectionId]="connectionId"
-        (closeGame)="handleQuitGame()"
-        (onIframeLoad)="handleIframeLoad()"
-        [isMobile]="isMobile"
-        [inTherapistSession]="inTherapistSession"
-        [isIntroductionProgressEnded]="isIntroductionProgressEnded"
-        (gameReadyToStart)="gameReadyToStart($event)"
-        (introductionProgressEnded)="introductionProgressEnded($event)"
-        (showGameMessage)="showGameMessageToUser($event)"
-        (hideGameMessage)="hideGameMessageFromUser()"
-        (sendInitGameSettingsForTherapist)="sendInitGameSettingsForTherapist($event)"
-        (sendShowTimerForTherapist)="sendShowTimerForTherapist($event)"
-        (setInitGameSettingsForTherapist)="setInitGameSettingsForTherapist($event)"
-      ></app-game-wrapper>
+      <app-game-wrapper *ngIf="isStudioGame && isMobile" #gameWrapper [therapistPeerId]="therapistPeerId" [currentGameName]="currentGameName" [isInSplitScreen]="isInSplitScreen" [connectedUser]="connectedUser" [isSwappedScreen]="isSwappedScreen" [peerId]="connectedUser && connectedUser.peerId" [isTherapist]="isTherapistMode" [gameIdTherapist]="gameIdTherapist" [gameUrl]="connectedPatientGameUrl" [connectionId]="connectionId" (closeGame)="handleQuitGame()" (onIframeLoad)="handleIframeLoad()" [isMobile]="isMobile" [inTherapistSession]="inTherapistSession" [isIntroductionProgressEnded]="isIntroductionProgressEnded" (gameReadyToStart)="gameReadyToStart($event)" (introductionProgressEnded)="introductionProgressEnded($event)" (showGameMessage)="showGameMessageToUser($event)" (hideGameMessage)="hideGameMessageFromUser()" (sendInitGameSettingsForTherapist)="sendInitGameSettingsForTherapist($event)" (sendShowTimerForTherapist)="sendShowTimerForTherapist($event)" (setInitGameSettingsForTherapist)="setInitGameSettingsForTherapist($event)"></app-game-wrapper>
     </div>
   </div>
   <div [ngClass]="{

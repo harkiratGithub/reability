@@ -40,6 +40,7 @@ import { Pose, POSE_CONNECTIONS, Results } from '@mediapipe/pose';
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 import { SkeltonVideoService } from '../../../common/services/skelton-video.service';
+import { SkeletonProgressBarService } from 'src/app/common/services/skeleton-progress-bar.service';
 
 let therapistToPatientConnection = null;
 declare var MediaRecorder: any;
@@ -181,6 +182,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     private ajaxService: AjaxService,
     private cdr: ChangeDetectorRef,
     private skeltonVideoService: SkeltonVideoService,
+    private skeltonProgressBarService: SkeletonProgressBarService,
   ) {
     this.subscription.add(
       this.ajaxService.getIceServers().subscribe((res) => {
@@ -247,6 +249,16 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           const videoName = action.msg?.data?.source?.split('/')[4];
           this.ajaxService.getGameMetaData(videoName).subscribe((gamesettings) => {
             if (gamesettings.length > 0) {
+              setInterval(() => {
+                const results = this.matchClipAndPatientData(this.videoMinMax, this.matchingCameraData);
+                const updateComments = this.updateComments(results);
+                const mainLength = this.videoMinMax.length;
+                const updateLength = updateComments.filter((data) => (data.RightCondition == 'Good' || data.LeftCondition == 'Good') && data.PatientTimestamp != undefined).length;
+                const thumbUpLength = updateComments.filter((data) => (data.RightComments == 'Perfect' || data.LeftComments == 'Perfect') && data.PatientTimestamp != undefined).length;
+                const percentage = Math.floor((updateLength / mainLength) * 100);
+                this.skeltonProgressBarService.setBarElement('' + percentage);
+                this.skeltonProgressBarService.setThumbUpElement('' + thumbUpLength);
+              }, 5000);
               this.landmarks = gamesettings[0].landmarks;
               this.videoMinMax = gamesettings[0].settings;
               this.landmarksPointer = gamesettings[0].landmarksPointer;
@@ -261,7 +273,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
 
               if (Math.abs(this.videoSeconds - currentPlayTime) > 1 || videoTime > 0 || action.msg.data.index > 0) {
                 this.videoSeconds = currentPlayTime
-                this.initializeCameraPoseModels()
+                // this.initializeCameraPoseModels()
                 if (!this.startTime) {
                   this.startTime = new Date().getTime(); // Save the initial timestamp
                 }
@@ -529,8 +541,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     this.skeletonLoadingBar();
 
     if (this.currentUser.id == 1802 || this.currentUser.id == 1793) {
-      this.initializeCamera();
-      this.initializePoseModels();
+      // this.initializeCamera();
+      // this.initializePoseModels();
     }
   }
 
@@ -924,7 +936,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         this.appActions.toggleEnlargeVideo(data.enlargeVideo);
         break;
       case MESSAGES.REDIRECT_TO_HOME:
-        console.log("========MESSAGES.REDIRECT_TO_HOME=====",MESSAGES.REDIRECT_TO_HOME);
+        console.log("========MESSAGES.REDIRECT_TO_HOME=====", MESSAGES.REDIRECT_TO_HOME);
         this.redirectToHome();
         break;
       case MESSAGES.REQUEST_APP_GAME_DATA:
@@ -1522,6 +1534,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         PatientTimestamp: closestPatient?.patientEntry.timestamp,
         LeftComments: isLeftGood ? "Good" : "Not Good",
         RightComments: isRightGood ? "Good" : "Not Good",
+        LeftCondition: isLeftGood ? "Good" : "Not Good",
+        RightCondition: isRightGood ? "Good" : "Not Good",
       });
     });
 
@@ -1544,6 +1558,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       } else if (angleRightDiff < -angleThreshold) {
         entry.RightComments = "Lower";
       } else {
+        entry.RightCondition = "Good";
         if (Math.abs(angleRightDiff) <= 2) {
           entry.RightComments = "Perfect";
         } else if (Math.abs(angleRightDiff) <= 4) {
@@ -1560,6 +1575,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       } else if (angleLeftDiff < -angleThreshold) {
         entry.LeftComments = "Lower";
       } else {
+        entry.LeftCondition = "Good";
         if (Math.abs(angleLeftDiff) <= 2) {
           entry.LeftComments = "Perfect";
         } else if (Math.abs(angleLeftDiff) <= 4) {
