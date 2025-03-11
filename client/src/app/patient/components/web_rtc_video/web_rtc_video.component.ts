@@ -171,6 +171,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   skeletonBtn;
   currentGameAppData: IGameAppData;
   searchCameraInterval;
+  heygenAPIService: HeygenAPIService
 
   constructor(
     private authenticationService: AuthenticationService,
@@ -183,7 +184,6 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     private cdr: ChangeDetectorRef,
     private skeltonVideoService: SkeltonVideoService,
     private skeltonProgressBarService: SkeletonProgressBarService,
-    private heygenAPIService: HeygenAPIService
   ) {
     this.subscription.add(
       this.ajaxService.getIceServers().subscribe((res) => {
@@ -228,8 +228,9 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         const action = JSON.parse(iframeaction);
         // console.log("action.msg.data.currentPlayTime.vidTime===", action);
         if (action.msg && action.msg.gameSummaryContent == "Session Ended") {
-          heygenAPIService.onStart();
-          heygenAPIService.sendText("hello");
+          // this.heygenAPIService = new HeygenAPIService();
+          // this.heygenAPIService.onStart();
+          // this.heygenAPIService.sendText("hello");
           this.videoIndex = -1;
           this.videoSeconds = 0;
           const results = this.matchClipAndPatientData(this.videoMinMax, this.matchingCameraData);
@@ -276,7 +277,10 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
 
               if (Math.abs(this.videoSeconds - currentPlayTime) > 1 || videoTime > 0 || action.msg.data.index > 0) {
                 this.videoSeconds = currentPlayTime
-                // this.initializeCameraPoseModels()
+                this.initializeCameraPoseModels()
+                this.heygenAPIService = new HeygenAPIService();
+                this.heygenAPIService.onStart();
+                this.heygenAPIService.sendText("hello");
                 if (!this.startTime) {
                   this.startTime = new Date().getTime(); // Save the initial timestamp
                 }
@@ -544,8 +548,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     this.skeletonLoadingBar();
 
     if (this.currentUser.id == 1802 || this.currentUser.id == 1793) {
-      // this.initializeCamera();
-      // this.initializePoseModels();
+      this.initializeCamera();
+      this.initializePoseModels();
     }
   }
 
