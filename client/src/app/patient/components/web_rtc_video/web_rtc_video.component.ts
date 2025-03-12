@@ -241,7 +241,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
               role: 'user',
               content: `
               JSON Array: ${updateComments},
-              Based on above array, give a 2 liner description on how the patient has perform the exercise.
+              Based on above array, give a 2 liner, with 10 seconds max speech time, description on how the patient has perform the exercise.
               `
             }]
           };
@@ -256,10 +256,11 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           });
 
           const data = await response.json();
-          this.heygenAPIService.sendText(data?.choices[0].message?.content);
+          if (data.choices.length > 0)
+            this.heygenAPIService.sendText(data?.choices[0].message?.content);
           setTimeout(() => {
             this.heygenAPIService.onClose()
-          }, 5000);
+          }, 15000);
 
           this.ajaxService.savePatientMetaData({
             game_id: this.gameId,
@@ -269,7 +270,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
             console.log("gamesettings===", gamesettings);
           });
           // this.saveToCSV(updateComments, 'min_max_matches.csv');
-          // this.saveToCSV(this.timeLog, 'time_matching.csv');
+          this.saveToCSV(this.timeLog, 'time_matching.csv');
         }
         if (action.msg && action.msg.data && action.msg.data.shouldPlay) {
           this.videoMinMax = [];
@@ -302,8 +303,6 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
 
               if (Math.abs(this.videoSeconds - currentPlayTime) > 1 || videoTime > 0 || action.msg.data.index > 0) {
                 this.videoSeconds = currentPlayTime
-                this.initializeCameraPoseModels()
-                this.heygenAPIService.onStart();
                 if (!this.startTime) {
                   this.startTime = new Date().getTime(); // Save the initial timestamp
                 }
@@ -313,6 +312,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                   this.processedTimestamps = new Set();
                   this.startTime = new Date().getTime();
                   this.currentVideoIndex = 0;
+                  this.initializeCameraPoseModels()
+                  this.heygenAPIService.onStart();
 
                   if (this.videoIndex > 0) {
                     const results = this.matchClipAndPatientData(this.videoMinMax, this.matchingCameraData);
@@ -325,7 +326,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                         role: 'user',
                         content: `
                           JSON Array: ${updateComments},
-                          Based on above array, give a 2 liner description on how the patient has perform the exercise.
+                          Based on above array, give a 2 liner, with 10 seconds max speech time, description on how the patient has perform the exercise.
                         `
                       }]
                     };
@@ -342,7 +343,9 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                     const data = await response.json();
                     if (data.choices.length > 0)
                       this.heygenAPIService.sendText(data?.choices[0].message?.content);
-
+                    setTimeout(() => {
+                      this.heygenAPIService.onClose()
+                    }, 15000);
                     this.ajaxService.savePatientMetaData({
                       game_id: this.gameId,
                       settings: updateComments,
@@ -386,7 +389,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     this.heygenAPIService = new HeygenAPIService();
     if (this.isMobile) {
       this.THERAPIST_REGULAR_VIDEO_CLASS = 'therapist-video-regular-video-mobile';
-      this.THERAPIST_ENLARGE_VIDEO_CLASS = 'therapist-video-enlarge-video-mobile';      
+      this.THERAPIST_ENLARGE_VIDEO_CLASS = 'therapist-video-enlarge-video-mobile';
     }
     this.searchCameraInterval = setInterval(async () => {
       this.userHasCamera = await this.hasUserCamera();
@@ -399,8 +402,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         this.handleCameraAvailability();
       }
     }, this.NO_CAMERA_MESSAGE_DELAY);
-    console.log("======going to set mobile device =========",this.isMobile);
-      this.handleMobileAvailability(this.isMobile);
+    console.log("======going to set mobile device =========", this.isMobile);
+    this.handleMobileAvailability(this.isMobile);
 
     this.localVideo = document.getElementById('patient-video');
 
@@ -612,8 +615,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   }
 
   handleMobileAvailability(isMobile) {
-    console.log("going to save mobile device",isMobile);
-    this.ajaxService.updatePatientMobileAvailability(this.currentUser.patientId, isMobile);    
+    console.log("going to save mobile device", isMobile);
+    this.ajaxService.updatePatientMobileAvailability(this.currentUser.patientId, isMobile);
   }
 
   skeletonLoadingBar = () => {
@@ -1978,7 +1981,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           this.timeMatching = withinTimeTolerance(
             elapsedTime,
             currentVideoAngle.ClipTimestamp,
-            .75
+            .70
           )
           if (this.lastComment == 'Good' && this.lastTimeMatching) {
             this.timeMatching = true;
@@ -1992,7 +1995,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           this.lastTimeMatching = this.timeMatching;
 
           const angleThreshold = 35;
-          const timestampThreshold = 1.5;
+          const timestampThreshold = 2;
 
           const timeDiff = Math.abs(currentVideoAngle.ClipTimestamp - elapsedTime);
           const angleLeftDiff = currentVideoAngle.ClipDeg - +leftAngle;
@@ -2236,7 +2239,7 @@ export class HeygenAPIService {
       session_id: sessionId,
       session_token: this.sessionToken!,
       silence_response: 'false',
-      opening_text: "Hello, how can I help you?",
+      opening_text: "",
       stt_language: "en",
     });
 
