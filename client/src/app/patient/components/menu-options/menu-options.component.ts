@@ -38,6 +38,7 @@ import {
 import { AjaxService } from '../../../therapist/services/ajax.service';
 import { IGame, IOrganAngle } from '../../../../types';
 import { IGameAppData } from '../../../../app/app.state';
+import { SkeletonProgressBarService } from 'src/app/common/services/skeleton-progress-bar.service';
 
 const MAX_GAMES_IN_PAGE = 10;
 const GAME_ICON_BASE_URL = '../../../../assets/game-icons/';
@@ -131,8 +132,9 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
   currentGameDescription: string = '';
   gameMessage: string = '';
   therapistPeerId: string = '';
-  InstituteLogo: string ;
-
+  InstituteLogo: string;
+  sliderValue: number = 0;
+  showThumbUp: boolean = false;
   constructor(
     private authenticationService: AuthenticationService,
     private bodyHandleService: BodyHandleService,
@@ -142,6 +144,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
     private menuOptionsActions: MenuOptionsAppActions,
     private patientWebRtcService: PatientWebRtcService,
     private ajax: AjaxService,
+    private skeltonProgressBarService: SkeletonProgressBarService,
     private ref: ChangeDetectorRef
   ) {
     if (!this.isTherapistMode) {
@@ -157,7 +160,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
         this.currentUser = user;
         this.InstituteLogo = this.currentUser?.instituteLogo || '';
       })
-    );   
+    );
     if (!this.isTherapistMode) {
       if (MOBILE_OR_SMALL_RESOLUTION) {
         this.isMobile = true;
@@ -169,12 +172,13 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
           this.isMobile = false;
         }
       });
-    } 
+    }
   }
 
   ngOnInit() {
-    console.log("=======isPatientOnMobile===========",this.isPatientOnMobile);
-    console.log("=======isTherapistMode===========",this.isTherapistMode);
+    console.log("=======isPatientOnMobile===========", this.isPatientOnMobile);
+    console.log("=======isTherapistMode===========", this.isTherapistMode);
+    console.log("we are under ngoninit function ");
     this.appActions.setCurrentGame({ url: 'menu-options', gameId: undefined });
     const canvas: any = document.getElementById('patient-canvas') as HTMLCanvasElement;
     if (canvas) {
@@ -183,7 +187,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
     const skeletonCanvas: any = document.getElementById('patient-canvas-skeleton') as HTMLCanvasElement;
     if (skeletonCanvas) {
       this.patientSkeletonCtx = skeletonCanvas.getContext('2d');
-    }   
+    }
 
     if (!this.isTherapistMode) {
       this.subscription.add(
@@ -234,7 +238,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
     );
 
     this.subscription.add(
-      
+
       this.validGames$.subscribe((games) => {
         this.games = games;
         this.menuApps = [];
@@ -262,7 +266,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
         }*/
 
         // If in mobile view, filter to show only "studio" game
-          
+
         if (this.isMobile || this.isPatientOnMobile) {
           this.currentMenuApps = this.menuApps.filter((app) => app.name === 'studio');
           const studioIndex = this.currentMenuApps.findIndex((app) => app.name === 'studio');
@@ -362,7 +366,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
             );
             if (this.showAngles) {
               const organAngles = getOrganAnglesFromBuffer(skeleton_buffer);
-              this.appActions.setOrganAngles(organAngles);  
+              this.appActions.setOrganAngles(organAngles);
             }
             this.patientWebRtcService.setSkeletonBufferFromWebCamBuffer(
               handleWebCamBuffer(skeleton_buffer, false, this.authenticationService.currentUserValue.peerId)
@@ -428,12 +432,31 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
           this.toggleVideoSessionView();
         }
       })
-    ); 
-    
+    );
+
+    this.subscription.add(
+      this.skeltonProgressBarService.progressBarElement$.subscribe(value => {
+        console.log(value);
+        if (+value > this.sliderValue) {
+          this.sliderValue = +value;
+        }
+      })
+    );
+
+    this.subscription.add(
+      this.skeltonProgressBarService.thumbUpElement$.subscribe(value => {
+        if (+value > 0 && +value % 3 === 0) {
+          this.showThumbUp = true;
+          setTimeout(() => {
+            this.showThumbUp = false;
+          }, 2000);
+        }
+      })
+    );
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    console.log( "we are under ngOnChanges function ");
+    console.log("we are under ngOnChanges function ");
     if (changes.showPercentageScoreForTherapist?.currentValue) {
       this.showPercentageScoreForTherapist = changes.showPercentageScoreForTherapist.currentValue;
     }
@@ -542,7 +565,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
 
   navigate(index) {
     console.log("we are in navigate function");
-   
+
     if (!this.currentMenuApps[index].url) {
       return;
     }
@@ -648,7 +671,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   gameReadyToStart(status) {
-    console.log("we are in gameReadyToStart function",status);
+    console.log("we are in gameReadyToStart function", status);
     this.isGameReadyToStart = status;
   }
 
@@ -717,9 +740,9 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
- 
+
   handleIframeLoad = () => {
-   
+
     this.onIframeLoad.emit();
   };
 
@@ -751,8 +774,8 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   getUrlGame(url) {
-    console.log("we are in getUrlGame function==",url);
-    
+    console.log("we are in getUrlGame function==", url);
+
     return url + 'index.html';
   }
 

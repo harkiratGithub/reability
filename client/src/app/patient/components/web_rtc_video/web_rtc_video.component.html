@@ -29,6 +29,12 @@
 </div>
 
 <div class="videos-wrapper">
+  <div class="videoWrapParent" *ngIf="this.currentUser.id == 1802 || this.currentUser.id == 1793">
+    <div class="videoWrap">
+      <video id="mediaElement" class="videoEle show" style="border-radius: 0.7rem; height:100% ;width: 100%" autoplay></video>
+    </div>
+  </div>
+
   <div class="video-content-container" id="web-rtc-wrapper" [ngClass]="{
       'video-content-container-regular-video': !enlargeVideo,
       'video-content-container-enlarge-video': enlargeVideo
@@ -103,7 +109,7 @@
           'hide-video': !showLocalVideo || !showPatientVideo || !displaySkeleton
         }" width="257" height="192" class="patient-canvas"></canvas>
 
-      <canvas *ngIf="this.currentUser.id == 1802 || this.currentUser.id == 1793" #canvasElement2 width="291" height="290" style="width: 100%;"></canvas>
+      <canvas *ngIf="this.currentUser.id == 1802 || this.currentUser.id == 1793" #canvasElement2 width="291" height="290" style="width: 100%;transform: scaleX(-1);"></canvas>
 
       <div class="text-container" *ngIf="this.currentUser.id == 1802 || this.currentUser.id == 1793">
         <span class="text-group">LS: {{cameraAngle.leftWrist | number: '1.2-2'}}</span>

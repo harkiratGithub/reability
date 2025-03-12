@@ -40,6 +40,8 @@ import { Pose, POSE_CONNECTIONS, Results } from '@mediapipe/pose';
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 import { SkeltonVideoService } from '../../../common/services/skelton-video.service';
+import { SkeletonProgressBarService } from 'src/app/common/services/skeleton-progress-bar.service';
+declare var LivekitClient: any;
 
 let therapistToPatientConnection = null;
 declare var MediaRecorder: any;
@@ -170,6 +172,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   skeletonBtn;
   currentGameAppData: IGameAppData;
   searchCameraInterval;
+  heygenAPIService: HeygenAPIService
 
   constructor(
     private authenticationService: AuthenticationService,
@@ -181,6 +184,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     private ajaxService: AjaxService,
     private cdr: ChangeDetectorRef,
     private skeltonVideoService: SkeltonVideoService,
+    private skeltonProgressBarService: SkeletonProgressBarService,
   ) {
     this.subscription.add(
       this.ajaxService.getIceServers().subscribe((res) => {
@@ -218,17 +222,44 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
      });
      */
 
-    this.skeltonVideoService.gameVideoElement$.subscribe((iframeaction) => {
+    this.skeltonVideoService.gameVideoElement$.subscribe(async (iframeaction) => {
       // console.log(" in webrtccomponents iframeaction===", iframeaction);
       if (typeof iframeaction === 'string') {
         this.landmarks = [];
         const action = JSON.parse(iframeaction);
-        // console.log("action.msg.data.currentPlayTime.vidTime===", action);
+        console.log("action.msg.data.currentPlayTime.vidTime===", action);
         if (action.msg && action.msg.gameSummaryContent == "Session Ended") {
           this.videoIndex = -1;
           this.videoSeconds = 0;
           const results = this.matchClipAndPatientData(this.videoMinMax, this.matchingCameraData);
           const updateComments = this.updateComments(results);
+
+          const apiKey = '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'
+          const body = {
+            model: 'gpt-4o-mini', // Or 'gpt-3.5-turbo'
+            messages: [{
+              role: 'user',
+              content: `
+              JSON Array: ${updateComments},
+              Based on above array, give a 2 liner description on how the patient has perform the exercise.
+              `
+            }]
+          };
+
+          const response = await fetch(`https://api.openai.com/v1/chat/completions`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${apiKey}`,
+            },
+            body: JSON.stringify(body)
+          });
+
+          const data = await response.json();
+          this.heygenAPIService.sendText(data?.choices[0].message?.content);
+          setTimeout(() => {
+            this.heygenAPIService.onClose()
+          }, 5000);
 
           this.ajaxService.savePatientMetaData({
             game_id: this.gameId,
@@ -245,8 +276,18 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           this.landmarksPointer = [];
           this.landmarksLinePointer = [];
           const videoName = action.msg?.data?.source?.split('/')[4];
-          this.ajaxService.getGameMetaData(videoName).subscribe((gamesettings) => {
+          this.ajaxService.getGameMetaData(videoName).subscribe(async (gamesettings) => {
             if (gamesettings.length > 0) {
+              setInterval(() => {
+                const results = this.matchClipAndPatientData(this.videoMinMax, this.matchingCameraData);
+                const updateComments = this.updateComments(results);
+                const mainLength = this.videoMinMax.length;
+                const updateLength = updateComments.filter((data) => (data.RightCondition == 'Good' || data.LeftCondition == 'Good') && data.PatientTimestamp != undefined).length;
+                const thumbUpLength = updateComments.filter((data) => (data.RightComments == 'Perfect' || data.LeftComments == 'Perfect') && data.PatientTimestamp != undefined).length;
+                const percentage = Math.floor((updateLength / mainLength) * 100);
+                this.skeltonProgressBarService.setBarElement('' + percentage);
+                this.skeltonProgressBarService.setThumbUpElement('' + thumbUpLength);
+              }, 5000);
               this.landmarks = gamesettings[0].landmarks;
               this.videoMinMax = gamesettings[0].settings;
               this.landmarksPointer = gamesettings[0].landmarksPointer;
@@ -262,6 +303,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
               if (Math.abs(this.videoSeconds - currentPlayTime) > 1 || videoTime > 0 || action.msg.data.index > 0) {
                 this.videoSeconds = currentPlayTime
                 this.initializeCameraPoseModels()
+                this.heygenAPIService.onStart();
                 if (!this.startTime) {
                   this.startTime = new Date().getTime(); // Save the initial timestamp
                 }
@@ -275,6 +317,32 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                   if (this.videoIndex > 0) {
                     const results = this.matchClipAndPatientData(this.videoMinMax, this.matchingCameraData);
                     const updateComments = this.updateComments(results);
+
+                    const apiKey = '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'
+                    const body = {
+                      model: 'gpt-4o-mini', // Or 'gpt-3.5-turbo'
+                      messages: [{
+                        role: 'user',
+                        content: `
+                          JSON Array: ${updateComments},
+                          Based on above array, give a 2 liner description on how the patient has perform the exercise.
+                        `
+                      }]
+                    };
+
+                    const response = await fetch(`https://api.openai.com/v1/chat/completions`, {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${apiKey}`,
+                      },
+                      body: JSON.stringify(body)
+                    });
+
+                    const data = await response.json();
+                    if (data.choices.length > 0)
+                      this.heygenAPIService.sendText(data?.choices[0].message?.content);
+
                     this.ajaxService.savePatientMetaData({
                       game_id: this.gameId,
                       settings: updateComments,
@@ -315,6 +383,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   }
 
   async ngOnInit() {
+    this.heygenAPIService = new HeygenAPIService();
     if (this.isMobile) {
       this.THERAPIST_REGULAR_VIDEO_CLASS = 'therapist-video-regular-video-mobile';
       this.THERAPIST_ENLARGE_VIDEO_CLASS = 'therapist-video-enlarge-video-mobile';      
@@ -931,7 +1000,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         this.appActions.toggleEnlargeVideo(data.enlargeVideo);
         break;
       case MESSAGES.REDIRECT_TO_HOME:
-        console.log("========MESSAGES.REDIRECT_TO_HOME=====",MESSAGES.REDIRECT_TO_HOME);
+        console.log("========MESSAGES.REDIRECT_TO_HOME=====", MESSAGES.REDIRECT_TO_HOME);
         this.redirectToHome();
         break;
       case MESSAGES.REQUEST_APP_GAME_DATA:
@@ -1529,6 +1598,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         PatientTimestamp: closestPatient?.patientEntry.timestamp,
         LeftComments: isLeftGood ? "Good" : "Not Good",
         RightComments: isRightGood ? "Good" : "Not Good",
+        LeftCondition: isLeftGood ? "Good" : "Not Good",
+        RightCondition: isRightGood ? "Good" : "Not Good",
       });
     });
 
@@ -1551,6 +1622,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       } else if (angleRightDiff < -angleThreshold) {
         entry.RightComments = "Lower";
       } else {
+        entry.RightCondition = "Good";
         if (Math.abs(angleRightDiff) <= 2) {
           entry.RightComments = "Perfect";
         } else if (Math.abs(angleRightDiff) <= 4) {
@@ -1567,6 +1639,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       } else if (angleLeftDiff < -angleThreshold) {
         entry.LeftComments = "Lower";
       } else {
+        entry.LeftCondition = "Good";
         if (Math.abs(angleLeftDiff) <= 2) {
           entry.LeftComments = "Perfect";
         } else if (Math.abs(angleLeftDiff) <= 4) {
@@ -2115,5 +2188,214 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     speech.rate = 1; // Speed: 0.1 to 10
     speech.pitch = 1; // Pitch: 0 to 2
     window.speechSynthesis.speak(speech);
+  }
+}
+
+export class HeygenAPIService {
+  API_CONFIG = {
+    apiKey: "NmU1MGQyNGE4YzZjNDQyZjllODM3Y2JjZDljMjY4NWUtMTczNTIwNzQ1Nw==", // Yoram
+    // apiKey: "ZThmY2JiZWQ0MDUxNGYzNmEwZmFlYTdhOWE2ZTBiN2MtMTcxMTEwMTQ1NQ==", // Raghav
+    // apiKey: "ZWE1NjlmOGZmNGIzNDg1M2FjYWY3Mzg",
+    serverUrl: "https://api.heygen.com",
+  };
+
+  newSessionInfo: any = null;
+  private room: any = null;
+  mediaStream: MediaStream | null = null;
+  webSocket: WebSocket | null = null;
+  sessionToken: string | null = null;
+
+  avatarID: string = '';
+  voiceID: string = '';
+  taskInput: string = ''
+  statusMessages: string[] = [];
+
+  updateNewStatus(message: string) {
+    const timestamp = new Date().toLocaleTimeString();
+    this.statusMessages.push(`[${timestamp}] ${message}`);
+    console.log(this.statusMessages);
+
+  }
+
+  async getSessionToken() {
+    const response = await fetch(`${this.API_CONFIG.serverUrl}/v1/streaming.create_token`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Api-Key": this.API_CONFIG.apiKey,
+      },
+    });
+
+    const data = await response.json();
+    this.sessionToken = data.data.token;
+    this.updateNewStatus("Session token obtained");
+  }
+
+  async connectWebSocket(sessionId: string) {
+    const params = new URLSearchParams({
+      session_id: sessionId,
+      session_token: this.sessionToken!,
+      silence_response: 'false',
+      opening_text: "Hello, how can I help you?",
+      stt_language: "en",
+    });
+
+    const wsUrl = `wss://${new URL(this.API_CONFIG.serverUrl).hostname}/v1/ws/streaming.chat?${params}`;
+    this.webSocket = new WebSocket(wsUrl);
+
+    this.webSocket.addEventListener("message", (event: MessageEvent) => {
+      const eventData = JSON.parse(event.data);
+      console.log("Raw WebSocket event:", eventData);
+    });
+  }
+
+  async createNewSession() {
+    if (!this.sessionToken) {
+      await this.getSessionToken();
+    }
+
+    const response = await fetch(`${this.API_CONFIG.serverUrl}/v1/streaming.new`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${this.sessionToken}`,
+      },
+      body: JSON.stringify({
+        quality: "high",
+        avatar_name: '2c57ba04ef4d4a5ca30a953d0791e7e3',
+        voice: {
+          voice_id: this.voiceID,
+          rate: 1.0,
+        },
+        version: "v2",
+        video_encoding: "H264",
+      }),
+    });
+
+    const data = await response.json();
+    console.log("data : ", data)
+    this.newSessionInfo = data.data;
+
+    this.room = new LivekitClient.Room({
+      adaptiveStream: true,
+      dynacast: true,
+      videoCaptureDefaults: {
+        resolution: LivekitClient.VideoPresets.h720.resolution,
+      },
+    });
+
+    this.room.on(LivekitClient.RoomEvent.DataReceived, (message: any) => {
+      const data = new TextDecoder().decode(message);
+      // console.log("Room message:", JSON.parse(data));
+    });
+
+    this.mediaStream = new MediaStream();
+    this.room.on(LivekitClient.RoomEvent.TrackSubscribed, (track: any) => {
+      if (track.kind === "video" || track.kind === "audio") {
+        this.mediaStream!.addTrack(track.mediaStreamTrack);
+        if (this.mediaStream!.getVideoTracks().length > 0 && this.mediaStream!.getAudioTracks().length > 0) {
+          const mediaElement = document.getElementById('mediaElement') as HTMLVideoElement;
+          mediaElement.srcObject = this.mediaStream;
+          this.updateNewStatus("Media stream ready");
+        }
+      }
+    });
+
+    this.room.on(LivekitClient.RoomEvent.TrackUnsubscribed, (track: any) => {
+      const mediaTrack = track.mediaStreamTrack;
+      if (mediaTrack) {
+        this.mediaStream!.removeTrack(mediaTrack);
+      }
+    });
+
+    this.room.on(LivekitClient.RoomEvent.Disconnected, (reason: any) => {
+      this.updateNewStatus(`Room disconnected: ${reason}`);
+    });
+
+    await this.room.prepareConnection(this.newSessionInfo.url, this.newSessionInfo.access_token);
+    this.updateNewStatus("Connection prepared");
+
+    await this.connectWebSocket(this.newSessionInfo.session_id);
+    this.updateNewStatus("Session created successfully");
+  }
+
+  async startStreamingSession() {
+    const startResponse = await fetch(`${this.API_CONFIG.serverUrl}/v1/streaming.start`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${this.sessionToken}`,
+      },
+      body: JSON.stringify({
+        session_id: this.newSessionInfo.session_id,
+      }),
+    });
+
+    await this.room.connect(this.newSessionInfo.url, this.newSessionInfo.access_token);
+    this.updateNewStatus("Connected to room");
+  }
+
+  async sendText(text: string, taskType: string = "repeat") {
+    if (!this.newSessionInfo) {
+      this.updateNewStatus("No active session");
+      return;
+    }
+
+    const response = await fetch(`${this.API_CONFIG.serverUrl}/v1/streaming.task`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${this.sessionToken}`,
+      },
+      body: JSON.stringify({
+        session_id: this.newSessionInfo.session_id,
+        text: text,
+        task_type: taskType,
+      }),
+    });
+
+    this.updateNewStatus(`Sent text (${taskType}): ${text}`);
+  }
+
+  async closeSession() {
+    if (!this.newSessionInfo) {
+      this.updateNewStatus("No active session");
+      return;
+    }
+
+    await fetch(`${this.API_CONFIG.serverUrl}/v1/streaming.stop`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${this.sessionToken}`,
+      },
+      body: JSON.stringify({
+        session_id: this.newSessionInfo.session_id,
+      }),
+    });
+
+    if (this.webSocket) {
+      this.webSocket.close();
+    }
+    if (this.room) {
+      this.room.disconnect();
+    }
+
+    const mediaElement = document.getElementById('mediaElement') as HTMLVideoElement;
+    mediaElement.srcObject = null;
+    this.newSessionInfo = null;
+    this.room = null;
+    this.mediaStream = null;
+    this.sessionToken = null;
+
+    this.updateNewStatus("Session closed");
+  }
+
+  onStart() {
+    this.createNewSession().then(() => this.startStreamingSession());
+  }
+
+  onClose() {
+    this.closeSession();
   }
 }
