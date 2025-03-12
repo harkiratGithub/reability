@@ -340,7 +340,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                     });
 
                     const data = await response.json();
-                    this.heygenAPIService.sendText(data?.choices[0].message?.content);
+                    if (data.choices.length > 0)
+                      this.heygenAPIService.sendText(data?.choices[0].message?.content);
 
                     this.ajaxService.savePatientMetaData({
                       game_id: this.gameId,
