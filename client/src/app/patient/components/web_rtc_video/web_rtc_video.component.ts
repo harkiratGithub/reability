@@ -1995,7 +1995,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           this.lastTimeMatching = this.timeMatching;
 
           const angleThreshold = 35;
-          const timestampThreshold = 2;
+          const timestampThreshold = 1.5;
 
           const timeDiff = Math.abs(currentVideoAngle.ClipTimestamp - elapsedTime);
           const angleLeftDiff = currentVideoAngle.ClipDeg - +leftAngle;
@@ -2116,10 +2116,34 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
               canvasCtx.strokeStyle = 'rgba(128, 128, 128, 0.6)';
 
               if (this.timeMatching && start % 2) {
-                canvasCtx.strokeStyle = this.leftCondition === 'Good' ? 'rgba(0, 255, 0, 0.6)' : 'rgba(255, 0, 0, 0.6)';
+                if (this.leftCondition === 'Good') {
+                  if (this.leftComment === "Perfect") {
+                    canvasCtx.strokeStyle = 'rgba(0, 255, 0)';
+                  } else if (this.leftComment === "Nice") {
+                    canvasCtx.strokeStyle = 'rgb(94, 255, 0)';
+                  } else {
+                    canvasCtx.strokeStyle = 'rgb(145, 255, 0)';
+                  }
+                }
+                else {
+                  canvasCtx.strokeStyle = 'rgba(255, 0, 0, 0.6)';
+                }
+                // canvasCtx.strokeStyle = this.leftCondition === 'Good' ? 'rgba(0, 255, 0, 0.6)' : 'rgba(255, 0, 0, 0.6)';
               }
               if (this.timeMatching && start % 2 === 0) {
-                canvasCtx.strokeStyle = this.rightCondition === 'Good' ? 'rgba(0, 255, 0, 0.6)' : 'rgba(255, 0, 0, 0.6)';
+                if (this.rightCondition === 'Good') {
+                  if (this.rightComment === "Perfect") {
+                    canvasCtx.strokeStyle = 'rgba(0, 255, 0)';
+                  } else if (this.rightComment === "Nice") {
+                    canvasCtx.strokeStyle = 'rgb(94, 255, 0)';
+                  } else {
+                    canvasCtx.strokeStyle = 'rgb(145, 255, 0)';
+                  }
+                }
+                else {
+                  canvasCtx.strokeStyle = 'rgba(255, 0, 0, 0.6)';
+                }
+                // canvasCtx.strokeStyle = this.rightCondition === 'Good' ? 'rgba(0, 255, 0, 0.6)' : 'rgba(255, 0, 0, 0.6)';
               }
               canvasCtx.stroke();
             }
