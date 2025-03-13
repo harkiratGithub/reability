@@ -231,6 +231,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         if (action.msg && action.msg.gameSummaryContent == "Session Ended") {
           this.videoIndex = -1;
           this.videoSeconds = 0;
+          this.skeltonProgressBarService.setBarElement('' + 0);
           const results = this.matchClipAndPatientData(this.videoMinMax, this.matchingCameraData);
           const updateComments = this.updateComments(results);
 
@@ -316,6 +317,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                   this.heygenAPIService.onStart();
 
                   if (this.videoIndex > 0) {
+                    this.skeltonProgressBarService.setBarElement('' + 0);
                     const results = this.matchClipAndPatientData(this.videoMinMax, this.matchingCameraData);
                     const updateComments = this.updateComments(results);
 
