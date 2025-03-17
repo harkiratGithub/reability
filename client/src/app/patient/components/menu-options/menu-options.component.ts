@@ -132,6 +132,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
   gameMessage: string = '';
   therapistPeerId: string = '';
   InstituteLogo: string ;
+
   constructor(
     private authenticationService: AuthenticationService,
     private bodyHandleService: BodyHandleService,
@@ -156,7 +157,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
         this.currentUser = user;
         this.InstituteLogo = this.currentUser?.instituteLogo || '';
       })
-    );
+    );   
     if (!this.isTherapistMode) {
       if (MOBILE_OR_SMALL_RESOLUTION) {
         this.isMobile = true;
@@ -168,7 +169,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
           this.isMobile = false;
         }
       });
-    }
+    } 
   }
 
   ngOnInit() {
@@ -182,7 +183,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
     const skeletonCanvas: any = document.getElementById('patient-canvas-skeleton') as HTMLCanvasElement;
     if (skeletonCanvas) {
       this.patientSkeletonCtx = skeletonCanvas.getContext('2d');
-    }
+    }   
 
     if (!this.isTherapistMode) {
       this.subscription.add(
@@ -233,6 +234,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
     );
 
     this.subscription.add(
+      
       this.validGames$.subscribe((games) => {
         this.games = games;
         this.menuApps = [];
@@ -251,14 +253,16 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
           })
         );
         //this.currentMenuApps = this.menuApps.slice(this.currentPageIndex, MAX_GAMES_IN_PAGE);
-       /* this.currentMenuApps = this.menuApps;
+
+        /*this.currentMenuApps = this.menuApps;
         if (this.isMobile) {
           const studioIndex = this.currentMenuApps.findIndex((app) => app.name === 'studio');
           if (studioIndex > -1) {
-            this.navigate(studioIndex);
+            //this.navigate(studioIndex);
           }
         }*/
 
+        // If in mobile view, filter to show only "studio" game          
         if (this.isMobile || this.isPatientOnMobile) {
           this.currentMenuApps = this.menuApps.filter((app) => app.name === 'studio');
           const studioIndex = this.currentMenuApps.findIndex((app) => app.name === 'studio');
@@ -424,7 +428,8 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
           this.toggleVideoSessionView();
         }
       })
-    );
+    ); 
+    
   }
 
   ngOnChanges(changes: SimpleChanges) {

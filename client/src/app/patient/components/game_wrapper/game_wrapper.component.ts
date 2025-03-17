@@ -615,12 +615,13 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
       if (this.isTherapist) {
         communicationUtil.sendMessageToIframe(this.iframeEl, {}, MESSAGES.SEND_QUIT_MESSAGE);
       } else {
+        this.quitGame();
         /*if (this.isMobile) {
-          this.authenticationService.logout();
+          this.gameReadyToStart.emit(true);
+          //this.authenticationService.logout();
         } else {
           this.quitGame();
         }*/
-          this.quitGame();
       }
     }
   };

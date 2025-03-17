@@ -41,10 +41,10 @@ Thumbs.db
 
 .env
 .vscode
-.env.local
-.env.demo
-.env.prod
-.env.us
+#.env.local
+#.env.demo
+#.env.prod
+#.env.us
 
 #newrelic log
 newrelic_agent.log
@@ -52,3 +52,4 @@ newrelic_agent.log
 /client/dist
 /client/package-lock.json
 /package-lock.json
+

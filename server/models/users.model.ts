@@ -97,59 +97,6 @@ export const isPatientEntryForToday = async (
 	}
 };
 */
-/*
-export const isPatientEntryForToday = async (
-	patientId: number, 
-	timezone: string
-  ): Promise<{ hasEntries: boolean; painLevel?: number }> => {
-	try {
-	 //const query = squelPostgres
-		//.select()
-		//.field(`${TABLE_NAME.RTM}.timestamp`, 'timestamp')
-		//.field(`${TABLE_NAME.RTM}.data->'patient'->>'pain_level'`, 'pain_level')
-		//.field(`${TABLE_NAME.RTM}.timezone`, 'timezone')
-		//.from(TABLE_NAME.RTM)
-		//.where('patient_id = ?', patientId)
-		//.where(`DATE(${TABLE_NAME.RTM}.timestamp AT TIME ZONE ?) = CURRENT_DATE`, timezone) 
-		//.toParam();	  
-	  //const result = await BaseModel.runQuery(query);
-	  
-	  const query = squelPostgres
-		.select()
-		.field(`${TABLE_NAME.RTM}.timestamp`, 'timestamp')
-		.field(`${TABLE_NAME.RTM}.data->'patient'->>'pain_level'`, 'pain_level')
-		.field(`${TABLE_NAME.RTM}.timezone`, 'timezone')
-		.field(
-			`${TABLE_NAME.RTM}.timestamp + INTERVAL '1 minute' * ${TABLE_NAME.RTM}.timezone`,
-			'date'
-		)
-		.field(`CURRENT_DATE`, 'current_date_system')
-		.field(`DATE(${TABLE_NAME.RTM}.timestamp + INTERVAL '1 minute' * ${TABLE_NAME.RTM}.timezone)`, 'current_date_table')
-		.from(TABLE_NAME.RTM)
-		.where('patient_id = ?', patientId)
-		.where(
-			`DATE(${TABLE_NAME.RTM}.timestamp + INTERVAL '1 minute' * ${TABLE_NAME.RTM}.timezone) = CURRENT_DATE`
-		)
-		.toParam();
-	  const result = await BaseModel.runQuery(query);
-	  console.log("=========result====",result);
-	  console.log("======tiemstamp========",result.rows[0]?.timestamp);
-	  console.log("=======timezone==========",timezone);
-	  const timezoneinMinutes = Helper.convertTimezoneToMinutes(timezone);
-	  console.log("=====timezoneinMinutes===",timezoneinMinutes);
-	  const now = Helper.currentTimeofTimezone(timezone);
-	  console.log("=now==",now);
-	  const convertedTime = Helper.convertUtcToTimezone(result.rows[0]?.timestamp, timezone);
-	  console.log(`Converted Time=========: ${convertedTime}`);
-	  const hoursPassed = now.diff(convertedTime, 'hours');
-	  console.log(`Hours Passed: ${hoursPassed}`)
-	  const hasEntries = result.rows.length > 0;
-	  const painLevel = hasEntries ? result.rows[0]?.pain_level : undefined;
-	  return { hasEntries, painLevel };
-	} catch (error) {
-	  return { hasEntries: false };
-	}
-};*/
 
 export const isPatientEntryForToday = async (
 	patientId: number
@@ -170,11 +117,11 @@ export const isPatientEntryForToday = async (
 		const result = await BaseModel.runQuery(query); 
 		const timestamp = result.rows[0]?.timestamp;
 	  const timezoneinMinutes = result.rows[0]?.timezone;	  
-	 // console.log("=======timezoneinMinutes=======", timezoneinMinutes);
+	  //console.log("=======timezoneinMinutes=======", timezoneinMinutes);
 	  const timezone = Helper.convertMinutesToTimezonestring(timezoneinMinutes);
-	  //console.log("=======timezone=======", timezone);
+	 // console.log("=======timezone=======", timezone);
 	  const convertedTime = Helper.convertUtcToTimezone(timestamp, timezone);
-	 // console.log("=======convertedTime=======", convertedTime);	  
+	  //console.log("=======convertedTime=======", convertedTime);	  
 	  const now = Helper.currentTimeofTimezone(timezone);	  
 	  const convertedDate = moment(convertedTime).format('YYYY-MM-DD');
 	  //console.log("=======convertedDate=======", convertedDate);
@@ -183,11 +130,11 @@ export const isPatientEntryForToday = async (
 	  // If the dates are different, show the pain scale popup
 	  const isNewDay = convertedDate !== currentDate;	  
 	  if (isNewDay || (result.rows.length == 0)) {
-		console.log('Show Pain Scale Popup');
+		//console.log('Show Pain Scale Popup');
 		hasEntries = false;
 	  }  
 	  const painLevel = hasEntries ? result.rows[0]?.pain_level : undefined;	  
-	  //console.log("===hasEntries===",hasEntries);
+	 // console.log("===hasEntries===",hasEntries);
 	 // console.log("===painLevel===",painLevel);
 	  return { hasEntries, painLevel };
 	} catch (error) {
@@ -367,7 +314,7 @@ export const updateById = async (user_id, object, client = null) => {
                 console.warn(`Invalid value type for field "${key}":`, value);
             }
         }
-        console.log('Sanitized Object:', sanitizedObject);
+        //console.log('Sanitized Object:', sanitizedObject);
         const result = await BaseModel.updateRowByField(
             TABLE_NAME.USER,
             sanitizedObject,
@@ -375,7 +322,7 @@ export const updateById = async (user_id, object, client = null) => {
             user_id,
             client
         );
-        
+       // console.log('Update Result:', result);
         return result;
     } catch (error) {
         console.error('Error in updateById:', error);

@@ -27,12 +27,13 @@
       for="{{ option.displayName }}"
       title="{{ option.displayName }}"
     >
-    <span class="ellipsis" *ngIf="sharedFilter?.displayText != 'Departments'" > {{ option.displayName }}</span>
-    <span class="ellipsis ellipsis-dept" *ngIf="sharedFilter?.displayText === 'Departments'">
-      <span class="ellipsis display-name">{{ option.displayName }}</span>
-      <!-- <span class="separator">:</span> -->
-      <small class="ellipsis selected-value">{{ option.selectedValueName }}</small>
-  </span>
+      <span class="ellipsis" *ngIf="sharedFilter?.displayText != 'Departments'" > {{ option.displayName }}</span>
+      <span class="ellipsis ellipsis-dept" *ngIf="sharedFilter?.displayText === 'Departments'">
+        <span class="ellipsis display-name">{{ option.displayName }}</span>
+        <!-- <span class="separator">:</span> -->
+        <small class="ellipsis selected-value">{{ option.selectedValueName }}</small>
+    </span>
+
       <input type="checkbox" id="{{ option.displayName }}" (change)="toggleSelection(option)" #checkboxes />
     </label>
     <div class="actions">

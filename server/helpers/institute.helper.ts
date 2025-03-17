@@ -34,11 +34,9 @@ export const createInstitute = async (institute, departments, file = undefined) 
 export const handleEditImage = async (file, existingImageId, client = null) => {
 	let updatedImgId;
 	if (file) {
-		// if already has image delete it
 		if (existingImageId && existingImageId !== 'null') {
 			await ImageHelper.deleteImage(existingImageId, process.env.AZURE_IMAGE_BUCKET_PATH, client);
 		}
-		// upload the new image
 		updatedImgId = await ImageHelper.createImage(
 			`${file.originalname}`,
 			file,
@@ -78,11 +76,8 @@ export const editInstitute = async (institute, file, imageId, departments) => {
 			...(updatedImgId && { image_id: updatedImgId }),
 		};
 		const updatedInstitute = await InstituteModel.edit(id, instituteToUpdate, client);
-
-		// save new departments
 		const newDepartments = getEditedInstituteDepartments(departments, updatedInstitute.id);
 		const createdDepartments = await BaseModel.insertBulk(TABLE_NAME.DEPARTMENT, newDepartments, client);
-
 		return {
 			institute: updatedInstitute,
 			newDepartments: createdDepartments,
