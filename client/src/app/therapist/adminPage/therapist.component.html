@@ -378,8 +378,6 @@
                   [volume]="therapistPatientConnection.volume"
                   (enlargeVideoChanged)="sendEnlargeVideoToPatient($event)"
                   (handlePatientVideo)="togglePatientVideo(therapistPatientConnection.connection.peer)"
-                  [isTherapistMode]="true"
-                  [isPatientOnMobile]="therapistPatientConnection.user.isMobile"
                 >
                 </app-therapist-web-rtc-video>
               </mat-grid-tile>
