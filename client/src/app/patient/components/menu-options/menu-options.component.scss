@@ -556,6 +556,7 @@ $top_bottom-padding: 6%;
   .hide-section-mobile {
     display: none;
   }
+
   .middle-section.mobile,
   .middle-section .mobile {
     .menu-item {
@@ -571,14 +572,14 @@ $top_bottom-padding: 6%;
       padding: 10px;
       cursor: pointer;
     }
-    
+
     .img-wrapper {
       width: 80px;
       height: 80px;
       margin: 50px ;      
       margin-top: -125px;
     }
-    
+
     .img-wrapper .enabled {
       display: flex;
       flex-direction: column;
@@ -592,19 +593,19 @@ $top_bottom-padding: 6%;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
       transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-    
+
     .img-wrapper .enabled:hover {
       transform: scale(1.1);
       box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
     }
-    
+
     .img-wrapper .game-image {
       width: 100%;
       height: 100%;
       object-fit: cover;
       border-radius: 16px;
     }
-    
+
     .img-wrapper .gradient-overlay {
       position: absolute;
       bottom: 0;
@@ -613,7 +614,7 @@ $top_bottom-padding: 6%;
       height: 30%;
       background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
     }
-    
+
     .img-wrapper .app-name {
       margin-top: 5px;
       font-size: 14px;
@@ -645,6 +646,7 @@ $top_bottom-padding: 6%;
       text-transform: capitalize;
     }
   }
+
 }
 
 .game-screen-mobile {

@@ -206,6 +206,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     console.log("======going to set mobile device =========",this.isMobile);
       this.handleMobileAvailability(this.isMobile);
 
+    console.log("======going to set mobile device =========",this.isMobile);
+    this.handleMobileAvailability(this.isMobile);
     this.localVideo = document.getElementById('patient-video');
 
     if (this.showLocalVideo) {
