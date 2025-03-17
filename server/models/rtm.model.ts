@@ -54,14 +54,52 @@ const getInstituteIdByPatientId = async (patient_id) => {
 		.join(TABLE_NAME.DEPARTMENT, 'd', 'd.id = pd.department_id')
 		.where('pd.patient_id = ?', patient_id)
 		.toParam();
-
 	const result = await BaseModel.runQuery(query);
-
 	const institute_id = result?.rows?.[0]?.institute_id;
-
+	return institute_id;
+};
+const getInstituteIdByTherapistId = async (therapist_id) => {
+	const query = squelPostgres
+		.select()
+		.field('d.institute_id')
+		.from(TABLE_NAME.THERAPIST_DEPARTMENTS, 'pd')
+		.join(TABLE_NAME.DEPARTMENT, 'd', 'd.id = pd.department_id')
+		.where('pd.therapist_id = ?', therapist_id)
+		.toParam();
+	const result = await BaseModel.runQuery(query);
+	const institute_id = result?.rows?.[0]?.institute_id;
 	return institute_id;
 };
 
+export const getInstituteLogoById = async (idForLogo, role) => {
+	try {
+		let institute_id = 0;
+		if (role === 'therapist') {
+			institute_id = await getInstituteIdByTherapistId(idForLogo);
+		} else if (role === 'patient') {
+			institute_id = await getInstituteIdByPatientId(idForLogo);
+		}
+		const imageQuery = squelPostgres
+			.select()
+			.field('i.url')
+			.from(TABLE_NAME.INSTITUTE, 'inst')
+			.join(TABLE_NAME.IMAGE, 'i', 'i.id = inst.image_id')
+			.where('inst.id = ?', institute_id)
+			.toParam();
+		const imageResult = await BaseModel.runQuery(imageQuery);
+		if (imageResult && imageResult.rows && imageResult.rows[0]?.url) {
+			console.log("Institute Logo URL Found:", imageResult.rows[0].url);
+			return imageResult.rows[0].url;
+		} else {
+			console.warn("Institute Logo URL not found, using default.");
+			return 'assets/therapist/therapist_logo.png';
+		}
+	} catch (error) {
+		console.error("Error fetching institute logo:", error);
+		return 'assets/therapist/therapist_logo.png';
+	}
+};
+/*
 export const updateRTM = async (patient_id, data, type = 'patient', client = null, timestamp = null, timezone=0) => {
 	const currentTimestamp = timestamp ? new Date(timestamp) : new Date();
 	if (isNaN(currentTimestamp.getTime())) {
@@ -178,4 +216,68 @@ export const updateRTM = async (patient_id, data, type = 'patient', client = nul
 		// 		client
 		// 	);
 	}
+};*/
+
+export const updateRTM = async (patient_id, data, type = 'patient', client = null, timestamp = null, timezone = 0) => {
+	const currentTimestamp = timestamp ? new Date(timestamp) : new Date();
+	if (isNaN(currentTimestamp.getTime())) {
+		throw new Error('Invalid timestamp provided');
+	}
+	const currentDate = currentTimestamp.toISOString().split('T')[0];
+	const institute_id = await getInstituteIdByPatientId(patient_id);
+	const dataString = JSON.stringify(
+		type === 'patient'
+			? {
+				patient: {
+					note: data?.patient_note,
+					pain_level: data?.painValue,
+				},
+			}
+			: {
+				therapist: {
+					start_time: data.start_time,
+					end_time: data.end_time,
+					therapist_id: data.therapist_id,
+					minutes_spent: data.minutes_spent,
+					review_activity_type: data.review_activity,
+					note: data.note,
+					mode: data.mode || 'manual',
+					therapist_session_id: data.therapist_session_id,
+				},
+			}
+	);
+	// Check for duplicates in the database
+	const duplicateCheckQuery = squelPostgres
+		.select()
+		.field('line')
+		.from(TABLE_NAME.RTM)
+		.where('patient_id = ?', patient_id)
+		.where('DATE(timestamp) = ?', currentDate)
+		.where('data = ?', dataString)
+		.toParam();
+
+	const duplicateCheckResult = await BaseModel.runQuery(duplicateCheckQuery);
+	const isDuplicate = duplicateCheckResult?.rows?.length > 0;
+	// if (isDuplicate) {
+	// 	return { message: 'Duplicate entry. No new record added.' };
+	// }
+
+	if (isDuplicate) {
+		const error: any = new Error('Duplicate entry. No new record added.');
+		error.status = 400; // Add a custom status code
+		throw error; // Throw the error
+	}
+
+	return BaseModel.createRow(
+		TABLE_NAME.RTM,
+		{
+			patient_id,
+			institute_id: institute_id,
+			data: dataString,
+			timestamp: currentTimestamp.toISOString(),
+			timezone: timezone,
+		},
+		rtmValidator,
+		client
+	);
 };

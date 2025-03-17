@@ -17,10 +17,18 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      width: 140px;
+      width: 180px;
       padding: 6px;
       &:hover {
         background-color: rgba($color: black, $alpha: 0.1);
+      }
+      .ellipsis-dept {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .selected-value {
+        color: #385f7c;
       }
     }
     .actions {

@@ -444,7 +444,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
             this.appActions.setMessageRTMModal(successMessage);
           })
           .catch((err) => {
-            this.appActions.setMessageRTMModal('Error occurred. Please try again later');
+            this.appActions.setMessageRTMModal(err || 'Error occurred. Please try again later');
             console.error('Error:', err);
           });
       },

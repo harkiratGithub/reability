@@ -30,6 +30,7 @@ export interface IBackOfficeTabFilter {
 export interface IMultiSelectOptions {
   value: any;
   displayName: string;
+  selectedValueName?: string;
 }
 export interface IBackOfficeInternalViewAction {
   actionType: InnerViewActions;

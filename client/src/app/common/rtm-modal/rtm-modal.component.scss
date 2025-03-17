@@ -266,3 +266,8 @@
   position: relative;
   min-height: 200px;
 }
+
+.send-invitation.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}

@@ -70,6 +70,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
   @Input() connectionId: any;
   @Input() connectedPatientGameUrl: any;
   @Input() isTherapistMode = false;
+  @Input() isPatientOnMobile = false;
   @Input() gameIdTherapist;
   @Input() isInSplitScreen = false;
   @Input() isSwappedScreen = false;
@@ -130,7 +131,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
   currentGameDescription: string = '';
   gameMessage: string = '';
   therapistPeerId: string = '';
-
+  InstituteLogo: string ;
   constructor(
     private authenticationService: AuthenticationService,
     private bodyHandleService: BodyHandleService,
@@ -153,6 +154,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
     this.subscription.add(
       this.authenticationService.currentUser.subscribe((user) => {
         this.currentUser = user;
+        this.InstituteLogo = this.currentUser?.instituteLogo || '';
       })
     );
     if (!this.isTherapistMode) {
@@ -170,6 +172,8 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnInit() {
+    console.log("=======isPatientOnMobile===========",this.isPatientOnMobile);
+    console.log("=======isTherapistMode===========",this.isTherapistMode);
     this.appActions.setCurrentGame({ url: 'menu-options', gameId: undefined });
     const canvas: any = document.getElementById('patient-canvas') as HTMLCanvasElement;
     if (canvas) {
@@ -247,12 +251,22 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
           })
         );
         //this.currentMenuApps = this.menuApps.slice(this.currentPageIndex, MAX_GAMES_IN_PAGE);
-        this.currentMenuApps = this.menuApps;
+       /* this.currentMenuApps = this.menuApps;
         if (this.isMobile) {
           const studioIndex = this.currentMenuApps.findIndex((app) => app.name === 'studio');
           if (studioIndex > -1) {
             this.navigate(studioIndex);
           }
+        }*/
+
+        if (this.isMobile || this.isPatientOnMobile) {
+          this.currentMenuApps = this.menuApps.filter((app) => app.name === 'studio');
+          const studioIndex = this.currentMenuApps.findIndex((app) => app.name === 'studio');
+          if (studioIndex > -1) {
+            this.navigate(studioIndex);
+          }
+        } else {
+          this.currentMenuApps = this.menuApps;
         }
 
         this.checkRightButton();
@@ -262,6 +276,9 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
     this.subscription.add(
       this.therapist$.subscribe((therapistFlag) => {
         this.role = therapistFlag ? 'Therapist' : 'patient';
+        if (this.isMobile) {
+          this.currentMenuApps = this.menuApps.filter((app) => app.name === 'studio');
+        }
       })
     );
 

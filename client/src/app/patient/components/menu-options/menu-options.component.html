@@ -21,11 +21,12 @@
           (!showTimer && isInGame) || (isTherapistMode && isConnectedUserInGame && !showTimerForTherapist)
       }"
     >
-      <div class="header-left-container">
-              <!-- <img class="shiba-logo" src="assets/main-menu/beyond.png" /> -->
-        <img class="logo" src="assets/therapist/therapist_logo.png
-" />
-      </div>
+    <div class="header-left-container" *ngIf="!InstituteLogo">
+      <img class="logo" src="assets/therapist/therapist_logo.png" />
+    </div>
+    <div class="header-left-container" *ngIf="InstituteLogo">
+      <img class="logo" [src]="InstituteLogo" />
+    </div>
       <div *ngIf="!isTherapistMode && !isInGame" class="header-right-container" (click)="logout()">
         <img class="log-out-image" src="assets/main-menu/svg-cards/log_out_new.svg" />
         <p class="log-out-text">Log out</p>
@@ -332,5 +333,46 @@
       [isMobile]="isMobile"
     >
     </app-web-rtc-video>
+
+    <div class="middle-section mobile">
+      <div class="content-background">
+        <div id="menu-container" class="menu-container movingRightAnimation">
+          <div *ngFor="let app of currentMenuApps; let i = index" class="menu-item">
+            <div class="img-wrapper">
+              <span *ngIf="!app.isEnabled">
+                <div class="enabled disabled">
+                  <img [src]="app.image" />
+                  <div class="gradient-overlay"></div>
+                  <p class="app-name">{{ app.name }}</p>
+                </div>
+              </span>
+              <span *ngIf="app.isEnabled">
+                <div
+                  *ngIf="!isTherapistMode"
+                  appHand
+                  [clickOnlyOnCenter]="true"
+                  [hoverClass]="'pressed'"
+                  [delayAnimation]="500"
+                  [timeToWait]="2000"
+                  [selectable]="app.isEnabled"
+                  (click)="navigate(i)"
+                  (outputFunc)="navigate(i)"
+                  class="enabled"
+                >
+                  <img class="game-image" [src]="app.image" />
+                  <div class="gradient-overlay"></div>
+                  <p class="app-name">{{ app.name }}</p>
+                </div>
+                <div *ngIf="isTherapistMode" class="enabled" (click)="navigate(i)">
+                  <img class="game-image" [src]="app.image" />
+                  <div class="gradient-overlay"></div>
+                  <p class="app-name">{{ app.name }}</p>
+                </div>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
