@@ -436,8 +436,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
 
     this.subscription.add(
       this.skeltonProgressBarService.progressBarElement$.subscribe(value => {
-        console.log(value);
-        if (+value > this.sliderValue) {
+        if (+value > this.sliderValue || +value == 0) {
           this.sliderValue = +value;
         }
       })

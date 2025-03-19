@@ -111,6 +111,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   leftCondition = '';
   lastComment = '';
   lastVideoName = '';
+  lastVideoMinMax = [];
   processedTimestamps: Set<string> = new Set();
   receivedRemoteVideo: boolean = false;
   connection: WebSocket;
@@ -173,6 +174,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   currentGameAppData: IGameAppData;
   searchCameraInterval;
   heygenAPIService: HeygenAPIService
+  newInterval;
 
   constructor(
     private authenticationService: AuthenticationService,
@@ -234,7 +236,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           this.skeltonProgressBarService.setBarElement('' + 0);
           const results = this.matchClipAndPatientData(this.videoMinMax, this.matchingCameraData);
           const updateComments = this.updateComments(results);
-
+          clearInterval(this.newInterval);
           const apiKey = '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'
           const body = {
             model: 'gpt-4o-mini', // Or 'gpt-3.5-turbo'
@@ -242,26 +244,26 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
               role: 'user',
               content: `
               JSON Array: ${updateComments},
-              Based on above array, give a 2 liner, with 10 seconds max speech time, description on how the patient has perform the exercise.
+              Based on above array, give a 1 liner, with 10 seconds max speech time, description on how the patient has perform the exercise.
               `
             }]
           };
 
-          const response = await fetch(`https://api.openai.com/v1/chat/completions`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${apiKey}`,
-            },
-            body: JSON.stringify(body)
-          });
+          // const response = await fetch(`https://api.openai.com/v1/chat/completions`, {
+          //   method: "POST",
+          //   headers: {
+          //     "Content-Type": "application/json",
+          //     "Authorization": `Bearer ${apiKey}`,
+          //   },
+          //   body: JSON.stringify(body)
+          // });
 
-          const data = await response.json();
-          if (data.choices.length > 0)
-            this.heygenAPIService.sendText(data?.choices[0].message?.content);
-          setTimeout(() => {
-            this.heygenAPIService.onClose()
-          }, 15000);
+          // const data = await response.json();
+          // if (data.choices.length > 0)
+          //   this.heygenAPIService.sendText(data?.choices[0].message?.content);
+          // setTimeout(() => {
+          //   this.heygenAPIService.onClose()
+          // }, 15000);
 
           this.ajaxService.savePatientMetaData({
             game_id: this.gameId,
@@ -280,7 +282,12 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           const videoName = action.msg?.data?.source?.split('/')[4];
           this.ajaxService.getGameMetaData(videoName).subscribe(async (gamesettings) => {
             if (gamesettings.length > 0) {
-              setInterval(() => {
+              this.matchingCameraData = [];
+              this.landmarks = gamesettings[0].landmarks;
+              this.videoMinMax = gamesettings[0].settings;
+              this.landmarksPointer = gamesettings[0].landmarksPointer;
+              this.landmarksLinePointer = gamesettings[0].landmarksLinePointer;
+              this.newInterval = setInterval(() => {
                 const results = this.matchClipAndPatientData(this.videoMinMax, this.matchingCameraData);
                 const updateComments = this.updateComments(results);
                 const mainLength = this.videoMinMax.length;
@@ -290,10 +297,6 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                 this.skeltonProgressBarService.setBarElement('' + percentage);
                 this.skeltonProgressBarService.setThumbUpElement('' + thumbUpLength);
               }, 5000);
-              this.landmarks = gamesettings[0].landmarks;
-              this.videoMinMax = gamesettings[0].settings;
-              this.landmarksPointer = gamesettings[0].landmarksPointer;
-              this.landmarksLinePointer = gamesettings[0].landmarksLinePointer;
 
               const videoTime = action.msg.data.currentPlayTime.vidTime;
               const currentPlayTime = new Date(action.msg.data.currentPlayTime.sysTime).getSeconds();
@@ -313,12 +316,13 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                   this.processedTimestamps = new Set();
                   this.startTime = new Date().getTime();
                   this.currentVideoIndex = 0;
-                  this.initializeCameraPoseModels()
-                  this.heygenAPIService.onStart();
+                  // this.initializeCameraPoseModels()
+                  // if (this.videoIndex == 0)
+                  //   this.heygenAPIService.onStart();
 
                   if (this.videoIndex > 0) {
                     this.skeltonProgressBarService.setBarElement('' + 0);
-                    const results = this.matchClipAndPatientData(this.videoMinMax, this.matchingCameraData);
+                    const results = this.matchClipAndPatientData(this.lastVideoMinMax, this.matchingCameraData);
                     const updateComments = this.updateComments(results);
 
                     const apiKey = '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'
@@ -328,26 +332,29 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                         role: 'user',
                         content: `
                           JSON Array: ${updateComments},
-                          Based on above array, give a 2 liner, with 10 seconds max speech time, description on how the patient has perform the exercise.
+                          Based on above array, give a 1 liner, with 10 seconds max speech time, description on how the patient has perform the exercise.
                         `
                       }]
                     };
 
-                    const response = await fetch(`https://api.openai.com/v1/chat/completions`, {
-                      method: "POST",
-                      headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${apiKey}`,
-                      },
-                      body: JSON.stringify(body)
-                    });
+                    // const response = await fetch(`https://api.openai.com/v1/chat/completions`, {
+                    //   method: "POST",
+                    //   headers: {
+                    //     "Content-Type": "application/json",
+                    //     "Authorization": `Bearer ${apiKey}`,
+                    //   },
+                    //   body: JSON.stringify(body)
+                    // });
 
-                    const data = await response.json();
-                    if (data.choices.length > 0)
-                      this.heygenAPIService.sendText(data?.choices[0].message?.content);
-                    setTimeout(() => {
-                      this.heygenAPIService.onClose()
-                    }, 15000);
+                    // const data = await response.json();
+                    // if (data.choices.length > 0)
+                    //   this.heygenAPIService.sendText(data?.choices[0].message?.content);
+                    // setTimeout(async () => {
+                    //   this.heygenAPIService.onClose();
+                    //   setTimeout(() => {
+                    //     this.heygenAPIService.onStart();
+                    //   }, 1000)
+                    // }, 15000);
                     this.ajaxService.savePatientMetaData({
                       game_id: this.gameId,
                       settings: updateComments,
@@ -356,8 +363,10 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                       console.log("gamesettings===", gamesettings);
                     });
                     // this.saveToCSV(updateComments, 'min_max_matches.csv');
+                    this.saveToCSV(this.timeLog, 'time_matching.csv');
                   }
                   this.lastVideoName = videoName;
+                  this.lastVideoMinMax = this.videoMinMax;
                 }
               }
             }
@@ -2060,7 +2069,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                 0,
                 2 * Math.PI
               );
-              canvasCtx.fillStyle = 'rgba(255, 0, 0, 0.6)';
+              canvasCtx.fillStyle = 'rgba(255, 255, 255)';
               canvasCtx.fill();
             }
             // } else if (this.videoIndex == 4 || this.videoIndex == 5 || this.videoIndex == 6) {
@@ -2115,7 +2124,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                 endLandmark.y * canvasElement.height
               );
               canvasCtx.lineWidth = 4;
-              canvasCtx.strokeStyle = 'rgba(128, 128, 128, 0.6)';
+              canvasCtx.strokeStyle = 'rgba(128, 128, 128, 0.8)';
 
               if (this.timeMatching && start % 2) {
                 if (this.leftCondition === 'Good') {
@@ -2127,9 +2136,9 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                     canvasCtx.strokeStyle = 'rgb(145, 255, 0)';
                   }
                 }
-                else {
-                  canvasCtx.strokeStyle = 'rgba(255, 0, 0, 0.6)';
-                }
+                // else {
+                //   canvasCtx.strokeStyle = 'rgba(255, 0, 0, 0.6)';
+                // }
                 // canvasCtx.strokeStyle = this.leftCondition === 'Good' ? 'rgba(0, 255, 0, 0.6)' : 'rgba(255, 0, 0, 0.6)';
               }
               if (this.timeMatching && start % 2 === 0) {
@@ -2142,9 +2151,9 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                     canvasCtx.strokeStyle = 'rgb(145, 255, 0)';
                   }
                 }
-                else {
-                  canvasCtx.strokeStyle = 'rgba(255, 0, 0, 0.6)';
-                }
+                // else {
+                //   canvasCtx.strokeStyle = 'rgba(255, 0, 0, 0.6)';
+                // }
                 // canvasCtx.strokeStyle = this.rightCondition === 'Good' ? 'rgba(0, 255, 0, 0.6)' : 'rgba(255, 0, 0, 0.6)';
               }
               canvasCtx.stroke();
@@ -2242,7 +2251,7 @@ export class HeygenAPIService {
   updateNewStatus(message: string) {
     const timestamp = new Date().toLocaleTimeString();
     this.statusMessages.push(`[${timestamp}] ${message}`);
-    console.log(this.statusMessages);
+    // console.log(this.statusMessages);
 
   }
 
@@ -2274,7 +2283,7 @@ export class HeygenAPIService {
 
     this.webSocket.addEventListener("message", (event: MessageEvent) => {
       const eventData = JSON.parse(event.data);
-      console.log("Raw WebSocket event:", eventData);
+      // console.log("Raw WebSocket event:", eventData);
     });
   }
 
@@ -2302,7 +2311,7 @@ export class HeygenAPIService {
     });
 
     const data = await response.json();
-    console.log("data : ", data)
+    // console.log("data : ", data)
     this.newSessionInfo = data.data;
 
     this.room = new LivekitClient.Room({
