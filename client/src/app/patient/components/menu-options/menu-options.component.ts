@@ -257,6 +257,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
           })
         );
         //this.currentMenuApps = this.menuApps.slice(this.currentPageIndex, MAX_GAMES_IN_PAGE);
+
         /*this.currentMenuApps = this.menuApps;
         if (this.isMobile) {
           const studioIndex = this.currentMenuApps.findIndex((app) => app.name === 'studio');
@@ -265,8 +266,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
           }
         }*/
 
-        // If in mobile view, filter to show only "studio" game
-
+        // If in mobile view, filter to show only "studio" game          
         if (this.isMobile || this.isPatientOnMobile) {
           this.currentMenuApps = this.menuApps.filter((app) => app.name === 'studio');
           const studioIndex = this.currentMenuApps.findIndex((app) => app.name === 'studio');

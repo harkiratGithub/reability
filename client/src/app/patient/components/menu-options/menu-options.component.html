@@ -210,6 +210,7 @@
     }">
     <app-web-rtc-video class="web-rtc-area-mobile" *ngIf="!isTherapistMode" (handleFullScreenVideoSession)="handleFullScreenVideoSession()" (handleNewGameFromTherapist)="handleNewGameFromTherapist($event)" [currentUser]="currentUser" [validGames]="games" (sendCallObjectToParent)="saveCallObject($event)" (handleShareScreen)="handleScreenShare($event)" (handleTherapistClickHome)="onClickHomeButton()" [showLocalVideo]="!isMobile" (handleOtherSideLeftVideoSession)="handleOtherSideLeftVideoSession()" [currentGameName]="currentGameName" [videoSessionDisplay]="videoSessionDisplay" [isMobile]="isMobile">
     </app-web-rtc-video>
+
     <div class="middle-section mobile">
       <div class="content-background">
         <div id="menu-container" class="menu-container movingRightAnimation">
@@ -239,6 +240,5 @@
         </div>
       </div>
     </div>
-
   </div>
 </div>

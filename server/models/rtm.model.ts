@@ -281,4 +281,3 @@ export const updateRTM = async (patient_id, data, type = 'patient', client = nul
 		client
 	);
 };
-
