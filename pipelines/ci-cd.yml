@@ -1,0 +1,26 @@
+trigger: none
+
+ 
+pool: 
+  vmImage: 'ubuntu-latest'
+
+resources:
+  repositories:
+    - repository: Pipelines
+      type: git
+      name: Hohermarkt/Pipelines  # Change this to the actual repo
+      ref: refs/heads/main  # Change branch if needed
+
+stages:
+- stage: TriggerExternalRepo
+  jobs:
+  - job:
+    displayName: Build frontend image
+    workspace:
+        clean: all
+    steps:
+    - template: /devops/templates/docker/docker-build-push.yml
+        parameters:
+        dockerFile: Dockerfile
+        buildContext: $(Build.SourcesDirectory)
+        repository: spectory-reability-main
