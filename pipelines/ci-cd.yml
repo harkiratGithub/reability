@@ -25,14 +25,14 @@ stages:
       #   buildContext: $(Build.SourcesDirectory)
       #   repository: spectory-reability-main
 
-# - stage: DeployStage
-#   jobs:
-#   - job:
-#     displayName: Deploy frontend image
-#     workspace:
-#         clean: all
-#     steps:
-#     - template: /pipelines/CD/cd.yaml@Pipelines
-#       parameters:
-#         WebAppName: 'app-reability'
-#         DockerNamespaceName: 'acrreability'
+- stage: DeployStage
+  jobs:
+  - job:
+    displayName: Deploy frontend image
+    workspace:
+        clean: all
+    steps:
+    - template: /pipelines/CD/cd.yaml@Pipelines
+      parameters:
+        WebAppName: 'demo-reability'
+        DockerNamespaceName: 'acrreability'
