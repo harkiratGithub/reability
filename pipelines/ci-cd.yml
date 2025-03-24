@@ -4,14 +4,18 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  DockerNamespaceName: 'acrreability'
+  # Dynamically set variable group based on source branch
+  - ${{ if eq(variables['Build.SourceBranchName'], 'refs/heads/demo-env') }}:
+      - group: demo-env-variables
+  - ${{ if eq(variables['Build.SourceBranchName'], 'refs/heads/app-env') }}:
+      - group: app-env-variables
 
 resources:
   repositories:
     - repository: Pipelines
       type: git
-      name: Hohermarkt/Pipelines  # Change this to the actual repo
-      ref: refs/heads/main  # Change branch if needed
+      name: Hohermarkt/Pipelines  
+      ref: refs/heads/main  
 
 stages:
 - stage: BuildStage
@@ -72,29 +76,25 @@ stages:
         echo "EMAIL_LANGUAGE=${EMAIL_LANGUAGE}" >> .env
 
         cat .env
-#     - template: /pipelines/CI/ci.yaml@Pipelines
-#       # parameters:
-#       #   dockerFile: Dockerfile
-#       #   buildContext: $(Build.SourcesDirectory)
-#       #   repository: spectory-reability-main
+    - template: /pipelines/CI/ci.yaml@Pipelines
 
-# - stage: DeployStage
-#   jobs:
-#   - job:
-#     displayName: Deploy frontend image
-#     workspace:
-#         clean: all
-#     steps:
-#     - script: |
-#         if [ "$(Build.SourceBranchName)" == "demo-env" ]; then
-#           echo "##vso[task.setvariable variable=WebAppName]demo-reability"
-#         elif [ "$(Build.SourceBranchName)" == "us-env" ]; then
-#           echo "##vso[task.setvariable variable=WebAppName]us-reability"
-#         elif [ "$(Build.SourceBranchName)" == "app-env" ]; then
-#           echo "##vso[task.setvariable variable=WebAppName]app-reability"
-#         fi
-#       displayName: 'Set WebAppName Variable'
-#     - template: /pipelines/CD/cd.yaml@Pipelines
-#       parameters:
-#         WebAppName: $(WebAppName)
-#         DockerNamespaceName: $(DockerNamespaceName)
+- stage: DeployStage
+  jobs:
+  - job:
+    displayName: Deploy frontend image
+    workspace:
+        clean: all
+    steps:
+    - script: |
+        if [ "$(Build.SourceBranchName)" == "demo-env" ]; then
+          echo "##vso[task.setvariable variable=WebAppName]demo-reability"
+        elif [ "$(Build.SourceBranchName)" == "us-env" ]; then
+          echo "##vso[task.setvariable variable=WebAppName]us-reability"
+        elif [ "$(Build.SourceBranchName)" == "app-env" ]; then
+          echo "##vso[task.setvariable variable=WebAppName]app-reability"
+        fi
+      displayName: 'Set WebAppName Variable'
+    - template: /pipelines/CD/cd.yaml@Pipelines
+      parameters:
+        WebAppName: $(WebAppName)
+        DockerNamespaceName: $(DockerNamespaceName)
