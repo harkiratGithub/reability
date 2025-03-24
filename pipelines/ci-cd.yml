@@ -4,10 +4,6 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  WebAppName: ${{
-    if eq(variables['Build.SourceBranchName'], 'demo-env') }} 'demo-reability'
-    ${{ if eq(variables['Build.SourceBranchName'], 'us-env') }} 'us-reability'
-    ${{ if eq(variables['Build.SourceBranchName'], 'app-env') }} 'app-reability'
   DockerNamespaceName: 'acrreability'
 
 resources:
@@ -38,6 +34,15 @@ stages:
     workspace:
         clean: all
     steps:
+    - script: |
+        if [ "$(Build.SourceBranchName)" == "demo-env" ]; then
+          echo "##vso[task.setvariable variable=WebAppName]demo-reability"
+        elif [ "$(Build.SourceBranchName)" == "us-env" ]; then
+          echo "##vso[task.setvariable variable=WebAppName]us-reability"
+        elif [ "$(Build.SourceBranchName)" == "app-env" ]; then
+          echo "##vso[task.setvariable variable=WebAppName]app-reability"
+        fi
+      displayName: 'Set WebAppName Variable'
     - template: /pipelines/CD/cd.yaml@Pipelines
       parameters:
         WebAppName: $(WebAppName)
