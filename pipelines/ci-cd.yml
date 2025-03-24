@@ -9,6 +9,8 @@ variables:
       - group: demo-env-variables
   - ${{ if eq(variables['Build.SourceBranchName'], 'refs/heads/app-env') }}:
       - group: app-env-variables
+  - ${{ if eq(variables['Build.SourceBranchName'], 'refs/heads/us-env') }}:
+      - group: us-env-variables
 
 resources:
   repositories:
@@ -97,4 +99,4 @@ stages:
     - template: /pipelines/CD/cd.yaml@Pipelines
       parameters:
         WebAppName: $(WebAppName)
-        DockerNamespaceName: $(DockerNamespaceName)
+        DockerNamespaceName: 'acrreability'
