@@ -19,8 +19,20 @@ stages:
     workspace:
         clean: all
     steps:
-    - template: /devops/templates/docker/docker-build-push.yml@Pipelines
+    - template: /pipelines/CI/ci.yaml@Pipelines
+      # parameters:
+      #   dockerFile: Dockerfile
+      #   buildContext: $(Build.SourcesDirectory)
+      #   repository: spectory-reability-main
+
+- stage: DeployStage
+  jobs:
+  - job:
+    displayName: Deploy frontend image
+    workspace:
+        clean: all
+    steps:
+    - template: /pipelines/CD/cd.yaml@Pipelines
       parameters:
-        dockerFile: Dockerfile
-        buildContext: $(Build.SourcesDirectory)
-        repository: spectory-reability-main
+        WebAppName: 'app-reability'
+        DockerNamespaceName: 'acrreability'
