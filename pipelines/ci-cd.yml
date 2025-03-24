@@ -12,15 +12,15 @@ resources:
       ref: refs/heads/main  # Change branch if needed
 
 stages:
-- stage: TriggerExternalRepo
+- stage: BuildStage
   jobs:
   - job:
     displayName: Build frontend image
     workspace:
         clean: all
     steps:
-    - template: /devops/templates/docker/docker-build-push.yml
-        parameters:
+    - template: /devops/templates/docker/docker-build-push.yml@Pipelines
+      parameters:
         dockerFile: Dockerfile
         buildContext: $(Build.SourcesDirectory)
         repository: spectory-reability-main
