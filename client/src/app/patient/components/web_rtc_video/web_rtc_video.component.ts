@@ -234,9 +234,13 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           this.videoIndex = -1;
           this.videoSeconds = 0;
           this.skeltonProgressBarService.setBarElement('' + 0);
-          const results = this.matchClipAndPatientData(this.videoMinMax, this.matchingCameraData);
-          const updateComments = this.updateComments(results);
+          const results = await this.matchClipAndPatientData(this.videoMinMax, this.matchingCameraData);
+          const updateComments = await this.updateComments(results);
           clearInterval(this.newInterval);
+          this.videoMinMax = [];
+          this.landmarksPointer = [];
+          this.matchingCameraData = [];
+          this.landmarksLinePointer = [];
           const apiKey = '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'
           const body = {
             model: 'gpt-4o-mini', // Or 'gpt-3.5-turbo'
@@ -279,7 +283,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           this.videoMinMax = [];
           this.landmarksPointer = [];
           this.landmarksLinePointer = [];
-          const videoName = action.msg?.data?.source?.split('/')[4];
+          const videoName = action.msg?.data?.source?.split('/')[5];
           this.ajaxService.getGameMetaData(videoName).subscribe(async (gamesettings) => {
             if (gamesettings.length > 0) {
               this.matchingCameraData = [];
@@ -287,16 +291,16 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
               this.videoMinMax = gamesettings[0].settings;
               this.landmarksPointer = gamesettings[0].landmarksPointer;
               this.landmarksLinePointer = gamesettings[0].landmarksLinePointer;
-              this.newInterval = setInterval(() => {
-                const results = this.matchClipAndPatientData(this.videoMinMax, this.matchingCameraData);
-                const updateComments = this.updateComments(results);
+              this.newInterval = setInterval(async () => {
+                const results = await this.matchClipAndPatientData(this.videoMinMax, this.matchingCameraData);
+                const updateComments = await this.updateComments(results);
                 const mainLength = this.videoMinMax.length;
                 const updateLength = updateComments.filter((data) => (data.RightCondition == 'Good' || data.LeftCondition == 'Good') && data.PatientTimestamp != undefined).length;
                 const thumbUpLength = updateComments.filter((data) => (data.RightComments == 'Perfect' || data.LeftComments == 'Perfect') && data.PatientTimestamp != undefined).length;
                 const percentage = Math.floor((updateLength / mainLength) * 100);
                 this.skeltonProgressBarService.setBarElement('' + percentage);
                 this.skeltonProgressBarService.setThumbUpElement('' + thumbUpLength);
-              }, 5000);
+              }, 3000);
 
               const videoTime = action.msg.data.currentPlayTime.vidTime;
               const currentPlayTime = new Date(action.msg.data.currentPlayTime.sysTime).getSeconds();
@@ -322,8 +326,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
 
                   if (this.videoIndex > 0) {
                     this.skeltonProgressBarService.setBarElement('' + 0);
-                    const results = this.matchClipAndPatientData(this.lastVideoMinMax, this.matchingCameraData);
-                    const updateComments = this.updateComments(results);
+                    const results = await this.matchClipAndPatientData(this.lastVideoMinMax, this.matchingCameraData);
+                    const updateComments = await this.updateComments(results);
 
                     const apiKey = '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'
                     const body = {
@@ -363,7 +367,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                       console.log("gamesettings===", gamesettings);
                     });
                     // this.saveToCSV(updateComments, 'min_max_matches.csv');
-                    this.saveToCSV(this.timeLog, 'time_matching.csv');
+                    // this.saveToCSV(this.timeLog, 'time_matching.csv');
                   }
                   this.lastVideoName = videoName;
                   this.lastVideoMinMax = this.videoMinMax;
@@ -416,7 +420,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     console.log("======going to set mobile device =========", this.isMobile);
     this.handleMobileAvailability(this.isMobile);
 
-    console.log("======going to set mobile device =========",this.isMobile);
+    console.log("======going to set mobile device =========", this.isMobile);
     this.handleMobileAvailability(this.isMobile);
     this.localVideo = document.getElementById('patient-video');
 
@@ -616,8 +620,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     this.skeletonLoadingBar();
 
     if (this.currentUser.id == 1802 || this.currentUser.id == 1793) {
-      this.initializeCamera();
-      this.initializePoseModels();
+      // this.initializeCamera();
+      // this.initializePoseModels();
     }
   }
 
@@ -1785,6 +1789,33 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     // };
   }
 
+  private async chatGPTAPI(dataArray: any) {
+    const apiKey = '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'
+    const body = {
+      model: 'gpt-4o-mini', // Or 'gpt-3.5-turbo'
+      messages: [{
+        role: 'user',
+        content: `
+          JSON Array: ${dataArray},
+          Based on above array, give a 1 liner, with 10 seconds max speech time, description on how the patient has perform the exercise.
+        `
+      }]
+    };
+
+    const response = await fetch(`https://api.openai.com/v1/chat/completions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify(body)
+    });
+
+    const data = await response.json();
+    // if (data.choices.length > 0)
+    this.heygenAPIService.sendText(data?.choices[0].message?.content);
+
+  }
   private initializeCameraPoseModels() {
     // this.videoPose = new Pose({
     //   locateFile: (file) =>

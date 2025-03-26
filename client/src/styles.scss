@@ -276,15 +276,18 @@ input {
 .mat-slider-vertical.mat-accent {
   &.thumbs-up {
     .mat-slider-focus-ring {
-      left: 15px;
+      width: 180px;
+      height: 180px;
+      left: 45px;
       opacity: 1;
+      bottom: -80px;
       display: block;
       transform: none;
       border-radius: 0px;
       background-size: contain;
       background-repeat: no-repeat;
       background-color: transparent;
-      background-image: url('./assets/bar-images/thumbs_up.png');
+      background-image: url('./assets/bar-images/thumbs_up.gif');
     }
   }
 
@@ -292,65 +295,84 @@ input {
     height: 100%;
     -webkit-appearance: none;
     appearance: none;
-    background: linear-gradient(to top, #9b0707 10%,
-        /* Dark Red */
-        #FF0000 33%,
-        /* Red */
-        #f0a211 34%,
-        /* Orange */
-        #FFFF00 66%,
-        /* Yellow */
-        #68ee68 67%,
-        /* Green */
-        #1c691c 100%
-        /* Dark Green */
-      );
+    // background: linear-gradient(to top, #00BEF1,
+    //     /* Yellow */
+    //     #2F54D2 60%,
+    //     /* Green */
+    //     #fff 60%,
+    //     #fff 62%,
+    //     /* Green */
+    //     #76C300 62%,
+    //     #76C300 98%,
+    //     #fff 98%);
     outline: none;
     position: relative;
-    width: 6px;
+    width: 100%;
     top: 0px;
     bottom: 0px;
     left: 0px;
-  }
+    border-radius: inherit;
 
-  .mat-slider-track-wrapper {
-    width: 0px;
-  }
+    .mat-slider-track-wrapper {
+      width: 100%;
+      border-radius: inherit;
 
-  .mat-slider-thumb {
-    width: 30px;
-    height: 30px;
-    bottom: -15px;
-    right: -15px;
-    background: none;
-    background-size: contain;
-    transform: none !important;
-    background-repeat: no-repeat;
-    background-image: url('./assets/bar-images/barmeter_levelbutton.png');
-  }
+      .mat-slider-track-background {
+        z-index: 2;
+        width: 100%;
+        background-color: #fff;
+      }
 
-  .mat-slider-thumb-label {
-    transform: none !important;
-    border-radius: 50% !important;
-    background-color: #4fb6bf !important;
-  }
+      .mat-slider-track-fill {
+        z-index: 1;
+        width: 100%;
+        transform: none !important;
+        background: url('./assets/bar-images/level_divider.png'), linear-gradient(to top, #00BEF1,
+            /* Yellow */
+            #2F54D2 60%,
+            /* Green */
+            #fff 60%,
+            #fff 62%,
+            /* Green */
+            #76C300 62%,
+            #76C300 97%,
+            #fff 97%);
+        background-position: center 39%;
+        background-size: 110%;
+        background-repeat: no-repeat;
+      }
+    }
 
-  .mat-slider-thumb-label-text {
-    font-weight: bold;
-    opacity: 1 !important;
-    transform: none !important;
-  }
+    .mat-slider-thumb-container {
+      left: 30%;
 
-  .mat-slider-ticks-container {
-    left: 11px;
-    width: 15px;
-    transform: translateY(-5%) !important;
+      .mat-slider-thumb {
+        width: 0;
+        height: 0;
+        right: -40px;
+        bottom: -11px;
+        background: none;
+        border-radius: 0;
+        transform: none !important;
+        border-right: 15px solid #545454 !important;
+        border-top: 10px solid transparent !important;
+        border-bottom: 10px solid transparent !important;
+      }
 
-    .mat-slider-ticks {
-      width: 15px;
-      opacity: 1 !important;
-      background-size: 2px 10% !important;
-      transform: translateZ(0px) translateY(5%) !important;
+      .mat-slider-thumb-label {
+        left: 43px;
+        width: 35px;
+        transform: none !important;
+        background: none !important;
+        border-radius: 0px !important;
+      }
+
+      .mat-slider-thumb-label-text {
+        font-weight: bold;
+        opacity: 1 !important;
+        transform: none !important;
+        color: #545454 !important;
+      }
     }
   }
 }

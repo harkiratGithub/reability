@@ -134,6 +134,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
   therapistPeerId: string = '';
   InstituteLogo: string;
   sliderValue: number = 0;
+  thumbUpValue: number = 0;
   showThumbUp: boolean = false;
   constructor(
     private authenticationService: AuthenticationService,
@@ -173,6 +174,10 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
         }
       });
     }
+  }
+
+  formatLabel(value: number): string {
+    return `${value} %`;
   }
 
   ngOnInit() {
@@ -444,11 +449,12 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
 
     this.subscription.add(
       this.skeltonProgressBarService.thumbUpElement$.subscribe(value => {
-        if (+value > 0 && +value % 3 === 0) {
+        if (+value > 0 && +value % 3 === 0 && this.thumbUpValue != +value) {
           this.showThumbUp = true;
+          this.thumbUpValue = +value;
           setTimeout(() => {
             this.showThumbUp = false;
-          }, 2000);
+          }, 5000);
         }
       })
     );
