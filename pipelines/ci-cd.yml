@@ -67,7 +67,7 @@ stages:
 
         echo "SIGNALING_SERVER=${SIGNALING_SERVER}" >> .env
         echo "SIGNALING_SERVER_URL=${SIGNALING_SERVER_URL}" >> .env
-
+        echo "SERVER_URL=${SERVER_URL}" >> .env
         echo "CAPTCHA_CLIENT_KEY=${CAPTCHA_CLIENT_KEY}" >> .env
         echo "CAPTCHA_SERVER_KEY=${CAPTCHA_SERVER_KEY}" >> .env
 
