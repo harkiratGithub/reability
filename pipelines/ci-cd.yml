@@ -20,65 +20,65 @@ resources:
       ref: refs/heads/main  
 
 stages:
-- stage: BuildStage
-  jobs:
-  - job:
-    displayName: Build frontend image
-    workspace:
-        clean: all
-    steps:
-    - script: |
-        echo "NODE_ENV=${NODE_ENV}" >> .env
-        echo "USERNAME_DEV=${USERNAME_DEV}" >> .env
-        echo "HOST_DEV=${HOST_DEV}" >> .env
-        echo "PASSWORD_DEV=${PASSWORD_DEV}" >> .env
-        echo "DB_DEV=${DB_DEV}" >> .env
-        echo "JWT_SECRET=${JWT_SECRET}" >> .env
-        echo "TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID}" >> .env
-        echo "TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN}" >> .env
-        echo "TWILIO_ACCOUNT_SID_TEST=${TWILIO_ACCOUNT_SID_TEST}" >> .env
-        echo "TWILIO_AUTH_TOKEN_TEST=${TWILIO_AUTH_TOKEN_TEST}" >> .env
-        echo "SCRIPT_BUCKET_NAME=${SCRIPT_BUCKET_NAME}" >> .env
-        echo "SCRIPT_GAME_NAME=${SCRIPT_GAME_NAME}" >> .env
-        echo "SCRIPT_BUCKET_DESCRIPTION=${SCRIPT_BUCKET_DESCRIPTION}" >> .env
-        echo "SECRET_KEY=${SECRET_KEY}" >> .env
-        echo "NODE_TLS_REJECT_UNAUTHORIZED=${NODE_TLS_REJECT_UNAUTHORIZED}" >> .env
-        echo "REABILITY_URL=${REABILITY_URL}" >> .env
-        echo "PROXY=${PROXY}" >> .env
-        echo "ENCRYPTION_KEY=${ENCRYPTION_KEY}" >> .env
-        echo "ENCRYPTION_IV=${ENCRYPTION_IV}" >> .env
-        echo "SECRET_KEY_SESSION=${SECRET_KEY_SESSION}" >> .env
-        echo "LOGGER_TOKEN=${LOGGER_TOKEN}" >> .env
-        echo "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}" >> .env
-        echo "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}" >> .env
-        echo "AWS_IMAGE_BUCKET_PATH=${AWS_IMAGE_BUCKET_PATH}" >> .env
-        echo "AWS_GAMES_IMAGES_BUCKET_PATH=${AWS_GAMES_IMAGES_BUCKET_PATH}" >> .env
-        echo "SENDGRID_API_KEY=${SENDGRID_API_KEY}" >> .env
-        echo "TWILIO_FROM_NUMBER=${TWILIO_FROM_NUMBER}" >> .env
-        echo "SHEABA_IP_TO_FILTER=${SHEABA_IP_TO_FILTER}" >> .env
-        echo "AZURE_STORAGE_ACCOUNT_NAME=${AZURE_STORAGE_ACCOUNT_NAME}" >> .env
-        echo "AZURE_STORAGE_ACCOUNT_KEY=${AZURE_STORAGE_ACCOUNT_KEY}" >> .env
-        echo "AZURE_CONTAINER_NAME=${AZURE_CONTAINER_NAME}" >> .env
-        echo "AZURE_AUDIO_CONTAINER_NAME=${AZURE_AUDIO_CONTAINER_NAME}" >> .env
-        echo "AZURE_IMAGE_BUCKET_PATH=${AZURE_IMAGE_BUCKET_PATH}" >> .env
-        echo "DATABASE_URL=${DATABASE_URL}" >> .env
-        echo "RECAPTCHA_MIN_SCORE=${RECAPTCHA_MIN_SCORE}" >> .env
-        echo "WB_CLEAR_GAMEDATA_PASSWORD=${WB_CLEAR_GAMEDATA_PASSWORD}" >> .env
+# - stage: BuildStage
+#   jobs:
+#   - job:
+#     displayName: Build frontend image
+#     workspace:
+#         clean: all
+#     steps:
+#     - script: |
+#         echo "NODE_ENV=${NODE_ENV}" >> .env
+#         echo "USERNAME_DEV=${USERNAME_DEV}" >> .env
+#         echo "HOST_DEV=${HOST_DEV}" >> .env
+#         echo "PASSWORD_DEV=${PASSWORD_DEV}" >> .env
+#         echo "DB_DEV=${DB_DEV}" >> .env
+#         echo "JWT_SECRET=${JWT_SECRET}" >> .env
+#         echo "TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID}" >> .env
+#         echo "TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN}" >> .env
+#         echo "TWILIO_ACCOUNT_SID_TEST=${TWILIO_ACCOUNT_SID_TEST}" >> .env
+#         echo "TWILIO_AUTH_TOKEN_TEST=${TWILIO_AUTH_TOKEN_TEST}" >> .env
+#         echo "SCRIPT_BUCKET_NAME=${SCRIPT_BUCKET_NAME}" >> .env
+#         echo "SCRIPT_GAME_NAME=${SCRIPT_GAME_NAME}" >> .env
+#         echo "SCRIPT_BUCKET_DESCRIPTION=${SCRIPT_BUCKET_DESCRIPTION}" >> .env
+#         echo "SECRET_KEY=${SECRET_KEY}" >> .env
+#         echo "NODE_TLS_REJECT_UNAUTHORIZED=${NODE_TLS_REJECT_UNAUTHORIZED}" >> .env
+#         echo "REABILITY_URL=${REABILITY_URL}" >> .env
+#         echo "PROXY=${PROXY}" >> .env
+#         echo "ENCRYPTION_KEY=${ENCRYPTION_KEY}" >> .env
+#         echo "ENCRYPTION_IV=${ENCRYPTION_IV}" >> .env
+#         echo "SECRET_KEY_SESSION=${SECRET_KEY_SESSION}" >> .env
+#         echo "LOGGER_TOKEN=${LOGGER_TOKEN}" >> .env
+#         echo "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}" >> .env
+#         echo "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}" >> .env
+#         echo "AWS_IMAGE_BUCKET_PATH=${AWS_IMAGE_BUCKET_PATH}" >> .env
+#         echo "AWS_GAMES_IMAGES_BUCKET_PATH=${AWS_GAMES_IMAGES_BUCKET_PATH}" >> .env
+#         echo "SENDGRID_API_KEY=${SENDGRID_API_KEY}" >> .env
+#         echo "TWILIO_FROM_NUMBER=${TWILIO_FROM_NUMBER}" >> .env
+#         echo "SHEABA_IP_TO_FILTER=${SHEABA_IP_TO_FILTER}" >> .env
+#         echo "AZURE_STORAGE_ACCOUNT_NAME=${AZURE_STORAGE_ACCOUNT_NAME}" >> .env
+#         echo "AZURE_STORAGE_ACCOUNT_KEY=${AZURE_STORAGE_ACCOUNT_KEY}" >> .env
+#         echo "AZURE_CONTAINER_NAME=${AZURE_CONTAINER_NAME}" >> .env
+#         echo "AZURE_AUDIO_CONTAINER_NAME=${AZURE_AUDIO_CONTAINER_NAME}" >> .env
+#         echo "AZURE_IMAGE_BUCKET_PATH=${AZURE_IMAGE_BUCKET_PATH}" >> .env
+#         echo "DATABASE_URL=${DATABASE_URL}" >> .env
+#         echo "RECAPTCHA_MIN_SCORE=${RECAPTCHA_MIN_SCORE}" >> .env
+#         echo "WB_CLEAR_GAMEDATA_PASSWORD=${WB_CLEAR_GAMEDATA_PASSWORD}" >> .env
 
-        echo "SIGNALING_SERVER=${SIGNALING_SERVER}" >> .env
-        echo "SIGNALING_SERVER_URL=${SIGNALING_SERVER_URL}" >> .env
-        echo "SERVER_URL=${SERVER_URL}" >> .env
-        echo "CAPTCHA_CLIENT_KEY=${CAPTCHA_CLIENT_KEY}" >> .env
-        echo "CAPTCHA_SERVER_KEY=${CAPTCHA_SERVER_KEY}" >> .env
+#         echo "SIGNALING_SERVER=${SIGNALING_SERVER}" >> .env
+#         echo "SIGNALING_SERVER_URL=${SIGNALING_SERVER_URL}" >> .env
+#         echo "SERVER_URL=${SERVER_URL}" >> .env
+#         echo "CAPTCHA_CLIENT_KEY=${CAPTCHA_CLIENT_KEY}" >> .env
+#         echo "CAPTCHA_SERVER_KEY=${CAPTCHA_SERVER_KEY}" >> .env
 
-        echo "DOMAIN=${DOMAIN}" >> .env
+#         echo "DOMAIN=${DOMAIN}" >> .env
 
-        echo "NEW_RELIC=${NEW_RELIC}" >> .env
-        echo "NEW_RELIC_APPLICATION_LOGGING_FORWARDING_ENABLED=${NEW_RELIC_APPLICATION_LOGGING_FORWARDING_ENABLED}" >> .env
-        echo "EMAIL_LANGUAGE=${EMAIL_LANGUAGE}" >> .env
+#         echo "NEW_RELIC=${NEW_RELIC}" >> .env
+#         echo "NEW_RELIC_APPLICATION_LOGGING_FORWARDING_ENABLED=${NEW_RELIC_APPLICATION_LOGGING_FORWARDING_ENABLED}" >> .env
+#         echo "EMAIL_LANGUAGE=${EMAIL_LANGUAGE}" >> .env
 
-        cat .env
-    - template: /pipelines/CI/ci.yaml@Pipelines
+#         cat .env
+#     - template: /pipelines/CI/ci.yaml@Pipelines
 
 - stage: DeployStage
   jobs:
