@@ -99,4 +99,3 @@ stages:
     - template: /pipelines/CD/cd.yaml@Pipelines
       parameters:
         WebAppName: $(WebAppName)
-        # DockerNamespaceName: 'acrreability'
