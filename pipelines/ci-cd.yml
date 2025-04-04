@@ -77,8 +77,9 @@ stages:
         echo "NEW_RELIC_APPLICATION_LOGGING_FORWARDING_ENABLED=${NEW_RELIC_APPLICATION_LOGGING_FORWARDING_ENABLED}" >> .env
         echo "EMAIL_LANGUAGE=${EMAIL_LANGUAGE}" >> .env
         pwd
-        ls -ltr
+        ls -la
         cat .env
+        cat ./client/src/environments/environment.prod.ts
 #     - template: /pipelines/CI/ci.yaml@Pipelines
 
 # - stage: DeployStage
