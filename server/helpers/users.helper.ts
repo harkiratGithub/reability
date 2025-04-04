@@ -126,6 +126,7 @@ export const getPatientsByTherapist = async (therapistId: any) => {
 			login_notification_email: decryptPatient.login_notification_email,
 			disabledSkeleton: decryptPatient.disabled_skeleton,
 			hasCamera: decryptPatient.has_camera,
+			isMobile: decryptPatient.is_mobile,
 			phone: decryptPatient.phone,
 		};
 	});

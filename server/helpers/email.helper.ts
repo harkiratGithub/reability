@@ -45,23 +45,20 @@ export const sendPatientCredentialsEmail = async (userEmail, userName, password)
 		<p>We’re excited to have you on board and look forward to supporting you on your journey to better health.</p>
 		<p>To ensure you get the most out of your sessions, we kindly ask that you enable the camera & microphone features when you log in. This is essential for two key reasons:</p>
 		<ol style="margin-left: 20px;">
-		<li>Many of the engaging, exercise-based games you'll be playing use skeletal tracking technology, which operates through your webcam to monitor your movements and provide feedback.</li>
-		<li>A licensed physical therapist and platform representative may check in with you on a video call from time to time to check on your progress and provide extra support if needed.</li>
+		<li>A licensed physical therapist will be interacting with you through the platform, face to face. </li>
+		<li>Many of the engaging, exercise-based games you'll be playing use skeletal tracking technology, which operates through your webcam to monitor your movements and provide feedback.</li>		
 		</ol>
-		<p>Rest assured, nothing from your sessions is being recorded.</p>
-		<p>Book your onboarding call with me, and I’ll guide you through everything you need to prepare for your first session and beyond. I’ll make sure you’re fully set up and confident with the process:</p>
-		<p style="font-weight: bold;">
-		<a href="https://calendly.com/arthur-therpt/30min" style="color: #007BFF; text-decoration: none;">Onboarding Call - Arthur Shevardnadze</a>
-		</p>
-		<p>During our meeting, I will instruct you to connect to the site using this link:</p>
+		<p>Rest assured, nothing from your sessions is being recorded.</p>		
+		<p>You can connect to our sessions using this link:</p>
 		<p style="font-weight: bold;">
 		<a href="${url}" style="color: #007BFF; text-decoration: none;">${process.env.SERVER_URL}</a>
 		</p>
 		<p><strong>Username:</strong> ${userName}<br><strong>Password:</strong> ${password}</p>
+		<p>Your therapist will join the session once available or at the scheduled appointment time.</p>
 		<p><strong>Note: On your first login, the browser will ask your permission to use the microphone and camera. Please confirm. The browser will also ask you to confirm saving the username and password. Please confirm.</strong></p>
 		<p>We also suggest adding the site to the bookmarks and/or the Desktop for easy access.</p>
 		<p>If you have any questions or concerns, don’t hesitate to reach out to us—we’re here to help!</p>
-		<p>A self-explanatory video is available <a href="https://mediaus.blob.core.windows.net/videos/WelcomeEmailVideo.mp4" target="_blank">here</a></p>
+		<p>A self-explanatory video is available <a href="https://mediaus.blob.core.windows.net/videos/WelcomeEmailVideo2.mp4" target="_blank">here</a></p>
 		<p>Best regards,</p>
 		<p style="font-weight: bold;">Arthur Shevardnadze<br>COO, TheRPT</p>
 		<p>212-470-1452</p>

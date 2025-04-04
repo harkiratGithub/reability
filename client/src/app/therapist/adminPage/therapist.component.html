@@ -331,6 +331,7 @@
                       [isSwappedScreen]="therapistPatientConnection.isSwappedScreens"
                       [isInSplitScreen]="!isFullScreenMode && connectedPaitents.length > 1"
                       [isTherapistMode]="true"
+                      [isPatientOnMobile]="therapistPatientConnection.user.isMobile"
                       [currentGameName]="therapistPatientConnection.gameName"
                       [connectionId]="therapistPatientConnection.connection.connectionId"
                       (onIframeLoad)="onIframeLoad(therapistPatientConnection.connection)"
@@ -376,7 +377,7 @@
                   "
                   [volume]="therapistPatientConnection.volume"
                   (enlargeVideoChanged)="sendEnlargeVideoToPatient($event)"
-                  (handlePatientVideo)="togglePatientVideo(therapistPatientConnection.connection.peer)"
+                  (handlePatientVideo)="togglePatientVideo(therapistPatientConnection.connection.peer)"                  
                 >
                 </app-therapist-web-rtc-video>
               </mat-grid-tile>

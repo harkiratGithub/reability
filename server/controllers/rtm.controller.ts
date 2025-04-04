@@ -7,8 +7,8 @@ export const updatePatientRTMSession = (req, res, next) => {
 	const { patientId, painValue , patient_note , userTimezone} = req.body;
 	const user = req.user;
 	RtmHelper.updatePatientSession(patientId, painValue , patient_note,userTimezone)
-		.then(async (createdPainSession) => {
-			ActivityLogHelper.createLog(user.id, patientId, TABLE_NAME.RTM, LogAction.Update, null, null, null, null);
+		.then(async (createdPainSession) => {			
+			ActivityLogHelper.createLog(user?.id, user?.id, TABLE_NAME.RTM, LogAction.Update, null, null, null, null);
 			res.json(createdPainSession);
 		})
 		.catch((err) => next(err));
@@ -19,7 +19,7 @@ export const updateTherapistRTMSession = (req, res, next) => {
 	const user = req.user;
 	RtmHelper.updateTherapistSession(patientId, data, timestamp, userTimezone)
 		.then(async (createdPainSession) => {
-			ActivityLogHelper.createLog(user.id, patientId, TABLE_NAME.RTM, LogAction.Update, null, null, null, null);
+			ActivityLogHelper.createLog(user?.id, user?.id, TABLE_NAME.RTM, LogAction.Update, null, null, null, null);
 			res.json(createdPainSession);
 		})
 		.catch((err) => next(err));

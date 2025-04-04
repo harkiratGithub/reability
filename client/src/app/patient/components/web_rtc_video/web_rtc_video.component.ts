@@ -190,7 +190,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   async ngOnInit() {
     if (this.isMobile) {
       this.THERAPIST_REGULAR_VIDEO_CLASS = 'therapist-video-regular-video-mobile';
-      this.THERAPIST_ENLARGE_VIDEO_CLASS = 'therapist-video-enlarge-video-mobile';
+      this.THERAPIST_ENLARGE_VIDEO_CLASS = 'therapist-video-enlarge-video-mobile';      
     }
     this.searchCameraInterval = setInterval(async () => {
       this.userHasCamera = await this.hasUserCamera();
@@ -203,7 +203,11 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         this.handleCameraAvailability();
       }
     }, this.NO_CAMERA_MESSAGE_DELAY);
+    console.log("======going to set mobile device =========",this.isMobile);
+      this.handleMobileAvailability(this.isMobile);
 
+    console.log("======going to set mobile device =========",this.isMobile);
+    this.handleMobileAvailability(this.isMobile);
     this.localVideo = document.getElementById('patient-video');
 
     if (this.showLocalVideo) {
@@ -390,6 +394,11 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     this.isCameraCheckComplete = true;
   }
 
+  handleMobileAvailability(isMobile) {
+    console.log("going to save mobile device",isMobile);
+    this.ajaxService.updatePatientMobileAvailability(this.currentUser.patientId, isMobile);    
+  }
+
   skeletonLoadingBar = () => {
     if (this.isMobile) {
       return;
@@ -432,9 +441,13 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     return ['iPad', 'iPhone', 'iPod'].indexOf(navigator.platform) >= 0;
   };
   */
-
+/*
   isIosDevice(): boolean {
     return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  }
+  */
+  isIosDevice(): boolean {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) && !('MSStream' in window);
   }
 
   isBodyTrackingReady = () => {
@@ -556,11 +569,13 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         this.remoteVideo.play();
       };
       if ('srcObject' in this.remoteVideo) {
-        this.remoteVideo.srcObject = stream;
+        //this.remoteVideo.srcObject = stream;
+        (this.remoteVideo as any).srcObject = stream;
       } else if (navigator['mozGetUserMedia']) {
         (this.remoteVideo as any).mozSrcObject = stream;
       } else {
-        (this.remoteVideo as any).src = (window.URL || window.webkitURL).createObjectURL(stream);
+        //(this.remoteVideo as any).src = (window.URL || window.webkitURL).createObjectURL(stream);
+        (this.remoteVideo as any).srcObject = stream;
       }
 
       this.remoteVideo.id = 'therapist-video';
@@ -593,11 +608,13 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     }
 
     if ('srcObject' in this.remoteVideo) {
-      this.remoteVideo.srcObject = stream;
+      //this.remoteVideo.srcObject = stream;
+      (this.remoteVideo as any).srcObject = stream;
     } else if (navigator['mozGetUserMedia']) {
       (this.remoteVideo as any).mozSrcObject = stream;
     } else {
-      (this.remoteVideo as any).src = (window.URL || window.webkitURL).createObjectURL(stream);
+      //(this.remoteVideo as any).src = (window.URL || window.webkitURL).createObjectURL(stream);
+      (this.remoteVideo as any).srcObject = stream;
     }
 
     this.remoteVideo.id = 'therapist-video';
@@ -638,7 +655,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   };
 
   hasUserMedia() {
-    return navigator.getUserMedia;
+   // return navigator.getUserMedia;
+   return navigator.mediaDevices.getUserMedia;
   }
 
   isDepthCameraConnected = () => {

@@ -4,7 +4,7 @@
 // The list of which env maps to which file can be found in `.angular-cli.json`.
 const MY_IP = '192.168.1.55'; 
 //const MY_IP = '192.168.50.40'; // EREZ Office ip
-// const MY_IP = '192.168.50.68'; // UZI Office ip
+//const MY_IP = '192.168.50.68'; // UZI Office ip
 //const MY_IP = '192.168.0.51'; // UZI HOME
 //const MY_IP = '192.168.43.245'; // UZI CELLPHONE 
 

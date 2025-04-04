@@ -621,8 +621,7 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
           //this.authenticationService.logout();
         } else {
           this.quitGame();
-        }
-          */
+        }*/
       }
     }
   };

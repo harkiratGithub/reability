@@ -297,6 +297,9 @@ export const getPatientActivities = async (patientId, startTime, endTime) => {
 export const updatePatientCameraAvailability = async (id, has_camera, client = null) =>
 	await PatientModel.updatePatientCameraAvailability(id, has_camera, client);
 
+export const updatePatientMobileAvailability = async (id, is_mobile, client = null) =>
+	await PatientModel.updatePatientMobileAvailability(id, is_mobile, client);
+
 export const updatePatient = async (patientId: number, patient: PatientModel.IPatientModel, client = null) => {
 	const updatedPatient = await BaseModel.updateRowByField(
 		TABLE_NAME.PATIENT,

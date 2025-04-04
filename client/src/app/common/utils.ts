@@ -346,7 +346,12 @@ export const filterHandMovments = (l_x, l_y, r_x, r_y, frameWidth, frameHeight, 
 };
 
 export const isMobileDevice = () => {
-  return 'ontouchstart' in window || navigator.msMaxTouchPoints || isIosMobile();
+  //return 'ontouchstart' in window || navigator.msMaxTouchPoints || isIosMobile();
+  return (
+    'ontouchstart' in window ||
+    (navigator.maxTouchPoints && navigator.maxTouchPoints > 0) ||
+    isIosMobile()
+  );
 };
 
 const isIosMobile = () => {

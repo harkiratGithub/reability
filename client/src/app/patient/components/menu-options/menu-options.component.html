@@ -282,55 +282,7 @@
       (sendShowTimerForTherapist)="sendShowTimerForTherapist($event)"
       [isMobile]="isMobile"
     ></app-game-intro>
-    <div class="middle-section mobile">
-      <div class="content-background">
-        <div id="menu-container" class="menu-container movingRightAnimation">
-          <div *ngFor="let app of currentMenuApps; let i = index" class="menu-item">
-            <div class="img-wrapper">
-              <span *ngIf="!app.isEnabled">
-                <div class="enabled disabled">
-                  <img [src]="app.image" />
-                  <div class="gradient-overlay"></div>
-                  <p class="app-name">{{ app.name }}</p>
-                </div>
-              </span>
-              <span *ngIf="app.isEnabled">
-                <div
-                  *ngIf="!isTherapistMode"
-                  appHand
-                  [clickOnlyOnCenter]="true"
-                  [hoverClass]="'pressed'"
-                  [delayAnimation]="500"
-                  [timeToWait]="2000"
-                  [selectable]="app.isEnabled"
-                  (click)="navigate(i)"
-                  (outputFunc)="navigate(i)"
-                  class="enabled"
-                >                 
-                  <div class="skeleton-game-icon-wrapper">
-                    <div class="bodytrack-icon-background" *ngIf="app.bodyTrackRequired"></div>
-                    <img
-                      class="skeleton-image"
-                      src="../../../../assets/skel/waving_hand_black_24dp.svg"
-                      *ngIf="app.bodyTrackRequired"
-                    />
-                  </div>
-                  <img class="game-image" [src]="app.image" />
-                  <div class="gradient-overlay"></div>
-                  <p class="app-name">{{ app.name }}</p>
-                </div>
-                <div *ngIf="isTherapistMode" class="enabled" (click)="navigate(i)">                  
-                  <img class="game-image" [src]="app.image" />
-                  <div class="gradient-overlay"></div>
-                  <p class="app-name">{{ app.name }}</p>
-                </div>
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
+    
     <div class="game-screen-mobile" *ngIf="isInGame || (isTherapistMode && isConnectedUserInGame)">
       <app-game-wrapper
         #gameWrapper
@@ -381,5 +333,46 @@
       [isMobile]="isMobile"
     >
     </app-web-rtc-video>
+
+    <div class="middle-section mobile">
+      <div class="content-background">
+        <div id="menu-container" class="menu-container movingRightAnimation">
+          <div *ngFor="let app of currentMenuApps; let i = index" class="menu-item">
+            <div class="img-wrapper">
+              <span *ngIf="!app.isEnabled">
+                <div class="enabled disabled">
+                  <img [src]="app.image" />
+                  <div class="gradient-overlay"></div>
+                  <p class="app-name">{{ app.name }}</p>
+                </div>
+              </span>
+              <span *ngIf="app.isEnabled">
+                <div
+                  *ngIf="!isTherapistMode"
+                  appHand
+                  [clickOnlyOnCenter]="true"
+                  [hoverClass]="'pressed'"
+                  [delayAnimation]="500"
+                  [timeToWait]="2000"
+                  [selectable]="app.isEnabled"
+                  (click)="navigate(i)"
+                  (outputFunc)="navigate(i)"
+                  class="enabled"
+                >
+                  <img class="game-image" [src]="app.image" />
+                  <div class="gradient-overlay"></div>
+                  <p class="app-name">{{ app.name }}</p>
+                </div>
+                <div *ngIf="isTherapistMode" class="enabled" (click)="navigate(i)">
+                  <img class="game-image" [src]="app.image" />
+                  <div class="gradient-overlay"></div>
+                  <p class="app-name">{{ app.name }}</p>
+                </div>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

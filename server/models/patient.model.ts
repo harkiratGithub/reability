@@ -393,6 +393,18 @@ export const updatePatientCameraAvailability = async (id, has_camera, client = n
 	return result.rows;
 };
 
+export const updatePatientMobileAvailability = async (id, is_mobile, client = null) => {
+	const query = squelPostgres
+		.update()
+		.table(TABLE_NAME.PATIENT)
+		.set('is_mobile', is_mobile)
+		.where(`id = ?`, id)
+		.returning('*')
+		.toParam();
+	const result = await BaseModel.runQuery(query, client);
+	return result.rows;
+};
+
 export const updatePatientTechIssue = async (id, techIssue, client = null) => {
 	const selectOldValue = `(SELECT tech_issue FROM ${TABLE_NAME.PATIENT} WHERE id = ${id} FOR UPDATE)`;
 	const query = squelPostgres
@@ -422,6 +434,7 @@ export const getPatientById = async (id: number) => {
 		.field(`${TABLE_NAME.PATIENT}.login_notification_email`)
 		.field(`${TABLE_NAME.PATIENT}.referral`)
 		.field(`${TABLE_NAME.PATIENT}.has_camera`)
+		.field(`${TABLE_NAME.PATIENT}.is_mobile`)
 		.field(`${TABLE_NAME.USER}.logged_in_at`)
 		.field(`${TABLE_NAME.USER}.email`)
 		.field(`${TABLE_NAME.USER}.user_name`)

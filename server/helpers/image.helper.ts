@@ -163,3 +163,4 @@ export const deleteImage = async (id, bucketName, client = null) => {
         throw err;
     }
 };
+

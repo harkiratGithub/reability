@@ -54,7 +54,9 @@ export class SearchComponent implements OnInit, OnDestroy, AfterViewInit {
   @Output() filterTextChanged = new EventEmitter<string>();
   @Output() monthChanged = new EventEmitter<{ month: string; year: string }>();
   @Output() sendmonthChanged = new EventEmitter<{ month: string; year: string }>();
-  monthControl = new FormControl(moment().toISOString(), [Validators.required, this.monthValidator]);
+  //monthControl = new FormControl(moment().toISOString(), [Validators.required, this.monthValidator]);
+  monthControl = new FormControl(moment(), [Validators.required, this.monthValidator]); // Use Moment type directly
+
   keyUp = new Subject<KeyboardEvent>();
   subscription: Subscription = new Subscription();
   minDate: Moment;
