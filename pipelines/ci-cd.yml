@@ -76,29 +76,26 @@ stages:
         echo "NEW_RELIC=${NEW_RELIC}" >> .env
         echo "NEW_RELIC_APPLICATION_LOGGING_FORWARDING_ENABLED=${NEW_RELIC_APPLICATION_LOGGING_FORWARDING_ENABLED}" >> .env
         echo "EMAIL_LANGUAGE=${EMAIL_LANGUAGE}" >> .env
-        pwd
-        ls -la
-        cat .env
-        cat ./client/src/environments/environment.prod.ts
-#     - template: /pipelines/CI/ci.yaml@Pipelines
+        
+    - template: /pipelines/CI/ci.yaml@Pipelines
 
-# - stage: DeployStage
-#   jobs:
-#   - job:
-#     displayName: Deploy frontend image
-#     workspace:
-#         clean: all
-#     steps:
-#     - script: |
-#         if [ "$(Build.SourceBranchName)" == "demo-env" ]; then
-#           echo "##vso[task.setvariable variable=WebAppName]demo-reability"
-#         elif [ "$(Build.SourceBranchName)" == "us-env" ]; then
-#           echo "##vso[task.setvariable variable=WebAppName]us-reability"
-#         elif [ "$(Build.SourceBranchName)" == "app-env" ]; then
-#           echo "##vso[task.setvariable variable=WebAppName]app-reability"
-#         fi
-#       displayName: 'Set WebAppName Variable'
-#     - template: /pipelines/CD/cd.yaml@Pipelines
-#       parameters:
-#         WebAppName: $(WebAppName)
-#         DockerNamespaceName: 'acrreability.azurecr.io'
+- stage: DeployStage
+  jobs:
+  - job:
+    displayName: Deploy frontend image
+    workspace:
+        clean: all
+    steps:
+    - script: |
+        if [ "$(Build.SourceBranchName)" == "demo-env" ]; then
+          echo "##vso[task.setvariable variable=WebAppName]demo-reability"
+        elif [ "$(Build.SourceBranchName)" == "us-env" ]; then
+          echo "##vso[task.setvariable variable=WebAppName]us-reability"
+        elif [ "$(Build.SourceBranchName)" == "app-env" ]; then
+          echo "##vso[task.setvariable variable=WebAppName]app-reability"
+        fi
+      displayName: 'Set WebAppName Variable'
+    - template: /pipelines/CD/cd.yaml@Pipelines
+      parameters:
+        WebAppName: $(WebAppName)
+        DockerNamespaceName: 'acrreability.azurecr.io'
