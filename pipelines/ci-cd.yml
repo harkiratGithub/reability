@@ -77,7 +77,7 @@ stages:
         echo "NEW_RELIC=${NEW_RELIC}" >> .env
         echo "NEW_RELIC_APPLICATION_LOGGING_FORWARDING_ENABLED=${NEW_RELIC_APPLICATION_LOGGING_FORWARDING_ENABLED}" >> .env
         echo "EMAIL_LANGUAGE=${EMAIL_LANGUAGE}" >> .env
-
+        cat .env
     - task: Docker@0
       displayName: 'Build an image'
       inputs:
