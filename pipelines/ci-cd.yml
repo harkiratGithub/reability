@@ -48,7 +48,7 @@ stages:
         echo "PROXY=${PROXY}" >> .env
         echo "ENCRYPTION_KEY=${ENCRYPTION_KEY}" >> .env
         echo "ENCRYPTION_IV=${ENCRYPTION_IV}" >> .env
-        echo "SECRET_KEY_SESSION=${SECRET_KEY_SESSION}" >> .env
+        echo "SECRET_KEY_SESSION=${SESSION_VALUE_SECRET_KEY}" >> .env
         echo "LOGGER_TOKEN=${LOGGER_TOKEN}" >> .env
         echo "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}" >> .env
         echo "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}" >> .env
