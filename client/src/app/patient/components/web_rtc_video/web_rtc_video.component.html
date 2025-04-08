@@ -29,11 +29,11 @@
 </div>
 
 <div class="videos-wrapper">
-  <div class="videoWrapParent" *ngIf="this.currentUser.id == 1802 || this.currentUser.id == 1793">
+  <!-- <div class="videoWrapParent" *ngIf="this.currentUser.id == 1802 || this.currentUser.id == 1793">
     <div class="videoWrap">
       <video id="mediaElement" class="videoEle show" style="border-radius: 0.7rem; height:100% ;width: 100%" autoplay></video>
     </div>
-  </div>
+  </div> -->
 
   <div class="video-content-container" id="web-rtc-wrapper" [ngClass]="{
       'video-content-container-regular-video': !enlargeVideo,
@@ -55,14 +55,6 @@
         <div class="dark-background"></div>
         <img src="../../../../assets/main-menu/no_camera.svg" />
       </div> -->
-      <div class="distance-warning" style="justify-content: space-between;" *ngIf="this.currentUser.id == 1802 || this.currentUser.id == 1793">
-        <div class="icon">
-          <img src="../../../../assets/game-icons/camera-icon.svg" alt="Camera Icon" />
-        </div>
-        <span class="message">Left Hand: {{leftComment}}</span>
-        <span class="message">Right Hand: {{rightComment}}</span>
-        <!-- <button (click)="playCommentAudio()">Play Audio</button> -->
-      </div>
 
       <video *ngIf="this.currentUser.id == 1802 || this.currentUser.id == 1793" id="patient-video" [ngClass]="{
                 'patient-video-regular-video': !enlargeVideo,
@@ -110,12 +102,6 @@
         }" width="257" height="192" class="patient-canvas"></canvas>
 
       <canvas *ngIf="this.currentUser.id == 1802 || this.currentUser.id == 1793" #canvasElement2 width="291" height="290" style="width: 100%;transform: scaleX(-1);"></canvas>
-
-      <div class="text-container" *ngIf="this.currentUser.id == 1802 || this.currentUser.id == 1793">
-        <span class="text-group">LS: {{cameraAngle.leftWrist | number: '1.2-2'}}</span>
-        <span class="separator">|</span>
-        <span class="text-group">RS: {{cameraAngle.rightWrist | number: '1.2-2'}}</span>
-      </div>
 
       <div *ngIf="trackBody && showAngles" class="angles">
         <div *ngFor="let organAngle of organAngles; let i = index" [ngClass]="{ 'angle-left': i % 2 === 0, 'angle-right': i % 2 !== 0 }">
