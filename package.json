@@ -66,7 +66,6 @@
 		"express-jwt": "^8.5.1",
 		"express-session": "^1.17.1",
 		"helmet": "^4.2.0",
-		"jimp": "^1.6.0",
 		"jsonwebtoken": "^9.0.2",
 		"lodash": "^4.17.19",
 		"luxon": "^3.5.0",

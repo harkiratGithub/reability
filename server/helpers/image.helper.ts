@@ -23,13 +23,12 @@ export const deleteImage = async (id, bucketName, client = null) => {
 };
 */
 
-const Jimp = require("jimp");
 import { v4 as uuidv4 } from "uuid";
 import { SharedKeyCredential, StorageURL, ServiceURL, ContainerURL, BlockBlobURL, Aborter } from "@azure/storage-blob";
 import * as ImageModel from '../models/image.model';
 
 // Function to resize and crop the image
-const resizeAndCropImage = async (imageBuffer: Buffer, width: number, height: number) => {
+/*const resizeAndCropImage = async (imageBuffer: Buffer, width: number, height: number) => {
     try {
         const image = await Jimp.read(imageBuffer);
         image
@@ -42,6 +41,7 @@ const resizeAndCropImage = async (imageBuffer: Buffer, width: number, height: nu
         throw err;
     }
 };
+*/
 
 export const createImage = async (
     imageKey: string,
@@ -54,10 +54,10 @@ export const createImage = async (
         const fileName = `${uuidv4()}.${extension}`;
         let fileBuffer = imageContent.buffer;
 
-        if (bucketName === 'gertner-images') {
-            // Call the resizeAndCropImage function
+       /* if (bucketName === 'gertner-images') {
             fileBuffer = await resizeAndCropImage(fileBuffer, 800, 800);
         }
+        */
 
         // Azure Blob Storage configuration
         const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
