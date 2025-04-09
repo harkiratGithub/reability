@@ -5,7 +5,7 @@
 		"node": "20.19.8"
 	},
 	"scripts": {
-		"heroku-postbuild": "npm run config-angular && cd client && npm install --legacy-peer-deps && npm run postinstall-peerjs && npm run build",
+		"heroku-postbuild": "cd client && npm install --legacy-peer-deps && npm run postinstall-peerjs && npm run build",
 		"config-angular": "ts-node ./server/tasks/config-env.ts",
 		"start": "ts-node server/server.ts",
 		"start:development": "npm run build:develop --prefix client && NODE_ENV=development NEW_RELIC_APP_NAME=Reability NEW_RELIC_LICENSE_KEY=fad76ee1ffddc459093b888a5d620588FFFFNRAL nodemon --experimental-loader=newrelic/esm-loader.mjs ./server/server.ts",
@@ -56,7 +56,7 @@
 		"@supercharge/request-ip": "^1.1.2",
 		"aws-sdk": "^2.710.0",
 		"axios": "^1.8.3",
-		"bcrypt": "^5.1.1",
+		"bcryptjs": "^3.0.2",
 		"connect-pg-simple": "^6.2.1",
 		"cors": "^2.8.5",
 		"crypto": "^1.0.1",
@@ -66,6 +66,7 @@
 		"express-jwt": "^8.5.1",
 		"express-session": "^1.17.1",
 		"helmet": "^4.2.0",
+		"jimp": "^1.6.0",
 		"jsonwebtoken": "^9.0.2",
 		"lodash": "^4.17.19",
 		"luxon": "^3.5.0",
@@ -86,7 +87,6 @@
 		"rimraf": "^3.0.2",
 		"rootpath": "^0.1.2",
 		"rxjs": "^7.8.2",
-		"sharp": "^0.30.7",
 		"speakeasy": "^2.0.0",
 		"squel": "^5.13.0",
 		"tinyurl": "^1.1.7",

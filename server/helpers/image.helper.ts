@@ -23,43 +23,43 @@ export const deleteImage = async (id, bucketName, client = null) => {
 };
 */
 
-import sharp from "sharp";
+const Jimp = require("jimp");
 import { v4 as uuidv4 } from "uuid";
 import { SharedKeyCredential, StorageURL, ServiceURL, ContainerURL, BlockBlobURL, Aborter } from "@azure/storage-blob";
 import * as ImageModel from '../models/image.model';
 
 // Function to resize and crop the image
-const resizeAndCropImage = async (imageBuffer, width, height, fit = 'inside', position = 'center') => {
+const resizeAndCropImage = async (imageBuffer: Buffer, width: number, height: number) => {
     try {
-        const resizedBuffer = await sharp(imageBuffer)
-            .resize({
-                width,
-                height,
-                fit,
-                position,
-                background: { r: 0, g: 0, b: 0, alpha: 1 }, // Black background for empty areas
-            })
-            .toBuffer();
+        const image = await Jimp.read(imageBuffer);
+        image
+            .resize(width, height) // Resizes the image
+            .background(0x000000FF); // Sets the black background for empty areas
 
-        return resizedBuffer;
+        return await image.getBufferAsync(Jimp.MIME_PNG); // Returns processed image as Buffer
     } catch (err) {
         console.error("Error resizing and cropping image:", err.message);
         throw err;
     }
 };
 
-
-export const createImage = async (imageKey, imageContent, bucketName, client = null) => {
+export const createImage = async (
+    imageKey: string,
+    imageContent: { buffer: Buffer; mimetype: string },
+    bucketName: string,
+    client = null
+) => {
     try {
         const extension = imageContent.mimetype.split('/')[1];
         const fileName = `${uuidv4()}.${extension}`;
         let fileBuffer = imageContent.buffer;
+
         if (bucketName === 'gertner-images') {
             // Call the resizeAndCropImage function
             fileBuffer = await resizeAndCropImage(fileBuffer, 800, 800);
         }
 
-        // Step 3: Azure Blob Storage configuration
+        // Azure Blob Storage configuration
         const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
         const accountKey = process.env.AZURE_STORAGE_ACCOUNT_KEY;
         const sharedKeyCredential = new SharedKeyCredential(accountName, accountKey);
@@ -73,18 +73,18 @@ export const createImage = async (imageKey, imageContent, bucketName, client = n
         const blockBlobURL = BlockBlobURL.fromContainerURL(containerURL, fileName);
         const aborter = Aborter.timeout(30 * 60 * 1000); // 30 minutes timeout
 
-        // Step 4: Upload the processed file to Azure Blob Storage
+        // Upload the processed file to Azure Blob Storage
         await blockBlobURL.upload(aborter, fileBuffer, fileBuffer.length, {
             blobHTTPHeaders: {
-                blobContentType: imageContent.mimetype, // Sets the correct MIME type
+                blobContentType: imageContent.mimetype,
             },
         });
 
-        // Step 5: Construct the file URL
+        // Construct the file URL
         const fileURL = `https://${accountName}.blob.core.windows.net/${bucketName}/${fileName}`;
         console.log("Uploaded File URL:", fileURL);
 
-        // Step 6: Save the image metadata to the database
+        // Save the image metadata to the database
         const row = await ImageModel.addImage(imageKey, fileURL, client);
         console.log("Database Record ID:", row.id);
 
@@ -94,6 +94,7 @@ export const createImage = async (imageKey, imageContent, bucketName, client = n
         throw err;
     }
 };
+
 
 /*
 export const deleteImage = async (id, bucketName, client = null) => {
