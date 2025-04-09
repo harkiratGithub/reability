@@ -4,13 +4,14 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  # Dynamically set variable group based on source branch
-  - ${{ if eq(variables['Build.SourceBranchName'], 'refs/heads/demo-env') }}:
-      - group: demo-env-variables
-  - ${{ if eq(variables['Build.SourceBranchName'], 'refs/heads/app-env') }}:
-      - group: app-env-variables
-  - ${{ if eq(variables['Build.SourceBranchName'], 'refs/heads/us-env') }}:
-      - group: us-env-variables
+  - group: app-env-variables
+  # # Dynamically set variable group based on source branch
+  # - ${{ if eq(variables['Build.SourceBranchName'], 'refs/heads/demo-env') }}:
+  #     - group: demo-env-variables
+  # - ${{ if eq(variables['Build.SourceBranchName'], 'refs/heads/app-env') }}:
+  #     - group: app-env-variables
+  # - ${{ if eq(variables['Build.SourceBranchName'], 'refs/heads/us-env') }}:
+  #     - group: us-env-variables
 
 resources:
   repositories:
