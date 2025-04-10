@@ -245,33 +245,6 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           this.landmarksPointer = [];
           this.matchingCameraData = [];
           this.landmarksLinePointer = [];
-          const apiKey = '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'
-          const body = {
-            model: 'gpt-4o-mini', // Or 'gpt-3.5-turbo'
-            messages: [{
-              role: 'user',
-              content: `
-              JSON Array: ${updateComments},
-              Based on above array, give a 1 liner, with 10 seconds max speech time, description on how the patient has perform the exercise.
-              `
-            }]
-          };
-
-          // const response = await fetch(`https://api.openai.com/v1/chat/completions`, {
-          //   method: "POST",
-          //   headers: {
-          //     "Content-Type": "application/json",
-          //     "Authorization": `Bearer ${apiKey}`,
-          //   },
-          //   body: JSON.stringify(body)
-          // });
-
-          // const data = await response.json();
-          // if (data.choices.length > 0)
-          //   this.heygenAPIService.sendText(data?.choices[0].message?.content);
-          // setTimeout(() => {
-          //   this.heygenAPIService.onClose()
-          // }, 15000);
 
           this.ajaxService.savePatientMetaData({
             game_id: this.gameId,
@@ -292,6 +265,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
             this.videoMinMax = [];
             this.landmarksPointer = [];
             this.landmarksLinePointer = [];
+            clearInterval(this.newInterval);
             const videoName = action.msg?.data?.source?.split('/')[5];
             this.ajaxService.getGameMetaData(videoName).subscribe(async (gamesettings) => {
               if (gamesettings.length > 0) {
@@ -343,52 +317,12 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                     this.startTime = Date.now();
                     this.currentVideoIndex = 0;
                     this.initializeCameraPoseModels()
-                    // setTimeout(() => {
-                    //   // this.remoteVideo.pause();
-                    //   this.patientWebRtcService.setShouldPauseGameState(true);
-                    // }, 5000);
-                    // setTimeout(() => {
-                    //   // this.remoteVideo.pause();
-                    //   this.patientWebRtcService.setShouldPauseGameState(false);
-                    // }, 10000);
-                    // if (this.videoIndex == 0)
-                    //   this.heygenAPIService.onStart();
 
                     if (this.videoIndex > 0) {
                       this.skeltonProgressBarService.setBarElement('' + 0);
                       const results = await this.matchClipAndPatientData(this.lastVideoMinMax, this.matchingCameraData);
                       const updateComments = await this.updateComments(results);
 
-                      const apiKey = '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'
-                      const body = {
-                        model: 'gpt-4o-mini', // Or 'gpt-3.5-turbo'
-                        messages: [{
-                          role: 'user',
-                          content: `
-                          JSON Array: ${updateComments},
-                          Based on above array, give a 1 liner, with 10 seconds max speech time, description on how the patient has perform the exercise.
-                        `
-                        }]
-                      };
-
-                      // const response = await fetch(`https://api.openai.com/v1/chat/completions`, {
-                      //   method: "POST",
-                      //   headers: {
-                      //     "Content-Type": "application/json",
-                      //     "Authorization": `Bearer ${apiKey}`,
-                      //   },
-                      //   body: JSON.stringify(body)
-                      // });
-
-                      // const data = await response.json();
-                      // if (data.choices.length > 0)
-                      //   this.heygenAPIService.sendText(data?.choices[0].message?.content);
-                      // setTimeout(async () => {
-                      //   this.heygenAPIService.onClose();
-                      //   setTimeout(() => {
-                      //     this.heygenAPIService.onStart();
-                      //   }, 1000)
-                      // }, 15000);
                       this.ajaxService.savePatientMetaData({
                         game_id: this.gameId,
                         settings: updateComments,
@@ -1795,6 +1729,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   }
 
   private initializePoseModels() {
+    console.log('initializePoseModels');
     // this.videoPose = new Pose({
     //   locateFile: (file) =>
     //     `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`,
@@ -1817,8 +1752,9 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     // this.videoPose.onResults((results: Results) => {
     //   this.onPoseVideoResults(results, this.canvasElement1.nativeElement);
     // });
+    this.showMarker = false;
     this.cameraPose.onResults((results: Results) => {
-      this.onPoseCameraResults(false, results, this.canvasElement2.nativeElement);
+      this.onPoseCameraResults(results, this.canvasElement2.nativeElement);
     });
 
     // this.videoElement.nativeElement.onloadeddata = () => {
@@ -1858,6 +1794,10 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       `;
     }
 
+    if (badLeftPercent > matchPercent && badRightPercent > matchPercent) {
+      feedbackPrompt += `Combine the feedback from both left and right hands in 10 words with no pointers.`;
+    }
+
     console.log('dataArray:', performedComments);
     if (feedbackPrompt) {
       this.callChatGPT = true
@@ -1887,8 +1827,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
             model: 'gpt-4o-mini', // Or 'gpt-3.5-turbo'
             messages: [{
               role: 'user',
-              content: `Feedback: ${content}. Make above feedback in one statement without any pointers in 10 words.
-              `
+              content: `Feedback: ${content}. Make above feedback in one statement without any pointers in 10 words.`
             }]
           };
           const datas = await this.chatGPTAPI(JSON.stringify(bodys));
@@ -1920,6 +1859,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   }
 
   private initializeCameraPoseModels() {
+    console.log('initializeCameraPoseModels');
+
     // this.videoPose = new Pose({
     //   locateFile: (file) =>
     //     `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`,
@@ -1942,8 +1883,9 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     // this.videoPose.onResults((results: Results) => {
     //   this.onPoseVideoResults(results, this.canvasElement1.nativeElement);
     // });
+    this.showMarker = true;
     this.cameraPose.onResults((results: Results) => {
-      this.onPoseCameraResults(true, results, this.canvasElement2.nativeElement);
+      this.onPoseCameraResults(results, this.canvasElement2.nativeElement);
     });
 
     // this.videoElement.nativeElement.onloadeddata = () => {
@@ -2016,11 +1958,9 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   }
 
   private onPoseCameraResults(
-    showMarker: boolean,
     results: Results,
     canvasElement: HTMLCanvasElement
   ) {
-    this.showMarker = showMarker;
     const canvasCtx = canvasElement.getContext('2d');
     if (canvasCtx) {
       canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
@@ -2369,11 +2309,6 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       this.callChatGPT = false;
       this.showMarker = true;
     }
-    // setTimeout(() => {
-    //   window.speechSynthesis.cancel();
-    //   this.patientWebRtcService.setShouldPauseGameState(false);
-    //   // this.initializeCameraPoseModels();
-    // }, 10000);
   }
 }
 
