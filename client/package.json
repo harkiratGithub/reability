@@ -4,7 +4,7 @@
     "node": "12.18.2"
   },
   "scripts": {
-    "heroku-postbuild": "npm run config-angular && cd client && npm install && npm run build",
+    "heroku-postbuild": "npm install",
     "start": "ng serve",
     "build": "node --max_old_space_size=8192 ./node_modules/@angular/cli/bin/ng build --prod",
     "build:develop": "node --max_old_space_size=8192 ./node_modules/@angular/cli/bin/ng build",
