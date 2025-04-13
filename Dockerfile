@@ -1,5 +1,5 @@
 # Use an official Node.js 12.18.2 image with Alpine Linux
-FROM node:12.18.2
+FROM node:14.18.3
 
 # Set the working directory
 WORKDIR /usr/src/app
