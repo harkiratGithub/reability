@@ -92,7 +92,6 @@ app.get('/', (req, res) => {
 });
 
 app.use('/', AuthRouter);
-
 // common
 app.post('/users/sendHeartBeat', permitAccess(), UserController.updateHeartBeat);
 app.post('/patient/validGames', permitAccess(), permitTherapistAccessToPatient(), PatientController.getValidGames);
