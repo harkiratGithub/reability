@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { reduce } from 'lodash';
 import { FIELDS_TO_DECRYPT, FIELDS_TO_ENCRYPT } from '../const';
