@@ -101,7 +101,7 @@
           'hide-video': !showLocalVideo || !showPatientVideo || !displaySkeleton
         }" width="257" height="192" class="patient-canvas"></canvas>
 
-      <canvas *ngIf="this.currentUser.id == 1802 || this.currentUser.id == 1793" #canvasElement2 width="291" height="290" style="width: 100%;transform: scaleX(-1);"></canvas>
+      <canvas *ngIf="this.currentUser.id == 1802 || this.currentUser.id == 1793" #canvasElement2 style="width: 100%;transform: scaleX(-1);min-height: 30vh;height: auto;border-radius: 10px;object-fit: fill;"></canvas>
 
       <div *ngIf="trackBody && showAngles" class="angles">
         <div *ngFor="let organAngle of organAngles; let i = index" [ngClass]="{ 'angle-left': i % 2 === 0, 'angle-right': i % 2 !== 0 }">

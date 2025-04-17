@@ -108,7 +108,7 @@
       '': !this.enlargeVideo,
       'right-section-enlarge-video': this.enlargeVideo,
       'hide-section': isShareScreen
-    }" [ngStyle]="{ 'justify-content': isTherapistMode ? 'unset' : 'space-between', width: currentUser.id == 1802 || currentUser.id == 1793 ? '32%' : '22%' }">
+    }">
     <div class="greeting" [ngClass]="{ 'greeting-flexbox': !isInGame, 'greeting-therapist': isTherapistMode && isConnectedUserInGame }">
       <p *ngIf="!isInGame && !isTherapistMode" class="user-greeting">Hi,</p>
       <h2 class="user-name" *ngIf="!isInGame || (isTherapistMode && !isConnectedUserInGame)">

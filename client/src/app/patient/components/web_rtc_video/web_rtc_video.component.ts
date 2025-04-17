@@ -1909,8 +1909,6 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       onFrame: async () => {
         await this.cameraPose.send({ image: this.cameraElement.nativeElement });
       },
-      width: 291,
-      height: 290,
     });
     this.camera.start();
   }
