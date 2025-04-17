@@ -110,7 +110,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
   hangupConfirmBtn: boolean = false;
   enlarge: boolean = false;
   sendEmailTimeoutConnection;
-  InstituteLogo: string ;
+  InstituteLogo: string;
   isPatientOnMobile: boolean = false;
   constructor(
     private authenticationService: AuthenticationService,
@@ -123,7 +123,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
     private ref: ChangeDetectorRef,
     public appActions: AppActions
   ) {
-    this.connectedTherapist = this.authenticationService.currentUserValue;   
+    this.connectedTherapist = this.authenticationService.currentUserValue;
     this.InstituteLogo = this.connectedTherapist?.instituteLogo || '';
     this.subscription.add(
       this.keyUp
@@ -226,7 +226,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     if (!this.isPatientVideoInSession && user.hasCamera) {
-      this.selectedUser = user;      
+      this.selectedUser = user;
       const connectedPaitent = this.connectedPaitents.find(
         (paitent) => paitent.connection.peer === this.selectedUser.peerId
       );
@@ -329,7 +329,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       if (user.role === Role.Video_Patient) {
         this.handleVideoPatientSession(user, conn);
       }
-      conn.on('data', (data) => {        
+      conn.on('data', (data) => {
         this.handleMessage(data, conn, user);
       });
       conn.on('close', () => {
@@ -816,7 +816,8 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
   };
 
   hasUserMedia() {
-    return navigator.getUserMedia;
+    // return navigator.getUserMedia;
+    return navigator.mediaDevices.getUserMedia;
   }
 
   hasUserCamera = async (): Promise<boolean> => {
@@ -1222,53 +1223,53 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       connectedPaitent.user.disabledSkeleton
     );
   };
-/*
-  getLoggedInPeers = () => {
-    this.ajax
-      .getOpenPeers()
-      .toPromise()
-      .then((list) => {
-        const availableList = list.filter(
-          (peer) => peer.peerStatus === PeersStatus.AVAILABLE || peer.peerStatus === PeersStatus.CONNECTED
-        );
-        this.ajax
-          .getConnectedPeers()
-          .toPromise()
-          .then((peerUsers) => {
-            this.filteredPatients = this.patients.filter((patient) =>
-              availableList.some(
-                (a) => a.user_id === Number(patient.peerId) && patient.username.includes(this.nameFilter)
-              )
-            );
-            this.filteredPatients = this.filteredPatients.filter((patient) =>
-              peerUsers.some((a) => a.id === patient.peerId)
-            );
-
-            // update hasCamera
-            this.filteredPatients = this.filteredPatients.map((patient) => {
-              const availablePatient = availableList.find((avp) => avp.user_id == patient.peerId);
-              if (availablePatient) {
-                patient.hasCamera = availablePatient.has_camera;
-              }
-              return patient;
+  /*
+    getLoggedInPeers = () => {
+      this.ajax
+        .getOpenPeers()
+        .toPromise()
+        .then((list) => {
+          const availableList = list.filter(
+            (peer) => peer.peerStatus === PeersStatus.AVAILABLE || peer.peerStatus === PeersStatus.CONNECTED
+          );
+          this.ajax
+            .getConnectedPeers()
+            .toPromise()
+            .then((peerUsers) => {
+              this.filteredPatients = this.patients.filter((patient) =>
+                availableList.some(
+                  (a) => a.user_id === Number(patient.peerId) && patient.username.includes(this.nameFilter)
+                )
+              );
+              this.filteredPatients = this.filteredPatients.filter((patient) =>
+                peerUsers.some((a) => a.id === patient.peerId)
+              );
+  
+              // update hasCamera
+              this.filteredPatients = this.filteredPatients.map((patient) => {
+                const availablePatient = availableList.find((avp) => avp.user_id == patient.peerId);
+                if (availablePatient) {
+                  patient.hasCamera = availablePatient.has_camera;
+                }
+                return patient;
+              });
+  
+              // update isMobile
+              this.filteredPatients = this.filteredPatients.map((patient) => {
+                const availablePatientismobile = availableList.find((avp) => avp.user_id == patient.peerId);
+                if (availablePatientismobile) {
+                  patient.isMobile = availablePatientismobile.is_mobile;
+                }
+                return patient;
+              });
+  
+              this.initializeDisconnectedPatients();
+              this.loggedInUserCount = this.filteredPatients.length;
+              // this.ref.detectChanges();
             });
-
-            // update isMobile
-            this.filteredPatients = this.filteredPatients.map((patient) => {
-              const availablePatientismobile = availableList.find((avp) => avp.user_id == patient.peerId);
-              if (availablePatientismobile) {
-                patient.isMobile = availablePatientismobile.is_mobile;
-              }
-              return patient;
-            });
-
-            this.initializeDisconnectedPatients();
-            this.loggedInUserCount = this.filteredPatients.length;
-            // this.ref.detectChanges();
-          });
-      });
-  };
-  */
+        });
+    };
+    */
 
   getLoggedInPeers = async () => {
     try {
@@ -1277,22 +1278,22 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       const availableList = openPeers.filter(
         (peer) => peer.peerStatus === PeersStatus.AVAILABLE || peer.peerStatus === PeersStatus.CONNECTED
       );
-  
+
       // Fetch connected peers
       const connectedPeers = await this.ajax.getConnectedPeers().toPromise();
-  
+
       // Filter patients
       this.filteredPatients = this.patients.filter((patient) =>
         availableList.some(
           (available) => available.user_id === Number(patient.peerId) && patient.username.includes(this.nameFilter)
         )
       );
-  
+
       // Further filter based on connected peers
       this.filteredPatients = this.filteredPatients.filter((patient) =>
         connectedPeers.some((peerUser) => peerUser.id === patient.peerId)
       );
-  
+
       // Update properties (hasCamera, isMobile) in a single iteration
       this.filteredPatients = this.filteredPatients.map((patient) => {
         const availablePatient = availableList.find((avp) => avp.user_id == patient.peerId);
@@ -1302,18 +1303,18 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
           isMobile: availablePatient?.is_mobile || false,
         };
       });
-  
+
       // Initialize disconnected patients and update user count
       this.initializeDisconnectedPatients();
       this.loggedInUserCount = this.filteredPatients.length;
-  
+
       // Detect changes if needed
       // this.ref.detectChanges();
     } catch (error) {
       console.error('Error fetching logged-in peers:', error);
     }
   };
-  
+
 
   initializeDisconnectedPatients = () => {
     const disconnectedPatients = _.differenceBy(this.patients, this.filteredPatients, 'peerId');

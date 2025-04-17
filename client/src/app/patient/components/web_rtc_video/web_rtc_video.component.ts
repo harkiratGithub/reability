@@ -855,7 +855,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   };
 
   hasUserMedia() {
-    return navigator.getUserMedia;
+    // return navigator.getUserMedia;
+    return navigator.mediaDevices.getUserMedia;
   }
 
   isDepthCameraConnected = () => {
