@@ -4,7 +4,8 @@ import { Observable, Subject } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AlertService {
-    private subject = new Subject<any>();
+    // private subject = new Subject<any>();
+    private subject = new Subject<{ type?: string; text?: string }>();
     private keepAfterNavigationChange = false;
 
     constructor(private router: Router) {
@@ -16,7 +17,7 @@ export class AlertService {
                     this.keepAfterNavigationChange = false;
                 } else {
                     // clear alert
-                    this.subject.next();
+                    this.subject.next({});
                 }
             }
         });

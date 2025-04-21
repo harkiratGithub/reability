@@ -107,14 +107,14 @@ export const handleWebCamBuffer = (WebCamBuffer, shouldScaleToFrame, id, iframeE
   depthCameraBuffer[MARKERS.spineMiddle_X] =
     WebCamBuffer[POSE_LANDMARKS_INDEXES.rightShoulder].x > 0 && WebCamBuffer[POSE_LANDMARKS_INDEXES.leftShoulder].x > 0
       ? ((WebCamBuffer[POSE_LANDMARKS_INDEXES.rightShoulder].x + WebCamBuffer[POSE_LANDMARKS_INDEXES.leftShoulder].x) /
-          2) *
-        ADJUST_MARKER_TO_VIDEO_MULTIPLIER *
-        videoWidth
+        2) *
+      ADJUST_MARKER_TO_VIDEO_MULTIPLIER *
+      videoWidth
       : 0;
   depthCameraBuffer[MARKERS.spineMiddle_Y] =
     (((WebCamBuffer[POSE_LANDMARKS_INDEXES.rightHip].y + WebCamBuffer[POSE_LANDMARKS_INDEXES.leftHip].y) / 2 +
       (WebCamBuffer[POSE_LANDMARKS_INDEXES.rightShoulder].y + WebCamBuffer[POSE_LANDMARKS_INDEXES.leftShoulder].y) /
-        2) /
+      2) /
       2) *
     ADJUST_MARKER_TO_VIDEO_MULTIPLIER *
     videoHeight;
@@ -217,8 +217,8 @@ export const handleWebCamBuffer = (WebCamBuffer, shouldScaleToFrame, id, iframeE
   depthCameraBuffer[MARKERS.hipsMiddle_X] =
     WebCamBuffer[POSE_LANDMARKS_INDEXES.rightHip].x > 0 && WebCamBuffer[POSE_LANDMARKS_INDEXES.leftHip].x > 0
       ? ((WebCamBuffer[POSE_LANDMARKS_INDEXES.rightHip].x + WebCamBuffer[POSE_LANDMARKS_INDEXES.leftHip].x) / 2) *
-        ADJUST_MARKER_TO_VIDEO_MULTIPLIER *
-        videoWidth
+      ADJUST_MARKER_TO_VIDEO_MULTIPLIER *
+      videoWidth
       : 0;
 
   // Left Knee
@@ -346,7 +346,12 @@ export const filterHandMovments = (l_x, l_y, r_x, r_y, frameWidth, frameHeight, 
 };
 
 export const isMobileDevice = () => {
-  return 'ontouchstart' in window || navigator.msMaxTouchPoints || isIosMobile();
+  //return 'ontouchstart' in window || navigator.msMaxTouchPoints || isIosMobile();
+  return (
+    'ontouchstart' in window ||
+    (navigator.maxTouchPoints && navigator.maxTouchPoints > 0) ||
+    isIosMobile()
+  );
 };
 
 const isIosMobile = () => {
