@@ -651,7 +651,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   */
 
   isIosDevice(): boolean {
-    return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    // return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) && !('MSStream' in window);
   }
 
   isBodyTrackingReady = () => {
@@ -777,7 +778,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       } else if (navigator['mozGetUserMedia']) {
         (this.remoteVideo as any).mozSrcObject = stream;
       } else {
-        (this.remoteVideo as any).src = (window.URL || window.webkitURL).createObjectURL(stream);
+        // (this.remoteVideo as any).src = (window.URL || window.webkitURL).createObjectURL(stream);
+        (this.remoteVideo as any).srcObject = stream;
       }
 
       this.remoteVideo.id = 'therapist-video';
@@ -814,7 +816,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     } else if (navigator['mozGetUserMedia']) {
       (this.remoteVideo as any).mozSrcObject = stream;
     } else {
-      (this.remoteVideo as any).src = (window.URL || window.webkitURL).createObjectURL(stream);
+      // (this.remoteVideo as any).src = (window.URL || window.webkitURL).createObjectURL(stream);
+      (this.remoteVideo as any).srcObject = stream;
     }
 
     this.remoteVideo.id = 'therapist-video';
