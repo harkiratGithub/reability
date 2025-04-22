@@ -1223,7 +1223,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       connectedPaitent.user.disabledSkeleton
     );
   };
-/*
+
   getLoggedInPeers = () => {
     this.ajax
       .getOpenPeers()
@@ -1269,8 +1269,8 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
           });
       });
   };
-  */
-
+  
+/*
   getLoggedInPeers = async () => {
     try {
       // Fetch open peers
@@ -1314,7 +1314,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       console.error('Error fetching logged-in peers:', error);
     }
   };
-  
+  */
 
   initializeDisconnectedPatients = () => {
     const disconnectedPatients = _.differenceBy(this.patients, this.filteredPatients, 'peerId');
