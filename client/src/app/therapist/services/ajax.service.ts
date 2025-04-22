@@ -460,20 +460,7 @@ export class AjaxService {
           patientId,
           hasMobile,
         })
-        .subscribe(() => {});
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  updatePatientMobileAvailability = (patientId, hasMobile) => {
-    try {
-      return this.http
-        .post<any>(`${this.baseUrl}/patient/mobileAvailability`, {
-          patientId,
-          hasMobile,
-        })
-        .subscribe(() => {});
+        .subscribe(() => { });
     } catch (err) {
       console.error(err);
     }
