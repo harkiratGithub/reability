@@ -184,7 +184,6 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
   ngOnInit() {
     console.log("=======isPatientOnMobile===========", this.isPatientOnMobile);
     console.log("=======isTherapistMode===========", this.isTherapistMode);
-    console.log("we are under ngoninit function ");
     this.appActions.setCurrentGame({ url: 'menu-options', gameId: undefined });
     const canvas: any = document.getElementById('patient-canvas') as HTMLCanvasElement;
     if (canvas) {
@@ -244,7 +243,6 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
     );
 
     this.subscription.add(
-
       this.validGames$.subscribe((games) => {
         this.games = games;
         this.menuApps = [];

@@ -466,6 +466,19 @@ export class AjaxService {
     }
   };
 
+  updatePatientMobileAvailability = (patientId, hasMobile) => {
+    try {
+      return this.http
+        .post<any>(`${this.baseUrl}/patient/mobileAvailability`, {
+          patientId,
+          hasMobile,
+        })
+        .subscribe(() => {});
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   updatePatient = (patient: IPatient): Observable<IPatient> => {
     try {
       return this.http.post<IPatient>(`${this.baseUrl}/therapist/patient`, patient);

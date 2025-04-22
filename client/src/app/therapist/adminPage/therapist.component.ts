@@ -1315,6 +1315,52 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   };
 
+  /*
+    getLoggedInPeers = async () => {
+      try {
+        // Fetch open peers
+        const openPeers = await this.ajax.getOpenPeers().toPromise();
+        const availableList = openPeers.filter(
+          (peer) => peer.peerStatus === PeersStatus.AVAILABLE || peer.peerStatus === PeersStatus.CONNECTED
+        );
+    
+        // Fetch connected peers
+        const connectedPeers = await this.ajax.getConnectedPeers().toPromise();
+    
+        // Filter patients
+        this.filteredPatients = this.patients.filter((patient) =>
+          availableList.some(
+            (available) => available.user_id === Number(patient.peerId) && patient.username.includes(this.nameFilter)
+          )
+        );
+    
+        // Further filter based on connected peers
+        this.filteredPatients = this.filteredPatients.filter((patient) =>
+          connectedPeers.some((peerUser) => peerUser.id === patient.peerId)
+        );
+    
+        // Update properties (hasCamera, isMobile) in a single iteration
+        this.filteredPatients = this.filteredPatients.map((patient) => {
+          const availablePatient = availableList.find((avp) => avp.user_id == patient.peerId);
+          return {
+            ...patient,
+            hasCamera: availablePatient?.has_camera || false,
+            isMobile: availablePatient?.is_mobile || false,
+          };
+        });
+    
+        // Initialize disconnected patients and update user count
+        this.initializeDisconnectedPatients();
+        this.loggedInUserCount = this.filteredPatients.length;
+    
+        // Detect changes if needed
+        // this.ref.detectChanges();
+      } catch (error) {
+        console.error('Error fetching logged-in peers:', error);
+      }
+    };
+    */
+
 
   initializeDisconnectedPatients = () => {
     const disconnectedPatients = _.differenceBy(this.patients, this.filteredPatients, 'peerId');

@@ -46,7 +46,6 @@ export const addUploadedGameRelatedImage = async (file) => {
 export const addAdminRelatedImage = async (file, name) => {
     const extension = file.substring('data:image/'.length, file.indexOf(';base64'));
     const fileName = `${uuidv4()}.${extension}`;
-
     file = file.replace(/^data:image\/png;base64,/, '').replace(/^data:image\/jpeg;base64,/, '');
     const fileBuffer = Buffer.from(file, 'base64');
 

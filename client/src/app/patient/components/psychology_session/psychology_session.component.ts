@@ -125,6 +125,7 @@ export class VideoPatientComponent implements OnInit, OnDestroy {
   }
 
 
+
   hasUserMedia() {
     //return navigator.getUserMedia;
     return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);

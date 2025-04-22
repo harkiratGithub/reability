@@ -649,9 +649,13 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     return ['iPad', 'iPhone', 'iPod'].indexOf(navigator.platform) >= 0;
   };
   */
-
+  /*
+    isIosDevice(): boolean {
+      // return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      return /iPad|iPhone|iPod/.test(navigator.userAgent) && !('MSStream' in window);
+    }
+    */
   isIosDevice(): boolean {
-    // return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     return /iPad|iPhone|iPod/.test(navigator.userAgent) && !('MSStream' in window);
   }
 
@@ -774,7 +778,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         this.remoteVideo.play();
       };
       if ('srcObject' in this.remoteVideo) {
-        this.remoteVideo.srcObject = stream;
+        //this.remoteVideo.srcObject = stream;
+        (this.remoteVideo as any).srcObject = stream;
       } else if (navigator['mozGetUserMedia']) {
         (this.remoteVideo as any).mozSrcObject = stream;
       } else {
@@ -812,7 +817,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     }
 
     if ('srcObject' in this.remoteVideo) {
-      this.remoteVideo.srcObject = stream;
+      //this.remoteVideo.srcObject = stream;
+      (this.remoteVideo as any).srcObject = stream;
     } else if (navigator['mozGetUserMedia']) {
       (this.remoteVideo as any).mozSrcObject = stream;
     } else {

@@ -2,16 +2,17 @@
   <div class="center">
     <div class="left-section">
       <p class="game">Whiteboard</p>
-      <ngx-file-drop dropZoneLabel="Drop files here" (onFileDrop)="dropped($event)">
-        <ng-template ngx-file-drop-content-tmp let-openFileSelector="openFileSelector">
-          <div class="file-drop">
-            <div>Drag files or directory</div>
-            <div>
-              <button type="button" class="browse-btn" (click)="openFileSelector()">Browse Files</button>
-            </div>
-          </div>
-        </ng-template>
-      </ngx-file-drop>
+      <div
+        class="file-drop"
+        (dragover)="onDragOver($event)"
+        (drop)="onFileDrop($event)"
+      >
+        <div>Drag files or directory</div>
+        <div>
+          <button type="button" class="browse-btn" (click)="browseFiles()">Browse Files</button>
+          <input type="file" #fileInput multiple (change)="onFileSelect($event)" hidden />
+        </div>
+      </div>
       <div class="upload-table" *ngIf="files.length">
         <table class="table">
           <thead>
@@ -20,7 +21,7 @@
             </tr>
           </thead>
           <tbody class="upload-name-style">
-            <tr *ngFor="let item of files; let i = index">
+            <tr *ngFor="let item of files">
               <td>
                 <strong>{{ item.relativePath }}</strong>
               </td>
@@ -48,17 +49,18 @@
   </div>
   <div class="middle">
     <div class="game">Images</div>
-    <ngx-file-drop dropZoneLabel="Drop files here" (onFileDrop)="droppedImages($event)">
-      <ng-template ngx-file-drop-content-tmp let-openFileSelector="openFileSelector">
-        <div class="file-drop">
-          <div>Drag images or directory</div>
-          <div>
-            <button type="button" class="browse-btn" (click)="openFileSelector()">Browse images</button>
-          </div>
-        </div>
-      </ng-template>
-    </ngx-file-drop>
-    <div class="upload-table" *ngIf="images.length">
+    <div
+      class="file-drop"
+      (dragover)="onDragOver($event)"
+      (drop)="onImageDrop($event)"
+    >
+      <div>Drag images or directory</div>
+      <div>
+        <button type="button" class="browse-btn" (click)="browseImages()">Browse Images</button>
+        <input type="file" #imageInput multiple (change)="onImageSelect($event)" accept="image/*" hidden />
+      </div>
+    </div>
+    <div class="upload-table" *ngIf="imageUrls.length">
       <table class="table">
         <thead>
           <tr>
@@ -66,25 +68,14 @@
           </tr>
         </thead>
         <tbody class="upload-name-style">
-          <div class="url-list">
-            <div>
-              <tr *ngFor="let item of imageUrls; let i = index">
-                <td>
-                  <strong>{{ item.imageName }}</strong>
-                </td>
-                <td>
-                  <a>{{ item.url }}</a>
-                </td>
-              </tr>
-            </div>
-            <!-- <div>
-              <tr *ngFor="let url of imageUrls; let i = index">
-                <td>
-                  <a>{{ url }}</a>
-                </td>
-              </tr>
-            </div> -->
-          </div>
+          <tr *ngFor="let item of imageUrls">
+            <td>
+              <strong>{{ item.imageName }}</strong>
+            </td>
+            <td>
+              <a>{{ item.url }}</a>
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>

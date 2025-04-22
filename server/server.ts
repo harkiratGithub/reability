@@ -37,7 +37,7 @@ import { ROLE } from './const';
 
 import helmet from 'helmet';
 const app = express();
-app.use(helmet.frameguard({ action: 'SAMEORIGIN' }));
+app.use(helmet.frameguard({ action: 'sameorigin' }));
 app.disable('x-powered-by');
 let server;
 if (process.env.NODE_ENV === 'development') {
@@ -92,6 +92,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/', AuthRouter);
+
 // common
 app.post('/users/sendHeartBeat', permitAccess(), UserController.updateHeartBeat);
 app.post('/patient/validGames', permitAccess(), permitTherapistAccessToPatient(), PatientController.getValidGames);

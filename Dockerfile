@@ -1,23 +1,27 @@
-# Use an official Node.js 12.18.2 image with Alpine Linux
-FROM node:12.18.2
+# Use an official Node.js 20 Alpine image
+FROM node:20-alpine
 
 # Set the working directory
 WORKDIR /usr/src/app
 
+# Disable postinstall script execution
+ENV npm_config_ignore_scripts=true
+
 # Copy package.json and package-lock.json to the working directory
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+
+# Install dependencies (use --legacy-peer-deps if needed for compatibility)
+RUN npm install --legacy-peer-deps 
 
 # Copy the entire application to the working directory
 COPY . .
 
-# Run the heroku-postbuild script, including Angular build
+# Run the heroku-postbuild script (typically for Angular or frontend builds)
 RUN npm run heroku-postbuild
 
 # Expose the port your app runs on
 EXPOSE 3000
 
-# Define the command to run your application
+# Start the application
 CMD ["npm", "start"]
