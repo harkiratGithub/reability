@@ -56,7 +56,7 @@
         <img src="../../../../assets/main-menu/no_camera.svg" />
       </div> -->
 
-      <video *ngIf="this.currentUser.id == 1802 || this.currentUser.id == 1793" id="patient-video" [ngClass]="{
+      <!-- <video id="patient-video" [ngClass]="{
                 'patient-video-regular-video': !enlargeVideo,
                 'patient-video-enlarge-video': enlargeVideo,
                 'hide-video':
@@ -65,9 +65,9 @@
                   (trackBody && !bodyTrackingLoading),
                 'disabled-skeleton': this.currentUser.disabledSkeleton || trackBody,
                 'ios-hide': isIosDevice()
-              }" class="patient-video" width="291" height="290" style="display: none;" muted autoplay playsinline #cameraElement></video>
+              }" class="patient-video" width="200" height="200" style="display:none" muted autoplay playsinline #cameraElement></video> -->
 
-      <video *ngIf="!isDepthCameraConnected() && (this.currentUser.id != 1802 && this.currentUser.id != 1793)" id="patient-video" [ngClass]="{
+      <video *ngIf="!isDepthCameraConnected()" id="patient-video" [ngClass]="{
           'patient-video-regular-video': !enlargeVideo,
           'patient-video-enlarge-video': enlargeVideo,
           'hide-video':
@@ -76,8 +76,8 @@
             (trackBody && !bodyTrackingLoading),
           'disabled-skeleton': this.currentUser.disabledSkeleton || trackBody,
           'ios-hide': isIosDevice()
-        }" class="patient-video" width="200" height="200" muted autoplay playsinline></video>
-      <video *ngIf="isDepthCameraConnected() && (this.currentUser.id != 1802 && this.currentUser.id != 1793)" id="patient-video" [ngClass]="{
+        }" class="patient-video" width="200" height="200" [ngStyle]="{ 'visibility': gameId == 3 ? 'hidden' : '' }" muted autoplay playsinline #cameraElement></video>
+      <video *ngIf="isDepthCameraConnected()" id="patient-video" [ngClass]="{
           'patient-video-regular-video': !enlargeVideo,
           'patient-video-enlarge-video': enlargeVideo,
           'hide-video': !showLocalVideo || !this.currentUser.disabledSkeleton,
@@ -93,15 +93,18 @@
       <canvas id="patient-canvas" [ngClass]="{
           'patient-video-regular-video': !enlargeVideo,
           'patient-video-enlarge-video': enlargeVideo,
-          'hide-video': !showLocalVideo || showPatientVideo || !trackBody
+          'hide-video': (!showLocalVideo || showPatientVideo || !trackBody) || gameId == 3
         }" width="257" height="192" class="patient-canvas"></canvas>
       <canvas id="patient-canvas-skeleton" [ngClass]="{
           'patient-video-regular-video': !enlargeVideo,
           'patient-video-enlarge-video': enlargeVideo,
-          'hide-video': !showLocalVideo || !showPatientVideo || !displaySkeleton
+          'hide-video': (!showLocalVideo || !showPatientVideo || !displaySkeleton) || gameId == 3
         }" width="257" height="192" class="patient-canvas"></canvas>
-
-      <canvas *ngIf="this.currentUser.id == 1802 || this.currentUser.id == 1793" #canvasElement2 style="width: 100%;transform: scaleX(-1);min-height: 30vh;height: auto;border-radius: 10px;object-fit: fill;"></canvas>
+      <canvas #canvasElement2 [ngClass]="{
+          'patient-video-regular-video': !enlargeVideo,
+          'patient-video-enlarge-video': enlargeVideo
+        }" [ngStyle]="{ 'display': gameId == 3 ? 'inline-block' : 'none' }" width="257" height="192" class="patient-canvas"></canvas>
+      <!-- <canvas [ngStyle]="{ 'display': gameId == 3 ? 'inline-block' : 'none' }" #canvasElement2 style="width: 100%;transform: scaleX(-1);min-height: 30vh;height: auto;border-radius: 10px;object-fit: fill;"></canvas> -->
 
       <div *ngIf="trackBody && showAngles" class="angles">
         <div *ngFor="let organAngle of organAngles; let i = index" [ngClass]="{ 'angle-left': i % 2 === 0, 'angle-right': i % 2 !== 0 }">
@@ -111,5 +114,5 @@
     </div>
   </div>
 
-  <video id="patient-video-skeleton" *ngIf="this.currentUser.id != 1802 && this.currentUser.id != 1793" class="hidden-video" [ngClass]="{ 'hide-video': true }" muted autoplay playsinline></video>
+  <video id="patient-video-skeleton" *ngIf="gameId !== 3" class="hidden-video" [ngClass]="{ 'hide-video': true }" muted autoplay playsinline></video>
 </div>

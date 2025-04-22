@@ -102,6 +102,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
   patientCtx: any;
   patientSkeletonCtx: any;
   isInGame: boolean = false;
+  gameId: number;
   currentPageIndex: number = 0;
   subscription: Subscription = new Subscription();
   movedRight = false;
@@ -590,6 +591,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
 
     this.bodyHandleService.removeHands(this.currentUser.peerId);
     this.isInGame = true;
+    this.gameId = this.currentMenuApps[index].gameId;
 
     this.appActions.setCurrentGame({
       url: this.currentMenuApps[index].url,
