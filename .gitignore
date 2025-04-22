@@ -50,3 +50,7 @@ Thumbs.db
 newrelic_agent.log
 /build
 /client/dist
+/client/package-lock.json
+/package-lock.json
+/client/.angular
+/client/src/environments/
