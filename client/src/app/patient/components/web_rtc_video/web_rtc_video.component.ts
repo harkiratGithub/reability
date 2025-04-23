@@ -179,6 +179,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   lastPerformedPercentage = 0;
   callChatGPT = false;
   showMarker = false;
+  lastPerformedIndex = 0;
 
   constructor(
     private authenticationService: AuthenticationService,
@@ -243,6 +244,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           this.landmarks = [];
           this.videoMinMax = [];
           this.landmarksPointer = [];
+          this.lastPerformedIndex = 0;
           this.matchingCameraData = [];
           this.landmarksLinePointer = [];
 
@@ -264,6 +266,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
             this.landmarks = [];
             this.videoMinMax = [];
             this.landmarksPointer = [];
+            this.lastPerformedIndex = 0;
             this.landmarksLinePointer = [];
             clearInterval(this.newInterval);
             const videoName = action.msg?.data?.source?.split('/')[5];
@@ -287,8 +290,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                   const performedLength = updateComments.filter((data) => data.PatientTimestamp != undefined).length;
                   const performedPercentage = Math.floor((performedLength / mainLength) * 100);
                   console.log("performedPercentage===", performedPercentage);
-
-                  if (performedPercentage > 10 && performedPercentage % 16 >= 0 && performedPercentage % 16 <= 5 && Math.abs(performedPercentage - this.lastPerformedPercentage) >= 10) {
+                  const mod = performedPercentage % 18;
+                  if (performedPercentage > 10 && (mod <= 5 || mod >= 13) && Math.abs(performedPercentage - this.lastPerformedPercentage) >= 10) {
                     this.lastPerformedPercentage = performedPercentage
                     setTimeout(() => {
                       if (!this.callChatGPT) {
@@ -1776,20 +1779,22 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     let badLeftPercent = 0
     let badRightPercent = 0
     let feedbackPrompt = '';
-    const matchPercent = 60;
+    const matchPercent = 55;
 
     const resultss = await this.matchClipAndPatientData(this.videoMinMax, this.matchingCameraData);
     const updateCommentss = await this.updateComments(resultss);
     const performedComments = updateCommentss.filter((data) => data.PatientTimestamp != undefined);
     performedComments.pop();
+    const currentPerformedComments = performedComments.slice(this.lastPerformedIndex);
+    this.lastPerformedIndex = performedComments.length;
 
-    const badLeftComments = performedComments.filter((data) => data.LeftCondition == "Not Good").length;
-    const badRightComments = performedComments.filter((data) => data.RightCondition == "Not Good").length;
+    const badLeftComments = currentPerformedComments.filter((data) => data.LeftCondition == "Not Good").length;
+    const badRightComments = currentPerformedComments.filter((data) => data.RightCondition == "Not Good").length;
 
-    badLeftPercent = Math.floor((badLeftComments / performedComments.length) * 100);
-    badRightPercent = Math.floor((badRightComments / performedComments.length) * 100);
+    badLeftPercent = Math.floor((badLeftComments / currentPerformedComments.length) * 100);
+    badRightPercent = Math.floor((badRightComments / currentPerformedComments.length) * 100);
 
-    console.log("badLeftPercent===", badLeftPercent, "badRightPercent===", badRightPercent, performedComments.length);
+    console.log("badLeftPercent===", badLeftPercent, "badRightPercent===", badRightPercent, currentPerformedComments.length);
     if (badLeftPercent > matchPercent) {
       feedbackPrompt += `
         Analyze only the "LeftComments" from each object in the array for left hand feedback.
@@ -1807,9 +1812,12 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     if (badLeftPercent > matchPercent && badRightPercent > matchPercent) {
       feedbackPrompt += `Combine the feedback from both left and right hands in 10 words with no pointers.`;
     }
+    if (badLeftPercent > matchPercent || badRightPercent > matchPercent) {
+      feedbackPrompt += 'Check for idle movements and give feedback accordingly.'
+    }
 
-    console.log('dataArray:', performedComments);
     if (feedbackPrompt) {
+      console.log("currentPerformedComments===", currentPerformedComments, performedComments);
       this.callChatGPT = true
       this.showMarker = false
 
@@ -1826,26 +1834,31 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       };
 
       const data = await this.chatGPTAPI(JSON.stringify(body));
-
-      if (data.choices.length > 0) {
+      if (data.choices && data.choices.length > 0) {
         let content = data?.choices[0].message?.content
         console.log('content==', content);
         const wordCount = content.trim().split(/\s+/).length;
 
-        if (wordCount > 12) {
-          const bodys = {
-            model: 'gpt-4o-mini', // Or 'gpt-3.5-turbo'
-            messages: [{
-              role: 'user',
-              content: `Feedback: ${content}. Make above feedback in one statement without any pointers in 10 words.`
-            }]
-          };
-          const datas = await this.chatGPTAPI(JSON.stringify(bodys));
-          content = datas?.choices[0].message?.content
-          console.log('content==', content);
-        }
-        this.patientWebRtcService.setShouldPauseGameState(true);
-        this.playCommentAudio(content)
+        setTimeout(async () => {
+          if (wordCount > 12) {
+            const bodys = {
+              model: 'gpt-4o-mini', // Or 'gpt-3.5-turbo'
+              messages: [{
+                role: 'user',
+                content: `Feedback: ${content}. Make above feedback in one statement, adding comments for idle movements if any, without any pointers in 10 words.`
+              }]
+            };
+            const datas = await this.chatGPTAPI(JSON.stringify(bodys));
+            if (datas.choices && datas.choices.length > 0) {
+              content = datas?.choices[0].message?.content
+              console.log('content==', content);
+            } else {
+              content = 'Both hands show mixed performance with weakness in idle movements.'
+            }
+          }
+          this.patientWebRtcService.setShouldPauseGameState(true);
+          this.playCommentAudio(content)
+        }, 100);
       } else {
         this.showMarker = true
         this.callChatGPT = false
@@ -1855,7 +1868,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   }
 
   private async chatGPTAPI(body: string) {
-    const apiKey = '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'
+    const apiKey = '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'
     const response = await fetch(`https://api.openai.com/v1/chat/completions`, {
       method: "POST",
       headers: {
@@ -2306,6 +2319,12 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   }
 
   playCommentAudio(commentText: string) {
+    if (commentText === '') {
+      this.patientWebRtcService.setShouldPauseGameState(false);
+      this.callChatGPT = false;
+      this.showMarker = true;
+      return
+    }
     const speech = new SpeechSynthesisUtterance("I paused the video to tell you this: " + commentText);
     speech.lang = 'en-US'; // Set language
     speech.volume = 1; // Volume: 0 to 1
