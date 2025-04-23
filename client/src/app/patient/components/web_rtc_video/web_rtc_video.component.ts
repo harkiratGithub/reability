@@ -289,7 +289,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
 
                   const performedLength = updateComments.filter((data) => data.PatientTimestamp != undefined).length;
                   const performedPercentage = Math.floor((performedLength / mainLength) * 100);
-                  console.log("performedPercentage===", performedPercentage);
+                  // console.log("performedPercentage===", performedPercentage);
                   const mod = performedPercentage % 18;
                   if (performedPercentage > 10 && (mod <= 5 || mod >= 13) && Math.abs(performedPercentage - this.lastPerformedPercentage) >= 10) {
                     this.lastPerformedPercentage = performedPercentage
@@ -1817,7 +1817,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     }
 
     if (feedbackPrompt) {
-      console.log("currentPerformedComments===", currentPerformedComments, performedComments);
+      // console.log("currentPerformedComments===", currentPerformedComments, performedComments);
       this.callChatGPT = true
       this.showMarker = false
 
@@ -1836,7 +1836,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       const data = await this.chatGPTAPI(JSON.stringify(body));
       if (data.choices && data.choices.length > 0) {
         let content = data?.choices[0].message?.content
-        console.log('content==', content);
+        // console.log('content==', content);
         const wordCount = content.trim().split(/\s+/).length;
 
         setTimeout(async () => {
@@ -1851,7 +1851,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
             const datas = await this.chatGPTAPI(JSON.stringify(bodys));
             if (datas.choices && datas.choices.length > 0) {
               content = datas?.choices[0].message?.content
-              console.log('content==', content);
+              // console.log('content==', content);
             } else {
               content = 'Both hands show mixed performance with weakness in idle movements.'
             }
