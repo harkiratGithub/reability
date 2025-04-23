@@ -1813,11 +1813,11 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       feedbackPrompt += `Combine the feedback from both left and right hands in 10 words with no pointers.`;
     }
     if (badLeftPercent > matchPercent || badRightPercent > matchPercent) {
-      feedbackPrompt += 'Check for idle movements and give feedback accordingly.'
+      feedbackPrompt += 'Check for idle movements and give feedback accordingly. Basic statement in less sophisticated language.'
     }
 
     if (feedbackPrompt) {
-      // console.log("currentPerformedComments===", currentPerformedComments, performedComments);
+      console.log("currentPerformedComments===", currentPerformedComments, performedComments);
       this.callChatGPT = true
       this.showMarker = false
 
@@ -1837,7 +1837,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       const data = await this.chatGPTAPI(JSON.stringify(body));
       if (data.choices && data.choices.length > 0) {
         content = data?.choices[0].message?.content
-        // console.log('content==', content);
+        console.log('content==', content);
         const wordCount = content.trim().split(/\s+/).length;
 
         setTimeout(async () => {
@@ -1846,13 +1846,16 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
               model: 'gpt-4o-mini', // Or 'gpt-3.5-turbo'
               messages: [{
                 role: 'user',
-                content: `Feedback: ${content}. Make above feedback in one statement, adding comments for idle movements if any, without any pointers in 10 words.`
+                content: `
+                Feedback: ${content}. Make above feedback in one statement, adding comments for idle movements if any, without any pointers in 10 words.
+                Basic statement in less sophisticated language.
+                `
               }]
             };
             const datas = await this.chatGPTAPI(JSON.stringify(bodys));
             if (datas.choices && datas.choices.length > 0) {
               content = datas?.choices[0].message?.content
-              // console.log('content==', content);
+              console.log('content==', content);
             } else {
               content = 'Both hands show mixed performance with weakness in idle movements.'
             }
@@ -1870,7 +1873,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   }
 
   private async chatGPTAPI(body: string) {
-    const apiKey = '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'
+    // const apiKey = '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'
+    const apiKey = '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'
     const response = await fetch(`https://api.openai.com/v1/chat/completions`, {
       method: "POST",
       headers: {
