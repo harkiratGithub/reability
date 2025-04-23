@@ -260,6 +260,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         }
         if (action.msg && action.msg.data && action.msg.data.shouldPlay) {
           if (this.videoIndex == action.msg.data.index) {
+            console.log("resumed===");
             this.startTime = Date.now() - Math.floor(action.msg.data.currentPlayTime.vidTime * 1000);
             this.cdr.detectChanges();
           } else {
@@ -289,9 +290,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
 
                   const performedLength = updateComments.filter((data) => data.PatientTimestamp != undefined).length;
                   const performedPercentage = Math.floor((performedLength / mainLength) * 100);
-                  // console.log("performedPercentage===", performedPercentage);
-                  const mod = performedPercentage % 18;
-                  if (performedPercentage > 10 && (mod <= 5 || mod >= 13) && Math.abs(performedPercentage - this.lastPerformedPercentage) >= 10) {
+                  console.log("performedPercentage===", performedPercentage, Date);
+                  if (performedPercentage > 10 && performedPercentage % 19 >= 0 && performedPercentage % 19 <= 10 && Math.abs(performedPercentage - this.lastPerformedPercentage) >= 10) {
                     this.lastPerformedPercentage = performedPercentage
                     setTimeout(() => {
                       if (!this.callChatGPT) {
@@ -299,7 +299,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                       }
                     }, 1000);
                   }
-                }, 3000);
+                }, 2000);
 
                 const videoTime = action.msg.data.currentPlayTime.vidTime;
                 const currentPlayTime = new Date(action.msg.data.currentPlayTime.sysTime).getSeconds();
@@ -1833,9 +1833,10 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         }]
       };
 
+      let content = "";
       const data = await this.chatGPTAPI(JSON.stringify(body));
       if (data.choices && data.choices.length > 0) {
-        let content = data?.choices[0].message?.content
+        content = data?.choices[0].message?.content
         // console.log('content==', content);
         const wordCount = content.trim().split(/\s+/).length;
 
@@ -1860,8 +1861,9 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           this.playCommentAudio(content)
         }, 100);
       } else {
-        this.showMarker = true
-        this.callChatGPT = false
+        content = 'Both hands show mixed performance with weakness in idle movements.'
+        this.patientWebRtcService.setShouldPauseGameState(true);
+        this.playCommentAudio(content)
       }
     }
     //   this.heygenAPIService.sendText(data?.choices[0].message?.content);
