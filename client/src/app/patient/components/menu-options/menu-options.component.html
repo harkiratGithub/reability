@@ -122,7 +122,7 @@
         {{ gameMission }}
       </p>
     </div>
-    <app-web-rtc-video class="web-rtc-area" *ngIf="!isTherapistMode" (handleFullScreenVideoSession)="handleFullScreenVideoSession()" (handleNewGameFromTherapist)="handleNewGameFromTherapist($event)" [currentUser]="currentUser" [validGames]="games" (sendCallObjectToParent)="saveCallObject($event)" (handleShareScreen)="handleScreenShare($event)" (handleTherapistClickHome)="onClickHomeButton()" [showLocalVideo]="!isMobile" (handleOtherSideLeftVideoSession)="handleOtherSideLeftVideoSession()" [currentGameName]="currentGameName" [videoSessionDisplay]="videoSessionDisplay" [isMobile]="isMobile" (closeGame)="handleQuitGame()" (onIframeLoad)="handleIframeLoad()">
+    <app-web-rtc-video class="web-rtc-area" *ngIf="!isTherapistMode" (handleFullScreenVideoSession)="handleFullScreenVideoSession()" (handleNewGameFromTherapist)="handleNewGameFromTherapist($event)" [currentUser]="currentUser" [validGames]="games" (sendCallObjectToParent)="saveCallObject($event)" (handleShareScreen)="handleScreenShare($event)" (handleTherapistClickHome)="onClickHomeButton()" [showLocalVideo]="!isMobile" (handleOtherSideLeftVideoSession)="handleOtherSideLeftVideoSession()" [currentGameName]="currentGameName" [gameId]="gameId" [videoSessionDisplay]="videoSessionDisplay" [isMobile]="isMobile" (closeGame)="handleQuitGame()" (onIframeLoad)="handleIframeLoad()">
     </app-web-rtc-video>
     <div *ngIf="isInGame || (isTherapistMode && isConnectedUserInGame)" class="game-data" [ngClass]="{ 'game-data-therapist': isTherapistMode, 'hide-section': isInSplitScreen }">
       <div *ngIf="showGameMessage && showTimer" class="message-dark-overlay"></div>

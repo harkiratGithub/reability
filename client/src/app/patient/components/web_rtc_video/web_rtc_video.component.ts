@@ -57,6 +57,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   @Input() currentGameName;
   @Input() videoSessionDisplay;
   @Input() isMobile;
+  @Input() gameId;
   @select((state) => state.global.currentGameUrl) readonly currentGameUrl$: Observable<any>;
   @select((state) => state.menu_options.is_in_game) readonly isInGame$: Observable<any>;
   @select((state) => state.global.gameId) readonly gameId$: Observable<any>;
@@ -144,7 +145,6 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   iceServers;
   isModalOpen = false;
   disconnectionInterval;
-  gameId;
   audioTrack;
   audioContext;
   gainNode;
@@ -1823,6 +1823,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       console.log("currentPerformedComments===", currentPerformedComments, performedComments);
       this.callChatGPT = true
       this.showMarker = false
+      this.patientWebRtcService.setShouldPauseGameState(true);
 
       const body = {
         model: 'gpt-4o-mini',
@@ -1863,12 +1864,10 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
               content = 'Both hands show mixed performance with weakness in idle movements.'
             }
           }
-          this.patientWebRtcService.setShouldPauseGameState(true);
           this.playCommentAudio(content)
         }, 100);
       } else {
         content = 'Both hands show mixed performance with weakness in idle movements.'
-        this.patientWebRtcService.setShouldPauseGameState(true);
         this.playCommentAudio(content)
       }
     }

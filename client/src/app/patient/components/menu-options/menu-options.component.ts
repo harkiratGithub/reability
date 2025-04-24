@@ -224,6 +224,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
 
       this.subscription.add(
         this.currentGame$.subscribe((currentGame) => {
+          console.log("current game===", currentGame);
           this.currentGameDescription = currentGame.description;
         })
       );
