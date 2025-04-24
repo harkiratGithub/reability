@@ -668,6 +668,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
   };
 
   handleQuitGame() {
+    this.gameId = null;
     this.isInGame = false;
     if (this.isTherapistMode) {
       this.isConnectedUserInGame = false;

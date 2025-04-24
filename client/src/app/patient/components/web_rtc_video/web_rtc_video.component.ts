@@ -207,6 +207,9 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     this.subscription.add(
       this.isInGame$.subscribe((isInGame) => {
         this.isInGame = isInGame;
+        if (!isInGame) {
+          this.gameId = null
+        }
         if (therapistToPatientConnection) {
           therapistToPatientConnection.send(this.getGameUrlMessage(isInGame));
         }
@@ -1798,22 +1801,22 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     if (badLeftPercent > matchPercent) {
       feedbackPrompt += `
         Analyze only the "LeftComments" from each object in the array for left hand feedback.
-        Feedback should be specific to the left hand movements and should not be generic or general in nature and also not in points, just a simple one liner 10 words.
+        Feedback should be specific to the left hand movements and should not be generic or general in nature and also not in points, just a simple one liner 7-8 words.
       `;
     }
 
     if (badRightPercent > matchPercent) {
       feedbackPrompt += `
         Analyze only the "RightComments" from each object in the array for right hand feedback.
-        Feedback should be specific to the right hand movements and should not be generic or general in nature and also not in points, just a simple one liner 10 words.
+        Feedback should be specific to the right hand movements and should not be generic or general in nature and also not in points, just a simple one liner 7-8 words.
       `;
     }
 
     if (badLeftPercent > matchPercent && badRightPercent > matchPercent) {
-      feedbackPrompt += `Combine the feedback from both left and right hands in 10 words with no pointers.`;
+      feedbackPrompt += `Combine the feedback from both left and right hands in 7-8 words with no pointers.`;
     }
     if (badLeftPercent > matchPercent || badRightPercent > matchPercent) {
-      feedbackPrompt += 'Check for idle movements and give feedback accordingly. Basic statement in less sophisticated language.'
+      feedbackPrompt += 'Check for idle movements and give feedback accordingly. Provide basic feedback in less sophisticated language in simple english.'
     }
 
     if (feedbackPrompt) {
@@ -1822,7 +1825,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       this.showMarker = false
 
       const body = {
-        model: 'gpt-4o-mini', // Or 'gpt-3.5-turbo'
+        model: 'gpt-4o-mini',
         messages: [{
           role: 'user',
           content: `
@@ -1843,12 +1846,12 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         setTimeout(async () => {
           if (wordCount > 12) {
             const bodys = {
-              model: 'gpt-4o-mini', // Or 'gpt-3.5-turbo'
+              model: 'gpt-4o-mini',
               messages: [{
                 role: 'user',
                 content: `
                 Feedback: ${content}. Make above feedback in one statement, adding comments for idle movements if any, without any pointers in 10 words.
-                Basic statement in less sophisticated language.
+                Provide basic feedback in less sophisticated language in simple english.
                 `
               }]
             };
@@ -1873,8 +1876,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   }
 
   private async chatGPTAPI(body: string) {
-    // const apiKey = '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'
-    const apiKey = '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'
+    const apiKey = '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'
+    // const apiKey = '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'
     const response = await fetch(`https://api.openai.com/v1/chat/completions`, {
       method: "POST",
       headers: {
