@@ -13,6 +13,8 @@ RUN npm install
 # Copy the entire application to the working directory
 COPY . .
 
+COPY .env .env
+
 # Run the heroku-postbuild script, including Angular build
 RUN npm run heroku-postbuild
 
