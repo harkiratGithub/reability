@@ -42,13 +42,13 @@ stages:
         echo "SCRIPT_BUCKET_NAME=${SCRIPT_BUCKET_NAME}" >> .env
         echo "SCRIPT_GAME_NAME=${SCRIPT_GAME_NAME}" >> .env
         echo "SCRIPT_BUCKET_DESCRIPTION=${SCRIPT_BUCKET_DESCRIPTION}" >> .env
-        echo "SECRET_KEY=${PEER_SESSION}" >> .env
+        echo "SECRET_KEY=${SECRET_KEY}" >> .env
         echo "NODE_TLS_REJECT_UNAUTHORIZED=${NODE_TLS_REJECT_UNAUTHORIZED}" >> .env
         echo "REABILITY_URL=${REABILITY_URL}" >> .env
         echo "PROXY=${PROXY}" >> .env
         echo "ENCRYPTION_KEY=${ENCRYPTION_KEY}" >> .env
         echo "ENCRYPTION_IV=${ENCRYPTION_IV}" >> .env
-        echo "SECRET_KEY_SESSION=${SESSION_VALUE_SECRET_KEY}" >> .env
+        echo "SECRET_KEY_SESSION=${SECRET_KEY_SESSION}" >> .env
         echo "LOGGER_TOKEN=${LOGGER_TOKEN}" >> .env
         echo "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}" >> .env
         echo "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}" >> .env
@@ -77,8 +77,27 @@ stages:
         echo "NEW_RELIC=${NEW_RELIC}" >> .env
         echo "NEW_RELIC_APPLICATION_LOGGING_FORWARDING_ENABLED=${NEW_RELIC_APPLICATION_LOGGING_FORWARDING_ENABLED}" >> .env
         echo "EMAIL_LANGUAGE=${EMAIL_LANGUAGE}" >> .env
+
         cat .env
-    - template: /pipelines/CI/ci.yaml@Pipelines
+    - task: Docker@0
+      displayName: 'Build an image'
+      inputs:
+        azureSubscription: 'ReAbility Subscription (61728cdf-71a4-41b8-806c-71e77423fcaa)'
+        azureContainerRegistry: 'acrreability.azurecr.io'
+        dockerFile: Dockerfile
+        imageName: '$(Build.DefinitionName):$(Build.BuildId)'
+        includeLatestTag: true
+        arguments: >
+          --build-arg ENV_FILE=.env
+    
+    - task: Docker@0
+      displayName: 'Push an image'
+      inputs:
+        azureSubscription: 'ReAbility Subscription (61728cdf-71a4-41b8-806c-71e77423fcaa)'
+        azureContainerRegistry: 'acrreability.azurecr.io'
+        action: 'Push an image'
+        imageName: '$(Build.DefinitionName):$(Build.BuildId)'
+        includeLatestTag: true
 
 - stage: DeployStage
   jobs:
