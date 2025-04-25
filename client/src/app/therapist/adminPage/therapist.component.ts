@@ -1153,7 +1153,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       (activeCall) => activeCall['call'].peer === peer_id
     );
     if (currStream && currStream.stream) {
-      return currStream.stream.getAudioTracks()[0].enabled ? false : true;
+      return currStream.stream.getAudioTracks()[0]?.enabled ? false : true;
     }
   };
 
