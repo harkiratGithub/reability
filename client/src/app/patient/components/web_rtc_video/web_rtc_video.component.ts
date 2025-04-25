@@ -1830,10 +1830,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         messages: [{
           role: 'user',
           content: `
-            JSON Array: ${JSON.stringify(performedComments)},
-            ${feedbackPrompt}
-            If feedback is greater than 15 words, then make it more simple to have one line statement without any pointers.
-          `
+            JSON Array: ${JSON.stringify(performedComments)}, ${feedbackPrompt}`
         }]
       };
 
@@ -1851,8 +1848,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
               messages: [{
                 role: 'user',
                 content: `
-                Feedback: ${content}. Make above feedback in one statement, adding comments for idle movements if any, without any pointers in 10 words.
-                Provide basic feedback in less sophisticated language in simple english.
+                Feedback: ${content}. Make above feedback in one statement in less sophisticated language in simple english, adding comments for idle movements if any, without any pointers in 6-7 words.
                 `
               }]
             };
