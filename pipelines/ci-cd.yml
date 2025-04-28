@@ -42,7 +42,7 @@ stages:
         echo "SCRIPT_BUCKET_NAME=${SCRIPT_BUCKET_NAME}" >> .env
         echo "SCRIPT_GAME_NAME=${SCRIPT_GAME_NAME}" >> .env
         echo "SCRIPT_BUCKET_DESCRIPTION=${SCRIPT_BUCKET_DESCRIPTION}" >> .env
-        echo "SECRET_KEY=${SECRET_KEY}" >> .env
+        echo "SECRET_KEY=${PEER_SESSION}" >> .env
         echo "NODE_TLS_REJECT_UNAUTHORIZED=${NODE_TLS_REJECT_UNAUTHORIZED}" >> .env
         echo "REABILITY_URL=${REABILITY_URL}" >> .env
         echo "PROXY=${PROXY}" >> .env
