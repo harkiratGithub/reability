@@ -17,6 +17,7 @@ import { Subscription, Observable } from 'rxjs';
 import { WebRtcService } from '../../services/therapist_web_rtc.service';
 import { AppActions } from '../../../app.actions';
 import { IEnlargeVideoMessage } from '../../../common/services/communication_util.service';
+import { SkeletonFrame, SkeletonService } from 'src/app/common/services/skeleton.service';
 
 const isVideoPlaying = (video) => !!(video.currentTime > 0 && !video.paused && !video.ended && video.readyState > 2);
 @Component({
@@ -42,6 +43,7 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
   @Output() handlePatientVideo = new EventEmitter();
   @Output() enlargeVideoChanged = new EventEmitter<IEnlargeVideoMessage>();
   @ViewChild('patientVideo') patientVideo: ElementRef<HTMLInputElement>;
+  @ViewChild('displayCanvas') canvasRef!: ElementRef<HTMLCanvasElement>;
 
   @select((state) => state.global.enlargeVideo) readonly enlargeVideo$: Observable<boolean>;
 
@@ -57,7 +59,7 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
   enlargeVideo = false;
   subscription: Subscription = new Subscription();
 
-  constructor(private webRtcService: WebRtcService, private appActions: AppActions) {
+  constructor(private webRtcService: WebRtcService, private appActions: AppActions, private skeletonService: SkeletonService) {
     this.initialize();
   }
 
@@ -67,6 +69,14 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
         this.enlargeVideo = enlargeVideo;
       })
     );
+
+    this.subscription.add(
+      this.skeletonService.skeleton$.subscribe((frame) => {
+        console.log(frame);
+        if (!frame) return;
+        this.drawSkeleton(frame);
+      })
+    )
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -233,4 +243,35 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
       }
     }
   };
+
+  drawSkeleton(frame: SkeletonFrame) {
+    const ctx = this.canvasRef.nativeElement.getContext('2d');
+    if (!ctx) return;
+
+    ctx.clearRect(0, 0, 640, 480);
+
+    // Draw joints
+    ctx.fillStyle = 'blue';
+    frame.joints.forEach(joint => {
+      if (joint.visibility && joint.visibility > 0.5) {
+        ctx.beginPath();
+        ctx.arc(joint.x, joint.y, 5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    });
+
+    // Draw connections
+    frame.connections.forEach(({ start, end, color }) => {
+      const jointStart = frame.joints.find(j => j.index === start);
+      const jointEnd = frame.joints.find(j => j.index === end);
+      if (jointStart && jointEnd) {
+        ctx.beginPath();
+        ctx.moveTo(jointStart.x, jointStart.y);
+        ctx.lineTo(jointEnd.x, jointEnd.y);
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = color;
+        ctx.stroke();
+      }
+    });
+  }
 }

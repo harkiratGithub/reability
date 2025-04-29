@@ -41,6 +41,7 @@ import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 import { SkeltonVideoService } from '../../../common/services/skelton-video.service';
 import { SkeletonProgressBarService } from 'src/app/common/services/skeleton-progress-bar.service';
+import { SkeletonService } from 'src/app/common/services/skeleton.service';
 declare var LivekitClient: any;
 
 let therapistToPatientConnection = null;
@@ -192,6 +193,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     private cdr: ChangeDetectorRef,
     private skeltonVideoService: SkeltonVideoService,
     private skeltonProgressBarService: SkeletonProgressBarService,
+    private skeletonService: SkeletonService
   ) {
     this.subscription.add(
       this.ajaxService.getIceServers().subscribe((res) => {
@@ -2159,7 +2161,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           this.timeLog.push({ elapsedTime, currentVideoTime: currentVideoAngle.ClipTimestamp, currentVideoAngle: currentVideoAngle.ClipDeg, rightAngle, timeMatching: this.timeMatching, rightComment: this.rightComment, lastComment: this.lastComment });
 
           this.cdr.detectChanges();
-
+          const joints = [];
+          const connections = [];
           // Additional code to draw pose landmarks and connections on the canvas
           results.poseLandmarks.forEach((landmark, index) => {
             // if (this.videoIndex == 3) {
@@ -2174,34 +2177,13 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
               );
               canvasCtx.fillStyle = 'rgba(255, 255, 255)';
               canvasCtx.fill();
+              joints.push({
+                x: landmark.x * canvasElement.width,
+                y: landmark.y * canvasElement.height,
+                visibility: landmark.visibility,
+                index
+              });
             }
-            // } else if (this.videoIndex == 4 || this.videoIndex == 5 || this.videoIndex == 6) {
-            //   if (index === 24 || index === 26 || index == 28 || index === 23 || index === 25 || index === 27) {
-            //     canvasCtx.beginPath();
-            //     canvasCtx.arc(
-            //       landmark.x * canvasElement.width,
-            //       landmark.y * canvasElement.height,
-            //       7,
-            //       0,
-            //       2 * Math.PI
-            //     );
-            //     canvasCtx.fillStyle = 'rgba(255, 0, 0, 0.6)';
-            //     canvasCtx.fill();
-            //   }
-            // } else {
-            //   if (index === 11 || index === 12 || index === 13 || index === 14 || index === 15 || index === 16 || index === 23 || index === 24) {
-            //     canvasCtx.beginPath();
-            //     canvasCtx.arc(
-            //       landmark.x * canvasElement.width,
-            //       landmark.y * canvasElement.height,
-            //       7,
-            //       0,
-            //       2 * Math.PI
-            //     );
-            //     canvasCtx.fillStyle = 'rgba(255, 0, 0, 0.6)';
-            //     canvasCtx.fill();
-            //   }
-            // }
           });
 
           POSE_CONNECTIONS.forEach(([start, end]) => {
@@ -2239,10 +2221,6 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                     canvasCtx.strokeStyle = 'rgb(145, 255, 0)';
                   }
                 }
-                // else {
-                //   canvasCtx.strokeStyle = 'rgba(255, 0, 0, 0.6)';
-                // }
-                // canvasCtx.strokeStyle = this.leftCondition === 'Good' ? 'rgba(0, 255, 0, 0.6)' : 'rgba(255, 0, 0, 0.6)';
               }
               if (this.timeMatching && start % 2 === 0) {
                 if (this.rightCondition === 'Good') {
@@ -2254,63 +2232,14 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                     canvasCtx.strokeStyle = 'rgb(145, 255, 0)';
                   }
                 }
-                // else {
-                //   canvasCtx.strokeStyle = 'rgba(255, 0, 0, 0.6)';
-                // }
-                // canvasCtx.strokeStyle = this.rightCondition === 'Good' ? 'rgba(0, 255, 0, 0.6)' : 'rgba(255, 0, 0, 0.6)';
               }
               canvasCtx.stroke();
+              connections.push({ start, end, color: canvasCtx.strokeStyle });
             }
-            // } else if (this.videoIndex == 4 || this.videoIndex == 5 || this.videoIndex == 6) {
-            //   if ((start === 24 && end === 26) || (start === 26 && end === 28) || (start === 23 && end === 25) || (start === 25 && end === 27)) {
-            //     const startLandmark = results.poseLandmarks[start];
-            //     const endLandmark = results.poseLandmarks[end];
-            //     canvasCtx.beginPath();
-            //     canvasCtx.moveTo(
-            //       startLandmark.x * canvasElement.width,
-            //       startLandmark.y * canvasElement.height
-            //     );
-            //     canvasCtx.lineTo(
-            //       endLandmark.x * canvasElement.width,
-            //       endLandmark.y * canvasElement.height
-            //     );
-            //     canvasCtx.lineWidth = 4;
-            //     canvasCtx.strokeStyle = 'rgba(128, 128, 128, 0.6)';
-
-            //     if (this.timeMatching && ((start === 24 && end === 26) || (start === 26 && end === 28))) {
-            //       canvasCtx.strokeStyle = this.leftCondition === 'Good' ? 'rgba(0, 255, 0, 0.6)' : 'rgba(255, 0, 0, 0.6)';
-            //     }
-            //     if (this.timeMatching && ((start === 23 && end === 25) || (start === 25 && end === 27))) {
-            //       canvasCtx.strokeStyle = this.rightCondition === 'Good' ? 'rgba(0, 255, 0, 0.6)' : 'rgba(255, 0, 0, 0.6)';
-            //     }
-            //     canvasCtx.stroke();
-            //   }
-            // } else {
-            //   if ((start === 11 && (end === 13 || end === 23)) || (start === 13 && end === 15) || (start === 12 && (end === 14 || end === 24)) || (start === 14 && end === 16)) {
-            //     const startLandmark = results.poseLandmarks[start];
-            //     const endLandmark = results.poseLandmarks[end];
-            //     canvasCtx.beginPath();
-            //     canvasCtx.moveTo(
-            //       startLandmark.x * canvasElement.width,
-            //       startLandmark.y * canvasElement.height
-            //     );
-            //     canvasCtx.lineTo(
-            //       endLandmark.x * canvasElement.width,
-            //       endLandmark.y * canvasElement.height
-            //     );
-            //     canvasCtx.lineWidth = 4;
-            //     canvasCtx.strokeStyle = 'rgba(128, 128, 128, 0.6)';
-
-            //     if (this.timeMatching && ((start === 11 && (end === 13 || end === 23)) || (start === 13 && end === 15))) {
-            //       canvasCtx.strokeStyle = this.leftCondition === 'Good' ? 'rgba(0, 255, 0, 0.6)' : 'rgba(255, 0, 0, 0.6)';
-            //     }
-            //     if (this.timeMatching && ((start === 12 && (end === 14 || end === 24)) || (start === 14 && end === 16))) {
-            //       canvasCtx.strokeStyle = this.rightCondition === 'Good' ? 'rgba(0, 255, 0, 0.6)' : 'rgba(255, 0, 0, 0.6)';
-            //     }
-            //     canvasCtx.stroke();
-            //   }
-            // }
           });
+
+          this.skeletonService.updateSkeleton({ joints, connections });
+          this.cdr.detectChanges();
         }
       }
     }
