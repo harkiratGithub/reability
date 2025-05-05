@@ -95,7 +95,7 @@ stages:
     #     action: 'Push an image'
     #     imageName: '$(Build.DefinitionName):$(Build.BuildId)'
     #     includeLatestTag: true
-    - template: /pipelines/CI/ci.yaml@Pipelines
+#    - template: /pipelines/CI/ci.yaml@Pipelines
 
 - stage: DeployStage
   jobs:
