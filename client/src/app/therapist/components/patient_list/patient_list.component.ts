@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { reduce, chain, filter, groupBy, capitalize, startsWith, head } from 'lodash';
+import { reduce, chain, filter, groupBy, capitalize, startsWith, head ,orderBy} from 'lodash';
 import * as util from '../../../backoffice/backoffice-util';
 import {
   GeneralModalData,
@@ -208,17 +208,16 @@ export class PatientListComponent implements OnInit, OnDestroy {
       }))
       .values()
       .uniqBy('id')
-      // .orderBy([(p) => (p.status === 'online' ? 1 : 0), (p) => new Date(p.lastLogin)], ['desc', 'desc'])
-      .orderBy(
+      .orderBy([(p) => (p.status === 'online' ? 1 : 0), (p) => new Date(p.lastLogin)], ['desc', 'desc'])
+      /*.orderBy(
         [
-          (p) => (new Date(p.created_at)), 
-          (p) => (p.status === 'online' ? 1 : 0), 
-          (p) => new Date(p.lastLogin),
+          (p) => (p.status === 'online' ? 1 : 0), // Online patients first
+          (p) => (p.created_at ? new Date(p.created_at) : new Date(p.lastLogin)), // Sort by created_at if no lastLogin        
+          (p) => (p.lastLogin ? 1 : 0),           // Patients with a lastLogin next
         ],
-        ['desc', 'desc', 'desc']
-      )
+        ['desc', 'desc', 'desc'] // Descending for online status, descending for lastLogin existence, ascending by date
+        )*/
       .value();
-
     patients.forEach((patient) => {
       for (let i = 0; i < this.lastWeekActivityArray.length; i++) {
         const checkActivity = filter(
