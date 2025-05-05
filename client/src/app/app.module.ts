@@ -130,7 +130,7 @@ import { MultiSelectComponent } from './common/multi-select/multi-select.compone
 import { AddEditExpertiseComponent } from './backoffice/add-edit/add-edit-expertise/add-edit-expertise.component';
 import { CamelCasePipe } from '../app/pipes/camelCase.pipe';
 import { GameMessageComponent } from './patient/components/game-message/game-message.component';
-import { NgxFileDropModule } from 'ngx-file-drop';
+//import { NgxFileDropModule } from 'ngx-file-drop';
 import { FileUploaderComponent } from './backoffice/file-uploader/file-uploader.component';
 import { GameLogsComponent } from './patient/components/game-logs/game-logs.component';
 import { ExportToExcelComponent } from './backoffice/export-to-excel/export-to-excel.component';
@@ -270,7 +270,7 @@ export const CUSTOM_MOMENT_FORMATS = {
     NgxMatTimepickerModule,
     MatMenuModule,
     MatSnackBarModule,
-    NgxFileDropModule,
+   // NgxFileDropModule,
     MatProgressSpinnerModule
   ],
   providers: [
