@@ -15,6 +15,7 @@ export interface Connection {
 }
 
 export interface SkeletonFrame {
+  userId: number;
   joints: Joint[];
   connections: Connection[];
 }

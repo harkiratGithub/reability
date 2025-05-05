@@ -68,7 +68,7 @@
       " alt="Rotate video left" />
         </div>
       </div>
-      <video #patientVideo id="{{ 'patient-video-' + therapistPatientConnection.peer }}" autoplay playsinline [style.transform]="'rotate(' + videoRotation + 'deg)'" [ngClass]="{
+      <video [ngStyle]="{ display: hideVideo ? 'none' : 'block' }" #patientVideo id="{{ 'patient-video-' + therapistPatientConnection.peer }}" autoplay playsinline [style.transform]="'rotate(' + videoRotation + 'deg)'" [ngClass]="{
           'zoom-video': enlargeVideo,
           'hide-video': !receivedRemoteVideo,
           'patient-video-full-screen-swapped': isSwappedScreens && !isSplitScreenView,
@@ -88,7 +88,26 @@
           'patient-video-full-screen-swapped-split-screen-no-skeleton':
             isSwappedScreens && isSplitScreenView && isDisabledSkeletonVideo
         }"></video>
-      <canvas #displayCanvas width="640" height="480"></canvas>
+      <canvas [ngStyle]="{ display: hideVideo ? 'block' : 'none' }" style="transform: scaleX(1)" id="{{ 'patient-video-' + therapistPatientConnection.peer }}" #canvasRef width="257" height="192" [ngClass]="{
+          'zoom-video': enlargeVideo,
+          'hide-video': !receivedRemoteVideo,
+          'patient-video-full-screen-swapped': isSwappedScreens && !isSplitScreenView,
+          'patient-video': !isSwappedScreens && !isSplitScreenView && !isDisabledSkeletonVideo,
+          'patient-video-depth-cam': !isSwappedScreens && !isSplitScreenView && isDepthCameraConnected,
+          'patient-video-split-screen': !isSwappedScreens && isSplitScreenView && !isDisabledSkeletonVideo,
+          'patient-video-split-screen-no-skeleton':
+            !isSwappedScreens && isSplitScreenView && isDisabledSkeletonVideo && !isActiveSkeleton,
+          'patient-video-split-screen-active-skeleton':
+            !isSwappedScreens && isSplitScreenView && isDisabledSkeletonVideo && isActiveSkeleton,
+          'patient-video-full-screen-swapped-split-screen':
+            isSwappedScreens && isSplitScreenView && !isDisabledSkeletonVideo,
+          'patient-video-no-skeleton':
+            !isSwappedScreens && !isSplitScreenView && isDisabledSkeletonVideo && !isActiveSkeleton,
+          'patient-video-active-skeleton':
+            !isSwappedScreens && !isSplitScreenView && isDisabledSkeletonVideo && isActiveSkeleton,
+          'patient-video-full-screen-swapped-split-screen-no-skeleton':
+            isSwappedScreens && isSplitScreenView && isDisabledSkeletonVideo
+        }"></canvas>
     </div>
   </div>
 </div>

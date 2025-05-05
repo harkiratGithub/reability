@@ -2177,12 +2177,6 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
               );
               canvasCtx.fillStyle = 'rgba(255, 255, 255)';
               canvasCtx.fill();
-              joints.push({
-                x: landmark.x * canvasElement.width,
-                y: landmark.y * canvasElement.height,
-                visibility: landmark.visibility,
-                index
-              });
             }
           });
 
@@ -2238,7 +2232,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
             }
           });
 
-          this.skeletonService.updateSkeleton({ joints, connections });
+          // this.skeletonService.updateSkeleton({ joints, connections });
+          therapistToPatientConnection.send({ type: 'skeleton_tracking', data: { userId: this.currentUser, frame: { joints: this.landmarksPointer, connections } } });
           this.cdr.detectChanges();
         }
       }

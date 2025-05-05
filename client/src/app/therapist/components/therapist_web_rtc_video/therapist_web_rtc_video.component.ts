@@ -13,7 +13,7 @@ import {
 } from '@angular/core';
 import { select } from '@angular-redux/store';
 import { Subscription, Observable } from 'rxjs';
-
+import { Pose, POSE_CONNECTIONS, Results } from '@mediapipe/pose';
 import { WebRtcService } from '../../services/therapist_web_rtc.service';
 import { AppActions } from '../../../app.actions';
 import { IEnlargeVideoMessage } from '../../../common/services/communication_util.service';
@@ -42,8 +42,9 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
   @Output() handleStreamSending = new EventEmitter();
   @Output() handlePatientVideo = new EventEmitter();
   @Output() enlargeVideoChanged = new EventEmitter<IEnlargeVideoMessage>();
-  @ViewChild('patientVideo') patientVideo: ElementRef<HTMLInputElement>;
-  @ViewChild('displayCanvas') canvasRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('patientVideo') patientVideo!: ElementRef;
+  @ViewChild('canvasRef') canvasRef!: ElementRef;
+  private cameraPose!: Pose;
 
   @select((state) => state.global.enlargeVideo) readonly enlargeVideo$: Observable<boolean>;
 
@@ -57,7 +58,10 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
   ctx;
   patientRotation = 0;
   enlargeVideo = false;
+  hideVideo = false;
   subscription: Subscription = new Subscription();
+  joints = [];
+  connections = [];
 
   constructor(private webRtcService: WebRtcService, private appActions: AppActions, private skeletonService: SkeletonService) {
     this.initialize();
@@ -71,10 +75,12 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
     );
 
     this.subscription.add(
-      this.skeletonService.skeleton$.subscribe((frame) => {
-        console.log(frame);
-        if (!frame) return;
-        this.drawSkeleton(frame);
+      this.skeletonService.skeleton$.subscribe((data: any) => {
+        if (data) {
+          this.joints = data.joints;
+          this.connections = data.connections;
+        }
+        // this.drawSkeleton(data.frame);
       })
     )
   }
@@ -135,6 +141,7 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
     if (this.enlargeVideo) {
       this.toggleEnlargeVideo();
     }
+    this.subscription.unsubscribe();
   }
 
   initialize() {
@@ -146,6 +153,7 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
   }
 
   handleCall() {
+    this.initializePoseModels();
     this.remoteVideo.srcObject = this.activeCallStream;
     this.remoteStream = this.activeCallStream;
     this.remoteVideo.onloadeddata = (e) => {
@@ -159,6 +167,7 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
       this.remoteVideo.play();
       this.receivedRemoteVideo = true;
       this.handleStreamSending.emit();
+      this.processVideoFrames();
     };
   }
 
@@ -244,34 +253,94 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
     }
   };
 
-  drawSkeleton(frame: SkeletonFrame) {
-    const ctx = this.canvasRef.nativeElement.getContext('2d');
-    if (!ctx) return;
+  private initializePoseModels() {
 
-    ctx.clearRect(0, 0, 640, 480);
-
-    // Draw joints
-    ctx.fillStyle = 'blue';
-    frame.joints.forEach(joint => {
-      if (joint.visibility && joint.visibility > 0.5) {
-        ctx.beginPath();
-        ctx.arc(joint.x, joint.y, 5, 0, Math.PI * 2);
-        ctx.fill();
-      }
+    this.cameraPose = new Pose({
+      locateFile: (file) =>
+        `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`,
     });
 
-    // Draw connections
-    frame.connections.forEach(({ start, end, color }) => {
-      const jointStart = frame.joints.find(j => j.index === start);
-      const jointEnd = frame.joints.find(j => j.index === end);
-      if (jointStart && jointEnd) {
-        ctx.beginPath();
-        ctx.moveTo(jointStart.x, jointStart.y);
-        ctx.lineTo(jointEnd.x, jointEnd.y);
-        ctx.lineWidth = 4;
-        ctx.strokeStyle = color;
-        ctx.stroke();
-      }
+    const poseOptions: any = {
+      modelComplexity: 1,
+      smoothLandmarks: true,
+      enableSegmentation: false,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5,
+    };
+    this.cameraPose.setOptions(poseOptions);
+
+    this.cameraPose.onResults((results: Results) => {
+      this.onPoseCameraResults(results, this.canvasRef.nativeElement);
     });
+
+    // this.patientVideo.nativeElement.onloadeddata = () => {
+    //   this.processVideoFrames();
+    // };
   }
+
+  private async processVideoFrames() {
+    const video = this.patientVideo.nativeElement;
+    const renderFrame = async () => {
+      if (video.paused || video.ended) return;
+      await this.cameraPose.send({ image: video });
+      requestAnimationFrame(renderFrame);
+    };
+    renderFrame();
+    this.hideVideo = true
+  }
+
+  private onPoseCameraResults(
+    results: Results,
+    canvasElement: HTMLCanvasElement
+  ) {
+    const canvasCtx = canvasElement.getContext('2d');
+    if (canvasCtx) {
+      canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+      canvasCtx.drawImage(
+        results.image,
+        0,
+        0,
+        canvasElement.width,
+        canvasElement.height
+      );
+
+      if (results.poseLandmarks && this.joints.length > 0 && this.connections.length > 0) {
+        results.poseLandmarks.forEach((landmark, index) => {
+          if (this.joints.includes(index)) {
+            canvasCtx.beginPath();
+            canvasCtx.arc(
+              landmark.x * canvasElement.width,
+              landmark.y * canvasElement.height,
+              7,
+              0,
+              2 * Math.PI
+            );
+            canvasCtx.fillStyle = 'rgba(255, 255, 255)';
+            canvasCtx.fill();
+          }
+        });
+
+        POSE_CONNECTIONS.forEach(([start, end]) => {
+          const poseData = this.connections.filter(c => c.start === start && c.end === end);
+          if (poseData.length > 0 && start === poseData[0].start && end === poseData[0].end) {
+            const startLandmark = results.poseLandmarks[start];
+            const endLandmark = results.poseLandmarks[end];
+            canvasCtx.beginPath();
+            canvasCtx.moveTo(
+              startLandmark.x * canvasElement.width,
+              startLandmark.y * canvasElement.height
+            );
+            canvasCtx.lineTo(
+              endLandmark.x * canvasElement.width,
+              endLandmark.y * canvasElement.height
+            );
+            canvasCtx.lineWidth = 4;
+            canvasCtx.strokeStyle = poseData[0].color;
+            canvasCtx.stroke();
+          }
+        });
+      }
+    }
+  }
+
 }

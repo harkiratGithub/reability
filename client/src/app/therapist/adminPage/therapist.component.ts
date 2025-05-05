@@ -36,6 +36,7 @@ import { AppActions } from 'src/app/app.actions';
 import { setCameraFrameRate } from '../../common/helpers/webRTC-common-utils';
 import { isMobileDevice } from '../../common/utils';
 import { MenuOptionsComponent } from '../../patient/components/menu-options/menu-options.component';
+import { SkeletonService } from 'src/app/common/services/skeleton.service';
 
 declare var MediaRecorder: any;
 enum tabs {
@@ -121,7 +122,8 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
     private sanitizer: DomSanitizer,
     private patientWebRtcService: PatientWebRtcService,
     private ref: ChangeDetectorRef,
-    public appActions: AppActions
+    public appActions: AppActions,
+    private skeletonService: SkeletonService
   ) {
     this.connectedTherapist = this.authenticationService.currentUserValue;
     this.InstituteLogo = this.connectedTherapist?.instituteLogo || '';
@@ -522,6 +524,9 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
         this.connectedPaitents = handlePatientsGamesMessage(this.connectedPaitents, data, conn);
         this.ref.detectChanges();
         break;
+      case 'skeleton_tracking':
+        this.skeletonService.updateSkeleton(data.data.frame);
+        break;
       case 'skeleton_buffer':
         this.setPatientFrame(conn, data.skeletonTrackingData);
         if (iframeEl && iframeEl.nodeName === 'IFRAME') {
@@ -694,7 +699,6 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       metadata: displayName,
     });
     const senders = this.therapistCall.peerConnection.getSenders();
-
     const audioTrack = localClone.getAudioTracks()[0];
     const videoTrack = localClone.getVideoTracks()[0].enabled;
     senders[0].replaceTrack(audioTrack);

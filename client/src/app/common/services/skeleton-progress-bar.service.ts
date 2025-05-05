@@ -14,15 +14,7 @@ export class SkeletonProgressBarService {
     this.progressBar.next(data);
   }
 
-  getBarElement(): string | null {
-    return this.progressBar.value;
-  }
-
   setThumbUpElement(data: string | null): void {
     this.thumbUp.next(data);
-  }
-
-  getThumbUpElement(): string | null {
-    return this.thumbUp.value;
   }
 }
