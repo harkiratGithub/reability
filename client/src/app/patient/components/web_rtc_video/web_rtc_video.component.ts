@@ -599,7 +599,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     this.skeletonLoadingBar();
 
     // if (this.currentUser.id == 1802 || this.currentUser.id == 1793) {
-    this.initializeCamera();
+    // this.initializeCamera();
     this.initializePoseModels();
     // }
   }
@@ -901,6 +901,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           }
           this.localVideo.onloadeddata = (e) => {
             this.localVideo.play();
+            this.processVideoFrames();
             if (this.isBodyTrackingAvailable) {
               this.webCamSkeletonService.bindPage(this.localVideoForSkeleton, true);
             }
@@ -1917,16 +1918,16 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       this.onPoseCameraResults(results, this.canvasElement2.nativeElement);
     });
 
-    // this.videoElement.nativeElement.onloadeddata = () => {
+    // this.cameraElement.nativeElement.onloadeddata = () => {
     //   this.processVideoFrames();
     // };
   }
 
   private async processVideoFrames() {
-    const video = this.videoElement.nativeElement;
+    const video = this.cameraElement.nativeElement;
     const renderFrame = async () => {
       if (video.paused || video.ended) return;
-      await this.videoPose.send({ image: video });
+      await this.cameraPose.send({ image: video });
       requestAnimationFrame(renderFrame);
     };
     renderFrame();
