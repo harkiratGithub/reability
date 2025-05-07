@@ -17,6 +17,8 @@ RUN npm install --legacy-peer-deps
 # Copy the entire application to the working directory
 COPY . .
 
+COPY .env .env
+
 # Run the heroku-postbuild script (typically for Angular or frontend builds)
 RUN npm run heroku-postbuild
 
