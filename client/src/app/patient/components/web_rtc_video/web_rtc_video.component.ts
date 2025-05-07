@@ -181,6 +181,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   callChatGPT = false;
   showMarker = false;
   lastPerformedIndex = 0;
+  barPercentage = 0;
+  barThumbsUp = 0;
 
   constructor(
     private authenticationService: AuthenticationService,
@@ -252,6 +254,10 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           this.lastPerformedIndex = 0;
           this.matchingCameraData = [];
           this.landmarksLinePointer = [];
+          if (therapistToPatientConnection) {
+            therapistToPatientConnection.send({ type: 'progress_bar', data: { userId: this.currentUser, barPercentage: 0, barThumbsUp: 0 } });
+            therapistToPatientConnection.send({ type: 'skeleton_tracking', data: { userId: this.currentUser, frame: { joints: [], connections: [] } } });
+          }
 
           this.ajaxService.savePatientMetaData({
             game_id: this.gameId,
@@ -264,9 +270,15 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           // this.saveToCSV(this.timeLog, 'time_matching.csv');
         }
         if (action.msg && action.msg.data && action.msg.data.shouldPlay) {
+          const videoTime = action.msg.data.currentPlayTime.vidTime;
           if (this.videoIndex == action.msg.data.index) {
-            console.log("resumed===");
-            this.startTime = Date.now() - Math.floor(action.msg.data.currentPlayTime.vidTime * 1000);
+            this.startTime = Date.now() - Math.floor(videoTime * 1000);
+            const closestIndex = this.videoMinMax.reduce((closestIdx, currentItem, currentIndex, array) => {
+              const currentDiff = Math.abs(currentItem.ClipTimestamp - videoTime);
+              const closestDiff = Math.abs(array[closestIdx].ClipTimestamp - videoTime);
+              return currentDiff < closestDiff ? currentIndex : closestIdx;
+            }, 0);
+            this.currentVideoIndex = closestIndex;
             this.cdr.detectChanges();
           } else {
             this.landmarks = [];
@@ -290,23 +302,26 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                   const updateLength = updateComments.filter((data) => (data.RightCondition == 'Good' || data.LeftCondition == 'Good') && data.PatientTimestamp != undefined).length;
                   const thumbUpLength = updateComments.filter((data) => (data.RightComments == 'Perfect' || data.LeftComments == 'Perfect') && data.PatientTimestamp != undefined).length;
                   const percentage = Math.floor((updateLength / mainLength) * 100);
+                  this.barPercentage = percentage;
+                  this.barThumbsUp = thumbUpLength;
                   this.skeltonProgressBarService.setBarElement('' + percentage);
                   this.skeltonProgressBarService.setThumbUpElement('' + thumbUpLength);
 
-                  const performedLength = updateComments.filter((data) => data.PatientTimestamp != undefined).length;
-                  const performedPercentage = Math.floor((performedLength / mainLength) * 100);
-                  console.log("performedPercentage===", performedPercentage, Date);
-                  if (performedPercentage > 10 && performedPercentage % 19 >= 0 && performedPercentage % 19 <= 10 && Math.abs(performedPercentage - this.lastPerformedPercentage) >= 10) {
-                    this.lastPerformedPercentage = performedPercentage
-                    setTimeout(() => {
-                      if (!this.callChatGPT) {
-                        this.generatefeedback();
-                      }
-                    }, 1000);
+                  if (!therapistToPatientConnection) {
+                    const performedLength = updateComments.filter((data) => data.PatientTimestamp != undefined).length;
+                    const performedPercentage = Math.floor((performedLength / mainLength) * 100);
+                    console.log("performedPercentage===", performedPercentage, Date);
+                    if (performedPercentage > 10 && performedPercentage % 19 >= 0 && performedPercentage % 19 <= 10 && Math.abs(performedPercentage - this.lastPerformedPercentage) >= 10) {
+                      this.lastPerformedPercentage = performedPercentage
+                      setTimeout(() => {
+                        if (!this.callChatGPT) {
+                          this.generatefeedback();
+                        }
+                      }, 1000);
+                    }
                   }
                 }, 2000);
 
-                const videoTime = action.msg.data.currentPlayTime.vidTime;
                 const currentPlayTime = new Date(action.msg.data.currentPlayTime.sysTime).getSeconds();
 
                 if (this.videoSeconds == 0) {
@@ -2071,7 +2086,6 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         this.cameraAngle['rightWrist'] = rightAngle;
 
         const elapsedTime = +((Date.now() - this.startTime) / 1000).toFixed(3);
-        // console.log(elapsedTime, "elapsedTime");
 
         this.matchingCameraData.push({
           timestamp: `${elapsedTime}`,
@@ -2234,7 +2248,10 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           });
 
           // this.skeletonService.updateSkeleton({ joints, connections });
-          therapistToPatientConnection.send({ type: 'skeleton_tracking', data: { userId: this.currentUser, frame: { joints: this.landmarksPointer, connections } } });
+          if (therapistToPatientConnection) {
+            therapistToPatientConnection.send({ type: 'skeleton_tracking', data: { userId: this.currentUser, frame: { joints: this.landmarksPointer, connections } } });
+            therapistToPatientConnection.send({ type: 'progress_bar', data: { userId: this.currentUser, barPercentage: this.barPercentage, barThumbsUp: this.barThumbsUp } });
+          }
           this.cdr.detectChanges();
         }
       }

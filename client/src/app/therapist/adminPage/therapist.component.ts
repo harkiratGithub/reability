@@ -37,6 +37,7 @@ import { setCameraFrameRate } from '../../common/helpers/webRTC-common-utils';
 import { isMobileDevice } from '../../common/utils';
 import { MenuOptionsComponent } from '../../patient/components/menu-options/menu-options.component';
 import { SkeletonService } from 'src/app/common/services/skeleton.service';
+import { SkeletonProgressBarService } from 'src/app/common/services/skeleton-progress-bar.service';
 
 declare var MediaRecorder: any;
 enum tabs {
@@ -123,7 +124,8 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
     private patientWebRtcService: PatientWebRtcService,
     private ref: ChangeDetectorRef,
     public appActions: AppActions,
-    private skeletonService: SkeletonService
+    private skeletonService: SkeletonService,
+    private skeltonProgressBarService: SkeletonProgressBarService
   ) {
     this.connectedTherapist = this.authenticationService.currentUserValue;
     this.InstituteLogo = this.connectedTherapist?.instituteLogo || '';
@@ -523,6 +525,10 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       case 'patients_game':
         this.connectedPaitents = handlePatientsGamesMessage(this.connectedPaitents, data, conn);
         this.ref.detectChanges();
+        break;
+      case 'progress_bar':
+        this.skeltonProgressBarService.setBarElement('' + data.data.barPercentage);
+        this.skeltonProgressBarService.setThumbUpElement('' + data.data.barThumbsUp);
         break;
       case 'skeleton_tracking':
         this.skeletonService.updateSkeleton(data.data.frame);

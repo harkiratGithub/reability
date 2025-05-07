@@ -18,6 +18,7 @@ import { WebRtcService } from '../../services/therapist_web_rtc.service';
 import { AppActions } from '../../../app.actions';
 import { IEnlargeVideoMessage } from '../../../common/services/communication_util.service';
 import { SkeletonFrame, SkeletonService } from 'src/app/common/services/skeleton.service';
+import { SkeletonProgressBarService } from 'src/app/common/services/skeleton-progress-bar.service';
 
 const isVideoPlaying = (video) => !!(video.currentTime > 0 && !video.paused && !video.ended && video.readyState > 2);
 @Component({
@@ -62,8 +63,11 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
   subscription: Subscription = new Subscription();
   joints = [];
   connections = [];
+  sliderValue: number = 0;
+  thumbUpValue: number = 0;
+  showThumbUp: boolean = false;
 
-  constructor(private webRtcService: WebRtcService, private appActions: AppActions, private skeletonService: SkeletonService) {
+  constructor(private webRtcService: WebRtcService, private appActions: AppActions, private skeletonService: SkeletonService, private skeltonProgressBarService: SkeletonProgressBarService) {
     this.initialize();
   }
 
@@ -83,6 +87,26 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
         // this.drawSkeleton(data.frame);
       })
     )
+
+    this.subscription.add(
+      this.skeltonProgressBarService.progressBarElement$.subscribe(value => {
+        if (+value > this.sliderValue || +value == 0) {
+          this.sliderValue = +value;
+        }
+      })
+    );
+
+    this.subscription.add(
+      this.skeltonProgressBarService.thumbUpElement$.subscribe(value => {
+        if (+value > 0 && +value % 3 === 0 && this.thumbUpValue != +value) {
+          this.showThumbUp = true;
+          this.thumbUpValue = +value;
+          setTimeout(() => {
+            this.showThumbUp = false;
+          }, 5000);
+        }
+      })
+    );
   }
 
   ngOnChanges(changes: SimpleChanges) {

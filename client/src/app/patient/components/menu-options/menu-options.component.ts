@@ -225,6 +225,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
       this.subscription.add(
         this.currentGame$.subscribe((currentGame) => {
           console.log("current game===", currentGame);
+          this.gameId = currentGame.id;
           this.currentGameDescription = currentGame.description;
         })
       );
@@ -462,6 +463,9 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     console.log("we are under ngOnChanges function ");
+    if (changes.gameIdTherapist?.currentValue) {
+      this.gameId = changes.gameIdTherapist?.currentValue;
+    }
     if (changes.showPercentageScoreForTherapist?.currentValue) {
       this.showPercentageScoreForTherapist = changes.showPercentageScoreForTherapist.currentValue;
     }
@@ -576,6 +580,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     this.currentGameIndex = index;
+    // this.gameId = this.currentMenuApps[index].gameId;
 
     if (this.isTherapistMode) {
       this.bodyHandleService.removeHands(this.connectedUser.peerId);
@@ -588,9 +593,8 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
       return;
     }
 
-    this.bodyHandleService.removeHands(this.currentUser.peerId);
     this.isInGame = true;
-    this.gameId = this.currentMenuApps[index].gameId;
+    this.bodyHandleService.removeHands(this.currentUser.peerId);
 
     this.appActions.setCurrentGame({
       url: this.currentMenuApps[index].url,
