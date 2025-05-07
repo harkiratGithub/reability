@@ -32,6 +32,7 @@ import { isNil, isBoolean, throttle } from 'lodash';
 import { setCameraFrameRate } from '../../../common/helpers/webRTC-common-utils';
 import { IOrganAngle, IScore } from '../../../../types';
 import { IGameAppData } from '../../../../app/app.state';
+import { HttpClient } from '@angular/common/http';
 
 let therapistToPatientConnection = null;
 declare var MediaRecorder: any;
@@ -126,7 +127,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   skeletonBtn;
   currentGameAppData: IGameAppData;
   searchCameraInterval;
-
+  rustdeskId: string | null = null;
+  therapistRustdeskId:string;
   constructor(
     private authenticationService: AuthenticationService,
     private patientWebRtcService: PatientWebRtcService,
@@ -134,7 +136,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     private menuOptionsActions: MenuOptionsAppActions,
     private depthCameraSocketService: DepthCameraSocketService,
     private webCamSkeletonService: WebCamSkeletonService,
-    private ajaxService: AjaxService
+    private ajaxService: AjaxService,private http: HttpClient,
   ) {
     this.subscription.add(
       this.ajaxService.getIceServers().subscribe((res) => {
@@ -175,6 +177,66 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       }
     }
   }
+
+    
+  getRustDeskID(): void {
+    this.ajaxService.getRustDeskID().subscribe(
+      (response) => {
+        this.rustdeskId = response.rustdeskID;
+        console.log("Fetched RustDesk ID:", this.rustdeskId);
+        this.registerAsPatient();
+      },
+      (error) => {
+        console.error("Error fetching RustDesk ID:", error);
+      }
+    );
+  }
+
+ 
+
+
+
+  registerAsPatient() {
+    const rustdesk_client = {
+      clientType: 'patient',
+      rustdeskId: this.rustdeskId
+    };
+    this.ajaxService.rustdeskRegisterClient(rustdesk_client); 
+    this.getTherapistID();   
+  }
+  getTherapistID() {
+    this.http.get<{ rustdeskId: string }>('patient/get-session/therapist')
+      .subscribe(response => {
+        this.therapistRustdeskId = response.rustdeskId;
+        console.log('therapist RustDesk ID:', this.therapistRustdeskId);
+      }, error => {
+        console.error('Error fetching patient ID:', error);
+      });
+  }
+
+/*startSharing() {
+  console.log("====startsharing button hit ");
+    const rustdesk_details = {
+        patientId: this.currentUser.patientId,
+        rustdeskId: this.rustdeskId
+    };
+    console.log("====startsharing details ",rustdesk_details);
+    this.ajaxService.rustdeskCreateSession(rustdesk_details);
+}*/
+
+shareMyScreen(): void {
+  this.http.post('/patient/create-session', {
+    therapistId: '1058037189', //this.patientRustdeskId,patientId
+    patientId: '271326153' //this.therapistRustdeskId
+  }).subscribe(
+    (response) => {
+      console.log('Connection established:', response);
+    },
+    (error) => {
+      console.error('Error connecting to Patient:', error);
+    }
+  );
+}
 
   getGameUrlMessage(isInGame: boolean) {
     return {
@@ -381,6 +443,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       }
     }, this.POSENET_LOADING_TIME_PASSED_DURATION);
     document.addEventListener('touchstart', this.handleBodyTracking.bind(this), { passive: false });
+    this.getRustDeskID();
   }
 
   ngAfterViewInit() {

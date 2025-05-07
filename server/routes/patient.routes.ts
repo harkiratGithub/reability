@@ -7,7 +7,7 @@ import * as UserGameDataController from '../controllers/user-game-data.controlle
 import * as ServerLogController from '../controllers/server-log.controller';
 import * as GameDataController from '../controllers/game-data.controller';
 import * as UserController from '../controllers/user.controller';
-
+import * as RustDeskController from "../controllers/rustdesk.controller";
 import express from 'express';
 import multer from 'multer';
 
@@ -41,4 +41,9 @@ router.post('/rtmSession', RtmController.updatePatientRTMSession);
 router.patch('/termsConditions', PatientController.updateUserTermsConditions);
 router.post('/users/sendEmail', UserController.sendEmailAfterlogin);
 router.get('/users/:id', PatientController.getActive);
+router.post('/create-rustdesk-session', RustDeskController.createRustDeskSession);
+router.post('/register-client', RustDeskController.registerClient);
+router.get('/get-rustdesk-id/:role', RustDeskController.fetchRustDeskID);
+router.post('/create-session', RustDeskController.createRustDeskSession);
+router.get('/get-session/therapist', RustDeskController.getRustDeskSessions);
 export default router;

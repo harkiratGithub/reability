@@ -679,6 +679,66 @@ export class AjaxService {
         console.error(err);
       }
     };  
+
+    rustdeskCreateSession = (rustdesk_details) => {
+      try {
+          this.http.post<any>(`${this.baseUrl}/patient/create-rustdesk-session`, rustdesk_details)
+          .subscribe({
+              next: (response) => console.log("RustDesk Session Response:", response),
+              error: (error) => console.error("API Error:", error),
+          });
+      } catch (err) {
+          console.error("Function Error:", err);
+      }
+  };
+
+  rustdeskRegisterClient = (rustdesk_client) => {
+    try {
+        this.http.post<any>(`${this.baseUrl}/patient/register-client`, rustdesk_client)
+        .subscribe({
+            next: (response) => console.log("RustDesk register  Response:", response),
+            error: (error) => console.error("API Error:", error),
+        });
+    } catch (err) {
+        console.error("Function Error:", err);
+    }
+  };
+
+    rustdeskGetSession = (therapistId) => {      
+      try {        
+        return this.http.get<any>(`${this.baseUrl}/therapist/get-rustdesk-session/${therapistId}`);
+      } catch (error) {
+        console.error(error);
+      }      
+    };
+
+    getRustDeskID = () => {      
+      try {        
+        return this.http.get<any>(`${this.baseUrl}/patient/get-rustdesk-id/patient`);
+      } catch (error) {
+        console.error(error);
+      }      
+    };
+
+    getTherapistRustDeskID = () => {      
+      try {        
+        return this.http.get<any>(`${this.baseUrl}/therapist/get-rustdesk-id/therapist`);
+      } catch (error) {
+        console.error(error);
+      }      
+    };
+
+    rustdeskRegisterTherapistClient = (rustdesk_client) => {
+      try {
+          this.http.post<any>(`${this.baseUrl}/therapist/register-client`, rustdesk_client)
+          .subscribe({
+              next: (response) => console.log("RustDesk register  Response:", response),
+              error: (error) => console.error("API Error:", error),
+          });
+      } catch (err) {
+          console.error("Function Error:", err);
+      }
+    };
     
   
 }

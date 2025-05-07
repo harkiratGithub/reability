@@ -36,7 +36,7 @@ import { AppActions } from 'src/app/app.actions';
 import { setCameraFrameRate } from '../../common/helpers/webRTC-common-utils';
 import { isMobileDevice } from '../../common/utils';
 import { MenuOptionsComponent } from '../../patient/components/menu-options/menu-options.component';
-
+import { HttpClient } from '@angular/common/http';
 declare var MediaRecorder: any;
 enum tabs {
   session,
@@ -112,6 +112,8 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
   sendEmailTimeoutConnection;
   InstituteLogo: string ;
   isPatientOnMobile: boolean = false;
+  therapistRustdeskId: string = '';
+  patientRustdeskId: string = '';
   constructor(
     private authenticationService: AuthenticationService,
     private webRtcService: WebRtcService,
@@ -121,7 +123,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
     private sanitizer: DomSanitizer,
     private patientWebRtcService: PatientWebRtcService,
     private ref: ChangeDetectorRef,
-    public appActions: AppActions
+    public appActions: AppActions,private http: HttpClient
   ) {
     this.connectedTherapist = this.authenticationService.currentUserValue;   
     this.InstituteLogo = this.connectedTherapist?.instituteLogo || '';
@@ -183,12 +185,59 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
     window.addEventListener(eventName, (event) => {
       this.ngOnDestroy();
     });
+    this.getTherapistRustDeskID();
   }
 
   ngAfterViewInit() {
     this.turnOnCamera();
   }
 
+
+  getTherapistRustDeskID(): void {
+    this.ajax.getTherapistRustDeskID().subscribe(
+      (response) => {
+        this.therapistRustdeskId = response.rustdeskID;
+        console.log("Fetched RustDesk ID:", this.therapistRustdeskId);
+        this.registerAsTherapist();
+      },
+      (error) => {
+        console.error("Error fetching RustDesk ID:", error);
+      }
+    );
+  }
+
+  registerAsTherapist() {
+    const rustdesk_client = {
+      clientType: 'therapist',
+      rustdeskId: this.therapistRustdeskId
+    };
+    this.ajax.rustdeskRegisterTherapistClient(rustdesk_client);  
+    this.getPatientID();  
+  }
+
+  getPatientID() {
+    this.http.get<{ rustdeskId: string }>('therapist/get-session/patient')
+      .subscribe(response => {
+        this.patientRustdeskId = response.rustdeskId;
+        console.log('Patient RustDesk ID:', this.patientRustdeskId);
+      }, error => {
+        console.error('Error fetching patient ID:', error);
+      });
+  }
+
+  rustdeskConnectToPatient(): void {
+    this.http.post('/therapist/create-session', {
+      patientId: '1058037189', //this.patientRustdeskId,patientId
+      therapistId: '271326153' //this.therapistRustdeskId
+    }).subscribe(
+      (response) => {
+        console.log('Connection established:', response);
+      },
+      (error) => {
+        console.error('Error connecting to Patient:', error);
+      }
+    );
+  }
   redirectToHome(conn) {
     this.webRtcService.privateMessage(conn.peer, { type: MESSAGES.REDIRECT_TO_HOME }, this.connectedPaitents);
   }

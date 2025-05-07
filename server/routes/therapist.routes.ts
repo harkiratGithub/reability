@@ -12,6 +12,7 @@ import * as GameDataController from '../controllers/game-data.controller';
 import * as ServerLogController from '../controllers/server-log.controller';
 import * as InstituteController from '../controllers/institute.controller';
 import * as DepartmentController from '../controllers/department.controller';
+import * as RustdeskController from '../controllers/rustdesk.controller';
 import express from 'express';
 import multer from 'multer';
 
@@ -75,6 +76,10 @@ router.get('/department', DepartmentController.getAllTherapistDepartment);
 router.post('/patient/create', PatientController.createPatient);
 // rtm therapist routes
 router.get('/rtm-details', PatientController.getAllRTMDetails);
-
+router.get('/get-rustdesk-session/:therapistId', RustdeskController.getRustDeskSessions);
+router.post('/register-client', RustdeskController.registerClient);
+router.get('/get-rustdesk-id/:role', RustdeskController.fetchRustDeskID);
+router.get('/get-session/patient', RustdeskController.getRustDeskSessions);
+router.post('/create-session', RustdeskController.createRustDeskSession);
 
 export default router;

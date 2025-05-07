@@ -399,6 +399,15 @@
     ></app-therapist-schedule>
   </div>
 </div>
+
+<div class="info-section">
+  <p><strong>Therapist RustDesk ID:</strong> {{ therapistRustdeskId }}</p>
+  <p><strong>Patient RustDesk ID:</strong> {{ patientRustdeskId }}</p>
+</div>
+
+<div class="action-section">
+  <button (click)="rustdeskConnectToPatient()">Request for RDP</button>
+</div>
 <app-full-screen-video-session-component
   *ngIf="videoSessionDisplay"
   [isTherapist]="true"
