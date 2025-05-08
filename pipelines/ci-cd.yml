@@ -88,7 +88,6 @@ stages:
         includeLatestTag: true
         arguments: >
           --build-arg ENV_FILE=.env
-        
     - task: Docker@0
       displayName: 'Push an image'
       inputs:
