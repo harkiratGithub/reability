@@ -66,13 +66,13 @@ app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 app.use(
 	session({
-		secret: 'ewhgwh5h830nrf34jubngfwaefswg4545',
+		secret: process.env.SECRET_KEY_SESSION,
 		proxy: process.env.NODE_ENV !== 'development',
 		cookie: {
 			maxAge: 8 * 60 * 60 * 1000, // 8 hours
 			secure: true,
 			sameSite: true,
-			domain: 'therpt.com',
+			domain: process.env.DOMAIN,
 		},
 		store: new PgSession({
 			pool: DbService.getDataBase(),
