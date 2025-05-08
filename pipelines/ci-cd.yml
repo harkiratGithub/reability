@@ -107,7 +107,6 @@ stages:
     steps:
     - script: |
         echo "##vso[task.setvariable variable=WebAppName]demo-reability"
-        fi
       displayName: 'Set WebAppName Variable'
     - template: /pipelines/CD/cd.yaml@Pipelines
       parameters:
