@@ -106,12 +106,7 @@ stages:
         clean: all
     steps:
     - script: |
-        if [ "$(Build.SourceBranchName)" == "skeltondev" ]; then
-          echo "##vso[task.setvariable variable=WebAppName]demo-reability"
-        elif [ "$(Build.SourceBranchName)" == "us-env" ]; then
-          echo "##vso[task.setvariable variable=WebAppName]us-reability"
-        elif [ "$(Build.SourceBranchName)" == "app-env" ]; then
-          echo "##vso[task.setvariable variable=WebAppName]app-reability"
+        echo "##vso[task.setvariable variable=WebAppName]demo-reability"
         fi
       displayName: 'Set WebAppName Variable'
     - template: /pipelines/CD/cd.yaml@Pipelines
