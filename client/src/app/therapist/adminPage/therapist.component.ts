@@ -694,7 +694,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
   initiateCall = (patientPeerId, user) => {
     const track = this.hiddenVideo.srcObject.clone();
     const localClone = this.localStream.clone();
-    const displayName = this.connectedTherapist.firstName + ' ' + this.connectedTherapist.lastName;
+    const displayName = this.connectedTherapist.first_name + ' ' + this.connectedTherapist.last_name;
     this.activeSessionWithAudio = null;
     this.audioTracks = this.streamHandlerService.muteAllActiveStreams(this.audioTracks);
     const existingTrack = this.audioTracks.find((track) => track.peer_id === patientPeerId);
