@@ -304,7 +304,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                   if (!therapistToPatientConnection) {
                     const performedLength = updateComments.filter((data) => data.PatientTimestamp != undefined).length;
                     const performedPercentage = Math.floor((performedLength / mainLength) * 100);
-                    console.log("performedPercentage===", performedPercentage, Date);
+                    // console.log("performedPercentage===", performedPercentage, Date);
                     if (performedPercentage > 10 && performedPercentage % 19 >= 0 && performedPercentage % 19 <= 10 && Math.abs(performedPercentage - this.lastPerformedPercentage) >= 10) {
                       this.lastPerformedPercentage = performedPercentage
                       setTimeout(() => {
@@ -1826,7 +1826,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     badLeftPercent = Math.floor((badLeftComments / currentPerformedComments.length) * 100);
     badRightPercent = Math.floor((badRightComments / currentPerformedComments.length) * 100);
 
-    console.log("badLeftPercent===", badLeftPercent, "badRightPercent===", badRightPercent, currentPerformedComments.length);
+    // console.log("badLeftPercent===", badLeftPercent, "badRightPercent===", badRightPercent, currentPerformedComments.length);
     if (badLeftPercent > matchPercent) {
       feedbackPrompt += `
         Analyze only the "LeftComments" from each object in the array for left hand feedback.
@@ -1849,7 +1849,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     }
 
     if (feedbackPrompt) {
-      console.log("currentPerformedComments===", currentPerformedComments, performedComments);
+      // console.log("currentPerformedComments===", currentPerformedComments, performedComments);
       this.callChatGPT = true
       this.showMarker = false
       this.patientWebRtcService.setShouldPauseGameState(true);
