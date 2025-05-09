@@ -213,6 +213,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         this.isInGame = isInGame;
         if (!isInGame) {
           this.gameId = null
+          this.resetTracking();
         }
         if (therapistToPatientConnection) {
           therapistToPatientConnection.send(this.getGameUrlMessage(isInGame));
@@ -242,22 +243,9 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         const action = JSON.parse(iframeaction);
         // console.log("action.msg.data.currentPlayTime.vidTime===", action);
         if (action.msg && action.msg.gameSummaryContent == "Session Ended") {
-          this.videoIndex = -1;
-          this.videoSeconds = 0;
-          this.skeltonProgressBarService.setBarElement('' + 0);
           const results = await this.matchClipAndPatientData(this.videoMinMax, this.matchingCameraData);
           const updateComments = await this.updateComments(results);
-          clearInterval(this.newInterval);
-          this.landmarks = [];
-          this.videoMinMax = [];
-          this.landmarksPointer = [];
-          this.lastPerformedIndex = 0;
-          this.matchingCameraData = [];
-          this.landmarksLinePointer = [];
-          if (therapistToPatientConnection) {
-            therapistToPatientConnection.send({ type: 'progress_bar', data: { userId: this.currentUser, barPercentage: 0, barThumbsUp: 0 } });
-            therapistToPatientConnection.send({ type: 'skeleton_tracking', data: { userId: this.currentUser, frame: { joints: [], connections: [] } } });
-          }
+          this.resetTracking();
 
           this.ajaxService.savePatientMetaData({
             game_id: this.gameId,
@@ -273,12 +261,18 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           const videoTime = action.msg.data.currentPlayTime.vidTime;
           if (this.videoIndex == action.msg.data.index) {
             this.startTime = Date.now() - Math.floor(videoTime * 1000);
-            const closestIndex = this.videoMinMax.reduce((closestIdx, currentItem, currentIndex, array) => {
+            const closestVideoIndex = this.videoMinMax.reduce((closestIdx, currentItem, currentIndex, array) => {
               const currentDiff = Math.abs(currentItem.ClipTimestamp - videoTime);
               const closestDiff = Math.abs(array[closestIdx].ClipTimestamp - videoTime);
               return currentDiff < closestDiff ? currentIndex : closestIdx;
             }, 0);
-            this.currentVideoIndex = closestIndex;
+            const closestPatientIndex = this.matchingCameraData.reduce((closestIdx, currentItem, currentIndex, array) => {
+              const currentDiff = Math.abs(+currentItem.timestamp - videoTime);
+              const closestDiff = Math.abs(+array[closestIdx].timestamp - videoTime);
+              return currentDiff < closestDiff ? currentIndex : closestIdx;
+            }, 0);
+            this.currentVideoIndex = closestVideoIndex;
+            this.matchingCameraData = this.matchingCameraData.slice(0, closestPatientIndex);
             this.cdr.detectChanges();
           } else {
             this.landmarks = [];
@@ -1796,6 +1790,23 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     // };
   }
 
+  private async resetTracking() {
+    this.videoIndex = -1;
+    this.videoSeconds = 0;
+    this.skeltonProgressBarService.setBarElement('' + 0);
+    clearInterval(this.newInterval);
+    this.landmarks = [];
+    this.videoMinMax = [];
+    this.landmarksPointer = [];
+    this.lastPerformedIndex = 0;
+    this.matchingCameraData = [];
+    this.landmarksLinePointer = [];
+    if (therapistToPatientConnection) {
+      therapistToPatientConnection.send({ type: 'progress_bar', data: { userId: this.currentUser, barPercentage: 0, barThumbsUp: 0 } });
+      therapistToPatientConnection.send({ type: 'skeleton_tracking', data: { userId: this.currentUser, frame: { joints: [], connections: [] } } });
+    }
+  }
+
   private async generatefeedback() {
     let badLeftPercent = 0
     let badRightPercent = 0
@@ -1834,7 +1845,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       feedbackPrompt += `Combine the feedback from both left and right hands in 7-8 words with no pointers.`;
     }
     if (badLeftPercent > matchPercent || badRightPercent > matchPercent) {
-      feedbackPrompt += 'Check for idle movements and give feedback accordingly. Provide basic feedback in less sophisticated language in simple english.'
+      feedbackPrompt += 'Check for idle movements and give feedback accordingly. Provide basic feedback in very simple english with no pointers.'
     }
 
     if (feedbackPrompt) {
@@ -1866,7 +1877,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
               messages: [{
                 role: 'user',
                 content: `
-                Feedback: ${content}. Make above feedback in one statement in less sophisticated language in simple english, adding comments for idle movements if any, without any pointers in 6-7 words.
+                Feedback: ${content}. Convert this to simple English within 6-7 words, add for idle movement if any.
                 `
               }]
             };
