@@ -1,11 +1,11 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, ViewChild, AfterViewInit  } from '@angular/core';
 import { first, debounceTime, distinctUntilChanged, map, mergeMap, delay } from 'rxjs/operators';
 import { FormControl } from '@angular/forms';
 import { Subject, Subscription, of, Observable } from 'rxjs';
 import _ from 'lodash';
 import Peer from 'peerjs';
 import { AudioContext } from 'standardized-audio-context';
-import { DomSanitizer } from '@angular/platform-browser';
+import { DomSanitizer,SafeResourceUrl } from '@angular/platform-browser';
 import { select } from '@angular-redux/store';
 
 import { User } from '../../common/models/user';
@@ -114,6 +114,8 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
   isPatientOnMobile: boolean = false;
   therapistRustdeskId: string = '';
   patientRustdeskId: string = '';
+  isRdpModalOpen = false;
+  patientId = '271326153'; 
   constructor(
     private authenticationService: AuthenticationService,
     private webRtcService: WebRtcService,
@@ -123,10 +125,10 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
     private sanitizer: DomSanitizer,
     private patientWebRtcService: PatientWebRtcService,
     private ref: ChangeDetectorRef,
-    public appActions: AppActions,private http: HttpClient
+    public appActions: AppActions,private http: HttpClient,
   ) {
     this.connectedTherapist = this.authenticationService.currentUserValue;   
-    this.InstituteLogo = this.connectedTherapist?.instituteLogo || '';
+    this.InstituteLogo = this.connectedTherapist?.instituteLogo || '';    
     this.subscription.add(
       this.keyUp
         .pipe(
@@ -185,14 +187,14 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
     window.addEventListener(eventName, (event) => {
       this.ngOnDestroy();
     });
-    this.getTherapistRustDeskID();
+    //this.getTherapistRustDeskID();
   }
 
   ngAfterViewInit() {
     this.turnOnCamera();
   }
 
-
+/*
   getTherapistRustDeskID(): void {
     this.ajax.getTherapistRustDeskID().subscribe(
       (response) => {
@@ -238,6 +240,68 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     );
   }
+
+  rustdeskConnectToPatient2(): void {
+    this.http.post('/therapist/create-session', {
+      patientId: '1058037189', //this.patientRustdeskId,patientId
+      therapistId: '507794292' //this.therapistRustdeskId
+    }).subscribe(
+      (response) => {
+        console.log('Connection established:', response);
+      },
+      (error) => {
+        console.error('Error connecting to Patient:', error);
+      }
+    );
+  }
+*/
+  openRdpModal() {
+    console.log("Going to open modal");
+    const modalClass = 'generic-dialog-container';
+    this.appActions.openCallModal({
+      panelClass: modalClass,
+      header: 'CONNECTION REQUEST',
+      content:'Remote Desktop Connection',
+      acceptBtnImg: '../../../assets/modal/btn_hover_request_timer.png',
+      acceptBtnImgHover: '../../../assets/modal/btn_accept_hover.png',
+     
+    });
+    this.isRdpModalOpen = true;
+  }
+
+  closeRdpModal() {
+    this.isRdpModalOpen = false;
+  }
+
+  copyToClipboard(text: string) {
+    navigator.clipboard.writeText(text).then(() => {
+      alert('Patient ID copied to clipboard');
+    });
+  }
+
+  /*connectToRdp() {
+    this.isRdpModalOpen = false;
+    const rdpUrl = 'https://rustdesk.com/web/'; // Replace with actual RustDesk/Web RDP URL
+    window.open(rdpUrl, '_blank');
+  }*/
+    connectToRdp() {
+      this.isRdpModalOpen = false;
+      const rdpUrl = 'https://rustdesk.com/web/'; // Replace with actual RustDesk/Web RDP URL
+      
+      // Set desired dimensions
+      const width = 800;
+      const height = 600;
+      const left = (window.screen.width - width) / 2; // Center the window horizontally
+      const top = (window.screen.height - height) / 2; // Center the window vertically
+      
+      // Open a new window with specific size and position
+      window.open(
+        rdpUrl, 
+        '_blank', 
+        `width=${width},height=${height},top=${top},left=${left},resizable=yes,scrollbars=yes`
+      );
+    }
+
   redirectToHome(conn) {
     this.webRtcService.privateMessage(conn.peer, { type: MESSAGES.REDIRECT_TO_HOME }, this.connectedPaitents);
   }

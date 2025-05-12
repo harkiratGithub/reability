@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { exec } from 'child_process';
+import { exec,spawn } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as dotenv from 'dotenv';
@@ -58,7 +58,8 @@ const getRustDeskID = (role: string): string | null => {
   }
 };
 
-// API to fetch RustDesk ID
+// API to fetch RustDesk IDconst { exec } = require('child_process');
+
 export const fetchRustDeskID = async (req: Request, res: Response): Promise<void> => {
   try {
     const role = req.params.role;
@@ -117,6 +118,7 @@ export const getRustDeskSessions = async (req: Request, res: Response): Promise<
 };
 
 // Create a RustDesk session
+/*
 export const createRustDeskSession = async (req: Request, res: Response): Promise<void> => {
   try {
     const { patientId, therapistId } = req.body;
@@ -144,4 +146,112 @@ export const createRustDeskSession = async (req: Request, res: Response): Promis
   } catch (error) {
     res.status(500).json({ error: 'Failed to establish connection' });
   }
+};*/
+
+export const createRustDeskSession = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { patientId, therapistId } = req.body;
+
+    if (!patientId || !therapistId) {
+      res.status(400).json({ error: 'Missing patientId or therapistId' });
+      return;
+    }
+
+    console.log('=========patientId========', patientId);
+    console.log('=========therapistId========', therapistId);
+
+    const relayHost = process.env.RUSTDESK_RELAY_HOST || '192.168.2.134';
+    const relayPort = process.env.RUSTDESK_RELAY_PORT || '21115';
+    const rendezvousPort = process.env.RUSTDESK_RENDEZVOUS_PORT || '21116';
+
+    const userAgent = req.headers['user-agent'] || '';
+    let clientOS: string;
+
+    if (userAgent.includes('Windows')) {
+      clientOS = 'win32';
+    } else if (userAgent.includes('Mac OS') || userAgent.includes('Macintosh')) {
+      clientOS = 'darwin';
+    } else if (userAgent.includes('Linux')) {
+      clientOS = 'linux';
+    } else {
+      res.status(400).json({ error: 'Unable to detect client OS' });
+      return;
+    }
+
+    console.log('=========Client OS========', clientOS);
+
+    let rustdeskCommand: string;
+
+    switch (clientOS) {
+      case 'win32': // Windows
+        rustdeskCommand = `"C:\\Program Files\\RustDesk\\rustdesk.exe" --connect ${therapistId} --relay-host ${relayHost} --relay-port ${relayPort} --rendezvous-host ${relayHost} --rendezvous-port ${rendezvousPort}`;
+        break;
+      case 'darwin': // macOS
+      case 'linux': // Linux
+        rustdeskCommand = `rustdesk --connect ${therapistId} --relay-host ${relayHost} --relay-port ${relayPort} --rendezvous-host ${relayHost} --rendezvous-port ${rendezvousPort}`;
+        break;
+      default:
+        res.status(500).json({ error: `Unsupported platform: ${clientOS}` });
+        return;
+    }
+
+    console.log('=========RustDesk Command========', rustdeskCommand);
+
+    if (clientOS === 'win32') {
+     /* exec(
+        `C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -Command "${rustdeskCommand}"`,
+        { shell: 'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe' },
+        (error, stdout, stderr) => {
+          if (error) {
+            console.error('RustDesk Connection Error:', error.message);
+            res.status(500).json({ error: 'Failed to establish connection', details: stderr });
+            return;
+          }
+          console.log('RustDesk STDOUT:', stdout);
+          res.status(200).json({ message: 'Connected successfully!' });
+        }
+      );*/
+
+      const process = spawn('cmd.exe', ['-Command', rustdeskCommand], { shell: true });
+
+    process.stdout.on('data', (data) => {
+        console.log(`Output: ${data}`);
+    });
+
+    process.stderr.on('data', (data) => {
+        console.error(`Error: ${data}`);
+    });
+
+    process.on('close', (code) => {
+        if (code !== 0) {
+            console.error(`Command failed with exit code ${code}`);
+        } else {
+            console.log('Command executed successfully');
+        }
+    });
+
+    process.on('error', (err) => {
+        console.error(`Process failed to start: ${err.message}`);
+    });
+    } else {
+      exec(
+        rustdeskCommand,
+        { shell: '/bin/sh' },
+        (error, stdout, stderr) => {
+          if (error) {
+            console.error('RustDesk Connection Error:', error.message);
+            res.status(500).json({ error: 'Failed to establish connection', details: stderr });
+            return;
+          }
+          console.log('RustDesk STDOUT:', stdout);
+          res.status(200).json({ message: 'Connected successfully!' });
+        }
+      );
+    }
+  } catch (error) {
+    console.error('Unexpected Error:', error);
+    res.status(500).json({ error: 'Unexpected server error', details: error.message });
+  }
 };
+
+
