@@ -151,3 +151,53 @@
     playsinline
   ></video>
 </div>
+<!-- Popup Container -->
+ <!--
+<div *ngIf="showPopup" class="popup-overlay">
+  <div class="popup">
+    <h3>Download & Install Rustdesk Software</h3>
+    <p>Please agree to the terms and conditions before proceeding to download.</p>
+    <div>
+      <div class="terms-box">
+        <a href="https://gertnervideos.blob.core.windows.net/privacy-doc/PatientPrivacyPolicy.pdf" target="_blank">
+          Read the Terms and Conditions
+        </a>
+      </div>
+      <label>
+        <input type="checkbox" [(ngModel)]="termsAccepted" /> I agree to the terms and conditions
+      </label>
+    </div>
+    <button [disabled]="!termsAccepted" (click)="downloadSoftware()" class="download-btn !termsAccepted">
+      Download
+    </button>
+    <button (click)="closePopup()" class="close-btn">
+      Close
+    </button>
+  </div>
+</div>
+-->
+
+<div *ngIf="showPopup" class="popup-overlay">
+  <div
+    class="popup"
+    [ngStyle]="{ top: popupPosition.y + 'px', left: popupPosition.x + 'px' }"
+    (mousedown)="startDrag($event)"
+    (mouseup)="stopDrag()"
+    (mousemove)="onDrag($event)"
+  >
+    <h3>Download & Install Rustdesk Software</h3>
+    <p>Please agree to the terms and conditions before proceeding to download.</p>
+    <div>
+      <div class="terms-box">
+        <a href="https://gertnervideos.blob.core.windows.net/privacy-doc/PatientPrivacyPolicy.pdf" target="_blank">
+          Read the Terms and Conditions
+        </a>
+      </div>
+      <label>
+        <input type="checkbox" [(ngModel)]="termsAccepted" /> I agree to the terms and conditions
+      </label>
+    </div>
+    <button [disabled]="!termsAccepted" (click)="downloadSoftware()"  [ngClass]="!termsAccepted ? 'disabled-btn' : 'download-btn'">Download</button>
+    <button (click)="closePopup()">Close</button>
+  </div>
+</div>

@@ -128,7 +128,11 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   currentGameAppData: IGameAppData;
   searchCameraInterval;
   rustdeskId: string | null = null;
-  therapistRustdeskId:string;
+  showPopup = false;
+  termsAccepted = false;
+  isDragging = false;
+  popupPosition = { x: 100, y: 100 }; 
+  dragStart = { x: 0, y: 0 }; 
   constructor(
     private authenticationService: AuthenticationService,
     private patientWebRtcService: PatientWebRtcService,
@@ -795,11 +799,14 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         this.appActions.toggleEnlargeVideo(data.enlargeVideo);
         break;
       case MESSAGES.REDIRECT_TO_HOME:
-        console.log("========MESSAGES.REDIRECT_TO_HOME=====",MESSAGES.REDIRECT_TO_HOME);
         this.redirectToHome();
         break;
       case MESSAGES.REQUEST_APP_GAME_DATA:
         this.handleRequestAppGameData();
+        break;
+      case MESSAGES.RDP_REQUEST:
+        console.log("========MESSAGES.RDP_REQUEST=====",MESSAGES.RDP_REQUEST);
+        this.redirectToRdpRequest();
         break;
       default:
         break;
@@ -809,6 +816,62 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   redirectToHome() {
     this.handleTherapistClickHome.emit();
   }
+
+  redirectToRdpRequest() {
+    this.fetchRustDeskId();
+    setTimeout(() => {
+      this.openRustdeskModal(` You can Install Rustdesk Software first and share the rustdesk ID`);
+    }, 100);;
+  }
+ // Triggered on mouse down
+startDrag(event: MouseEvent): void {
+  this.isDragging = true;
+  this.dragStart.x = event.clientX - this.popupPosition.x;
+  this.dragStart.y = event.clientY - this.popupPosition.y;
+}
+
+// Triggered on mouse up
+stopDrag(): void {
+  this.isDragging = false;
+}
+
+// Triggered on mouse move
+onDrag(event: MouseEvent): void {
+  if (this.isDragging) {
+    this.popupPosition.x = event.clientX - this.dragStart.x;
+    this.popupPosition.y = event.clientY - this.dragStart.y;
+  }
+}
+
+fetchRustDeskId() { 
+  console.log("========this.patient_id======",this.currentUser.patientId);
+  this.ajaxService.getpatientRustDeskId(this.currentUser.patientId).subscribe((response) => {     
+   this.rustdeskId = response[0].rustdesk_id;
+  });
+}
+
+// Method to open the popup
+openRustdeskModal(message: string): void { 
+  this.fetchRustDeskId();
+  console.log("========this.patient_id======",this.currentUser.patientId);
+  console.log("=======rustdeskid====",this.rustdeskId);
+  if(!this.rustdeskId){
+    this.showPopup = true;
+  } 
+}
+
+// Method to close the popup
+closePopup(): void {
+  this.showPopup = false;
+  this.termsAccepted = false;
+}
+
+// Method to handle download button click
+downloadSoftware(): void {
+  const downloadUrl = 'https://github.com/rustdesk/rustdesk/releases/'; // Replace with actual download URL
+  window.open(downloadUrl, '_blank');
+  this.closePopup();
+}
 
   handleRequestAppGameData = () => {
     if (therapistToPatientConnection) {

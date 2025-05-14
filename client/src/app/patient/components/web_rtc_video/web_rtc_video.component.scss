@@ -471,3 +471,101 @@
     text-align: center;
   }
 }
+/*
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+
+.popup {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+}
+
+.popup h3 {
+  margin-top: 0;
+  font-size: 1.5em; 
+}
+.popup button {
+  background-color: #007bff; 
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 12px 24px; 
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: calc(50% - 10px); 
+  margin: 10px 5px;
+}
+
+.popup button:hover {
+  background-color: #0056b3; 
+}
+*/
+
+/* Popup Overlay */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Popup Box */
+.popup {
+  position: absolute; /* Allow manual positioning */
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+  cursor: move; /* Indicate that the popup is draggable */
+}
+
+.popup h3 {
+  margin-top: 0;
+}
+
+.popup button {
+  margin: 10px 5px;
+}
+.download-btn {
+  background-color: blue;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.disabled-btn {
+  background-color: grey;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: not-allowed;
+}

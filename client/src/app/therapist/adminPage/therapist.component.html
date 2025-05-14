@@ -304,7 +304,7 @@
                       <img src="../../../assets/therapist/header-icons/home.svg" />
                     </div>
                      <!-- RDP -->
-                    <div class="btn toggle-btn" (click)="openRdpModal()">
+                    <div class="btn toggle-btn" (click)="openRdpModal(therapistPatientConnection)">
                       RDP
                     </div>
                   </div>
@@ -425,13 +425,36 @@
 <video id="hidden-video" class="hide" width="320" height="240" playsinline autoplay muted></video>
 
 
-<!-- Modal for RDP -->
+<!-- 
 <div *ngIf="isRdpModalOpen" class="rdp-modal">
   <div class="modal-content">
     <h2>Remote Desktop Connection</h2>
     <p>Patient ID: <span>{{ patientId }}</span></p>
     <button (click)="copyToClipboard(patientId)">Copy Patient ID</button>
     <button (click)="connectToRdp()">Connect</button>
+    <button (click)="closeRdpModal()">Cancel</button>
+  </div>
+</div>
+-->
+
+<!-- Modal for RDP -->
+<div *ngIf="isRdpModalOpen" class="rdp-modal">
+  <div class="modal-content">
+    <h2>Remote Desktop Connection</h2>
+    <!-- Conditional Rendering for RustDesk ID -->
+    <div *ngIf="rustdeskId; else enterRustDeskId">
+      <p>RustDesk ID: <span>{{ rustdeskId }}</span></p>
+      <button (click)="copyToClipboard(rustdeskId)">Copy Rustdesk ID</button>
+      <button (click)="connectToRdp()">Connect</button>
+    </div>
+    <ng-template #enterRustDeskId>
+      <div>
+        <label for="rustdesk-id">Enter RustDesk ID:</label>
+        <input id="rustdesk-id" [(ngModel)]="newRustdeskId" placeholder="Enter RustDesk ID" />
+        <button (click)="saveRustDeskId()">Save</button>
+      </div>
+    </ng-template>
+
     <button (click)="closeRdpModal()">Cancel</button>
   </div>
 </div>

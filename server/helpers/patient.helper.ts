@@ -443,3 +443,19 @@ const getPreparedContactArrayForDiff = (contacts: any[]) => {
 	}
 	return contacts;
 };
+
+export const updatePatientRustdeskId = async (id, rustdesk_id, client = null) =>
+	await PatientModel.updatePatientRustdeskId(id, rustdesk_id, client);
+
+
+export const getPatientRustdeskId = async (patientId: number) => {
+	console.log("===========Helper - Patient ID======", patientId);
+  
+	if (!patientId) {
+	  throw new Error("Patient ID is not valid.");
+	}
+  
+	// Fetch data from model
+	return await PatientModel.getPatientRustdeskId(patientId);
+  };
+  

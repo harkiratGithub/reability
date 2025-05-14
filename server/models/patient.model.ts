@@ -881,3 +881,41 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 		}
 	});
 };
+
+/* save patient rustdesk ID */
+export const updatePatientRustdeskId = async (id, rustdesk_id, client = null) => {
+	const query = squelPostgres
+		.update()
+		.table(TABLE_NAME.PATIENT)
+		.set('rustdesk_id', rustdesk_id)
+		.where(`id = ?`, id)
+		.returning('*')
+		.toParam();
+	const result = await BaseModel.runQuery(query, client);
+	return result.rows;
+};
+/* get rustdesk id by Patient ID */
+
+export const getPatientRustdeskId = async (patientId: number) => {
+	console.log("===========Model - Patient ID======", patientId);
+  
+	const query = squelPostgres
+	  .select()
+	  .field(`${TABLE_NAME.PATIENT}.rustdesk_id`)
+	  .from(TABLE_NAME.PATIENT)
+	  .where(`id = ?`, patientId)
+	  .toParam();
+  
+	console.log("Executing Query:", query.text, query.values);
+  
+	// Execute query
+	const result = await BaseModel.runQuery(query);
+  
+	// Check for results
+	if (result.rows.length === 0) {
+	  throw new Error(`No RustDesk ID found for patient ID ${patientId}`);
+	}
+  
+	return result.rows;
+  };
+  

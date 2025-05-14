@@ -680,65 +680,32 @@ export class AjaxService {
       }
     };  
 
-    rustdeskCreateSession = (rustdesk_details) => {
+    getRustDeskId = (patientId) => {      
+      try {     
+       return this.http.get<any>(`${this.baseUrl}/therapist/get-rustdesk-id/${patientId}`);
+      } catch (error) {
+        console.error(error);
+      }      
+    };
+
+    getpatientRustDeskId = (patientId) => {      
+      try {   
+        console.log("===geturl==", `${this.baseUrl}/patient/get-rustdesk-id/${patientId}`)  
+       return this.http.get<any>(`${this.baseUrl}/patient/get-rustdesk-id/${patientId}`);
+      } catch (error) {
+        console.error(error);
+      }      
+    };
+
+
+    saveRustDeskId = (patientId, rustdeskId) => {
       try {
-          this.http.post<any>(`${this.baseUrl}/patient/create-rustdesk-session`, rustdesk_details)
-          .subscribe({
-              next: (response) => console.log("RustDesk Session Response:", response),
-              error: (error) => console.error("API Error:", error),
+        return this.http.post<any>(`${this.baseUrl}/therapist/save-rustdesk-id`, {
+            patientId,
+            rustdeskId,
           });
       } catch (err) {
-          console.error("Function Error:", err);
+        console.error(err);
       }
-  };
-
-  rustdeskRegisterClient = (rustdesk_client) => {
-    try {
-        this.http.post<any>(`${this.baseUrl}/patient/register-client`, rustdesk_client)
-        .subscribe({
-            next: (response) => console.log("RustDesk register  Response:", response),
-            error: (error) => console.error("API Error:", error),
-        });
-    } catch (err) {
-        console.error("Function Error:", err);
-    }
-  };
-
-    rustdeskGetSession = (therapistId) => {      
-      try {        
-        return this.http.get<any>(`${this.baseUrl}/therapist/get-rustdesk-session/${therapistId}`);
-      } catch (error) {
-        console.error(error);
-      }      
-    };
-
-    getRustDeskID = () => {      
-      try {        
-        return this.http.get<any>(`${this.baseUrl}/patient/get-rustdesk-id/patient`);
-      } catch (error) {
-        console.error(error);
-      }      
-    };
-
-    getTherapistRustDeskID = () => {      
-      try {        
-        return this.http.get<any>(`${this.baseUrl}/therapist/get-rustdesk-id/therapist`);
-      } catch (error) {
-        console.error(error);
-      }      
-    };
-
-    rustdeskRegisterTherapistClient = (rustdesk_client) => {
-      try {
-          this.http.post<any>(`${this.baseUrl}/therapist/register-client`, rustdesk_client)
-          .subscribe({
-              next: (response) => console.log("RustDesk register  Response:", response),
-              error: (error) => console.error("API Error:", error),
-          });
-      } catch (err) {
-          console.error("Function Error:", err);
-      }
-    };
-    
-  
+    };  
 }

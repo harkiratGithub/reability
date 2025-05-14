@@ -306,3 +306,41 @@ export const updateUserTermsConditions = (req, res, next) => {
 			next(err);
 		});
 };
+
+export const updatePatientRustdeskId = (req, res, next) => {
+	const { patientId, rustdeskId } = req.body;
+	PatientHelper.updatePatientRustdeskId(patientId, rustdeskId)
+		.then((updatedPatient) => res.json(updatedPatient))
+		.catch((err) => {
+			next(err);
+		});
+};
+
+
+export const getPatientRustdeskId = async (req, res, next) => {
+	try {
+		console.log("===========req.params======", req.params);
+  
+	  // Validate patientId
+	  const { patientId } = req.params;
+	  if (!patientId) {
+		return res.status(400).json({ error: "Patient ID is required." });
+	  }
+  
+	  // Fetch data
+	  const data = await PatientHelper.getPatientRustdeskId(patientId);
+  
+	  // Check if data exists
+	  if (!data || data.length === 0) {
+		return res.status(404).json({ error: "No RustDesk ID found for the given Patient ID." });
+	  }
+  
+	  console.log("Fetched RustDesk ID:", data);
+	  res.json(data);
+  
+	} catch (error) {
+	  console.error("Error in getPatientRustdeskId:", error);
+	  next(error);
+	}
+  };
+  

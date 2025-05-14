@@ -115,7 +115,9 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
   therapistRustdeskId: string = '';
   patientRustdeskId: string = '';
   isRdpModalOpen = false;
-  patientId = '271326153'; 
+  patientId:string ='' ; 
+  rustdeskId: string | null = null; 
+  newRustdeskId = '';
   constructor(
     private authenticationService: AuthenticationService,
     private webRtcService: WebRtcService,
@@ -194,79 +196,19 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
     this.turnOnCamera();
   }
 
-/*
-  getTherapistRustDeskID(): void {
-    this.ajax.getTherapistRustDeskID().subscribe(
-      (response) => {
-        this.therapistRustdeskId = response.rustdeskID;
-        console.log("Fetched RustDesk ID:", this.therapistRustdeskId);
-        this.registerAsTherapist();
-      },
-      (error) => {
-        console.error("Error fetching RustDesk ID:", error);
-      }
-    );
+  sendRdpRequestToPatient(conn) {  
+    //console.log("we are going to send connection",this.connectedPaitents);
+    this.webRtcService.privateMessage(conn.user.peerId, { type: MESSAGES.RDP_REQUEST }, this.connectedPaitents);
+   // console.log("private message set",conn.user.peerId);
   }
-
-  registerAsTherapist() {
-    const rustdesk_client = {
-      clientType: 'therapist',
-      rustdeskId: this.therapistRustdeskId
-    };
-    this.ajax.rustdeskRegisterTherapistClient(rustdesk_client);  
-    this.getPatientID();  
-  }
-
-  getPatientID() {
-    this.http.get<{ rustdeskId: string }>('therapist/get-session/patient')
-      .subscribe(response => {
-        this.patientRustdeskId = response.rustdeskId;
-        console.log('Patient RustDesk ID:', this.patientRustdeskId);
-      }, error => {
-        console.error('Error fetching patient ID:', error);
-      });
-  }
-
-  rustdeskConnectToPatient(): void {
-    this.http.post('/therapist/create-session', {
-      patientId: '1058037189', //this.patientRustdeskId,patientId
-      therapistId: '271326153' //this.therapistRustdeskId
-    }).subscribe(
-      (response) => {
-        console.log('Connection established:', response);
-      },
-      (error) => {
-        console.error('Error connecting to Patient:', error);
-      }
-    );
-  }
-
-  rustdeskConnectToPatient2(): void {
-    this.http.post('/therapist/create-session', {
-      patientId: '1058037189', //this.patientRustdeskId,patientId
-      therapistId: '507794292' //this.therapistRustdeskId
-    }).subscribe(
-      (response) => {
-        console.log('Connection established:', response);
-      },
-      (error) => {
-        console.error('Error connecting to Patient:', error);
-      }
-    );
-  }
-*/
-  openRdpModal() {
-    console.log("Going to open modal");
-    const modalClass = 'generic-dialog-container';
-    this.appActions.openCallModal({
-      panelClass: modalClass,
-      header: 'CONNECTION REQUEST',
-      content:'Remote Desktop Connection',
-      acceptBtnImg: '../../../assets/modal/btn_hover_request_timer.png',
-      acceptBtnImgHover: '../../../assets/modal/btn_accept_hover.png',
-     
-    });
+  
+  
+  openRdpModal = (conn) =>{
+    this.sendRdpRequestToPatient(conn);
+    const modalClass = 'generic-dialog-container';    
     this.isRdpModalOpen = true;
+    this.fetchRustDeskId(conn);
+    this.patientId = conn.user.patientId;
   }
 
   closeRdpModal() {
@@ -275,20 +217,48 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
 
   copyToClipboard(text: string) {
     navigator.clipboard.writeText(text).then(() => {
-      alert('Patient ID copied to clipboard');
+      alert('Rustdesk ID copied to clipboard');
     });
   }
 
-  /*connectToRdp() {
-    this.isRdpModalOpen = false;
-    const rdpUrl = 'https://rustdesk.com/web/'; // Replace with actual RustDesk/Web RDP URL
-    window.open(rdpUrl, '_blank');
-  }*/
-    connectToRdp() {
-      this.isRdpModalOpen = false;
+  connectToRdp() {
+    if (!this.rustdeskId) {
+      alert('RustDesk ID is required to connect.');
+      return;
+    }
+    const rdpUrl = `https://rustdesk.com/web/?id=${this.rustdeskId}`; // Append RustDesk ID to URL
+    const width = 800;
+    const height = 600;
+    const left = (window.screen.width - width) / 2;
+    const top = (window.screen.height - height) / 2;
+
+    window.open(
+      rdpUrl,
+      '_blank',
+      `width=${width},height=${height},top=${top},left=${left},resizable=yes,scrollbars=yes`
+    );
+  }
+
+  fetchRustDeskId(conn) { //[{"rustdesk_id":"271326153"}]
+    this.ajax.getRustDeskId(conn.user.patientId).subscribe((response) => {     
+     this.rustdeskId = response[0].rustdesk_id;
+    });
+  }
+
+  saveRustDeskId() {
+    if (!this.newRustdeskId) {
+      console.log('Please enter a valid RustDesk ID.');
+      return;
+    }
+    this.ajax.saveRustDeskId(this.patientId, this.newRustdeskId).subscribe(() => {
+      this.rustdeskId = this.newRustdeskId;
+      this.newRustdeskId = ''; 
+      console.log('RustDesk ID saved successfully.');
+    });
+  }
+   /* connectToRdp() {
+      this.isRdpModalOpen = false;      
       const rdpUrl = 'https://rustdesk.com/web/'; // Replace with actual RustDesk/Web RDP URL
-      
-      // Set desired dimensions
       const width = 800;
       const height = 600;
       const left = (window.screen.width - width) / 2; // Center the window horizontally
@@ -300,7 +270,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
         '_blank', 
         `width=${width},height=${height},top=${top},left=${left},resizable=yes,scrollbars=yes`
       );
-    }
+    }*/
 
   redirectToHome(conn) {
     this.webRtcService.privateMessage(conn.peer, { type: MESSAGES.REDIRECT_TO_HOME }, this.connectedPaitents);

@@ -78,8 +78,10 @@ router.post('/patient/create', PatientController.createPatient);
 router.get('/rtm-details', PatientController.getAllRTMDetails);
 router.get('/get-rustdesk-session/:therapistId', RustdeskController.getRustDeskSessions);
 router.post('/register-client', RustdeskController.registerClient);
-router.get('/get-rustdesk-id/:role', RustdeskController.fetchRustDeskID);
+//router.get('/get-rustdesk-id/:role', RustdeskController.fetchRustDeskID);
 router.get('/get-session/patient', RustdeskController.getRustDeskSessions);
 router.post('/create-session', RustdeskController.createRustDeskSession);
+router.post('/save-rustdesk-id', PatientController.updatePatientRustdeskId);
+router.get('/get-rustdesk-id/:patientId', PatientController.getPatientRustdeskId);
 
 export default router;
