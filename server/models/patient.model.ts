@@ -626,12 +626,12 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 	*/
 	const decryptedRows = result.rows.map((row) => {
 		const decryptedRow = EncryptHelper.decryptJson(row);
-	
+
 		// Adjust the `since` field based on `tzminutes`
 		if (decryptedRow.since && decryptedRow.tzminutes !== undefined) {
 			const sinceDate = new Date(decryptedRow.since);
 			sinceDate.setMinutes(sinceDate.getMinutes() + decryptedRow.tzminutes); // Adjusting based on tzminutes
-	
+
 			// Format the date to 'YYYY-DD-MM h:m:S'
 			const year = sinceDate.getFullYear();
 			const day = String(sinceDate.getDate()).padStart(2, '0'); // Zero-padded day
@@ -639,9 +639,9 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 			const hours = String(sinceDate.getHours()).padStart(2, '0'); // Zero-padded hours
 			const minutes = String(sinceDate.getMinutes()).padStart(2, '0'); // Zero-padded minutes
 			const seconds = String(sinceDate.getSeconds()).padStart(2, '0'); // Zero-padded seconds
-	
+
 			decryptedRow.since = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-		}	
+		}
 		return decryptedRow;
 	});
 
@@ -887,35 +887,28 @@ export const updatePatientRustdeskId = async (id, rustdesk_id, client = null) =>
 	const query = squelPostgres
 		.update()
 		.table(TABLE_NAME.PATIENT)
-		.set('rustdesk_id', rustdesk_id)
+		.set('rustdesk_id', EncryptHelper.encryptPersonalData(rustdesk_id))
 		.where(`id = ?`, id)
 		.returning('*')
 		.toParam();
 	const result = await BaseModel.runQuery(query, client);
 	return result.rows;
 };
-/* get rustdesk id by Patient ID */
 
+/* get rustdesk id by Patient ID */
 export const getPatientRustdeskId = async (patientId: number) => {
-	console.log("===========Model - Patient ID======", patientId);
-  
 	const query = squelPostgres
-	  .select()
-	  .field(`${TABLE_NAME.PATIENT}.rustdesk_id`)
-	  .from(TABLE_NAME.PATIENT)
-	  .where(`id = ?`, patientId)
-	  .toParam();
-  
+		.select()
+		.field(`${TABLE_NAME.PATIENT}.rustdesk_id`)
+		.from(TABLE_NAME.PATIENT)
+		.where(`id = ?`, patientId)
+		.toParam();
 	console.log("Executing Query:", query.text, query.values);
-  
-	// Execute query
 	const result = await BaseModel.runQuery(query);
-  
-	// Check for results
 	if (result.rows.length === 0) {
-	  throw new Error(`No RustDesk ID found for patient ID ${patientId}`);
+		throw new Error(`No RustDesk ID found for patient ID ${patientId}`);
 	}
-  
-	return result.rows;
-  };
-  
+	const encryptedRustdeskId = result.rows[0].rustdesk_id;
+	const decryptedRustdeskId = EncryptHelper.decryptPersonalData(encryptedRustdeskId);
+	return decryptedRustdeskId;
+};

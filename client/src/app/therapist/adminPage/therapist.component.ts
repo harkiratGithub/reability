@@ -241,7 +241,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
 
   fetchRustDeskId(conn) { //[{"rustdesk_id":"271326153"}]
     this.ajax.getRustDeskId(conn.user.patientId).subscribe((response) => {     
-     this.rustdeskId = response[0].rustdesk_id;
+     this.rustdeskId = response; //response[0].rustdesk_id;
     });
   }
 

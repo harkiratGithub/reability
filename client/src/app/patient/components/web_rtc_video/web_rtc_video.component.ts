@@ -844,17 +844,14 @@ onDrag(event: MouseEvent): void {
 }
 
 fetchRustDeskId() { 
-  console.log("========this.patient_id======",this.currentUser.patientId);
   this.ajaxService.getpatientRustDeskId(this.currentUser.patientId).subscribe((response) => {     
-   this.rustdeskId = response[0].rustdesk_id;
+   this.rustdeskId = response; //response[0].rustdesk_id;
   });
 }
 
 // Method to open the popup
 openRustdeskModal(message: string): void { 
-  this.fetchRustDeskId();
-  console.log("========this.patient_id======",this.currentUser.patientId);
-  console.log("=======rustdeskid====",this.rustdeskId);
+  this.fetchRustDeskId();  
   if(!this.rustdeskId){
     this.showPopup = true;
   } 
@@ -868,7 +865,7 @@ closePopup(): void {
 
 // Method to handle download button click
 downloadSoftware(): void {
-  const downloadUrl = 'https://github.com/rustdesk/rustdesk/releases/'; // Replace with actual download URL
+  const downloadUrl = 'https://github.com/rustdesk/rustdesk/releases/'; 
   window.open(downloadUrl, '_blank');
   this.closePopup();
 }

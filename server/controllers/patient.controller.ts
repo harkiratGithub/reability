@@ -331,9 +331,10 @@ export const getPatientRustdeskId = async (req, res, next) => {
 	  const data = await PatientHelper.getPatientRustdeskId(patientId);
   
 	  // Check if data exists
-	  if (!data || data.length === 0) {
+	  /*if (!data || data.length === 0) {
 		return res.status(404).json({ error: "No RustDesk ID found for the given Patient ID." });
 	  }
+		*/
   
 	  console.log("Fetched RustDesk ID:", data);
 	  res.json(data);

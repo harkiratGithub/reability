@@ -187,17 +187,12 @@
   >
     <h3>Download & Install Rustdesk Software</h3>
     <p>Please agree to the terms and conditions before proceeding to download.</p>
-    <div>
-      <div class="terms-box">
-        <a href="https://gertnervideos.blob.core.windows.net/privacy-doc/PatientPrivacyPolicy.pdf" target="_blank">
-          Read the Terms and Conditions
-        </a>
-      </div>
+    <div>      
       <label>
-        <input type="checkbox" [(ngModel)]="termsAccepted" /> I agree to the terms and conditions
+        <input type="checkbox" [(ngModel)]="termsAccepted" /> I agree to the <a href="https://gertnervideos.blob.core.windows.net/privacy-doc/PatientPrivacyPolicy.pdf" target="_blank">terms and conditions</a>
       </label>
     </div>
     <button [disabled]="!termsAccepted" (click)="downloadSoftware()"  [ngClass]="!termsAccepted ? 'disabled-btn' : 'download-btn'">Download</button>
-    <button (click)="closePopup()">Close</button>
+    <button (click)="closePopup()" class="download-btn">Close</button>
   </div>
 </div>
