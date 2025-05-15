@@ -290,7 +290,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                   const updateComments = await this.updateComments(results);
                   const mainLength = this.videoMinMax.length;
                   const updateLength = updateComments.filter((data) => (data.RightCondition == 'Good' || data.LeftCondition == 'Good') && data.PatientTimestamp != undefined).length;
-                  const thumbUpLength = updateComments.filter((data) => (data.RightComments == 'Perfect' || data.LeftComments == 'Perfect') && data.PatientTimestamp != undefined).length;
+                  const thumbUpLength = updateComments.filter((data) => (data.RightComments == 'Perfect' && data.LeftComments == 'Perfect') && data.PatientTimestamp != undefined).length;
                   const percentage = Math.floor((updateLength / mainLength) * 100);
                   this.barPercentage = percentage;
                   this.barThumbsUp = thumbUpLength;
@@ -1846,7 +1846,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     }
 
     if (feedbackPrompt) {
-      // console.log("currentPerformedComments===", currentPerformedComments, performedComments);
+      console.log("currentPerformedComments===", currentPerformedComments, performedComments);
       this.callChatGPT = true
       this.showMarker = false
       this.patientWebRtcService.setShouldPauseGameState(true);
@@ -1868,7 +1868,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         const wordCount = content.trim().split(/\s+/).length;
 
         setTimeout(async () => {
-          if (wordCount > 12) {
+          if (wordCount > 12 && content.toLowerCase().indexOf('idle') == -1) {
             const bodys = {
               model: 'gpt-4o-mini',
               messages: [{
@@ -1883,13 +1883,15 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
               content = datas?.choices[0].message?.content
               console.log('content==', content);
             } else {
-              content = 'Both hands show mixed performance with weakness in idle movements.'
+              content = 'Both hands show mixed performance with idle movements.'
             }
+          } else {
+            content = 'Both hands show mixed performance with idle movements.'
           }
           this.playCommentAudio(content)
         }, 100);
       } else {
-        content = 'Both hands show mixed performance with weakness in idle movements.'
+        content = 'Both hands show mixed performance with idle movements.'
         this.playCommentAudio(content)
       }
     }
@@ -2120,16 +2122,14 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           this.timeMatching = withinTimeTolerance(
             elapsedTime,
             currentVideoAngle.ClipTimestamp,
-            .70
+            1.2
           )
-          if (this.lastComment == 'Good' && this.lastTimeMatching) {
+
+          if (this.lastComment == 'Good') {
             this.timeMatching = true;
           }
           if (!this.timeMatching && this.timeMatching != this.lastTimeMatching) {
             this.currentVideoIndex++;
-          }
-          if (this.timeMatching != this.lastTimeMatching) {
-            this.lastComment = 'Bad';
           }
           this.lastTimeMatching = this.timeMatching;
 
@@ -2176,15 +2176,14 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
             }
           }
 
-          if (this.lastComment && this.timeMatching && this.lastComment != this.rightCondition && this.lastComment == 'Good') {
-            this.currentVideoIndex++;
-            this.lastTimeMatching = false;
+          if (this.leftCondition == 'Good' || this.rightCondition == 'Good') {
+            this.lastComment = 'Good';
+          } else {
+            this.lastComment = 'Bad';
           }
-          this.lastComment = this.rightCondition
-          this.timeLog.push({ elapsedTime, currentVideoTime: currentVideoAngle.ClipTimestamp, currentVideoAngle: currentVideoAngle.ClipDeg, rightAngle, timeMatching: this.timeMatching, rightComment: this.rightComment, lastComment: this.lastComment });
+          // this.timeLog.push({ elapsedTime, currentVideoTime: currentVideoAngle.ClipTimestamp, currentVideoAngle: currentVideoAngle.ClipDeg, rightAngle, timeMatching: this.timeMatching, rightComment: this.rightComment, lastComment: this.lastComment });
 
           this.cdr.detectChanges();
-          const joints = [];
           const connections = [];
           // Additional code to draw pose landmarks and connections on the canvas
           results.poseLandmarks.forEach((landmark, index) => {
