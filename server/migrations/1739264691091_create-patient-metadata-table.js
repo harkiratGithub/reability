@@ -7,6 +7,7 @@ exports.up = (pgm) => {
 		id: 'id',
 		video_name: { type: 'varchar(255)', onDelete: 'SET NULL' },
 		game_id: { type: 'integer', references: 'game', onDelete: 'SET NULL' },
+		game_score: { type: 'integer', notNull: 'true', default: 0 },
 		game_settings_id: { type: 'integer', references: 'game_settings', onDelete: 'SET NULL' },
 		patient_id: { type: 'integer', references: 'patient', onDelete: 'SET NULL' },
 		settings: { type: 'jsonb', notNull: 'true', default: '{}' },

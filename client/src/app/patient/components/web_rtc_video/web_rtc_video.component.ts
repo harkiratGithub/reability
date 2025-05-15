@@ -87,7 +87,6 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   //videoElement: HTMLVideoElement | null = null;
   iframeElement: HTMLIFrameElement | null = null;
 
-  private videoPose!: Pose;
   private cameraPose!: Pose;
   private camera!: Camera;
   timeMatching = false;
@@ -97,7 +96,6 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     leftWrist: Infinity,
     rightWrist: Infinity,
   };
-  private matchingData: { timestamp: string; wrist: string; status: string }[] = [];
   private matchingCameraData: { timestamp: string; 'LSA Deg': string; 'RSA Deg': string; }[] = [];
   private startTime: number;
   private videoIndex: number;
@@ -183,6 +181,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   lastPerformedIndex = 0;
   barPercentage = 0;
   barThumbsUp = 0;
+  firstTimeSpeech = false;
 
   constructor(
     private authenticationService: AuthenticationService,
@@ -245,15 +244,17 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         if (action.msg && action.msg.gameSummaryContent == "Session Ended") {
           const results = await this.matchClipAndPatientData(this.videoMinMax, this.matchingCameraData);
           const updateComments = await this.updateComments(results);
-          this.resetTracking();
 
           this.ajaxService.savePatientMetaData({
             game_id: this.gameId,
             settings: updateComments,
             video_name: this.lastVideoName,
+            game_score: this.barPercentage
           }).subscribe((gamesettings) => {
-            console.log("gamesettings===", gamesettings);
+            this.skeltonProgressBarService.setScoreElement('' + this.barPercentage);
+            // console.log("gamesettings===", gamesettings);
           });
+          this.resetTracking();
           // this.saveToCSV(updateComments, 'min_max_matches.csv');
           // this.saveToCSV(this.timeLog, 'time_matching.csv');
         }
@@ -275,16 +276,11 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
             this.matchingCameraData = this.matchingCameraData.slice(0, closestPatientIndex);
             this.cdr.detectChanges();
           } else {
-            this.landmarks = [];
-            this.videoMinMax = [];
-            this.landmarksPointer = [];
-            this.lastPerformedIndex = 0;
-            this.landmarksLinePointer = [];
-            clearInterval(this.newInterval);
+            this.resetTracking();
             const videoName = action.msg?.data?.source?.split('/')[5];
             this.ajaxService.getGameMetaData(videoName).subscribe(async (gamesettings) => {
               if (gamesettings.length > 0) {
-                this.matchingCameraData = [];
+                this.firstTimeSpeech = true;
                 this.landmarks = gamesettings[0].landmarks;
                 this.videoMinMax = gamesettings[0].settings;
                 this.landmarksPointer = gamesettings[0].landmarksPointer;
@@ -336,7 +332,6 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                     this.initializeCameraPoseModels()
 
                     if (this.videoIndex > 0) {
-                      this.skeltonProgressBarService.setBarElement('' + 0);
                       const results = await this.matchClipAndPatientData(this.lastVideoMinMax, this.matchingCameraData);
                       const updateComments = await this.updateComments(results);
 
@@ -344,9 +339,11 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                         game_id: this.gameId,
                         settings: updateComments,
                         video_name: this.lastVideoName,
+                        game_score: this.barPercentage
                       }).subscribe((gamesettings) => {
-                        console.log("gamesettings===", gamesettings);
+                        // console.log("gamesettings===", gamesettings);
                       });
+                      this.resetTracking();
                       // this.saveToCSV(updateComments, 'min_max_matches.csv');
                       // this.saveToCSV(this.timeLog, 'time_matching.csv');
                     }
@@ -2276,19 +2273,21 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   }
 
   playCommentAudio(commentText: string) {
+    const firstTimeText = this.firstTimeSpeech ? "I paused the video to tell you this: " : "";
     if (commentText === '') {
       this.patientWebRtcService.setShouldPauseGameState(false);
       this.callChatGPT = false;
       this.showMarker = true;
       return
     }
-    const speech = new SpeechSynthesisUtterance("I paused the video to tell you this: " + commentText);
+    const speech = new SpeechSynthesisUtterance(`${firstTimeText}${commentText}`);
     speech.lang = 'en-US'; // Set language
     speech.volume = 1; // Volume: 0 to 1
     speech.rate = .9; // Speed: 0.1 to 10
     speech.pitch = 0.5; // Pitch: 0 to 2
     window.speechSynthesis.speak(speech);
     speech.onend = () => {
+      this.firstTimeSpeech = false;
       this.patientWebRtcService.setShouldPauseGameState(false);
       this.callChatGPT = false;
       this.showMarker = true;

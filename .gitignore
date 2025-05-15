@@ -54,3 +54,4 @@ newrelic_agent.log
 /package-lock.json
 /client/.angular
 /client/src/environments
+client/src/assets/st-video/
