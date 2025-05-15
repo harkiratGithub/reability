@@ -1826,23 +1826,23 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     // console.log("badLeftPercent===", badLeftPercent, "badRightPercent===", badRightPercent, currentPerformedComments.length);
     if (badLeftPercent > matchPercent) {
       feedbackPrompt += `
-        Analyze only the "LeftComments" from each object in the array for left hand feedback.
-        Feedback should be specific to the left hand movements and should not be generic or general in nature and also not in points, just a simple one liner 7-8 words.
+        Compare "ClipDeg" with "PatientLeftDeg" from each object in the array for left hand feedback.
+        Feedback should be specific to the left hand movements and should not be generic or general in nature and also not in points, just a simple one liner 6-7 words.
       `;
     }
 
     if (badRightPercent > matchPercent) {
       feedbackPrompt += `
-        Analyze only the "RightComments" from each object in the array for right hand feedback.
-        Feedback should be specific to the right hand movements and should not be generic or general in nature and also not in points, just a simple one liner 7-8 words.
+        Compare "ClipDeg" with "PatientRightDeg" from each object in the array for right hand feedback.
+        Feedback should be specific to the right hand movements and should not be generic or general in nature and also not in points, just a simple one liner 6-7 words.
       `;
     }
 
     if (badLeftPercent > matchPercent && badRightPercent > matchPercent) {
-      feedbackPrompt += `Combine the feedback from both left and right hands in 7-8 words with no pointers.`;
+      feedbackPrompt += `Combine the feedback from both left and right hands in 6-7 words with no pointers.`;
     }
     if (badLeftPercent > matchPercent || badRightPercent > matchPercent) {
-      feedbackPrompt += 'Check for idle movements and give feedback accordingly. Provide basic feedback in very simple english with no pointers.'
+      feedbackPrompt += 'Check "PatientLeftDeg" and "PatientRightDeg" values in each object, if the values are similar maximum times then this is idle movements. And if there is any idle movements, then only give feedback for idle movements, and omit other feedback, in simple English within 6-7 words.'
     }
 
     if (feedbackPrompt) {
@@ -1874,7 +1874,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
               messages: [{
                 role: 'user',
                 content: `
-                Feedback: ${content}. Convert this to simple English within 6-7 words, add for idle movement if any.
+                Feedback: ${content}. Convert this to simple English within 6-7 words.
                 `
               }]
             };
@@ -1883,15 +1883,15 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
               content = datas?.choices[0].message?.content
               console.log('content==', content);
             } else {
-              content = 'Both hands show mixed performance with idle movements.'
+              content = 'Idle movements detected in both hands.'
             }
           } else {
-            content = 'Both hands show mixed performance with idle movements.'
+            content = 'Idle movements detected in both hands.'
           }
           this.playCommentAudio(content)
         }, 100);
       } else {
-        content = 'Both hands show mixed performance with idle movements.'
+        content = 'Idle movements detected in both hands.'
         this.playCommentAudio(content)
       }
     }
