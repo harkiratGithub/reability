@@ -895,6 +895,7 @@ app-therapist-web-rtc-video {
   justify-content: center;
   align-items: center;
   z-index: 99999999;
+  font-family: Open Sans;
 
   .modal-content {
     background: white;
@@ -918,7 +919,6 @@ app-therapist-web-rtc-video {
       color: white;
       border-radius: 5px;
       cursor: pointer;
-
       &:hover {
         background: #0056b3;
       }

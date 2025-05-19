@@ -151,31 +151,6 @@
     playsinline
   ></video>
 </div>
-<!-- Popup Container -->
- <!--
-<div *ngIf="showPopup" class="popup-overlay">
-  <div class="popup">
-    <h3>Download & Install Rustdesk Software</h3>
-    <p>Please agree to the terms and conditions before proceeding to download.</p>
-    <div>
-      <div class="terms-box">
-        <a href="https://gertnervideos.blob.core.windows.net/privacy-doc/PatientPrivacyPolicy.pdf" target="_blank">
-          Read the Terms and Conditions
-        </a>
-      </div>
-      <label>
-        <input type="checkbox" [(ngModel)]="termsAccepted" /> I agree to the terms and conditions
-      </label>
-    </div>
-    <button [disabled]="!termsAccepted" (click)="downloadSoftware()" class="download-btn !termsAccepted">
-      Download
-    </button>
-    <button (click)="closePopup()" class="close-btn">
-      Close
-    </button>
-  </div>
-</div>
--->
 
 <div *ngIf="showPopup" class="popup-overlay">
   <div
@@ -185,8 +160,7 @@
     (mouseup)="stopDrag()"
     (mousemove)="onDrag($event)"
   >
-    <h3>Download & Install Rustdesk Software</h3>
-    <p>Please agree to the terms and conditions before proceeding to download.</p>
+    <p>Please download Remote Connect software and tell your therapist your ID code</p>
     <div>      
       <label>
         <input type="checkbox" [(ngModel)]="termsAccepted" /> I agree to the <a href="https://gertnervideos.blob.core.windows.net/privacy-doc/PatientPrivacyPolicy.pdf" target="_blank">terms and conditions</a>

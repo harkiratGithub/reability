@@ -215,11 +215,11 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
     this.isRdpModalOpen = false;
   }
 
-  copyToClipboard(text: string) {
+ /* copyToClipboard(text: string) {
     navigator.clipboard.writeText(text).then(() => {
       alert('Rustdesk ID copied to clipboard');
     });
-  }
+  }*/
 
   connectToRdp() {
     if (!this.rustdeskId) {
