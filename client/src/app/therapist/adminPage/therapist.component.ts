@@ -233,6 +233,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       if (!connectedPaitent && !this.selectedUser.waitingForSession) {
         this.selectedUser.missedLastCall = false;
         this.selectedUser.waitingForSession = true;
+        this.ajax.updateStartSessionWithPatient(this.selectedUser.peerId, "ringing");
         this.joinSession(this.selectedUser.peerId, this.selectedUser);
       }
       this.getSpanSize();
@@ -1230,7 +1231,15 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       .toPromise()
       .then((list) => {
         const availableList = list.filter(
-          (peer) => peer.peerStatus === PeersStatus.AVAILABLE || peer.peerStatus === PeersStatus.CONNECTED
+          (peer) => {
+            if (peer.peerStatus === PeersStatus.AVAILABLE || peer.peerStatus === PeersStatus.CONNECTED) {
+              return true;
+            }
+            if (peer.peerStatus === PeersStatus.RINGING) {
+              return peer.therapist_id === this.connectedTherapist.id;
+            }
+            return false;
+          }
         );
         this.ajax
           .getConnectedPeers()
