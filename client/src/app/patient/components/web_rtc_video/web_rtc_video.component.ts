@@ -182,6 +182,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   barPercentage = 0;
   barThumbsUp = 0;
   firstTimeSpeech = false;
+  finalFeedback = false;
 
   constructor(
     private authenticationService: AuthenticationService,
@@ -252,7 +253,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
             game_score: this.barPercentage
           }).subscribe((gamesettings) => {
             this.skeltonProgressBarService.setScoreElement('' + this.barPercentage);
-            // console.log("gamesettings===", gamesettings);
+            // console.log("gamesettings===", gamesettings);50216-41549
           });
           this.resetTracking();
           // this.saveToCSV(updateComments, 'min_max_matches.csv');
@@ -309,6 +310,12 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                           this.generatefeedback();
                         }
                       }, 1000);
+                    }
+                    if (performedPercentage >= 99) {
+                      this.heygenAPIService = new HeygenAPIService();
+                      this.lastPerformedIndex = 0;
+                      this.finalFeedback = true;
+                      this.generatefeedback();
                     }
                   }
                 }, 2000);
@@ -384,7 +391,6 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   }
 
   async ngOnInit() {
-    this.heygenAPIService = new HeygenAPIService();
     if (this.isMobile) {
       this.THERAPIST_REGULAR_VIDEO_CLASS = 'therapist-video-regular-video-mobile';
       this.THERAPIST_ENLARGE_VIDEO_CLASS = 'therapist-video-enlarge-video-mobile';
@@ -1809,6 +1815,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   }
 
   private async generatefeedback() {
+    let content = "";
     let badLeftPercent = 0
     let badRightPercent = 0
     let feedbackPrompt = '';
@@ -1816,90 +1823,110 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
 
     const resultss = await this.matchClipAndPatientData(this.videoMinMax, this.matchingCameraData);
     const updateCommentss = await this.updateComments(resultss);
-    const performedComments = updateCommentss.filter((data) => data.PatientTimestamp != undefined);
-    performedComments.pop();
-    const currentPerformedComments = performedComments.slice(this.lastPerformedIndex);
-    this.lastPerformedIndex = performedComments.length;
 
-    const badLeftComments = currentPerformedComments.filter((data) => data.LeftCondition == "Not Good").length;
-    const badRightComments = currentPerformedComments.filter((data) => data.RightCondition == "Not Good").length;
+    if (!this.finalFeedback) {
+      const performedComments = updateCommentss.filter((data) => data.PatientTimestamp != undefined);
+      performedComments.pop();
+      const currentPerformedComments = performedComments.slice(this.lastPerformedIndex);
+      this.lastPerformedIndex = performedComments.length;
 
-    badLeftPercent = Math.floor((badLeftComments / currentPerformedComments.length) * 100);
-    badRightPercent = Math.floor((badRightComments / currentPerformedComments.length) * 100);
+      const badLeftComments = currentPerformedComments.filter((data) => data.LeftCondition == "Not Good").length;
+      const badRightComments = currentPerformedComments.filter((data) => data.RightCondition == "Not Good").length;
 
-    // console.log("badLeftPercent===", badLeftPercent, "badRightPercent===", badRightPercent, currentPerformedComments.length);
-    if (badLeftPercent > matchPercent) {
-      feedbackPrompt += `
+      badLeftPercent = Math.floor((badLeftComments / currentPerformedComments.length) * 100);
+      badRightPercent = Math.floor((badRightComments / currentPerformedComments.length) * 100);
+
+      // console.log("badLeftPercent===", badLeftPercent, "badRightPercent===", badRightPercent, currentPerformedComments.length);
+      if (badLeftPercent > matchPercent) {
+        feedbackPrompt += `
         Compare "ClipDeg" with "PatientLeftDeg" from each object in the array for left hand feedback.
         Feedback should be specific to the left hand movements and should not be generic or general in nature and also not in points, just a simple one liner 6-7 words.
       `;
-    }
+      }
 
-    if (badRightPercent > matchPercent) {
-      feedbackPrompt += `
+      if (badRightPercent > matchPercent) {
+        feedbackPrompt += `
         Compare "ClipDeg" with "PatientRightDeg" from each object in the array for right hand feedback.
         Feedback should be specific to the right hand movements and should not be generic or general in nature and also not in points, just a simple one liner 6-7 words.
       `;
-    }
+      }
 
-    if (badLeftPercent > matchPercent && badRightPercent > matchPercent) {
-      feedbackPrompt += `Combine the feedback from both left and right hands in 6-7 words with no pointers.`;
-    }
-    if (badLeftPercent > matchPercent || badRightPercent > matchPercent) {
-      feedbackPrompt += 'Check "PatientLeftDeg" and "PatientRightDeg" values in each object, if the values are similar maximum times then this is idle movements. And if there is any idle movements, then only give feedback for idle movements, and omit other feedback, in simple English within 6-7 words.'
-    }
+      if (badLeftPercent > matchPercent && badRightPercent > matchPercent) {
+        feedbackPrompt += `Combine the feedback from both left and right hands in 6-7 words with no pointers.`;
+      }
+      if (badLeftPercent > matchPercent || badRightPercent > matchPercent) {
+        feedbackPrompt += 'Check "PatientLeftDeg" and "PatientRightDeg" values in each object, if the values are similar maximum times then this is idle movements. And if there is any idle movements, then only give feedback for idle movements, and omit other feedback, in simple English within 6-7 words.'
+      }
 
-    if (feedbackPrompt) {
-      console.log("currentPerformedComments===", currentPerformedComments, performedComments);
-      this.callChatGPT = true
-      this.showMarker = false
-      this.patientWebRtcService.setShouldPauseGameState(true);
+      if (feedbackPrompt) {
+        console.log("currentPerformedComments===", currentPerformedComments, performedComments);
+        this.callChatGPT = true
+        this.showMarker = false
+        this.patientWebRtcService.setShouldPauseGameState(true);
 
-      const body = {
+        const body = {
+          model: 'gpt-4o-mini',
+          messages: [{
+            role: 'user',
+            content: `JSON Array: ${JSON.stringify(performedComments)}, ${feedbackPrompt}`
+          }]
+        };
+
+        const data = await this.chatGPTAPI(JSON.stringify(body));
+        if (data.choices && data.choices.length > 0) {
+          content = data?.choices[0].message?.content
+          console.log('content==', content);
+          const wordCount = content.trim().split(/\s+/).length;
+
+          setTimeout(async () => {
+            if (wordCount > 12 && content.toLowerCase().indexOf('idle') == -1) {
+              const bodys = {
+                model: 'gpt-4o-mini',
+                messages: [{
+                  role: 'user',
+                  content: `
+                Feedback: ${content}. Convert this to simple English within 6-7 words.
+                `
+                }]
+              };
+              const datas = await this.chatGPTAPI(JSON.stringify(bodys));
+              if (datas.choices && datas.choices.length > 0) {
+                content = datas?.choices[0].message?.content
+                console.log('content==', content);
+              } else {
+                content = 'Idle movements detected in both hands.'
+              }
+            } else {
+              content = 'Idle movements detected in both hands.'
+            }
+            this.playCommentAudio(content)
+          }, 100);
+        } else {
+          content = 'Idle movements detected in both hands.'
+          this.playCommentAudio(content)
+        }
+      }
+    } else {
+      this.finalFeedback = false;
+      const bodys = {
         model: 'gpt-4o-mini',
         messages: [{
           role: 'user',
           content: `
-            JSON Array: ${JSON.stringify(performedComments)}, ${feedbackPrompt}`
+            You are the virtual therapist.
+            JSON Array: ${updateCommentss}. 
+            Based on the above JSON Array, give feedback to the patient on how he performed the task comparing the "ClipDeg" with "PatientLeftDeg" and "PatientRightDeg" values in each object.
+            Feedback should be specific to in simple English within 12-15 words.
+          `
         }]
       };
-
-      let content = "";
-      const data = await this.chatGPTAPI(JSON.stringify(body));
-      if (data.choices && data.choices.length > 0) {
-        content = data?.choices[0].message?.content
-        console.log('content==', content);
-        const wordCount = content.trim().split(/\s+/).length;
-
-        setTimeout(async () => {
-          if (wordCount > 12 && content.toLowerCase().indexOf('idle') == -1) {
-            const bodys = {
-              model: 'gpt-4o-mini',
-              messages: [{
-                role: 'user',
-                content: `
-                Feedback: ${content}. Convert this to simple English within 6-7 words.
-                `
-              }]
-            };
-            const datas = await this.chatGPTAPI(JSON.stringify(bodys));
-            if (datas.choices && datas.choices.length > 0) {
-              content = datas?.choices[0].message?.content
-              console.log('content==', content);
-            } else {
-              content = 'Idle movements detected in both hands.'
-            }
-          } else {
-            content = 'Idle movements detected in both hands.'
-          }
-          this.playCommentAudio(content)
-        }, 100);
-      } else {
-        content = 'Idle movements detected in both hands.'
-        this.playCommentAudio(content)
+      const datas = await this.chatGPTAPI(JSON.stringify(bodys));
+      if (datas.choices && datas.choices.length > 0) {
+        content = datas?.choices[0].message?.content
       }
+      this.heygenAPIService.sendText(content);
+      this.heygenAPIService.closeSession();
     }
-    //   this.heygenAPIService.sendText(data?.choices[0].message?.content);
   }
 
   private async chatGPTAPI(body: string) {
@@ -2324,8 +2351,6 @@ export class HeygenAPIService {
   updateNewStatus(message: string) {
     const timestamp = new Date().toLocaleTimeString();
     this.statusMessages.push(`[${timestamp}] ${message}`);
-    // console.log(this.statusMessages);
-
   }
 
   async getSessionToken() {
