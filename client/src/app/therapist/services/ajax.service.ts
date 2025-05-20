@@ -192,11 +192,12 @@ export class AjaxService {
     return this.http.post<User[]>(`${this.baseUrl}/therapist/users/getAll`, {});
   }
 
-  updateStartSessionWithPatient = (userId) => {
+  updateStartSessionWithPatient = (userId, type = null) => {
     try {
       this.http
         .post<any>(`${this.baseUrl}/therapist/sessions/therapistStartTime`, {
           userId,
+          type
         })
         .subscribe(() => { });
     } catch (err) {

@@ -12,6 +12,7 @@ export enum ScoreType {
 }
 
 export const PeersStatus = {
+  RINGING: 'Ringing',
   CONNECTED: 'Connected',
   AVAILABLE: 'Available',
   LOGGED_OUT: 'Offline',
