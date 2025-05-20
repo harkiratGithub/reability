@@ -32,29 +32,28 @@ export const onLogIn = async (user: {
 	peerId: string;
 	email: string;
 	is_two_factor_enabled: boolean;
-	timezone:string;
+	timezone: string;
 	instituteLogo?: string;
 }): Promise<any> => {
 	try {
 		let instituteLogo = '';
 
-			
-		const currentTimestamp =  new Date();	
+		const currentTimestamp = new Date();
 		await UserModel.updateById(user.id, {
 			logged_in_at: Helper.createTimeForDb(),
 			logged_out_at: Helper.createTimeForDb(),
 			user_last_login: currentTimestamp.toISOString(),
-			timezone: user.timezone,			
+			timezone: user.timezone,
 		});
 		switch (user.role) {
 			case ROLE.ADMIN:
 				const adminDetails = await UserModel.getAdminDetails(user.id);
 				const { email } = EncryptHelper.decryptJson(adminDetails[0]);
-				return { ...user, email, };
+				return { ...user, email };
 			case ROLE.THERAPIST:
 				const therapistDetails = await UserModel.getUserDetails(user.id, user.therapistId || undefined);
 				const therapistInfo = EncryptHelper.decryptJson(therapistDetails[0]);
-				instituteLogo = await RtmModel.getInstituteLogoById(user.therapistId,user.role);
+				instituteLogo = await RtmModel.getInstituteLogoById(user.therapistId, user.role);
 				return { ...user, instituteLogo, ...therapistInfo };
 			case ROLE.VIDEO_PATIENT:
 				const userDetails = await UserModel.getUserDetails(user.id, user.therapistId || undefined);
@@ -65,7 +64,7 @@ export const onLogIn = async (user: {
 					is_two_factor_enabled: is_two_factor_enabled,
 					departments,
 				} = EncryptHelper.decryptJson(userDetails[0]);
-				return { ...user, id, firstName, lastName, is_two_factor_enabled, departments, };
+				return { ...user, id, firstName, lastName, is_two_factor_enabled, departments };
 			case ROLE.PATIENT:
 				const details = await UserModel.getUserDetails(user.id, user.therapistId || undefined);
 				const {
@@ -76,7 +75,7 @@ export const onLogIn = async (user: {
 					pain_level: pain_level,
 					timestamp: timestamp,
 					date_agreed_terms: date_agreed_terms,
-					timezone:timezone,
+					timezone: timezone,
 				} = EncryptHelper.decryptJson(details[0]);
 				const RTM = details?.some((ele: { department_name: string }) => ele.department_name.toLowerCase() === 'rtm');
 				const todayEntry = await UserModel.isPatientEntryForToday(patientId);
@@ -86,10 +85,10 @@ export const onLogIn = async (user: {
 				const isRTM = RTM;
 				const validGames = await GameModel.getValidGameForPatient(patientId);
 				const patient = await PatientModel.findPatientByUserId(user.id);
-				instituteLogo = await RtmModel.getInstituteLogoById(patientId,user.role);
+				instituteLogo = await RtmModel.getInstituteLogoById(patientId, user.role);
 				const disabledSkeleton = patient.disabled_skeleton;
 				const requiresTermsAgreement = date_agreed_terms === null;
-				
+
 				return {
 					...user,
 					id: patientId,
@@ -161,6 +160,7 @@ export const getOpenPeers = async (therapistId: any) => {
 	try {
 		const openPeers = await UserModel.getPeersByTherapistId(therapistId);
 		const busyPeers = await TherapistSessionModel.getBusyPeers();
+		const ringingPeers = await TherapistSessionModel.getRingingPeers();
 		const peersStatus = openPeers.map(
 			(peer: { [x: string]: any; active: any; logged_out_at: any; patient_id: any }) => {
 				let userStatus: string;
@@ -170,8 +170,13 @@ export const getOpenPeers = async (therapistId: any) => {
 					: false;
 				userStatus = openPeer ? PEERS_STATUS.AVAILABLE : PEERS_STATUS.LOGGED_OUT;
 				const therapistLastSession = findLast(busyPeers, (b) => b.patient_id === peer.patient_id);
+				const therapistLastRingingSession = findLast(ringingPeers, (b) => b.patient_id === peer.patient_id);
 				if (userStatus === PEERS_STATUS.AVAILABLE && therapistLastSession) {
 					userStatus = therapistLastSession.therapist_id === therapistId ? PEERS_STATUS.CONNECTED : PEERS_STATUS.BUSY;
+				}
+				if (userStatus === PEERS_STATUS.AVAILABLE && therapistLastRingingSession) {
+					userStatus =
+						therapistLastRingingSession.therapist_id === therapistId ? PEERS_STATUS.RINGING : PEERS_STATUS.BUSY;
 				}
 				delete peer['patient_id'];
 				delete peer['active'];

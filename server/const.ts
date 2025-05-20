@@ -59,6 +59,7 @@ export const GENDER_TYPE = {
 
 export const PEERS_STATUS = {
 	CONNECTED: 'Connected',
+	RINGING: 'Ringing',
 	AVAILABLE: 'Available',
 	LOGGED_OUT: 'Offline',
 	BUSY: 'Busy',
