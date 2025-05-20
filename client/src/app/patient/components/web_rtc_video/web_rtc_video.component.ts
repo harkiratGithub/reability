@@ -302,7 +302,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                   if (!therapistToPatientConnection) {
                     const performedLength = updateComments.filter((data) => data.PatientTimestamp != undefined).length;
                     const performedPercentage = Math.floor((performedLength / mainLength) * 100);
-                    // console.log("performedPercentage===", performedPercentage, Date);
+                    console.log("performedPercentage===", performedPercentage, Date);
                     if (performedPercentage > 10 && performedPercentage % 19 >= 0 && performedPercentage % 19 <= 10 && Math.abs(performedPercentage - this.lastPerformedPercentage) >= 10) {
                       this.lastPerformedPercentage = performedPercentage
                       setTimeout(() => {
@@ -1840,22 +1840,22 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       if (badLeftPercent > matchPercent) {
         feedbackPrompt += `
         Compare "ClipDeg" with "PatientLeftDeg" from each object in the array for left hand feedback.
-        Feedback should be specific to the left hand movements and should not be generic or general in nature and also not in points, just a simple one liner 6-7 words.
+        Feedback should be specific to the left hand movements.
       `;
       }
 
       if (badRightPercent > matchPercent) {
         feedbackPrompt += `
         Compare "ClipDeg" with "PatientRightDeg" from each object in the array for right hand feedback.
-        Feedback should be specific to the right hand movements and should not be generic or general in nature and also not in points, just a simple one liner 6-7 words.
+        Feedback should be specific to the right hand movements.
       `;
       }
 
       if (badLeftPercent > matchPercent && badRightPercent > matchPercent) {
-        feedbackPrompt += `Combine the feedback from both left and right hands in 6-7 words with no pointers.`;
+        feedbackPrompt += `Combine the feedback from both left and right hands.`;
       }
       if (badLeftPercent > matchPercent || badRightPercent > matchPercent) {
-        feedbackPrompt += 'Check "PatientLeftDeg" and "PatientRightDeg" values in each object, if the values are similar maximum times then this is idle movements. And if there is any idle movements, then only give feedback for idle movements, and omit other feedback, in simple English within 6-7 words.'
+        feedbackPrompt += 'Check "PatientLeftDeg" and "PatientRightDeg" values in each object, if the values are similar continuously, then this is idle movements. Then only give feedback for idle movements, and exclude other feedback, in simple English within 6-7 words with no pointers.'
       }
 
       if (feedbackPrompt) {
