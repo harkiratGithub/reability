@@ -285,6 +285,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                 this.videoMinMax = gamesettings[0].settings;
                 this.landmarksPointer = gamesettings[0].landmarksPointer;
                 this.landmarksLinePointer = gamesettings[0].landmarksLinePointer;
+                this.skeltonProgressBarService.setShowProgressBar('true');
                 this.newInterval = setInterval(async () => {
                   const results = await this.matchClipAndPatientData(this.videoMinMax, this.matchingCameraData);
                   const updateComments = await this.updateComments(results);
@@ -351,6 +352,9 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                     this.lastVideoMinMax = this.videoMinMax;
                   }
                 }
+              } else {
+                this.resetTracking();
+                this.skeltonProgressBarService.setShowProgressBar('false');
               }
             });
           }
@@ -2257,10 +2261,14 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           // this.skeletonService.updateSkeleton({ joints, connections });
           if (therapistToPatientConnection) {
             therapistToPatientConnection.send({ type: 'skeleton_tracking', data: { userId: this.currentUser, frame: { joints: this.landmarksPointer, connections } } });
-            therapistToPatientConnection.send({ type: 'progress_bar', data: { userId: this.currentUser, barPercentage: this.barPercentage, barThumbsUp: this.barThumbsUp } });
+            therapistToPatientConnection.send({ type: 'progress_bar', data: { userId: this.currentUser, barPercentage: this.barPercentage, barThumbsUp: this.barThumbsUp, showProgressBar: 'true' } });
           }
           this.cdr.detectChanges();
         }
+      }
+      if (therapistToPatientConnection && this.landmarks.length == 0) {
+        therapistToPatientConnection.send({ type: 'skeleton_tracking', data: { userId: this.currentUser, frame: { joints: [], connections: [] } } });
+        therapistToPatientConnection.send({ type: 'progress_bar', data: { userId: this.currentUser, barPercentage: 0, barThumbsUp: 0, showProgressBar: 'false' } });
       }
     }
   }

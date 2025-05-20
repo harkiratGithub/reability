@@ -137,6 +137,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
   sliderValue: number = 0;
   thumbUpValue: number = 0;
   showThumbUp: boolean = false;
+  showProgressBar: boolean = false;
   constructor(
     private authenticationService: AuthenticationService,
     private bodyHandleService: BodyHandleService,
@@ -450,13 +451,19 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
 
     this.subscription.add(
       this.skeltonProgressBarService.thumbUpElement$.subscribe(value => {
-        if (+value > 0 && +value % 3 === 0 && this.thumbUpValue != +value) {
+        if (+value > 0 && +value % 3 === 0 && this.thumbUpValue != +value && this.thumbUpValue < +value) {
           this.showThumbUp = true;
           this.thumbUpValue = +value;
           setTimeout(() => {
             this.showThumbUp = false;
-          }, 5000);
+          }, 3000);
         }
+      })
+    );
+
+    this.subscription.add(
+      this.skeltonProgressBarService.showProgressBarElement$.subscribe(value => {
+        this.showProgressBar = value == 'true';
       })
     );
   }

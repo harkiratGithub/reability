@@ -6,15 +6,14 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class SkeletonProgressBarService {
   private thumbUp = new BehaviorSubject<string | null>(null);
-  private progressBar = new BehaviorSubject<string | null>(null);
   private finalScore = new BehaviorSubject<string | null>(null);
-  progressBarElement$ = this.progressBar.asObservable();
+  private progressBar = new BehaviorSubject<string | null>(null);
+  private showProgressBar = new BehaviorSubject<string | null>(null);
+
   thumbUpElement$ = this.thumbUp.asObservable();
   scoreElement$ = this.finalScore.asObservable();
-
-  setBarElement(data: string | null): void {
-    this.progressBar.next(data);
-  }
+  progressBarElement$ = this.progressBar.asObservable();
+  showProgressBarElement$ = this.showProgressBar.asObservable();
 
   setThumbUpElement(data: string | null): void {
     this.thumbUp.next(data);
@@ -22,5 +21,13 @@ export class SkeletonProgressBarService {
 
   setScoreElement(data: string | null): void {
     this.finalScore.next(data);
+  }
+
+  setBarElement(data: string | null): void {
+    this.progressBar.next(data);
+  }
+
+  setShowProgressBar(data: string | null): void {
+    this.showProgressBar.next(data);
   }
 }

@@ -529,6 +529,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       case 'progress_bar':
         this.skeltonProgressBarService.setBarElement('' + data.data.barPercentage);
         this.skeltonProgressBarService.setThumbUpElement('' + data.data.barThumbsUp);
+        this.skeltonProgressBarService.setShowProgressBar(data.data.showProgressBar);
         break;
       case 'skeleton_tracking':
         this.skeletonService.updateSkeleton(data.data.frame);
