@@ -32,6 +32,7 @@ import { isNil, isBoolean, throttle } from 'lodash';
 import { setCameraFrameRate } from '../../../common/helpers/webRTC-common-utils';
 import { IOrganAngle, IScore } from '../../../../types';
 import { IGameAppData } from '../../../../app/app.state';
+import { HttpClient } from '@angular/common/http';
 
 let therapistToPatientConnection = null;
 declare var MediaRecorder: any;
@@ -126,7 +127,12 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   skeletonBtn;
   currentGameAppData: IGameAppData;
   searchCameraInterval;
-
+  rustdeskId: string | null = null;
+  showPopup = false;
+  termsAccepted = false;
+  isDragging = false;
+  popupPosition = { x: 100, y: 100 }; 
+  dragStart = { x: 0, y: 0 }; 
   constructor(
     private authenticationService: AuthenticationService,
     private patientWebRtcService: PatientWebRtcService,
@@ -134,7 +140,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     private menuOptionsActions: MenuOptionsAppActions,
     private depthCameraSocketService: DepthCameraSocketService,
     private webCamSkeletonService: WebCamSkeletonService,
-    private ajaxService: AjaxService
+    private ajaxService: AjaxService,private http: HttpClient,
   ) {
     this.subscription.add(
       this.ajaxService.getIceServers().subscribe((res) => {
@@ -203,10 +209,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         this.handleCameraAvailability();
       }
     }, this.NO_CAMERA_MESSAGE_DELAY);
-    console.log("======going to set mobile device =========",this.isMobile);
       this.handleMobileAvailability(this.isMobile);
-
-    console.log("======going to set mobile device =========",this.isMobile);
     this.handleMobileAvailability(this.isMobile);
     this.localVideo = document.getElementById('patient-video');
 
@@ -381,6 +384,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       }
     }, this.POSENET_LOADING_TIME_PASSED_DURATION);
     document.addEventListener('touchstart', this.handleBodyTracking.bind(this), { passive: false });
+   
   }
 
   ngAfterViewInit() {
@@ -792,11 +796,14 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         this.appActions.toggleEnlargeVideo(data.enlargeVideo);
         break;
       case MESSAGES.REDIRECT_TO_HOME:
-        console.log("========MESSAGES.REDIRECT_TO_HOME=====",MESSAGES.REDIRECT_TO_HOME);
         this.redirectToHome();
         break;
       case MESSAGES.REQUEST_APP_GAME_DATA:
         this.handleRequestAppGameData();
+        break;
+      case MESSAGES.RDP_REQUEST:
+        console.log("========MESSAGES.RDP_REQUEST=====",MESSAGES.RDP_REQUEST);
+        this.redirectToRdpRequest();
         break;
       default:
         break;
@@ -806,6 +813,59 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   redirectToHome() {
     this.handleTherapistClickHome.emit();
   }
+
+  redirectToRdpRequest() {
+    this.fetchRustDeskId();
+    setTimeout(() => {
+      this.openRustdeskModal(` You can Install Rustdesk Software first and share the rustdesk ID`);
+    }, 100);
+  }
+ // Triggered on mouse down
+startDrag(event: MouseEvent): void {
+  this.isDragging = true;
+  this.dragStart.x = event.clientX - this.popupPosition.x;
+  this.dragStart.y = event.clientY - this.popupPosition.y;
+}
+
+// Triggered on mouse up
+stopDrag(): void {
+  this.isDragging = false;
+}
+
+// Triggered on mouse move
+onDrag(event: MouseEvent): void {
+  if (this.isDragging) {
+    this.popupPosition.x = event.clientX - this.dragStart.x;
+    this.popupPosition.y = event.clientY - this.dragStart.y;
+  }
+}
+
+fetchRustDeskId() { 
+  this.ajaxService.getpatientRustDeskId(this.currentUser.patientId).subscribe((response) => {     
+   this.rustdeskId = response; 
+  });
+}
+
+// Method to open the popup
+openRustdeskModal(message: string): void { 
+  this.fetchRustDeskId();  
+  if(!this.rustdeskId){
+    this.showPopup = true;
+  } 
+}
+
+// Method to close the popup
+closePopup(): void {
+  this.showPopup = false;
+  this.termsAccepted = false;
+}
+
+// Method to handle download button click
+downloadSoftware(): void {
+  const downloadUrl = 'https://github.com/rustdesk/rustdesk/releases/'; 
+  window.open(downloadUrl, '_blank');
+  this.closePopup();
+}
 
   handleRequestAppGameData = () => {
     if (therapistToPatientConnection) {

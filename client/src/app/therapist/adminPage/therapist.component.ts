@@ -1,11 +1,11 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, ViewChild, AfterViewInit  } from '@angular/core';
 import { first, debounceTime, distinctUntilChanged, map, mergeMap, delay } from 'rxjs/operators';
 import { FormControl } from '@angular/forms';
 import { Subject, Subscription, of, Observable } from 'rxjs';
 import _ from 'lodash';
 import Peer from 'peerjs';
 import { AudioContext } from 'standardized-audio-context';
-import { DomSanitizer } from '@angular/platform-browser';
+import { DomSanitizer,SafeResourceUrl } from '@angular/platform-browser';
 import { select } from '@angular-redux/store';
 
 import { User } from '../../common/models/user';
@@ -36,7 +36,7 @@ import { AppActions } from 'src/app/app.actions';
 import { setCameraFrameRate } from '../../common/helpers/webRTC-common-utils';
 import { isMobileDevice } from '../../common/utils';
 import { MenuOptionsComponent } from '../../patient/components/menu-options/menu-options.component';
-
+import { HttpClient } from '@angular/common/http';
 declare var MediaRecorder: any;
 enum tabs {
   session,
@@ -111,7 +111,11 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
   enlarge: boolean = false;
   sendEmailTimeoutConnection;
   InstituteLogo: string ;
-  isPatientOnMobile: boolean = false;
+  isPatientOnMobile: boolean = false;  
+  isRdpModalOpen = false;
+  patientId:string ='' ; 
+  rustdeskId: string | null = null; 
+  newRustdeskId = '';
   constructor(
     private authenticationService: AuthenticationService,
     private webRtcService: WebRtcService,
@@ -121,10 +125,10 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
     private sanitizer: DomSanitizer,
     private patientWebRtcService: PatientWebRtcService,
     private ref: ChangeDetectorRef,
-    public appActions: AppActions
+    public appActions: AppActions,private http: HttpClient,
   ) {
     this.connectedTherapist = this.authenticationService.currentUserValue;   
-    this.InstituteLogo = this.connectedTherapist?.instituteLogo || '';
+    this.InstituteLogo = this.connectedTherapist?.instituteLogo || '';    
     this.subscription.add(
       this.keyUp
         .pipe(
@@ -188,6 +192,62 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
   ngAfterViewInit() {
     this.turnOnCamera();
   }
+
+  sendRdpRequestToPatient(conn) {  
+    this.webRtcService.privateMessage(conn.user.peerId, { type: MESSAGES.RDP_REQUEST }, this.connectedPaitents);   
+  }
+  
+  
+  openRdpModal = (conn) =>{
+    this.sendRdpRequestToPatient(conn);
+    const modalClass = 'generic-dialog-container';    
+    this.isRdpModalOpen = true;
+    this.fetchRustDeskId(conn);
+    this.patientId = conn.user.patientId;
+  }
+
+  closeRdpModal() {
+    this.isRdpModalOpen = false;
+  }
+
+  connectToRdp() {
+    if (!this.rustdeskId) {
+      alert('RustDesk ID is required to connect.');
+      return;
+    }
+    const rdpUrl = `https://rustdesk.com/web/?id=${this.rustdeskId}`; // Append RustDesk ID to URL
+    const width = 800;
+    const height = 600;
+    const left = (window.screen.width - width) / 2;
+    const top = (window.screen.height - height) / 2;
+
+    window.open(
+      rdpUrl,
+      '_blank',
+      `width=${width},height=${height},top=${top},left=${left},resizable=yes,scrollbars=yes`
+    );
+  }
+
+  fetchRustDeskId(conn) {
+    this.ajax.getRustDeskId(conn.user.patientId).subscribe((response) => {     
+     this.rustdeskId = response; 
+    });
+  }
+
+  saveRustDeskId() {
+    if (!this.newRustdeskId) {
+      console.log('Please enter a valid RustDesk ID.');
+      return;
+    }  
+    const rustdeskIdAsString = this.newRustdeskId.toString();  
+    this.ajax.saveRustDeskId(this.patientId, rustdeskIdAsString).subscribe(() => {
+      this.rustdeskId = rustdeskIdAsString;
+      this.newRustdeskId = ''; 
+      console.log('RustDesk ID saved successfully.');
+    }, error => {
+      console.error('Failed to save RustDesk ID:', error);
+    });
+  }  
 
   redirectToHome(conn) {
     this.webRtcService.privateMessage(conn.peer, { type: MESSAGES.REDIRECT_TO_HOME }, this.connectedPaitents);

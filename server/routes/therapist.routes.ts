@@ -75,6 +75,8 @@ router.get('/department', DepartmentController.getAllTherapistDepartment);
 router.post('/patient/create', PatientController.createPatient);
 // rtm therapist routes
 router.get('/rtm-details', PatientController.getAllRTMDetails);
-
+// Rustdesk api route 
+router.post('/save-rustdesk-id', PatientController.updatePatientRustdeskId);
+router.get('/get-rustdesk-id/:patientId', PatientController.getPatientRustdeskId);
 
 export default router;

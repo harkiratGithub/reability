@@ -680,6 +680,32 @@ export class AjaxService {
         console.error(err);
       }
     };  
-    
-  
+
+    getRustDeskId = (patientId) => {      
+      try {     
+       return this.http.get<any>(`${this.baseUrl}/therapist/get-rustdesk-id/${patientId}`);
+      } catch (error) {
+        console.error(error);
+      }      
+    };
+
+    getpatientRustDeskId = (patientId) => {      
+      try {   
+       return this.http.get<any>(`${this.baseUrl}/patient/get-rustdesk-id/${patientId}`);
+      } catch (error) {
+        console.error(error);
+      }      
+    };
+
+
+    saveRustDeskId = (patientId, rustdeskId) => {
+      try {
+        return this.http.post<any>(`${this.baseUrl}/therapist/save-rustdesk-id`, {
+            patientId,
+            rustdeskId,
+          });
+      } catch (err) {
+        console.error(err);
+      }
+    };  
 }

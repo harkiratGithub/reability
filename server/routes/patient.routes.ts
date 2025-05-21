@@ -7,7 +7,6 @@ import * as UserGameDataController from '../controllers/user-game-data.controlle
 import * as ServerLogController from '../controllers/server-log.controller';
 import * as GameDataController from '../controllers/game-data.controller';
 import * as UserController from '../controllers/user.controller';
-
 import express from 'express';
 import multer from 'multer';
 
@@ -41,4 +40,6 @@ router.post('/rtmSession', RtmController.updatePatientRTMSession);
 router.patch('/termsConditions', PatientController.updateUserTermsConditions);
 router.post('/users/sendEmail', UserController.sendEmailAfterlogin);
 router.get('/users/:id', PatientController.getActive);
+//Rustdesk API route
+router.get('/get-rustdesk-id/:patientId', PatientController.getPatientRustdeskId);
 export default router;
