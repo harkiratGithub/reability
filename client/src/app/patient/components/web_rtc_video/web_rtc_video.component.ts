@@ -183,6 +183,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   barThumbsUp = 0;
   firstTimeSpeech = false;
   finalFeedback = false;
+  heygenActive = false;
 
   constructor(
     private authenticationService: AuthenticationService,
@@ -291,8 +292,9 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                   const results = await this.matchClipAndPatientData(this.videoMinMax, this.matchingCameraData);
                   const updateComments = await this.updateComments(results);
                   const mainLength = this.videoMinMax.length;
-                  const updateLength = updateComments.filter((data) => (data.RightCondition == 'Good' || data.LeftCondition == 'Good') && data.PatientTimestamp != undefined).length;
-                  const thumbUpLength = updateComments.filter((data) => (data.RightComments == 'Perfect' && data.LeftComments == 'Perfect') && data.PatientTimestamp != undefined).length;
+                  const mainComments = updateComments.filter((data) => data.PatientTimestamp != undefined);
+                  const updateLength = mainComments.filter((data) => (data.RightCondition == 'Good' || data.LeftCondition == 'Good')).length;
+                  const thumbUpLength = mainComments.filter((data) => (data.RightComments == 'Perfect' && data.LeftComments == 'Perfect')).length;
                   const percentage = Math.floor((updateLength / mainLength) * 100);
                   this.barPercentage = percentage;
                   this.barThumbsUp = thumbUpLength;
@@ -300,10 +302,30 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                   this.skeltonProgressBarService.setThumbUpElement('' + thumbUpLength);
 
                   if (!therapistToPatientConnection) {
-                    const performedLength = updateComments.filter((data) => data.PatientTimestamp != undefined).length;
+                    const performedLength = mainComments.length;
                     const performedPercentage = Math.floor((performedLength / mainLength) * 100);
-                    console.log("performedPercentage===", performedPercentage, Date);
-                    if (performedPercentage > 10 && performedPercentage % 19 >= 0 && performedPercentage % 19 <= 10 && Math.abs(performedPercentage - this.lastPerformedPercentage) >= 10) {
+                    console.log("performedPercentage===", performedPercentage);
+                    if (performedLength % 3 == 0) {
+                      const { allLeftSame, allRightSame } = await this.checkIdleCondition(mainComments);
+                      if (allLeftSame || allRightSame) {
+                        let content = "";
+                        this.patientWebRtcService.setShouldPauseGameState(true);
+                        if (allLeftSame && allRightSame) {
+                          content = 'Idle movements detected for both hands.'
+                        } else if (allLeftSame) {
+                          content = 'Idle movements detected for left hand.'
+                        } else if (allRightSame) {
+                          content = 'Idle movements detected for right hand.'
+                        }
+                        this.playCommentAudio(content)
+                      }
+                    }
+                    if (performedPercentage > 10 && performedPercentage % 19 >= 0 && performedPercentage % 19 <= 5 && Math.abs(performedPercentage - this.lastPerformedPercentage) >= 15) {
+                      if (performedPercentage >= 96) {
+                        this.heygenAPIService = new HeygenAPIService();
+                        this.heygenAPIService.onStart();
+                        this.heygenActive = true;
+                      }
                       this.lastPerformedPercentage = performedPercentage
                       setTimeout(() => {
                         if (!this.callChatGPT) {
@@ -311,14 +333,15 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                         }
                       }, 1000);
                     }
-                    if (performedPercentage >= 99) {
-                      this.heygenAPIService = new HeygenAPIService();
-                      this.lastPerformedIndex = 0;
+                    if (performedPercentage >= 97) {
+                      clearInterval(this.newInterval);
+                      console.log("performedPercentage===", performedPercentage);
+                      this.patientWebRtcService.setShouldPauseGameState(true);
                       this.finalFeedback = true;
                       this.generatefeedback();
                     }
                   }
-                }, 2000);
+                }, 1000);
 
                 const currentPlayTime = new Date(action.msg.data.currentPlayTime.sysTime).getSeconds();
 
@@ -1814,6 +1837,28 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     }
   }
 
+  private async checkIdleCondition(results: any[]) {
+    const threshold = 10;
+    const lastThree = results.slice(-3);
+
+    if (lastThree.length < 3) {
+      return { allLeftSame: false, allRightSame: false };
+    }
+
+    const baseLeft = lastThree[0].PatientLeftDeg;
+    const baseRight = lastThree[0].PatientRightDeg;
+
+    const allLeftSame = lastThree.every(
+      (entry) => Math.abs(entry.PatientLeftDeg - baseLeft) <= threshold
+    );
+
+    const allRightSame = lastThree.every(
+      (entry) => Math.abs(entry.PatientRightDeg - baseRight) <= threshold
+    );
+
+    return { allLeftSame, allRightSame };
+  }
+
   private async generatefeedback() {
     let content = "";
     let badLeftPercent = 0
@@ -1823,7 +1868,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
 
     const resultss = await this.matchClipAndPatientData(this.videoMinMax, this.matchingCameraData);
     const updateCommentss = await this.updateComments(resultss);
-
+    console.log("updateCommentss===", this.finalFeedback);
     if (!this.finalFeedback) {
       const performedComments = updateCommentss.filter((data) => data.PatientTimestamp != undefined);
       performedComments.pop();
@@ -1840,14 +1885,14 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       if (badLeftPercent > matchPercent) {
         feedbackPrompt += `
         Compare "ClipDeg" with "PatientLeftDeg" from each object in the array for left hand feedback.
-        Feedback should be specific to the left hand movements.
+        Summary should be specific to the left hand movements.
       `;
       }
 
       if (badRightPercent > matchPercent) {
         feedbackPrompt += `
         Compare "ClipDeg" with "PatientRightDeg" from each object in the array for right hand feedback.
-        Feedback should be specific to the right hand movements.
+        Summary should be specific to the right hand movements.
       `;
       }
 
@@ -1855,7 +1900,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         feedbackPrompt += `Combine the feedback from both left and right hands.`;
       }
       if (badLeftPercent > matchPercent || badRightPercent > matchPercent) {
-        feedbackPrompt += 'Check "PatientLeftDeg" and "PatientRightDeg" values in each object, if the values are similar continuously, then this is idle movements. Then only give feedback for idle movements, and exclude other feedback, in simple English within 6-7 words with no pointers.'
+        feedbackPrompt += 'Check "PatientLeftDeg" or "PatientRightDeg" values in each object, if the values are similar continuously, then this is idle movements. Then only give summary for idle movements, and exclude other feedback, in simple English within 6-7 words with no pointers.'
       }
 
       if (feedbackPrompt) {
@@ -1885,8 +1930,9 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                 messages: [{
                   role: 'user',
                   content: `
-                Feedback: ${content}. Convert this to simple English within 6-7 words.
-                `
+                    You are the virtual therapist.
+                    Summary: ${content}. Convert this to simple English within 6-7 words with no pointers.
+                  `
                 }]
               };
               const datas = await this.chatGPTAPI(JSON.stringify(bodys));
@@ -1894,15 +1940,15 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                 content = datas?.choices[0].message?.content
                 console.log('content==', content);
               } else {
-                content = 'Idle movements detected in both hands.'
+                content = 'Idle movements detected for both hands.'
               }
             } else {
-              content = 'Idle movements detected in both hands.'
+              content = 'Idle movements detected for both hands.'
             }
             this.playCommentAudio(content)
           }, 100);
         } else {
-          content = 'Idle movements detected in both hands.'
+          content = 'Idle movements detected for both hands.'
           this.playCommentAudio(content)
         }
       }
@@ -1914,9 +1960,9 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           role: 'user',
           content: `
             You are the virtual therapist.
-            JSON Array: ${updateCommentss}. 
-            Based on the above JSON Array, give feedback to the patient on how he performed the task comparing the "ClipDeg" with "PatientLeftDeg" and "PatientRightDeg" values in each object.
-            Feedback should be specific to in simple English within 12-15 words.
+            JSON Array: ${JSON.stringify(updateCommentss)}. 
+            Based on the above JSON Array, give summary to the patient on how he performed the task comparing the "ClipDeg" with "PatientLeftDeg" and "PatientRightDeg" values in each object.
+            Summary should be specific to the hand movements also include the idle movements, in simple English within 12-15 words with no pointers.
           `
         }]
       };
@@ -1924,8 +1970,12 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       if (datas.choices && datas.choices.length > 0) {
         content = datas?.choices[0].message?.content
       }
-      this.heygenAPIService.sendText(content);
-      this.heygenAPIService.closeSession();
+      await this.heygenAPIService.sendText(content);
+      setTimeout(() => {
+        this.heygenActive = false;
+        this.heygenAPIService.closeSession();
+        this.patientWebRtcService.setShouldPauseGameState(false);
+      }, 20000);
     }
   }
 
@@ -2256,28 +2306,31 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                 endLandmark.y * canvasElement.height
               );
               canvasCtx.lineWidth = 4;
-              canvasCtx.strokeStyle = 'rgba(128, 128, 128, 0.8)';
+              // canvasCtx.strokeStyle = 'rgba(128, 128, 128, 0.8)';
+              canvasCtx.strokeStyle = 'rgba(0, 255, 0)';
 
               if (this.timeMatching && start % 2) {
-                if (this.leftCondition === 'Good') {
-                  if (this.leftComment === "Perfect") {
-                    canvasCtx.strokeStyle = 'rgba(0, 255, 0)';
-                  } else if (this.leftComment === "Nice") {
-                    canvasCtx.strokeStyle = 'rgb(94, 255, 0)';
-                  } else {
-                    canvasCtx.strokeStyle = 'rgb(145, 255, 0)';
-                  }
+                if (this.leftCondition === 'Bad') {
+                  canvasCtx.strokeStyle = 'rgba(128, 128, 128, 0.8)';
+                  // if (this.leftComment === "Perfect") {
+                  //   canvasCtx.strokeStyle = 'rgba(0, 255, 0)';
+                  // } else if (this.leftComment === "Nice") {
+                  //   canvasCtx.strokeStyle = 'rgb(94, 255, 0)';
+                  // } else {
+                  //   canvasCtx.strokeStyle = 'rgb(145, 255, 0)';
+                  // }
                 }
               }
               if (this.timeMatching && start % 2 === 0) {
-                if (this.rightCondition === 'Good') {
-                  if (this.rightComment === "Perfect") {
-                    canvasCtx.strokeStyle = 'rgba(0, 255, 0)';
-                  } else if (this.rightComment === "Nice") {
-                    canvasCtx.strokeStyle = 'rgb(94, 255, 0)';
-                  } else {
-                    canvasCtx.strokeStyle = 'rgb(145, 255, 0)';
-                  }
+                if (this.rightCondition === 'Bad') {
+                  canvasCtx.strokeStyle = 'rgba(128, 128, 128, 0.8)';
+                  // if (this.rightComment === "Perfect") {
+                  //   canvasCtx.strokeStyle = 'rgba(0, 255, 0)';
+                  // } else if (this.rightComment === "Nice") {
+                  //   canvasCtx.strokeStyle = 'rgb(94, 255, 0)';
+                  // } else {
+                  //   canvasCtx.strokeStyle = 'rgb(145, 255, 0)';
+                  // }
                 }
               }
               canvasCtx.stroke();
@@ -2471,7 +2524,7 @@ export class HeygenAPIService {
     this.updateNewStatus("Connected to room");
   }
 
-  async sendText(text: string, taskType: string = "repeat") {
+  async sendText(text: string, taskType: string = "talk") {
     if (!this.newSessionInfo) {
       this.updateNewStatus("No active session");
       return;
@@ -2486,7 +2539,6 @@ export class HeygenAPIService {
       body: JSON.stringify({
         session_id: this.newSessionInfo.session_id,
         text: text,
-        task_type: taskType,
       }),
     });
 
