@@ -12,7 +12,6 @@ import * as GameDataController from '../controllers/game-data.controller';
 import * as ServerLogController from '../controllers/server-log.controller';
 import * as InstituteController from '../controllers/institute.controller';
 import * as DepartmentController from '../controllers/department.controller';
-import * as RustdeskController from '../controllers/rustdesk.controller';
 import express from 'express';
 import multer from 'multer';
 

@@ -7,7 +7,6 @@ import * as UserGameDataController from '../controllers/user-game-data.controlle
 import * as ServerLogController from '../controllers/server-log.controller';
 import * as GameDataController from '../controllers/game-data.controller';
 import * as UserController from '../controllers/user.controller';
-import * as RustDeskController from "../controllers/rustdesk.controller";
 import express from 'express';
 import multer from 'multer';
 
