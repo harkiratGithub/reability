@@ -5,7 +5,7 @@ import { Subject, Subscription, of, Observable } from 'rxjs';
 import _ from 'lodash';
 import Peer from 'peerjs';
 import { AudioContext } from 'standardized-audio-context';
-import { DomSanitizer } from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { select } from '@angular-redux/store';
 
 import { User } from '../../common/models/user';
@@ -39,6 +39,7 @@ import { MenuOptionsComponent } from '../../patient/components/menu-options/menu
 import { SkeletonService } from 'src/app/common/services/skeleton.service';
 import { SkeletonProgressBarService } from 'src/app/common/services/skeleton-progress-bar.service';
 
+import { HttpClient } from '@angular/common/http';
 declare var MediaRecorder: any;
 enum tabs {
   session,
@@ -114,6 +115,10 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
   sendEmailTimeoutConnection;
   InstituteLogo: string;
   isPatientOnMobile: boolean = false;
+  isRdpModalOpen = false;
+  patientId: string = '';
+  rustdeskId: string | null = null;
+  newRustdeskId = '';
   constructor(
     private authenticationService: AuthenticationService,
     private webRtcService: WebRtcService,
@@ -125,7 +130,8 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
     private ref: ChangeDetectorRef,
     public appActions: AppActions,
     private skeletonService: SkeletonService,
-    private skeltonProgressBarService: SkeletonProgressBarService
+    private skeltonProgressBarService: SkeletonProgressBarService,
+    private http: HttpClient,
   ) {
     this.connectedTherapist = this.authenticationService.currentUserValue;
     this.InstituteLogo = this.connectedTherapist?.instituteLogo || '';
@@ -191,6 +197,62 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngAfterViewInit() {
     this.turnOnCamera();
+  }
+
+  sendRdpRequestToPatient(conn) {
+    this.webRtcService.privateMessage(conn.user.peerId, { type: MESSAGES.RDP_REQUEST }, this.connectedPaitents);
+  }
+
+
+  openRdpModal = (conn) => {
+    this.sendRdpRequestToPatient(conn);
+    const modalClass = 'generic-dialog-container';
+    this.isRdpModalOpen = true;
+    this.fetchRustDeskId(conn);
+    this.patientId = conn.user.patientId;
+  }
+
+  closeRdpModal() {
+    this.isRdpModalOpen = false;
+  }
+
+  connectToRdp() {
+    if (!this.rustdeskId) {
+      alert('RustDesk ID is required to connect.');
+      return;
+    }
+    const rdpUrl = `https://rustdesk.com/web/?id=${this.rustdeskId}`; // Append RustDesk ID to URL
+    const width = 800;
+    const height = 600;
+    const left = (window.screen.width - width) / 2;
+    const top = (window.screen.height - height) / 2;
+
+    window.open(
+      rdpUrl,
+      '_blank',
+      `width=${width},height=${height},top=${top},left=${left},resizable=yes,scrollbars=yes`
+    );
+  }
+
+  fetchRustDeskId(conn) {
+    this.ajax.getRustDeskId(conn.user.patientId).subscribe((response) => {
+      this.rustdeskId = response;
+    });
+  }
+
+  saveRustDeskId() {
+    if (!this.newRustdeskId) {
+      console.log('Please enter a valid RustDesk ID.');
+      return;
+    }
+    const rustdeskIdAsString = this.newRustdeskId.toString();
+    this.ajax.saveRustDeskId(this.patientId, rustdeskIdAsString).subscribe(() => {
+      this.rustdeskId = rustdeskIdAsString;
+      this.newRustdeskId = '';
+      console.log('RustDesk ID saved successfully.');
+    }, error => {
+      console.error('Failed to save RustDesk ID:', error);
+    });
   }
 
   redirectToHome(conn) {

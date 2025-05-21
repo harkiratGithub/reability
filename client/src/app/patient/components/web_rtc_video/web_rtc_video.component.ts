@@ -43,6 +43,7 @@ import { SkeltonVideoService } from '../../../common/services/skelton-video.serv
 import { SkeletonProgressBarService } from 'src/app/common/services/skeleton-progress-bar.service';
 import { SkeletonService } from 'src/app/common/services/skeleton.service';
 declare var LivekitClient: any;
+import { HttpClient } from '@angular/common/http';
 
 let therapistToPatientConnection = null;
 declare var MediaRecorder: any;
@@ -188,6 +189,12 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   lastIdleLength = 0;
   lastTriggerTime = 0;
 
+  rustdeskId: string | null = null;
+  showPopup = false;
+  termsAccepted = false;
+  isDragging = false;
+  popupPosition = { x: 100, y: 100 };
+  dragStart = { x: 0, y: 0 };
   constructor(
     private authenticationService: AuthenticationService,
     private patientWebRtcService: PatientWebRtcService,
@@ -199,7 +206,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     private cdr: ChangeDetectorRef,
     private skeltonVideoService: SkeltonVideoService,
     private skeltonProgressBarService: SkeletonProgressBarService,
-    private skeletonService: SkeletonService
+    private skeletonService: SkeletonService,
+    private http: HttpClient,
   ) {
     this.subscription.add(
       this.ajaxService.getIceServers().subscribe((res) => {
@@ -443,10 +451,6 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         this.handleCameraAvailability();
       }
     }, this.NO_CAMERA_MESSAGE_DELAY);
-    console.log("======going to set mobile device =========", this.isMobile);
-    this.handleMobileAvailability(this.isMobile);
-
-    console.log("======going to set mobile device =========", this.isMobile);
     this.handleMobileAvailability(this.isMobile);
     this.localVideo = document.getElementById('patient-video');
 
@@ -620,24 +624,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         therapistToPatientConnection.send({ type: 'track_body', payload: this.trackBody });
       }
     }, this.POSENET_LOADING_TIME_PASSED_DURATION);
-
-    // Retrieve the iframe and video elements from the service
-
-    /*this.skeltonVideoService.iframeUrl$.subscribe((url) => {
-      console.log("iframeurl in webrtccomponents===", url);
-      this.iframeUrl = url;
-    });
-    */
-
-    // getIframeUrl
-    this.skeltonVideoService.gameVideoElement$.subscribe((iframeaction) => {
-      // const action = JSON.parse(iframeaction);
-      // console.log(" in webrtccomponents iframeaction===", iframeaction);
-      // if (action.msg.shouldPlay) {
-      //   this.initializePoseModels
-      // }
-      //this.iframeUrl = action;
-    });
+    document.addEventListener('touchstart', this.handleBodyTracking.bind(this), { passive: false });
 
   }
 
@@ -1069,6 +1056,10 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       case MESSAGES.REQUEST_APP_GAME_DATA:
         this.handleRequestAppGameData();
         break;
+      case MESSAGES.RDP_REQUEST:
+        console.log("========MESSAGES.RDP_REQUEST=====", MESSAGES.RDP_REQUEST);
+        this.redirectToRdpRequest();
+        break;
       default:
         break;
     }
@@ -1076,6 +1067,59 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
 
   redirectToHome() {
     this.handleTherapistClickHome.emit();
+  }
+
+  redirectToRdpRequest() {
+    this.fetchRustDeskId();
+    setTimeout(() => {
+      this.openRustdeskModal(` You can Install Rustdesk Software first and share the rustdesk ID`);
+    }, 100);
+  }
+  // Triggered on mouse down
+  startDrag(event: MouseEvent): void {
+    this.isDragging = true;
+    this.dragStart.x = event.clientX - this.popupPosition.x;
+    this.dragStart.y = event.clientY - this.popupPosition.y;
+  }
+
+  // Triggered on mouse up
+  stopDrag(): void {
+    this.isDragging = false;
+  }
+
+  // Triggered on mouse move
+  onDrag(event: MouseEvent): void {
+    if (this.isDragging) {
+      this.popupPosition.x = event.clientX - this.dragStart.x;
+      this.popupPosition.y = event.clientY - this.dragStart.y;
+    }
+  }
+
+  fetchRustDeskId() {
+    this.ajaxService.getpatientRustDeskId(this.currentUser.patientId).subscribe((response) => {
+      this.rustdeskId = response;
+    });
+  }
+
+  // Method to open the popup
+  openRustdeskModal(message: string): void {
+    this.fetchRustDeskId();
+    if (!this.rustdeskId) {
+      this.showPopup = true;
+    }
+  }
+
+  // Method to close the popup
+  closePopup(): void {
+    this.showPopup = false;
+    this.termsAccepted = false;
+  }
+
+  // Method to handle download button click
+  downloadSoftware(): void {
+    const downloadUrl = 'https://github.com/rustdesk/rustdesk/releases/';
+    window.open(downloadUrl, '_blank');
+    this.closePopup();
   }
 
   handleRequestAppGameData = () => {
