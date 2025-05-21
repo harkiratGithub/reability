@@ -111,9 +111,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
   enlarge: boolean = false;
   sendEmailTimeoutConnection;
   InstituteLogo: string ;
-  isPatientOnMobile: boolean = false;
-  therapistRustdeskId: string = '';
-  patientRustdeskId: string = '';
+  isPatientOnMobile: boolean = false;  
   isRdpModalOpen = false;
   patientId:string ='' ; 
   rustdeskId: string | null = null; 
@@ -189,7 +187,6 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
     window.addEventListener(eventName, (event) => {
       this.ngOnDestroy();
     });
-    //this.getTherapistRustDeskID();
   }
 
   ngAfterViewInit() {
@@ -197,9 +194,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   sendRdpRequestToPatient(conn) {  
-    //console.log("we are going to send connection",this.connectedPaitents);
-    this.webRtcService.privateMessage(conn.user.peerId, { type: MESSAGES.RDP_REQUEST }, this.connectedPaitents);
-   // console.log("private message set",conn.user.peerId);
+    this.webRtcService.privateMessage(conn.user.peerId, { type: MESSAGES.RDP_REQUEST }, this.connectedPaitents);   
   }
   
   
@@ -214,12 +209,6 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
   closeRdpModal() {
     this.isRdpModalOpen = false;
   }
-
- /* copyToClipboard(text: string) {
-    navigator.clipboard.writeText(text).then(() => {
-      alert('Rustdesk ID copied to clipboard');
-    });
-  }*/
 
   connectToRdp() {
     if (!this.rustdeskId) {
@@ -239,9 +228,9 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
     );
   }
 
-  fetchRustDeskId(conn) { //[{"rustdesk_id":"271326153"}]
+  fetchRustDeskId(conn) {
     this.ajax.getRustDeskId(conn.user.patientId).subscribe((response) => {     
-     this.rustdeskId = response; //response[0].rustdesk_id;
+     this.rustdeskId = response; 
     });
   }
 
@@ -249,28 +238,16 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
     if (!this.newRustdeskId) {
       console.log('Please enter a valid RustDesk ID.');
       return;
-    }
-    this.ajax.saveRustDeskId(this.patientId, this.newRustdeskId).subscribe(() => {
-      this.rustdeskId = this.newRustdeskId;
+    }  
+    const rustdeskIdAsString = this.newRustdeskId.toString();  
+    this.ajax.saveRustDeskId(this.patientId, rustdeskIdAsString).subscribe(() => {
+      this.rustdeskId = rustdeskIdAsString;
       this.newRustdeskId = ''; 
       console.log('RustDesk ID saved successfully.');
+    }, error => {
+      console.error('Failed to save RustDesk ID:', error);
     });
-  }
-   /* connectToRdp() {
-      this.isRdpModalOpen = false;      
-      const rdpUrl = 'https://rustdesk.com/web/'; // Replace with actual RustDesk/Web RDP URL
-      const width = 800;
-      const height = 600;
-      const left = (window.screen.width - width) / 2; // Center the window horizontally
-      const top = (window.screen.height - height) / 2; // Center the window vertically
-      
-      // Open a new window with specific size and position
-      window.open(
-        rdpUrl, 
-        '_blank', 
-        `width=${width},height=${height},top=${top},left=${left},resizable=yes,scrollbars=yes`
-      );
-    }*/
+  }  
 
   redirectToHome(conn) {
     this.webRtcService.privateMessage(conn.peer, { type: MESSAGES.REDIRECT_TO_HOME }, this.connectedPaitents);

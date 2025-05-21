@@ -209,10 +209,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         this.handleCameraAvailability();
       }
     }, this.NO_CAMERA_MESSAGE_DELAY);
-    console.log("======going to set mobile device =========",this.isMobile);
       this.handleMobileAvailability(this.isMobile);
-
-    console.log("======going to set mobile device =========",this.isMobile);
     this.handleMobileAvailability(this.isMobile);
     this.localVideo = document.getElementById('patient-video');
 
@@ -821,7 +818,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     this.fetchRustDeskId();
     setTimeout(() => {
       this.openRustdeskModal(` You can Install Rustdesk Software first and share the rustdesk ID`);
-    }, 100);;
+    }, 100);
   }
  // Triggered on mouse down
 startDrag(event: MouseEvent): void {
@@ -845,7 +842,7 @@ onDrag(event: MouseEvent): void {
 
 fetchRustDeskId() { 
   this.ajaxService.getpatientRustDeskId(this.currentUser.patientId).subscribe((response) => {     
-   this.rustdeskId = response; //response[0].rustdesk_id;
+   this.rustdeskId = response; 
   });
 }
 

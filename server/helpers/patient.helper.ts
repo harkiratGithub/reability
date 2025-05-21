@@ -449,13 +449,9 @@ export const updatePatientRustdeskId = async (id, rustdesk_id, client = null) =>
 
 
 export const getPatientRustdeskId = async (patientId: number) => {
-	console.log("===========Helper - Patient ID======", patientId);
-  
 	if (!patientId) {
 	  throw new Error("Patient ID is not valid.");
 	}
-  
-	// Fetch data from model
 	return await PatientModel.getPatientRustdeskId(patientId);
   };
   

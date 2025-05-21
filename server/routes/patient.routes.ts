@@ -41,9 +41,6 @@ router.post('/rtmSession', RtmController.updatePatientRTMSession);
 router.patch('/termsConditions', PatientController.updateUserTermsConditions);
 router.post('/users/sendEmail', UserController.sendEmailAfterlogin);
 router.get('/users/:id', PatientController.getActive);
-router.post('/create-rustdesk-session', RustDeskController.createRustDeskSession);
-router.post('/register-client', RustDeskController.registerClient);
+//Rustdesk API route
 router.get('/get-rustdesk-id/:patientId', PatientController.getPatientRustdeskId);
-router.post('/create-session', RustDeskController.createRustDeskSession);
-router.get('/get-session/therapist', RustDeskController.getRustDeskSessions);
 export default router;

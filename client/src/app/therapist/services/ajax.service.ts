@@ -690,7 +690,6 @@ export class AjaxService {
 
     getpatientRustDeskId = (patientId) => {      
       try {   
-        console.log("===geturl==", `${this.baseUrl}/patient/get-rustdesk-id/${patientId}`)  
        return this.http.get<any>(`${this.baseUrl}/patient/get-rustdesk-id/${patientId}`);
       } catch (error) {
         console.error(error);
