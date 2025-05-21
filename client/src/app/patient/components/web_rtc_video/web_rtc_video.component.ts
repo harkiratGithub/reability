@@ -1970,12 +1970,16 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       if (datas.choices && datas.choices.length > 0) {
         content = datas?.choices[0].message?.content
       }
-      await this.heygenAPIService.sendText(content);
+      const response: any = await this.heygenAPIService.sendText(content);
+      let timeout = 5000;
+      if (response && response.data && response.data.duration_ms) {
+        timeout = response.data.duration_ms;
+      }
       setTimeout(() => {
         this.heygenActive = false;
         this.heygenAPIService.closeSession();
         this.patientWebRtcService.setShouldPauseGameState(false);
-      }, 20000);
+      }, timeout);
     }
   }
 
@@ -2543,6 +2547,7 @@ export class HeygenAPIService {
     });
 
     this.updateNewStatus(`Sent text (${taskType}): ${text}`);
+    return response
   }
 
   async closeSession() {
