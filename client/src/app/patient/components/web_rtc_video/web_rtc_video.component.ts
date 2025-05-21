@@ -184,6 +184,9 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   firstTimeSpeech = false;
   finalFeedback = false;
   heygenActive = false;
+  checkIdle = true;
+  lastIdleLength = 0;
+  lastTriggerTime = 0;
 
   constructor(
     private authenticationService: AuthenticationService,
@@ -302,13 +305,23 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                   this.skeltonProgressBarService.setThumbUpElement('' + thumbUpLength);
 
                   if (!therapistToPatientConnection) {
+                    if (!this.lastTriggerTime) this.lastTriggerTime = 0;
+                    const now = Date.now();
+                    const cooldown = 3000; // 2 seconds
+
                     const performedLength = mainComments.length;
                     const performedPercentage = Math.floor((performedLength / mainLength) * 100);
-                    console.log("performedPercentage===", performedPercentage);
-                    if (performedLength % 3 == 0) {
+                    console.log("performedPercentage===", performedPercentage, performedLength, performedLength % 4 == 0, this.checkIdle, this.callChatGPT);
+                    if (performedLength > 0 && performedLength % 4 == 0 && this.checkIdle && !this.callChatGPT && this.lastIdleLength != performedLength && now - this.lastTriggerTime > cooldown) {
                       const { allLeftSame, allRightSame } = await this.checkIdleCondition(mainComments);
+                      console.log("allLeftSame===", allLeftSame, "allRightSame===", allRightSame);
                       if (allLeftSame || allRightSame) {
                         let content = "";
+                        this.checkIdle = false
+                        this.showMarker = false
+                        this.callChatGPT = true
+                        this.lastIdleLength = performedLength
+                        this.lastTriggerTime = now;
                         this.patientWebRtcService.setShouldPauseGameState(true);
                         if (allLeftSame && allRightSame) {
                           content = 'Idle movements detected for both hands.'
@@ -320,12 +333,13 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                         this.playCommentAudio(content)
                       }
                     }
-                    if (performedPercentage > 10 && performedPercentage % 19 >= 0 && performedPercentage % 19 <= 5 && Math.abs(performedPercentage - this.lastPerformedPercentage) >= 15) {
+                    if (performedPercentage > 10 && performedPercentage % 19 >= 0 && performedPercentage % 19 <= 5 && Math.abs(performedPercentage - this.lastPerformedPercentage) >= 15 && this.checkIdle && now - this.lastTriggerTime > cooldown) {
                       if (performedPercentage >= 96) {
                         this.heygenAPIService = new HeygenAPIService();
                         this.heygenAPIService.onStart();
                         this.heygenActive = true;
                       }
+                      this.lastTriggerTime = now;
                       this.lastPerformedPercentage = performedPercentage
                       setTimeout(() => {
                         if (!this.callChatGPT) {
@@ -341,7 +355,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                       this.generatefeedback();
                     }
                   }
-                }, 1000);
+                }, 2000);
 
                 const currentPlayTime = new Date(action.msg.data.currentPlayTime.sysTime).getSeconds();
 
@@ -1831,6 +1845,10 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     this.lastPerformedIndex = 0;
     this.matchingCameraData = [];
     this.landmarksLinePointer = [];
+    this.checkIdle = true
+    this.showMarker = false
+    this.callChatGPT = false
+    this.lastIdleLength = 0
     if (therapistToPatientConnection) {
       therapistToPatientConnection.send({ type: 'progress_bar', data: { userId: this.currentUser, barPercentage: 0, barThumbsUp: 0 } });
       therapistToPatientConnection.send({ type: 'skeleton_tracking', data: { userId: this.currentUser, frame: { joints: [], connections: [] } } });
@@ -1903,10 +1921,11 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         feedbackPrompt += 'Check "PatientLeftDeg" or "PatientRightDeg" values in each object, if the values are similar continuously, then this is idle movements. Then only give summary for idle movements, and exclude other feedback, in simple English within 6-7 words with no pointers.'
       }
 
-      if (feedbackPrompt) {
+      if (feedbackPrompt && !this.callChatGPT && this.checkIdle) {
         console.log("currentPerformedComments===", currentPerformedComments, performedComments);
         this.callChatGPT = true
         this.showMarker = false
+        this.checkIdle = false
         this.patientWebRtcService.setShouldPauseGameState(true);
 
         const body = {
@@ -2369,6 +2388,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       this.patientWebRtcService.setShouldPauseGameState(false);
       this.callChatGPT = false;
       this.showMarker = true;
+      this.checkIdle = true;
       return
     }
     const speech = new SpeechSynthesisUtterance(`${firstTimeText}${commentText}`);
@@ -2382,6 +2402,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       this.patientWebRtcService.setShouldPauseGameState(false);
       this.callChatGPT = false;
       this.showMarker = true;
+      this.checkIdle = true;
     }
   }
 }
