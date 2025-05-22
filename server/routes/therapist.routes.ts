@@ -21,6 +21,7 @@ const upload = multer({ storage });
 
 router.post('/users/getAll', UserController.getAllPatientForTherapist);
 router.post('/sessions/therapistStartTime', therapistSessionController.createTherapistPatientSession);
+router.get('/sessions/lastStatus/:patientId', therapistSessionController.getLastSessionStatusByPatientId);
 router.post('/users/openPeers', UserController.getPeersStatus);
 router.post('/users/sendEmail', UserController.sendEmailAfterConnection);
 router.post('/getPatientList', PatientController.getPatientListActivities);

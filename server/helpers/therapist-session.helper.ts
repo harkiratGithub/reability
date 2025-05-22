@@ -75,3 +75,19 @@ export const updateTherapistSession = async (userId) => {
 	console.log('updateTherapistSessionEndTime');
 	return TherapistSessionModel.updateTherapistSessionEndTime(userId);
 };
+
+export const getLastSessionStatusByPatientId = async (patientId) => {
+	try {
+		const lastSession = await TherapistSessionModel.getLastSessionByPatientId(patientId);
+		if (!lastSession) {
+			return null;
+		}
+		return {
+			type: lastSession.type,
+			status: lastSession.status,
+			therapist_id: lastSession.therapist_id,
+		};
+	} catch (error) {
+		throw error;
+	}
+};
