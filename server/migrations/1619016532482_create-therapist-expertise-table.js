@@ -23,6 +23,10 @@ exports.up = pgm => {
       notNull: true,
       default: pgm.func('current_timestamp')
     },
+    type: {
+      type: 'varchar(255)',
+      notNull: false
+    }
   });
   pgm.createTrigger('therapist_expertise', 'update_time_therapist_expertise', {
     when: 'BEFORE',

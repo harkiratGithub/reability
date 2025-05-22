@@ -14,6 +14,10 @@ exports.up = pgm => {
     end_time: {
       type: 'timestamp',
       notNull: true
+    },
+    type: {
+      type: 'text',
+      notNull: false
     }
   });
 
