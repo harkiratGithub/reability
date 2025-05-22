@@ -226,6 +226,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       '_blank',
       `width=${width},height=${height},top=${top},left=${left},resizable=yes,scrollbars=yes`
     );
+    this.isRdpModalOpen = false;
   }
 
   fetchRustDeskId(conn) {
