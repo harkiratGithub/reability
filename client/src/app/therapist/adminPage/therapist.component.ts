@@ -198,13 +198,17 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
   }
   
   
-  openRdpModal = (conn) =>{
-    this.sendRdpRequestToPatient(conn);
-    const modalClass = 'generic-dialog-container';    
-    this.isRdpModalOpen = true;
-    this.fetchRustDeskId(conn);
-    this.patientId = conn.user.patientId;
-  }
+  openRdpModal = async (conn) => {
+    await this.fetchRustDeskId(conn); // Wait for the RustDesk ID to be fetched    
+    if (this.rustdeskId) {
+      this.connectToRdp();
+    } else {
+      this.sendRdpRequestToPatient(conn);
+      const modalClass = 'generic-dialog-container';
+      this.isRdpModalOpen = true;
+      this.patientId = conn.user.patientId;
+    }
+  };
 
   closeRdpModal() {
     this.isRdpModalOpen = false;
@@ -215,7 +219,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       alert('RustDesk ID is required to connect.');
       return;
     }
-    const rdpUrl = `https://rustdesk.com/web/?id=${this.rustdeskId}`; // Append RustDesk ID to URL
+    const rdpUrl = `https://rustdesk.com/web/?id=${this.rustdeskId}`; 
     const width = 800;
     const height = 600;
     const left = (window.screen.width - width) / 2;
@@ -229,11 +233,26 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
     this.isRdpModalOpen = false;
   }
 
-  fetchRustDeskId(conn) {
+ /* fetchRustDeskId(conn) {
     this.ajax.getRustDeskId(conn.user.patientId).subscribe((response) => {     
      this.rustdeskId = response; 
     });
-  }
+  }*/
+    fetchRustDeskId(conn): Promise<void> {
+      return new Promise((resolve, reject) => {
+        this.ajax.getRustDeskId(conn.user.patientId).subscribe(
+          (response) => {
+            this.rustdeskId = response; // Assign the fetched RustDesk ID
+            resolve(); // Resolve the Promise after setting the ID
+          },
+          (error) => {
+            console.error('Failed to fetch RustDesk ID', error);
+            this.rustdeskId = null; // Set ID to null in case of an error
+            resolve(); // Resolve even on error to prevent blocking
+          }
+        );
+      });
+    }
 
   saveRustDeskId() {
     if (!this.newRustdeskId) {
