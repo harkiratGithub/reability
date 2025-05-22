@@ -321,7 +321,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                     const performedLength = mainComments.length;
                     const performedPercentage = Math.floor((performedLength / mainLength) * 100);
                     // console.log("performedPercentage===", performedPercentage, performedLength, performedLength % 4 == 0, this.checkIdle, this.callChatGPT, this.heygenActive);
-                    if (performedPercentage >= 80 && !this.heygenActive) {
+                    if (performedPercentage >= 60 && !this.heygenActive) {
                       this.heygenActive = true;
                       this.heygenAPIService = new HeygenAPIService();
                       this.heygenAPIService.onStart();
