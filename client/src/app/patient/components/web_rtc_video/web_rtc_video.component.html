@@ -117,8 +117,14 @@
   <video id="patient-video-skeleton" *ngIf="gameId !== 3" class="hidden-video" [ngClass]="{ 'hide-video': true }" muted autoplay playsinline></video>
 </div>
 
-<div *ngIf="showPopup" class="popup-overlay">
-  <div class="popup" [ngStyle]="{ top: popupPosition.y + 'px', left: popupPosition.x + 'px' }" (mousedown)="startDrag($event)" (mouseup)="stopDrag()" (mousemove)="onDrag($event)">
+<!--<div *ngIf="showPopup" class="popup-overlay">
+  <div
+    class="popup"
+    [ngStyle]="{ top: popupPosition.y + 'px', left: popupPosition.x + 'px' }"
+    (mousedown)="startDrag($event)"
+    (mouseup)="stopDrag()"
+    (mousemove)="onDrag($event)"
+  >
     <p>Please download Remote Connect software and tell your therapist your ID code</p>
     <div>
       <label>
@@ -127,5 +133,30 @@
     </div>
     <button [disabled]="!termsAccepted" (click)="downloadSoftware()" [ngClass]="!termsAccepted ? 'disabled-btn' : 'download-btn'">Download</button>
     <button (click)="closePopup()" class="download-btn">Close</button>
+  </div>
+</div>-->
+<div *ngIf="showPopup" class="popup-overlay">
+  <div class="popup" [ngStyle]="{ top: popupPosition.y + 'px', left: popupPosition.x + 'px' }" (mousedown)="startDrag($event)" (mouseup)="stopDrag()" (mousemove)="onDrag($event)">
+    <p>Please download Remote Connect software and tell your therapist your ID code</p>
+    <div>
+      <label>
+        <input type="checkbox" [(ngModel)]="termsAccepted" /> I agree to the
+        <a href="https://gertnervideos.blob.core.windows.net/privacy-doc/PatientPrivacyPolicy.pdf" target="_blank">
+          terms and conditions
+        </a>
+      </label>
+    </div>
+
+    <!-- Buttons for Windows and Mac -->
+    <div>
+      <button [disabled]="!termsAccepted" (click)="downloadSoftware('win')" [ngClass]="!termsAccepted ? 'disabled-btn' : 'download-btn'">
+        Windows 64bit
+      </button>
+      <button [disabled]="!termsAccepted" (click)="downloadSoftware('mac')" [ngClass]="!termsAccepted ? 'disabled-btn' : 'download-btn'">
+        Mac
+      </button>
+    </div>
+
+    <button (click)="closePopup()" class="download-btn">Cancle</button>
   </div>
 </div>

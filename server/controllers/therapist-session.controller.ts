@@ -7,3 +7,15 @@ export const createTherapistPatientSession = (req, res, next) => {
 		.then((settings) => res.json(settings))
 		.catch((err) => next(err));
 };
+
+export const getLastSessionStatusByPatientId = (req, res, next) => {
+	const { patientId } = req.params;
+	TherapistSessionHelper.getLastSessionStatusByPatientId(Number(patientId))
+		.then((result) => {
+			if (!result) {
+				return res.status(404).json({ message: 'No session found for the patient' });
+			}
+			res.json(result);
+		})
+		.catch((err) => next(err));
+};

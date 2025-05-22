@@ -53,7 +53,9 @@
               }" title="{{ user.isInSession || user.waitingForSession || !user.hasCamera ? '' : 'Connect to patient' }}">
               {{ user.username }} - {{ user.firstName }} {{ user.lastName }}
               <div *ngIf="!user.hasCamera" class="no-camera" title="Error: Patient webcam disconnected"></div>
-              <div *ngIf="user.waitingForSession" class="ringing">RINGING...</div>
+              <div *ngIf="user.waitingForSession" class="ringing">
+                {{ isPatientOnRinging == 'ringing' ? "Busy" : "RINGING..." }}
+              </div>
               <div *ngIf="user.missedLastCall" class="missed-call" title="Click to retry"></div>
               <div *ngIf="user.isInSession" class="call-duration">{{ user.callDurationInSeconds | durationpipe }}</div>
             </div>
@@ -184,7 +186,7 @@
                     <div class="btn toggle-btn" (click)="navigateHome(therapistPatientConnection)">
                       <img src="../../../assets/therapist/header-icons/home.svg" />
                     </div>
-                     <!-- RDP -->
+                    <!-- RDP -->
                     <div class="btn toggle-btn" (click)="openRdpModal(therapistPatientConnection)">
                       <!--<img src="../../../assets/therapist/header-icons/rdp-off.svg" />
                       <img src="../../../assets/therapist/header-icons/rdp-on.png" />--> RDP
@@ -210,8 +212,7 @@
                 </div>
                 <app-therapist-web-rtc-video [showWebRtcVideos]="therapistPatientConnection.showWebRtcVideos" [therapistPatientConnection]="therapistPatientConnection.connection" [activeCallStream]="getCurrentStream(therapistPatientConnection.connection.peer)" [localStream]="getLocalStream(therapistPatientConnection.connection.peer)" [isSplitScreenView]="!isFullScreenMode && connectedPaitents.length > 1" [shouldSwapViews]="isFullScreenMode || connectedPaitents.length === 1" [isSwappedScreens]="therapistPatientConnection.isSwappedScreens" (handleVideoSessionView)="handleVideoSessionView()" (handleStreamSending)="handleStreamSending(therapistPatientConnection.connection.peer)" [isDisabledSkeletonVideo]="therapistPatientConnection.user.disabledSkeleton" [isDepthCameraConnected]="therapistPatientConnection.isDepthCamConnected" [isActiveSkeleton]="
                     therapistPatientConnection.options_menu_state.skeletonBuffer ||
-                    therapistPatientConnection.options_menu_state.skeletonInGame
-                  " [volume]="therapistPatientConnection.volume" (enlargeVideoChanged)="sendEnlargeVideoToPatient($event)" (handlePatientVideo)="togglePatientVideo(therapistPatientConnection.connection.peer)">
+                    therapistPatientConnection.options_menu_state.skeletonInGame" [volume]="therapistPatientConnection.volume" (enlargeVideoChanged)="sendEnlargeVideoToPatient($event)" (handlePatientVideo)="togglePatientVideo(therapistPatientConnection.connection.peer)">
                 </app-therapist-web-rtc-video>
               </mat-grid-tile>
             </mat-grid-list>
@@ -231,7 +232,7 @@
   <div class="modal-content">
     <h2>Remote Desktop Connection</h2>
     <div *ngIf="rustdeskId; else enterRustDeskId">
-     <!-- <p>RustDesk ID: <span>{{ rustdeskId }}</span></p>
+      <!-- <p>RustDesk ID: <span>{{ rustdeskId }}</span></p>
       <button (click)="copyToClipboard(rustdeskId)">Copy Rustdesk ID</button>-->
       <button (click)="connectToRdp()">Connect</button>
     </div>

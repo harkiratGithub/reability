@@ -119,6 +119,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
   patientId: string = '';
   rustdeskId: string | null = null;
   newRustdeskId = '';
+  isPatientOnRinging: string = '';
   constructor(
     private authenticationService: AuthenticationService,
     private webRtcService: WebRtcService,
@@ -203,14 +204,17 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
     this.webRtcService.privateMessage(conn.user.peerId, { type: MESSAGES.RDP_REQUEST }, this.connectedPaitents);
   }
 
-
-  openRdpModal = (conn) => {
-    this.sendRdpRequestToPatient(conn);
-    const modalClass = 'generic-dialog-container';
-    this.isRdpModalOpen = true;
-    this.fetchRustDeskId(conn);
-    this.patientId = conn.user.patientId;
-  }
+  openRdpModal = async (conn) => {
+    await this.fetchRustDeskId(conn); // Wait for the RustDesk ID to be fetched    
+    if (this.rustdeskId) {
+      this.connectToRdp();
+    } else {
+      this.sendRdpRequestToPatient(conn);
+      const modalClass = 'generic-dialog-container';
+      this.isRdpModalOpen = true;
+      this.patientId = conn.user.patientId;
+    }
+  };
 
   closeRdpModal() {
     this.isRdpModalOpen = false;
@@ -221,7 +225,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       alert('RustDesk ID is required to connect.');
       return;
     }
-    const rdpUrl = `https://rustdesk.com/web/?id=${this.rustdeskId}`; // Append RustDesk ID to URL
+    const rdpUrl = `https://rustdesk.com/web/?id=${this.rustdeskId}`;
     const width = 800;
     const height = 600;
     const left = (window.screen.width - width) / 2;
@@ -232,11 +236,27 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       '_blank',
       `width=${width},height=${height},top=${top},left=${left},resizable=yes,scrollbars=yes`
     );
+    this.isRdpModalOpen = false;
   }
 
-  fetchRustDeskId(conn) {
-    this.ajax.getRustDeskId(conn.user.patientId).subscribe((response) => {
-      this.rustdeskId = response;
+  /* fetchRustDeskId(conn) {
+     this.ajax.getRustDeskId(conn.user.patientId).subscribe((response) => {     
+      this.rustdeskId = response; 
+     });
+   }*/
+  fetchRustDeskId(conn): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.ajax.getRustDeskId(conn.user.patientId).subscribe(
+        (response) => {
+          this.rustdeskId = response; // Assign the fetched RustDesk ID
+          resolve(); // Resolve the Promise after setting the ID
+        },
+        (error) => {
+          console.error('Failed to fetch RustDesk ID', error);
+          this.rustdeskId = null; // Set ID to null in case of an error
+          resolve(); // Resolve even on error to prevent blocking
+        }
+      );
     });
   }
 
@@ -299,12 +319,26 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       if (!connectedPaitent && !this.selectedUser.waitingForSession) {
         this.selectedUser.missedLastCall = false;
         this.selectedUser.waitingForSession = true;
-        this.ajax.updateStartSessionWithPatient(this.selectedUser.peerId, "ringing");
-        this.joinSession(this.selectedUser.peerId, this.selectedUser);
+        const onRingingCallSession = await this.fetchLastSessionStatus(this.selectedUser.patientId);
+        if (onRingingCallSession.type !== 'ringing') {
+          this.ajax.updateStartSessionWithPatient(this.selectedUser.peerId, 'ringing');
+          this.joinSession(this.selectedUser.peerId, this.selectedUser);
+        }
       }
       this.getSpanSize();
     }
   }
+
+  async fetchLastSessionStatus(patientId: number) {
+    try {
+      const result = await this.ajax.getLastTherapistSessionStatus(patientId).toPromise();
+      this.isPatientOnRinging = result.type;
+      return result;
+    } catch (error) {
+      return null;
+    }
+  }
+
   onClickSettings = (connectionId, isGameShown) => {
     if (!isGameShown) {
       return;
@@ -497,6 +531,8 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
     this.stopCallTimer(user);
     if (!isPatientVideoInSession) {
       this.webRtcService.privateMessage(user.peerId, { type: 'hang_up_session' }, this.connectedPaitents);
+      // Update the session type to null if the call is hung up
+      this.ajax.updateStartSessionWithPatient(user.peerId, null);
     }
     setTimeout(() => {
       if (user === this.selectedUser) {
@@ -1353,50 +1389,50 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
   };
 
   /*
-    getLoggedInPeers = async () => {
-      try {
-        // Fetch open peers
-        const openPeers = await this.ajax.getOpenPeers().toPromise();
-        const availableList = openPeers.filter(
-          (peer) => peer.peerStatus === PeersStatus.AVAILABLE || peer.peerStatus === PeersStatus.CONNECTED
-        );
-    
-        // Fetch connected peers
-        const connectedPeers = await this.ajax.getConnectedPeers().toPromise();
-    
-        // Filter patients
-        this.filteredPatients = this.patients.filter((patient) =>
-          availableList.some(
-            (available) => available.user_id === Number(patient.peerId) && patient.username.includes(this.nameFilter)
-          )
-        );
-    
-        // Further filter based on connected peers
-        this.filteredPatients = this.filteredPatients.filter((patient) =>
-          connectedPeers.some((peerUser) => peerUser.id === patient.peerId)
-        );
-    
-        // Update properties (hasCamera, isMobile) in a single iteration
-        this.filteredPatients = this.filteredPatients.map((patient) => {
-          const availablePatient = availableList.find((avp) => avp.user_id == patient.peerId);
-          return {
-            ...patient,
-            hasCamera: availablePatient?.has_camera || false,
-            isMobile: availablePatient?.is_mobile || false,
-          };
-        });
-    
-        // Initialize disconnected patients and update user count
-        this.initializeDisconnectedPatients();
-        this.loggedInUserCount = this.filteredPatients.length;
-    
-        // Detect changes if needed
-        // this.ref.detectChanges();
-      } catch (error) {
-        console.error('Error fetching logged-in peers:', error);
-      }
-    };
-    */
+  getLoggedInPeers = async () => {
+    try {
+      // Fetch open peers
+      const openPeers = await this.ajax.getOpenPeers().toPromise();
+      const availableList = openPeers.filter(
+        (peer) => peer.peerStatus === PeersStatus.AVAILABLE || peer.peerStatus === PeersStatus.CONNECTED
+      );
+  
+      // Fetch connected peers
+      const connectedPeers = await this.ajax.getConnectedPeers().toPromise();
+  
+      // Filter patients
+      this.filteredPatients = this.patients.filter((patient) =>
+        availableList.some(
+          (available) => available.user_id === Number(patient.peerId) && patient.username.includes(this.nameFilter)
+        )
+      );
+  
+      // Further filter based on connected peers
+      this.filteredPatients = this.filteredPatients.filter((patient) =>
+        connectedPeers.some((peerUser) => peerUser.id === patient.peerId)
+      );
+  
+      // Update properties (hasCamera, isMobile) in a single iteration
+      this.filteredPatients = this.filteredPatients.map((patient) => {
+        const availablePatient = availableList.find((avp) => avp.user_id == patient.peerId);
+        return {
+          ...patient,
+          hasCamera: availablePatient?.has_camera || false,
+          isMobile: availablePatient?.is_mobile || false,
+        };
+      });
+  
+      // Initialize disconnected patients and update user count
+      this.initializeDisconnectedPatients();
+      this.loggedInUserCount = this.filteredPatients.length;
+  
+      // Detect changes if needed
+      // this.ref.detectChanges();
+    } catch (error) {
+      console.error('Error fetching logged-in peers:', error);
+    }
+  };
+  */
 
   initializeDisconnectedPatients = () => {
     const disconnectedPatients = _.differenceBy(this.patients, this.filteredPatients, 'peerId');

@@ -1115,10 +1115,18 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     this.termsAccepted = false;
   }
 
-  // Method to handle download button click
-  downloadSoftware(): void {
-    const downloadUrl = 'https://github.com/rustdesk/rustdesk/releases/';
-    window.open(downloadUrl, '_blank');
+  downloadSoftware(platform: 'win' | 'mac') {
+    const links = {
+      win: 'https://github.com/rustdesk/rustdesk/releases/download/1.4.0/rustdesk-1.4.0-x86_64.exe',
+      mac: 'https://github.com/rustdesk/rustdesk/releases/download/1.4.0/rustdesk-1.4.0-x86_64.dmg'
+    };
+    // Create an anchor element and trigger download
+    const link = document.createElement('a');
+    link.href = links[platform];
+    link.download = platform === 'win' ? 'RustDesk-Windows.exe' : 'RustDesk-Mac.dmg';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
     this.closePopup();
   }
 

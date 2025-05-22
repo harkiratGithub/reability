@@ -29,7 +29,6 @@ export class AjaxService {
   };
 
   login = (username, password, captchaToken, userTimezone) => {
-    console.log("====userTimezone=====", userTimezone);
     try {
       return this.http.post<any>(`${this.baseUrl}/login`, {
         username,
@@ -197,7 +196,7 @@ export class AjaxService {
       this.http
         .post<any>(`${this.baseUrl}/therapist/sessions/therapistStartTime`, {
           userId,
-          type
+          type,
         })
         .subscribe(() => { });
     } catch (err) {
@@ -689,6 +688,7 @@ export class AjaxService {
     }
   };
 
+
   getRustDeskId = (patientId) => {
     try {
       return this.http.get<any>(`${this.baseUrl}/therapist/get-rustdesk-id/${patientId}`);
@@ -705,13 +705,20 @@ export class AjaxService {
     }
   };
 
-
   saveRustDeskId = (patientId, rustdeskId) => {
     try {
       return this.http.post<any>(`${this.baseUrl}/therapist/save-rustdesk-id`, {
         patientId,
         rustdeskId,
       });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  getLastTherapistSessionStatus = (patientId: number): Observable<any> => {
+    try {
+      return this.http.get<any>(`${this.baseUrl}/therapist/sessions/lastStatus/${patientId}`);
     } catch (err) {
       console.error(err);
     }
