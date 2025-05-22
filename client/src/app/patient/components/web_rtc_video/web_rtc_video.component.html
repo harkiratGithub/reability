@@ -29,7 +29,7 @@
 </div>
 
 <div class="videos-wrapper">
-  <div class="videoWrapParent" *ngIf="this.heygenActive">
+  <div class="videoWrapParent" [ngStyle]="{ 'display': heygenShow ? 'block' : 'none' }">
     <div class="videoWrap">
       <video id="mediaElement" class="videoEle show" style="border-radius: 0.7rem; height:100% ;width: 100%" autoplay></video>
     </div>

@@ -185,6 +185,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   firstTimeSpeech = false;
   finalFeedback = false;
   heygenActive = false;
+  heygenShow = false;
   checkIdle = true;
   lastIdleLength = 0;
   lastTriggerTime = 0;
@@ -315,21 +316,25 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                   if (!therapistToPatientConnection) {
                     if (!this.lastTriggerTime) this.lastTriggerTime = 0;
                     const now = Date.now();
-                    const cooldown = 3000; // 2 seconds
+                    const cooldown = 6000;
 
                     const performedLength = mainComments.length;
                     const performedPercentage = Math.floor((performedLength / mainLength) * 100);
-                    console.log("performedPercentage===", performedPercentage, performedLength, performedLength % 4 == 0, this.checkIdle, this.callChatGPT);
+                    // console.log("performedPercentage===", performedPercentage, performedLength, performedLength % 4 == 0, this.checkIdle, this.callChatGPT, this.heygenActive);
+                    if (performedPercentage >= 80 && !this.heygenActive) {
+                      this.heygenActive = true;
+                      this.heygenAPIService = new HeygenAPIService();
+                      this.heygenAPIService.onStart();
+                    }
                     if (performedLength > 0 && performedLength % 4 == 0 && this.checkIdle && !this.callChatGPT && this.lastIdleLength != performedLength && now - this.lastTriggerTime > cooldown) {
                       const { allLeftSame, allRightSame } = await this.checkIdleCondition(mainComments);
-                      console.log("allLeftSame===", allLeftSame, "allRightSame===", allRightSame);
+                      // console.log("allLeftSame===", allLeftSame, "allRightSame===", allRightSame);
                       if (allLeftSame || allRightSame) {
                         let content = "";
                         this.checkIdle = false
                         this.showMarker = false
                         this.callChatGPT = true
                         this.lastIdleLength = performedLength
-                        this.lastTriggerTime = now;
                         this.patientWebRtcService.setShouldPauseGameState(true);
                         if (allLeftSame && allRightSame) {
                           content = 'Idle movements detected for both hands.'
@@ -342,12 +347,6 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                       }
                     }
                     if (performedPercentage > 10 && performedPercentage % 19 >= 0 && performedPercentage % 19 <= 5 && Math.abs(performedPercentage - this.lastPerformedPercentage) >= 15 && this.checkIdle && now - this.lastTriggerTime > cooldown) {
-                      if (performedPercentage >= 96) {
-                        this.heygenAPIService = new HeygenAPIService();
-                        this.heygenAPIService.onStart();
-                        this.heygenActive = true;
-                      }
-                      this.lastTriggerTime = now;
                       this.lastPerformedPercentage = performedPercentage
                       setTimeout(() => {
                         if (!this.callChatGPT) {
@@ -357,7 +356,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                     }
                     if (performedPercentage >= 97) {
                       clearInterval(this.newInterval);
-                      console.log("performedPercentage===", performedPercentage);
+                      // console.log("performedPercentage===", performedPercentage);
                       this.patientWebRtcService.setShouldPauseGameState(true);
                       this.finalFeedback = true;
                       this.generatefeedback();
@@ -1930,7 +1929,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
 
     const resultss = await this.matchClipAndPatientData(this.videoMinMax, this.matchingCameraData);
     const updateCommentss = await this.updateComments(resultss);
-    console.log("updateCommentss===", this.finalFeedback);
+    // console.log("updateCommentss===", this.finalFeedback);
     if (!this.finalFeedback) {
       const performedComments = updateCommentss.filter((data) => data.PatientTimestamp != undefined);
       performedComments.pop();
@@ -2033,12 +2032,14 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       if (datas.choices && datas.choices.length > 0) {
         content = datas?.choices[0].message?.content
       }
+      this.heygenShow = true;
       const response: any = await this.heygenAPIService.sendText(content);
       let timeout = 5000;
       if (response && response.data && response.data.duration_ms) {
-        timeout = response.data.duration_ms;
+        timeout = response.data.duration_ms + 1500;
       }
       setTimeout(() => {
+        this.heygenShow = false;
         this.heygenActive = false;
         this.heygenAPIService.closeSession();
         this.patientWebRtcService.setShouldPauseGameState(false);
@@ -2447,6 +2448,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       this.callChatGPT = false;
       this.showMarker = true;
       this.checkIdle = true;
+      this.lastTriggerTime = Date.now();
     }
   }
 }
