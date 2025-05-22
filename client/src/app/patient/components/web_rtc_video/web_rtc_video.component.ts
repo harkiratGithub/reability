@@ -335,6 +335,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                         this.showMarker = false
                         this.callChatGPT = true
                         this.lastIdleLength = performedLength
+                        this.lastPerformedIndex = performedLength
                         this.patientWebRtcService.setShouldPauseGameState(true);
                         if (allLeftSame && allRightSame) {
                           content = 'Idle movements detected for both hands.'
@@ -2015,6 +2016,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         }
       }
     } else {
+      let timeout = 5000;
       this.finalFeedback = false;
       const bodys = {
         model: 'gpt-4o-mini',
@@ -2033,10 +2035,9 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         content = datas?.choices[0].message?.content
       }
       this.heygenShow = true;
-      const response: any = await this.heygenAPIService.sendText(content);
-      let timeout = 5000;
+      const response = await this.heygenAPIService.sendText(content);
       if (response && response.data && response.data.duration_ms) {
-        timeout = response.data.duration_ms + 1500;
+        timeout = response.data.duration_ms + 1000;
       }
       setTimeout(() => {
         this.heygenShow = false;
@@ -2522,7 +2523,7 @@ export class HeygenAPIService {
       },
       body: JSON.stringify({
         quality: "high",
-        avatar_name: '2c57ba04ef4d4a5ca30a953d0791e7e3',
+        avatar_name: 'Ann_Therapist_public',
         voice: {
           voice_id: this.voiceID,
           rate: 1.0,
@@ -2614,7 +2615,7 @@ export class HeygenAPIService {
     });
 
     this.updateNewStatus(`Sent text (${taskType}): ${text}`);
-    return response
+    return response.json();
   }
 
   async closeSession() {
