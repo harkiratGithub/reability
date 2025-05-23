@@ -133,6 +133,9 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   isDragging = false;
   popupPosition = { x: 100, y: 100 }; 
   dragStart = { x: 0, y: 0 }; 
+  isWindows = false;
+  isMac = false;
+  isLinux = false;
   constructor(
     private authenticationService: AuthenticationService,
     private patientWebRtcService: PatientWebRtcService,
@@ -384,7 +387,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       }
     }, this.POSENET_LOADING_TIME_PASSED_DURATION);
     document.addEventListener('touchstart', this.handleBodyTracking.bind(this), { passive: false });
-   
+    this.detectOS();
   }
 
   ngAfterViewInit() {
@@ -860,20 +863,36 @@ closePopup(): void {
   this.termsAccepted = false;
 }
 
-  downloadSoftware(platform: 'win' | 'mac') {
-    const links = {
-      win: 'https://github.com/rustdesk/rustdesk/releases/download/1.4.0/rustdesk-1.4.0-x86_64.exe',
-      mac: 'https://github.com/rustdesk/rustdesk/releases/download/1.4.0/rustdesk-1.4.0-x86_64.dmg'
-    };
-    // Create an anchor element and trigger download
+detectOS() {
+  const userAgent = navigator.userAgent;
+  this.isWindows = /Windows/i.test(userAgent);
+  this.isMac = /Macintosh|Mac/i.test(userAgent);
+  this.isLinux = /Linux|Ubuntu/i.test(userAgent);
+}
+
+downloadSoftware(platform: 'win' | 'mac' | 'linux') {
+  const links = {
+    win: 'https://github.com/rustdesk/rustdesk/releases/download/1.4.0/rustdesk-1.4.0-x86_64.exe',
+    mac: 'https://github.com/rustdesk/rustdesk/releases/download/1.4.0/rustdesk-1.4.0-x86_64.dmg',
+    linux: 'https://github.com/rustdesk/rustdesk/releases/download/1.4.0/rustdesk-1.4.0-x86_64.deb'
+  };
+  // Trigger the download without affecting the page session
+  try {
     const link = document.createElement('a');
     link.href = links[platform];
-    link.download = platform === 'win' ? 'RustDesk-Windows.exe' : 'RustDesk-Mac.dmg';
+    link.download = 
+      platform === 'win' ? 'RustDesk-Windows.exe' : 
+      platform === 'mac' ? 'RustDesk-Mac.dmg' : 
+      'RustDesk-Linux.deb';
+    link.target = '_blank'; // Open in a new tab to avoid disruption
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    this.closePopup();
+  } catch (error) {
+    console.error('Error initiating download:', error);
   }
+  this.closePopup();
+}
   
 handleRequestAppGameData = () => {
     if (therapistToPatientConnection) {

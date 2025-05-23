@@ -190,26 +190,36 @@
         </a>
       </label>
     </div>
-    
-    <!-- Buttons for Windows and Mac -->
-    <div>
+
+    <!-- Buttons displayed based on OS -->
+    <div *ngIf="isWindows">
       <button 
         [disabled]="!termsAccepted" 
         (click)="downloadSoftware('win')" 
         [ngClass]="!termsAccepted ? 'disabled-btn' : 'download-btn'"
       >
-      Windows 64bit
+      Download
       </button>
+    </div>
+    <div *ngIf="isMac">
       <button 
         [disabled]="!termsAccepted" 
         (click)="downloadSoftware('mac')" 
         [ngClass]="!termsAccepted ? 'disabled-btn' : 'download-btn'"
       >
-      Mac
+      Download
+      </button>
+    </div>
+    <div *ngIf="isLinux">
+      <button 
+        [disabled]="!termsAccepted" 
+        (click)="downloadSoftware('linux')" 
+        [ngClass]="!termsAccepted ? 'disabled-btn' : 'download-btn'"
+      >
+      Download
       </button>
     </div>
 
-    <button (click)="closePopup()" class="download-btn">Cancle</button>
+    <button (click)="closePopup()" class="download-btn">Cancel</button>
   </div>
 </div>
-
