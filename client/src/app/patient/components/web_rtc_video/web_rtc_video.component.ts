@@ -143,7 +143,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     private menuOptionsActions: MenuOptionsAppActions,
     private depthCameraSocketService: DepthCameraSocketService,
     private webCamSkeletonService: WebCamSkeletonService,
-    private ajaxService: AjaxService,private http: HttpClient,
+    private ajaxService: AjaxService,
+    private http: HttpClient
   ) {
     this.subscription.add(
       this.ajaxService.getIceServers().subscribe((res) => {
@@ -199,31 +200,69 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   async ngOnInit() {
     if (this.isMobile) {
       this.THERAPIST_REGULAR_VIDEO_CLASS = 'therapist-video-regular-video-mobile';
-      this.THERAPIST_ENLARGE_VIDEO_CLASS = 'therapist-video-enlarge-video-mobile';      
+      this.THERAPIST_ENLARGE_VIDEO_CLASS = 'therapist-video-enlarge-video-mobile';
     }
+    console.log('updateP0');
+    // Set initial status to unavailable
+    this.updatePatientAvailabilityStatus('unavailable');
+
+    // Check for camera and microphone
+    this.userHasCamera = await this.hasUserCamera();
+    this.userHasMicrophone = await this.hasUserMicrophone();
+    this.isCameraCheckComplete = true;
+
+    // Handle camera availability
+    this.handleCameraAvailability();
+
+    // Handle mobile availability
+    this.handleMobileAvailability(this.isMobile);
+
+    // For mobile devices, wait 22 seconds before making available
+    if (this.isMobile) {
+      setTimeout(() => {
+        if (!this.currentUser.isDoNotDisturb) {
+          this.updatePatientAvailabilityStatus('available');
+        }
+      }, 22000);
+    }
+
+    // For desktop, wait for MediaPipe hand detection
+    if (!this.isMobile) {
+      // Check model initialization status periodically
+      const checkModelInterval = setInterval(() => {
+        if (this.webCamSkeletonService.modelInitialized && 
+            this.posenetLoadingTimePassed && 
+            !this.currentUser.isDoNotDisturb) {
+          this.updatePatientAvailabilityStatus('available');
+          clearInterval(checkModelInterval);
+        }
+      }, 1000);
+    }
+
     this.searchCameraInterval = setInterval(async () => {
       this.userHasCamera = await this.hasUserCamera();
       if (this.userHasCamera) {
         this.handleCameraAvailability();
       }
     }, 1000);
+
     setTimeout(() => {
       if (!this.userHasCamera) {
         this.handleCameraAvailability();
       }
     }, this.NO_CAMERA_MESSAGE_DELAY);
-      this.handleMobileAvailability(this.isMobile);
-    this.handleMobileAvailability(this.isMobile);
+
     this.localVideo = document.getElementById('patient-video');
 
     if (this.showLocalVideo) {
       this.prepareLocalRTCSpecs();
       this.initCanvas(false);
     }
-    this.userHasMicrophone = await this.hasUserMicrophone();
+
     if (!this.userHasMicrophone) {
       this.handleMicNotConnected();
     }
+
     this.subscription.add(
       this.authenticationService.currentUser.subscribe((currentUser) => {
         if (!currentUser) {
@@ -399,11 +438,17 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     clearInterval(this.searchCameraInterval);
     this.ajaxService.updatePatientCameraAvailability(this.currentUser.patientId, this.userHasCamera);
     this.isCameraCheckComplete = true;
+
+    // If no camera is available, keep status as unavailable
+    if (!this.userHasCamera) {
+      console.log('updateP6');
+      this.updatePatientAvailabilityStatus('unavailable');
+    }
   }
 
   handleMobileAvailability(isMobile) {
-    console.log("going to save mobile device",isMobile);
-    this.ajaxService.updatePatientMobileAvailability(this.currentUser.patientId, isMobile);    
+    console.log('going to save mobile device', isMobile);
+    this.ajaxService.updatePatientMobileAvailability(this.currentUser.patientId, isMobile);
   }
 
   skeletonLoadingBar = () => {
@@ -444,21 +489,14 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     therapistToPatientConnection.send(data);
   };
 
-  /*isIosDevice = () => {
-    return ['iPad', 'iPhone', 'iPod'].indexOf(navigator.platform) >= 0;
-  };
-  */
-/*
-  isIosDevice(): boolean {
-    return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-  }
-  */
   isIosDevice(): boolean {
     return /iPad|iPhone|iPod/.test(navigator.userAgent) && !('MSStream' in window);
   }
 
   isBodyTrackingReady = () => {
-    return this.isBodyTrackingAvailable && this.webCamSkeletonService.modelInitialized && this.posenetLoadingTimePassed;
+    return this.isBodyTrackingAvailable && 
+           this.webCamSkeletonService.modelInitialized && 
+           this.posenetLoadingTimePassed;
   };
 
   initCanvas = (isDepth) => {
@@ -469,8 +507,6 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     };
     let canv;
     canv = document.getElementById('patient-canvas') as HTMLCanvasElement;
-
-    // below are the code for make the IPAD compatibility Mime Type 
 
     if (canv && canv.getContext) {
       const context = canv.getContext('2d');
@@ -484,10 +520,9 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       'video/webm;codecs=vp8',
       'video/webm;codecs=vp9',
       'video/webm;codecs=h264',
-      'video/mp4'
-    ];  
+      'video/mp4',
+    ];
 
-    // below function to check dynamically supported mime type 
     function getSupportedMimeType(): string | null {
       for (const mimeType of mimeTypes) {
         if (MediaRecorder.isTypeSupported(mimeType)) {
@@ -496,7 +531,6 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       }
       return null; // No supported MIME type found
     }
-    // Selection of mime type 
     const supportedMimeType = getSupportedMimeType();
     if (supportedMimeType) {
       options.mimeType = supportedMimeType;
@@ -504,16 +538,14 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     } else {
       console.error('No supported MIME type found for MediaRecorder.');
     }
-    
+
     this.localStream = canv.captureStream(60);
     const mediaRecorder = new MediaRecorder(this.localStream, options);
     mediaRecorder.start();
     this.localStream = mediaRecorder.stream;
-    // add an audio track to the local stream
     navigator.mediaDevices.getUserMedia({ video: false, audio: true }).then((stream) => {
-      // possible to use this.mediaStremConstraints
       const audioTracks = stream.getAudioTracks();
-      this.localStream.addTrack(audioTracks[0]); // add an audio track to the local stream?\
+      this.localStream.addTrack(audioTracks[0]);
       if (this.localStream.getAudioTracks()[0].muted) {
         this.handleMicMute();
       }
@@ -576,12 +608,10 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         this.remoteVideo.play();
       };
       if ('srcObject' in this.remoteVideo) {
-        //this.remoteVideo.srcObject = stream;
         (this.remoteVideo as any).srcObject = stream;
       } else if (navigator['mozGetUserMedia']) {
         (this.remoteVideo as any).mozSrcObject = stream;
       } else {
-        //(this.remoteVideo as any).src = (window.URL || window.webkitURL).createObjectURL(stream);
         (this.remoteVideo as any).srcObject = stream;
       }
 
@@ -615,12 +645,10 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     }
 
     if ('srcObject' in this.remoteVideo) {
-      //this.remoteVideo.srcObject = stream;
       (this.remoteVideo as any).srcObject = stream;
     } else if (navigator['mozGetUserMedia']) {
       (this.remoteVideo as any).mozSrcObject = stream;
     } else {
-      //(this.remoteVideo as any).src = (window.URL || window.webkitURL).createObjectURL(stream);
       (this.remoteVideo as any).srcObject = stream;
     }
 
@@ -662,8 +690,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   };
 
   hasUserMedia() {
-   // return navigator.getUserMedia;
-   return navigator.mediaDevices.getUserMedia;
+    return navigator.mediaDevices.getUserMedia;
   }
 
   isDepthCameraConnected = () => {
@@ -805,7 +832,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         this.handleRequestAppGameData();
         break;
       case MESSAGES.RDP_REQUEST:
-        console.log("========MESSAGES.RDP_REQUEST=====",MESSAGES.RDP_REQUEST);
+        console.log('========MESSAGES.RDP_REQUEST=====', MESSAGES.RDP_REQUEST);
         this.redirectToRdpRequest();
         break;
       default:
@@ -823,45 +850,41 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       this.openRustdeskModal(` You can Install Rustdesk Software first and share the rustdesk ID`);
     }, 100);
   }
- // Triggered on mouse down
-startDrag(event: MouseEvent): void {
-  this.isDragging = true;
-  this.dragStart.x = event.clientX - this.popupPosition.x;
-  this.dragStart.y = event.clientY - this.popupPosition.y;
-}
 
-// Triggered on mouse up
-stopDrag(): void {
-  this.isDragging = false;
-}
-
-// Triggered on mouse move
-onDrag(event: MouseEvent): void {
-  if (this.isDragging) {
-    this.popupPosition.x = event.clientX - this.dragStart.x;
-    this.popupPosition.y = event.clientY - this.dragStart.y;
+  startDrag(event: MouseEvent): void {
+    this.isDragging = true;
+    this.dragStart.x = event.clientX - this.popupPosition.x;
+    this.dragStart.y = event.clientY - this.popupPosition.y;
   }
-}
 
-fetchRustDeskId() { 
-  this.ajaxService.getpatientRustDeskId(this.currentUser.patientId).subscribe((response) => {     
-   this.rustdeskId = response; 
-  });
-}
+  stopDrag(): void {
+    this.isDragging = false;
+  }
 
-// Method to open the popup
-openRustdeskModal(message: string): void { 
-  this.fetchRustDeskId();  
-  if(!this.rustdeskId){
-    this.showPopup = true;
-  } 
-}
+  onDrag(event: MouseEvent): void {
+    if (this.isDragging) {
+      this.popupPosition.x = event.clientX - this.dragStart.x;
+      this.popupPosition.y = event.clientY - this.dragStart.y;
+    }
+  }
 
-// Method to close the popup
-closePopup(): void {
-  this.showPopup = false;
-  this.termsAccepted = false;
-}
+  fetchRustDeskId() {
+    this.ajaxService.getpatientRustDeskId(this.currentUser.patientId).subscribe((response) => {
+      this.rustdeskId = response;
+    });
+  }
+
+  openRustdeskModal(message: string): void {
+    this.fetchRustDeskId();
+    if (!this.rustdeskId) {
+      this.showPopup = true;
+    }
+  }
+
+  closePopup(): void {
+    this.showPopup = false;
+    this.termsAccepted = false;
+  }
 
 detectOS() {
   const userAgent = navigator.userAgent;
@@ -963,7 +986,6 @@ handleRequestAppGameData = () => {
     this.patientPeer.on('connection', (connection) => {
       this.peerHasErrors = false;
       therapistToPatientConnection = connection;
-      // Use the handleMessage to callback when a message comes in
       therapistToPatientConnection.on('open', () => {
         therapistToPatientConnection.on('data', (data) => {
           this.handleMessage(data);
@@ -1074,7 +1096,6 @@ handleRequestAppGameData = () => {
       call.answer(outgoingStream);
       if (this.isIosDevice()) {
         call.peerConnection.addEventListener('track', (event) => {
-          // other pc track
           if (!this.receivedRemoteVideo) {
             this.receivedRemoteVideo = true;
             this.menuOptionsActions.setOnTherapistSession(true);
@@ -1178,10 +1199,9 @@ handleRequestAppGameData = () => {
         videoBitsPerSecond: 2500000,
         mimeType: 'video/webm;codecs=vp8',
       };
-      
+
       let canv;
 
-      
       if (this.depthCameraSocketService.isDepthCameraConnected) {
         canv = document.getElementById('patient-canvas-skeleton') as HTMLCanvasElement;
       } else if (this.currentUser.disabledSkeleton) {
@@ -1189,8 +1209,6 @@ handleRequestAppGameData = () => {
       } else if (!this.depthCameraSocketService.isDepthCameraConnected) {
         return this.localStream;
       }
-
-      // below are the code for make the IPAD compatibility Mime Type 
 
       if (canv && canv.getContext) {
         const context = canv.getContext('2d');
@@ -1204,10 +1222,9 @@ handleRequestAppGameData = () => {
         'video/webm;codecs=vp8',
         'video/webm;codecs=vp9',
         'video/webm;codecs=h264',
-        'video/mp4'
-      ];  
+        'video/mp4',
+      ];
 
-      // below function to check dynamically supported mime type 
       function getSupportedMimeType(): string | null {
         for (const mimeType of mimeTypes) {
           if (MediaRecorder.isTypeSupported(mimeType)) {
@@ -1216,7 +1233,6 @@ handleRequestAppGameData = () => {
         }
         return null; // No supported MIME type found
       }
-      // Selection of mime type 
       const supportedMimeType = getSupportedMimeType();
       if (supportedMimeType) {
         options.mimeType = supportedMimeType;
@@ -1403,6 +1419,37 @@ handleRequestAppGameData = () => {
     }
   };
 
+  updatePatientAvailabilityStatus(status: 'offline' | 'unavailable' | 'available' | 'do_not_disturb') {
+    console.log('updateP7');
+    console.log('currentUser', this.currentUser, this.currentUser?.patientId, 'status', status);
+    if (this.currentUser?.patientId) {
+      this.ajaxService.updatePatientAvailabilityStatus(this.currentUser.patientId, status).subscribe(
+        () => {
+          console.log(`Patient availability status updated to ${status}`);
+          // Update the current user's status locally
+          if (this.currentUser) {
+            this.currentUser.availabilityStatus = status;
+          }
+        },
+        (error) => {
+          console.error('Error updating patient availability status:', error);
+          // Retry once after a short delay
+          setTimeout(() => {
+            this.ajaxService.updatePatientAvailabilityStatus(this.currentUser.patientId, status).subscribe(
+              () => {
+                console.log(`Patient availability status retry successful: ${status}`);
+                if (this.currentUser) {
+                  this.currentUser.availabilityStatus = status;
+                }
+              },
+              (retryError) => console.error('Error updating patient availability status on retry:', retryError)
+            );
+          }, 1000);
+        }
+      );
+    }
+  }
+
   updateVideosStyles = () => {
     if (!this.remoteVideo) {
       return;
@@ -1423,6 +1470,7 @@ handleRequestAppGameData = () => {
   };
 
   ngOnDestroy() {
+    // Status update is now handled in AuthenticationService.logout()
     if (!this.isMobile) {
       this.webCamSkeletonService.stopPage();
     }

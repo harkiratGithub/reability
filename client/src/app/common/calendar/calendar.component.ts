@@ -252,6 +252,7 @@ export class CalendarComponent implements OnInit, OnChanges {
           this.updatePatient.emit({
             id: this.currentCoPatient.patientId,
             techIssue: issue,
+            availabilityStatus: 'available' as 'available' | 'offline' | 'unavailable' | 'do_not_disturb',
             ...techReason,
           });
           this.currentCoPatient.techIssue = issue;
