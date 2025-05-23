@@ -161,31 +161,32 @@ export const getOpenPeers = async (therapistId: any) => {
 		const openPeers = await UserModel.getPeersByTherapistId(therapistId);
 		const busyPeers = await TherapistSessionModel.getBusyPeers();
 		const ringingPeers = await TherapistSessionModel.getRingingPeers();
-		const peersStatus = openPeers.map(
-			(peer: { [x: string]: any; active: any; logged_out_at: any; patient_id: any }) => {
-				let userStatus: string;
-				userStatus = peer.active ? PEERS_STATUS.LOGGED_OUT : PEERS_STATUS.DISABLED;
-				const openPeer = peer.logged_out_at
-					? !Helper.checkIfPassedAmountOfMs(peer.logged_out_at, delayedHeartbeat)
-					: false;
-				userStatus = openPeer ? PEERS_STATUS.AVAILABLE : PEERS_STATUS.LOGGED_OUT;
-				const therapistLastSession = findLast(busyPeers, (b) => b.patient_id === peer.patient_id);
-				const therapistLastRingingSession = findLast(ringingPeers, (b) => b.patient_id === peer.patient_id);
-				if (userStatus === PEERS_STATUS.AVAILABLE && therapistLastSession) {
-					userStatus = therapistLastSession.therapist_id === therapistId ? PEERS_STATUS.CONNECTED : PEERS_STATUS.BUSY;
-				}
-				if (userStatus === PEERS_STATUS.AVAILABLE && therapistLastRingingSession) {
-					userStatus =
-						therapistLastRingingSession.therapist_id === therapistId ? PEERS_STATUS.RINGING : PEERS_STATUS.BUSY;
-				}
-				delete peer['patient_id'];
-				delete peer['active'];
-				return {
-					...peer,
-					peerStatus: userStatus,
-				};
-			}
-		);
+const peersStatus = openPeers.map(
+	(peer: { [x: string]: any; active: any; logged_out_at: any; patient_id: any; availability_status?: string }) => {
+		let userStatus: string;
+		userStatus = peer.active ? PEERS_STATUS.LOGGED_OUT : PEERS_STATUS.DISABLED;
+		const openPeer = peer.logged_out_at
+			? !Helper.checkIfPassedAmountOfMs(peer.logged_out_at, delayedHeartbeat)
+			: false;
+		userStatus = openPeer ? PEERS_STATUS.AVAILABLE : PEERS_STATUS.LOGGED_OUT;
+		const therapistLastSession = findLast(busyPeers, (b) => b.patient_id === peer.patient_id);
+		const therapistLastRingingSession = findLast(ringingPeers, (b) => b.patient_id === peer.patient_id);
+		if (userStatus === PEERS_STATUS.AVAILABLE && therapistLastSession) {
+			userStatus = therapistLastSession.therapist_id === therapistId ? PEERS_STATUS.CONNECTED : PEERS_STATUS.BUSY;
+		}
+		if (userStatus === PEERS_STATUS.AVAILABLE && therapistLastRingingSession) {
+			userStatus =
+				therapistLastRingingSession.therapist_id === therapistId ? PEERS_STATUS.RINGING : PEERS_STATUS.BUSY;
+		}
+		delete peer['patient_id'];
+		delete peer['active'];
+		return {
+			...peer,
+			peerStatus: userStatus,
+			availability_status: peer.availability_status || 'unavailable', // Include availability_status in response
+		};
+	}
+);
 		return peersStatus;
 	} catch (err) {
 		throw err;
