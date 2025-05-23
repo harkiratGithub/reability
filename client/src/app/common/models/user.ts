@@ -21,4 +21,5 @@ export class User {
   login_notification_email?: string;
   instituteLogo?: string; 
   isMobile: boolean;
+  patientId?: number;
 }

@@ -116,6 +116,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
   patientId:string ='' ; 
   rustdeskId: string | null = null; 
   newRustdeskId = '';
+  isPatientOnRinging: string = '';
   constructor(
     private authenticationService: AuthenticationService,
     private webRtcService: WebRtcService,
@@ -128,7 +129,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
     public appActions: AppActions,private http: HttpClient,
   ) {
     this.connectedTherapist = this.authenticationService.currentUserValue;   
-    this.InstituteLogo = this.connectedTherapist?.instituteLogo || '';    
+    this.InstituteLogo = this.connectedTherapist?.instituteLogo || '';
     this.subscription.add(
       this.keyUp
         .pipe(
@@ -306,19 +307,33 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     if (!this.isPatientVideoInSession && user.hasCamera) {
-      this.selectedUser = user;      
+      this.selectedUser = user;
       const connectedPaitent = this.connectedPaitents.find(
         (paitent) => paitent.connection.peer === this.selectedUser.peerId
       );
       if (!connectedPaitent && !this.selectedUser.waitingForSession) {
         this.selectedUser.missedLastCall = false;
         this.selectedUser.waitingForSession = true;
-        this.ajax.updateStartSessionWithPatient(this.selectedUser.peerId, "ringing");
-        this.joinSession(this.selectedUser.peerId, this.selectedUser);
+        const onRingingCallSession = await this.fetchLastSessionStatus(this.selectedUser.patientId);
+        if (onRingingCallSession.type !== 'ringing') {
+          this.ajax.updateStartSessionWithPatient(this.selectedUser.peerId, 'ringing');
+          this.joinSession(this.selectedUser.peerId, this.selectedUser);
+        }
       }
       this.getSpanSize();
     }
   }
+
+  async fetchLastSessionStatus(patientId: number) {
+    try {
+      const result = await this.ajax.getLastTherapistSessionStatus(patientId).toPromise();
+      this.isPatientOnRinging = result.type;
+      return result;
+    } catch (error) {
+      return null;
+    }
+  }
+
   onClickSettings = (connectionId, isGameShown) => {
     if (!isGameShown) {
       return;
@@ -410,7 +425,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       if (user.role === Role.Video_Patient) {
         this.handleVideoPatientSession(user, conn);
       }
-      conn.on('data', (data) => {        
+      conn.on('data', (data) => {
         this.handleMessage(data, conn, user);
       });
       conn.on('close', () => {
@@ -511,6 +526,8 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
     this.stopCallTimer(user);
     if (!isPatientVideoInSession) {
       this.webRtcService.privateMessage(user.peerId, { type: 'hang_up_session' }, this.connectedPaitents);
+      // Update the session type to null if the call is hung up
+      this.ajax.updateStartSessionWithPatient(user.peerId, null);
     }
     setTimeout(() => {
       if (user === this.selectedUser) {
@@ -897,8 +914,8 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
   };
 
   hasUserMedia() {
-   // return navigator.getUserMedia;
-   return navigator.mediaDevices.getUserMedia;
+    // return navigator.getUserMedia;
+    return navigator.mediaDevices.getUserMedia;
   }
 
   hasUserCamera = async (): Promise<boolean> => {
@@ -1312,13 +1329,13 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       .then((list) => {
         const availableList = list.filter(
           (peer) => {
-            if (peer.peerStatus === PeersStatus.AVAILABLE || peer.peerStatus === PeersStatus.CONNECTED) {
-              return true;
-            }
-            if (peer.peerStatus === PeersStatus.RINGING) {
-              return peer.therapist_id === this.connectedTherapist.id;
-            }
-            return false;
+          if (peer.peerStatus === PeersStatus.AVAILABLE || peer.peerStatus === PeersStatus.CONNECTED) {
+            return true;
+          }
+          if (peer.peerStatus === PeersStatus.RINGING) {
+            return peer.therapist_id === this.connectedTherapist.id;
+          }
+          return false;
           }
         );
         this.ajax
@@ -1358,8 +1375,8 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
           });
       });
   };
-  
-/*
+
+  /*
   getLoggedInPeers = async () => {
     try {
       // Fetch open peers
