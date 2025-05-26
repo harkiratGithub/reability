@@ -332,6 +332,36 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                     if (performedLength > 0 && performedLength % 4 == 0 && this.checkIdle && !this.callChatGPT && this.lastIdleLength != performedLength && now - this.lastTriggerTime > cooldown) {
                       const { allLeftSame, allRightSame } = await this.checkIdleCondition(mainComments);
                       // console.log("allLeftSame===", allLeftSame, "allRightSame===", allRightSame);
+                      const leftMessages = [
+                        'It looks like the left hand has been idle for a while.',
+                        'No movement detected on the left hand.',
+                        'The left hand seems to be resting.',
+                        'Left hand is showing signs of inactivity.',
+                        'Left hand activity has paused.',
+                        'Left hand remains unmoved.',
+                        'Stillness noticed in the left hand.'
+                      ];
+
+                      const rightMessages = [
+                        'It looks like the right hand has been idle for a while.',
+                        'No movement detected on the right hand.',
+                        'The right hand seems to be resting.',
+                        'Right hand is showing signs of inactivity.',
+                        'Right hand activity has paused.',
+                        'Right hand remains unmoved.',
+                        'Stillness noticed in the right hand.'
+                      ];
+
+                      const bothMessages = [
+                        'Idle movements detected for both hands.',
+                        'No activity observed from either hand.',
+                        'Both hands appear to be inactive.',
+                        'Looks like both hands are idle.',
+                        'Neither hand has shown movement.',
+                        'Both hands are staying still.',
+                        'Activity paused on both hands.'
+                      ];
+
                       if (allLeftSame || allRightSame) {
                         let content = "";
                         this.checkIdle = false
@@ -341,11 +371,11 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                         this.lastPerformedIndex = performedLength
                         this.patientWebRtcService.setShouldPauseGameState(true);
                         if (allLeftSame && allRightSame) {
-                          content = 'Idle movements detected for both hands.'
+                          content = bothMessages[Math.floor(Math.random() * bothMessages.length)];
                         } else if (allLeftSame) {
-                          content = 'Idle movements detected for left hand.'
+                          content = leftMessages[Math.floor(Math.random() * leftMessages.length)];
                         } else if (allRightSame) {
-                          content = 'Idle movements detected for right hand.'
+                          content = rightMessages[Math.floor(Math.random() * rightMessages.length)];
                         }
                         this.playCommentAudio(content)
                       }
@@ -2050,10 +2080,10 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         messages: [{
           role: 'user',
           content: `
-            You are the virtual therapist.
-            JSON Array: ${JSON.stringify(updateCommentss)}. 
+            You are the real virtual therapist.
+            JSON Array: ${JSON.stringify(updateCommentss)}.
             Based on the above JSON Array, give summary to the patient on how he performed the task comparing the "ClipDeg" with "PatientLeftDeg" and "PatientRightDeg" values in each object.
-            Summary should be specific to the hand movements also include the idle movements, in simple English within 12-15 words with no pointers.
+            Summary should be specific to the hand movements also include the idle movements, in simple English within 15 seconds with no pointers.
           `
         }]
       };
@@ -2455,7 +2485,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     audio.play(); // Play the audio
   }
 
-  playCommentAudio(commentText: string) {
+  async playCommentAudio(commentText: string) {
+    console.log("commentText===", commentText);
     const firstTimeText = this.firstTimeSpeech ? "I paused the video to tell you this: " : "";
     if (commentText === '') {
       this.patientWebRtcService.setShouldPauseGameState(false);
@@ -2464,19 +2495,57 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       this.checkIdle = true;
       return
     }
-    const speech = new SpeechSynthesisUtterance(`${firstTimeText}${commentText}`);
-    speech.lang = 'en-US'; // Set language
-    speech.volume = 1; // Volume: 0 to 1
-    speech.rate = .9; // Speed: 0.1 to 10
-    speech.pitch = 0.5; // Pitch: 0 to 2
-    window.speechSynthesis.speak(speech);
-    speech.onend = () => {
+    // const speech = new SpeechSynthesisUtterance(`${firstTimeText}${commentText}`);
+    // speech.lang = 'en-US'; // Set language
+    // speech.volume = 1; // Volume: 0 to 1
+    // speech.rate = .9; // Speed: 0.1 to 10
+    // speech.pitch = 0.5; // Pitch: 0 to 2
+    // window.speechSynthesis.speak(speech);
+    // speech.onend = () => {
+    //   this.firstTimeSpeech = false;
+    //   this.patientWebRtcService.setShouldPauseGameState(false);
+    //   this.callChatGPT = false;
+    //   this.showMarker = true;
+    //   this.checkIdle = true;
+    //   this.lastTriggerTime = Date.now();
+    // }
+
+    const response = await fetch("https://api.elevenlabs.io/v1/text-to-speech/EXAVITQu4vr4xnSDxMaL?output_format=mp3_44100_128", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "xi-api-key": "sk_b9f5656613768a9b0da13a4504ddac71aa39df1c0303456f"
+      },
+      body: JSON.stringify({
+        text: firstTimeText + commentText,
+        model_id: "eleven_multilingual_v2"
+      })
+    })
+
+    const contentType = response.headers.get("content-type");
+    console.log("contentType===", contentType);
+    if (contentType && contentType.includes("application/json")) {
+      const jsonData = await response.json();
+      console.log("Received JSON:", jsonData);
       this.firstTimeSpeech = false;
       this.patientWebRtcService.setShouldPauseGameState(false);
       this.callChatGPT = false;
       this.showMarker = true;
       this.checkIdle = true;
       this.lastTriggerTime = Date.now();
+    } else if (contentType && (contentType.includes("audio/") || contentType.includes("application/octet-stream"))) {
+      const blobData = await response.blob();
+      const audioUrl = URL.createObjectURL(blobData);
+      const audio = new Audio(audioUrl);
+      audio.play();
+      audio.onended = () => {
+        this.firstTimeSpeech = false;
+        this.patientWebRtcService.setShouldPauseGameState(false);
+        this.callChatGPT = false;
+        this.showMarker = true;
+        this.checkIdle = true;
+        this.lastTriggerTime = Date.now();
+      }
     }
   }
 }
