@@ -2514,7 +2514,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "xi-api-key": "sk_b9f5656613768a9b0da13a4504ddac71aa39df1c0303456f"
+        "xi-api-key": "sk_e860ad577bda185b1f347aad2430e78bd067afdda73e6529"
       },
       body: JSON.stringify({
         text: firstTimeText + commentText,
