@@ -1399,8 +1399,11 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
           .toPromise()
           .then((peerUsers) => {
             let newFilteredPatients = this.patients.filter((patient) =>
-              availableList.some(
-                (a) => a.user_id === Number(patient.peerId) && patient.username.includes(this.nameFilter)
+              availableList.some((a) => a.user_id === Number(patient.peerId)) &&
+              (
+                (patient.username && patient.username.toLowerCase().includes(this.nameFilter.toLowerCase())) ||
+                (patient.firstName && patient.firstName.toLowerCase().includes(this.nameFilter.toLowerCase())) ||
+                (patient.lastName && patient.lastName.toLowerCase().includes(this.nameFilter.toLowerCase()))
               )
             );
             newFilteredPatients = newFilteredPatients.filter((patient) =>
@@ -1423,7 +1426,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
               }
             });
 
-            this.filteredPatients = newFilteredPatients;
+            this.allPatients = this.filteredPatients = newFilteredPatients;
             this.initializeDisconnectedPatients();
             this.loggedInUserCount = this.filteredPatients.length;
             this.ref.detectChanges();
