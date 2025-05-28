@@ -5,11 +5,11 @@
 
 
 <div class="pose-container">
-  <video #videoElement src="assets/st-video/p033.mp4" autoplay muted controls width="700" (ended)="generateCSV()"></video>
+  <video #videoElement src="assets/st-video/video.mp4" autoplay muted controls width="700"></video>
   <!-- <iframe id="videoIframe" #videoIframe width="720" height="480" style="border:none;" srcdoc='<!DOCTYPE html>
           <html>
           <body>
-            <video id="videoElement" #videoElement src="assets/st-video/video.mp4" autoplay muted controls width="700"></video>
+            <video (ended)="generateCSV()" id="videoElement" #videoElement src="assets/st-video/video.mp4" autoplay muted controls width="700"></video>
           </body>
           </html>'>
   </iframe> -->

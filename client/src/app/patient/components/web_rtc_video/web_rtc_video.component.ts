@@ -368,7 +368,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                         this.showMarker = false
                         this.callChatGPT = true
                         this.lastIdleLength = performedLength
-                        this.lastPerformedIndex = performedLength
+                        // this.lastPerformedIndex = performedLength
                         this.patientWebRtcService.setShouldPauseGameState(true);
                         if (allLeftSame && allRightSame) {
                           content = bothMessages[Math.floor(Math.random() * bothMessages.length)];
@@ -2244,11 +2244,23 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         // const rightWrist = results.poseLandmarks[12];
         // const rightElbow = results.poseLandmarks[14];
 
+        const leftHip = results.poseLandmarks[23];
+        const leftShoulder = results.poseLandmarks[11];
+        const leftElbow = results.poseLandmarks[13];
+        const rightHip = results.poseLandmarks[24];
+        const rightShoulder = results.poseLandmarks[12];
+        const rightElbow = results.poseLandmarks[14];
+
+        // const leftShoulder = results.poseLandmarks[this.landmarks[0]];
+        // const leftWrist = results.poseLandmarks[this.landmarks[1]];
+        // const rightShoulder = results.poseLandmarks[this.landmarks[2]];
+        // const rightWrist = results.poseLandmarks[this.landmarks[3]];
+
         // if (this.videoIndex == 1) {
-        const leftShoulder = results.poseLandmarks[this.landmarks[0]];
-        const leftWrist = results.poseLandmarks[this.landmarks[1]];
-        const rightShoulder = results.poseLandmarks[this.landmarks[2]];
-        const rightWrist = results.poseLandmarks[this.landmarks[3]];
+        //   leftShoulder = results.poseLandmarks[23];
+        //   leftWrist = results.poseLandmarks[15];
+        //   rightShoulder = results.poseLandmarks[23];
+        //   rightWrist = results.poseLandmarks[15];
         // } else if (this.videoIndex == 2) {
         //   leftShoulder = results.poseLandmarks[24];
         //   leftWrist = results.poseLandmarks[16];
@@ -2277,27 +2289,27 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         // }
 
         // Calculate angles for left and right wrists
-        const leftAngle = this.calculateAngleBetweenPoints(
-          { x: leftShoulder.x, y: leftShoulder.y, z: leftShoulder.z },
-          { x: leftWrist.x, y: leftWrist.y, z: leftWrist.z }
-        );
-
-        const rightAngle = this.calculateAngleBetweenPoints(
-          { x: rightShoulder.x, y: rightShoulder.y, z: rightShoulder.z },
-          { x: rightWrist.x, y: rightWrist.y, z: rightWrist.z }
-        );
-
-        // const leftAngle = this.getAngleBetweenPoints(
-        //   leftShoulder,
-        //   leftWrist,
-        //   leftElbow
+        // const leftAngle = this.calculateAngleBetweenPoints(
+        //   { x: leftShoulder.x, y: leftShoulder.y, z: leftShoulder.z },
+        //   { x: leftWrist.x, y: leftWrist.y, z: leftWrist.z }
         // );
 
-        // const rightAngle = this.getAngleBetweenPoints(
-        //   rightShoulder,
-        //   rightWrist,
-        //   rightElbow
+        // const rightAngle = this.calculateAngleBetweenPoints(
+        //   { x: rightShoulder.x, y: rightShoulder.y, z: rightShoulder.z },
+        //   { x: rightWrist.x, y: rightWrist.y, z: rightWrist.z }
         // );
+
+        const leftAngle = this.getAngleBetweenPoints(
+          leftHip,
+          leftShoulder,
+          leftElbow
+        );
+
+        const rightAngle = this.getAngleBetweenPoints(
+          rightHip,
+          rightShoulder,
+          rightElbow
+        );
 
         this.cameraAngle['leftWrist'] = leftAngle;
         this.cameraAngle['rightWrist'] = rightAngle;
@@ -2391,6 +2403,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           // this.timeLog.push({ elapsedTime, currentVideoTime: currentVideoAngle.ClipTimestamp, currentVideoAngle: currentVideoAngle.ClipDeg, rightAngle, timeMatching: this.timeMatching, rightComment: this.rightComment, lastComment: this.lastComment });
 
           this.cdr.detectChanges();
+          const joints = [];
           const connections = [];
           // Additional code to draw pose landmarks and connections on the canvas
           results.poseLandmarks.forEach((landmark, index) => {
@@ -2404,69 +2417,80 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                 0,
                 2 * Math.PI
               );
-              canvasCtx.fillStyle = 'rgba(255, 255, 255)';
+              canvasCtx.fillStyle = 'rgba(0, 255, 0)';
+              if (this.timeMatching && index % 2) {
+                if (this.leftCondition === 'Bad') {
+                  canvasCtx.fillStyle = 'rgba(255, 255, 255)';
+                }
+              }
+              if (this.timeMatching && index % 2 === 0) {
+                if (this.rightCondition === 'Bad') {
+                  canvasCtx.fillStyle = 'rgba(255, 255, 255)';
+                }
+              }
+              joints.push({ index, color: canvasCtx.fillStyle });
               canvasCtx.fill();
             }
           });
 
-          POSE_CONNECTIONS.forEach(([start, end]) => {
-            // if (this.videoIndex == 3) {
-            const conditionString = this.landmarksLinePointer.map(item => {
-              if (Array.isArray(item.end)) {
-                return item.end.map(e => `(start === ${item.start} && end === ${e})`).join(' || ');
-              }
-              return `(start === ${item.start} && end === ${item.end})`;
-            }).join(' || ');
-            const condition = `(${conditionString})`;
+          // POSE_CONNECTIONS.forEach(([start, end]) => {
+          //   // if (this.videoIndex == 3) {
+          //   const conditionString = this.landmarksLinePointer.map(item => {
+          //     if (Array.isArray(item.end)) {
+          //       return item.end.map(e => `(start === ${item.start} && end === ${e})`).join(' || ');
+          //     }
+          //     return `(start === ${item.start} && end === ${item.end})`;
+          //   }).join(' || ');
+          //   const condition = `(${conditionString})`;
 
-            if (eval(condition)) {
-              const startLandmark = results.poseLandmarks[start];
-              const endLandmark = results.poseLandmarks[end];
-              canvasCtx.beginPath();
-              canvasCtx.moveTo(
-                startLandmark.x * canvasElement.width,
-                startLandmark.y * canvasElement.height
-              );
-              canvasCtx.lineTo(
-                endLandmark.x * canvasElement.width,
-                endLandmark.y * canvasElement.height
-              );
-              canvasCtx.lineWidth = 4;
-              // canvasCtx.strokeStyle = 'rgba(128, 128, 128, 0.8)';
-              canvasCtx.strokeStyle = 'rgba(0, 255, 0)';
+          //   if (eval(condition)) {
+          //     const startLandmark = results.poseLandmarks[start];
+          //     const endLandmark = results.poseLandmarks[end];
+          //     canvasCtx.beginPath();
+          //     canvasCtx.moveTo(
+          //       startLandmark.x * canvasElement.width,
+          //       startLandmark.y * canvasElement.height
+          //     );
+          //     canvasCtx.lineTo(
+          //       endLandmark.x * canvasElement.width,
+          //       endLandmark.y * canvasElement.height
+          //     );
+          //     canvasCtx.lineWidth = 4;
+          //     // canvasCtx.strokeStyle = 'rgba(128, 128, 128, 0.8)';
+          //     canvasCtx.strokeStyle = 'rgba(0, 255, 0)';
 
-              if (this.timeMatching && start % 2) {
-                if (this.leftCondition === 'Bad') {
-                  canvasCtx.strokeStyle = 'rgba(128, 128, 128, 0.8)';
-                  // if (this.leftComment === "Perfect") {
-                  //   canvasCtx.strokeStyle = 'rgba(0, 255, 0)';
-                  // } else if (this.leftComment === "Nice") {
-                  //   canvasCtx.strokeStyle = 'rgb(94, 255, 0)';
-                  // } else {
-                  //   canvasCtx.strokeStyle = 'rgb(145, 255, 0)';
-                  // }
-                }
-              }
-              if (this.timeMatching && start % 2 === 0) {
-                if (this.rightCondition === 'Bad') {
-                  canvasCtx.strokeStyle = 'rgba(128, 128, 128, 0.8)';
-                  // if (this.rightComment === "Perfect") {
-                  //   canvasCtx.strokeStyle = 'rgba(0, 255, 0)';
-                  // } else if (this.rightComment === "Nice") {
-                  //   canvasCtx.strokeStyle = 'rgb(94, 255, 0)';
-                  // } else {
-                  //   canvasCtx.strokeStyle = 'rgb(145, 255, 0)';
-                  // }
-                }
-              }
-              canvasCtx.stroke();
-              connections.push({ start, end, color: canvasCtx.strokeStyle });
-            }
-          });
+          //     if (this.timeMatching && start % 2) {
+          //       if (this.leftCondition === 'Bad') {
+          //         canvasCtx.strokeStyle = 'rgba(128, 128, 128, 0.8)';
+          //         // if (this.leftComment === "Perfect") {
+          //         //   canvasCtx.strokeStyle = 'rgba(0, 255, 0)';
+          //         // } else if (this.leftComment === "Nice") {
+          //         //   canvasCtx.strokeStyle = 'rgb(94, 255, 0)';
+          //         // } else {
+          //         //   canvasCtx.strokeStyle = 'rgb(145, 255, 0)';
+          //         // }
+          //       }
+          //     }
+          //     if (this.timeMatching && start % 2 === 0) {
+          //       if (this.rightCondition === 'Bad') {
+          //         canvasCtx.strokeStyle = 'rgba(128, 128, 128, 0.8)';
+          //         // if (this.rightComment === "Perfect") {
+          //         //   canvasCtx.strokeStyle = 'rgba(0, 255, 0)';
+          //         // } else if (this.rightComment === "Nice") {
+          //         //   canvasCtx.strokeStyle = 'rgb(94, 255, 0)';
+          //         // } else {
+          //         //   canvasCtx.strokeStyle = 'rgb(145, 255, 0)';
+          //         // }
+          //       }
+          //     }
+          //     canvasCtx.stroke();
+          //     connections.push({ start, end, color: canvasCtx.strokeStyle });
+          //   }
+          // });
 
           // this.skeletonService.updateSkeleton({ joints, connections });
           if (therapistToPatientConnection) {
-            therapistToPatientConnection.send({ type: 'skeleton_tracking', data: { userId: this.currentUser, frame: { joints: this.landmarksPointer, connections } } });
+            therapistToPatientConnection.send({ type: 'skeleton_tracking', data: { userId: this.currentUser, frame: { joints, connections } } });
             therapistToPatientConnection.send({ type: 'progress_bar', data: { userId: this.currentUser, barPercentage: this.barPercentage, barThumbsUp: this.barThumbsUp, showProgressBar: 'true' } });
           }
           this.cdr.detectChanges();

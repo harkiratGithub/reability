@@ -606,60 +606,22 @@ export class PoseComparisonComponent implements OnInit, AfterViewInit {
       width: 640,
       height: 480,
     });
-    // this.camera.start();
+    this.camera.start();
   }
-
-  calculateAngle(landmarkA: any, landmarkB: any, landmarkC: any): number {
-    // Vector AB (from A to B)
-    const ABx = landmarkB.x - landmarkA.x;
-    const ABy = landmarkB.y - landmarkA.y;
-    const ABz = landmarkB.z - landmarkA.z;
-
-    // Vector AC (from A to C)
-    const ACx = landmarkC.x - landmarkA.x;
-    const ACy = landmarkC.y - landmarkA.y;
-    const ACz = landmarkC.z - landmarkA.z;
-
-    // Dot product of AB and AC
-    const dotProduct = ABx * ACx + ABy * ACy + ABz * ACz;
-
-    // Magnitude of vectors AB and AC
-    const magnitudeAB = Math.sqrt(ABx * ABx + ABy * ABy + ABz * ABz);
-    const magnitudeAC = Math.sqrt(ACx * ACx + ACy * ACy + ACz * ACz);
-
-    // Calculate the angle in radians and convert to degrees
-    const angleRad = Math.acos(dotProduct / (magnitudeAB * magnitudeAC));
-    return (angleRad * 180) / Math.PI; // Convert to degrees
-  }
-
-  // private calculateAngleBetweenPoints(
-  //   A: { x: number; y: number },
-  //   B: { x: number; y: number }
-  // ): number {
-  //   const vectorAB = { x: B.x - A.x, y: B.y - A.y };
-  //   const verticalVector = { x: 0, y: 1 };
-
-  //   const dotProduct =
-  //     vectorAB.x * verticalVector.x + vectorAB.y * verticalVector.y;
-  //   const magnitudeAB = Math.sqrt(vectorAB.x ** 2 + vectorAB.y ** 2);
-
-  //   const angleInRadians = Math.acos(dotProduct / magnitudeAB);
-  //   return angleInRadians * (180 / Math.PI);
-  // }
 
   private calculateAngleBetweenPoints(
     A: { x: number; y: number; z: number },
     B: { x: number; y: number; z: number }
   ): number {
-    const vectorAB = { x: B.x - A.x, y: B.y - A.y, z: B.z - A.z };
-    const verticalVector = { x: 0, y: 0, z: -1 };
+    const vectorAB = { x: B.x - A.x, y: B.y - A.y };
+    const verticalVector = { x: 0, y: 1 };
 
     const dotProduct =
-      vectorAB.x * verticalVector.x + vectorAB.y * verticalVector.y + vectorAB.z * verticalVector.z;
+      vectorAB.x * verticalVector.x + vectorAB.y * verticalVector.y;
 
-    const magnitudeAB = Math.sqrt(vectorAB.x ** 2 + vectorAB.y ** 2 + vectorAB.z ** 2);
+    const magnitudeAB = Math.sqrt(vectorAB.x ** 2 + vectorAB.y ** 2);
     const magnitudeVertical = Math.sqrt(
-      verticalVector.x ** 2 + verticalVector.y ** 2 + verticalVector.z ** 2
+      verticalVector.x ** 2 + verticalVector.y ** 2
     );
 
     const angleInRadians = Math.acos(
@@ -667,6 +629,12 @@ export class PoseComparisonComponent implements OnInit, AfterViewInit {
     );
     return angleInRadians * (180 / Math.PI);
   }
+
+  private getAngleBetweenPoints(start, middle, end) {
+    const radians = Math.atan2(end.y - middle.y, end.x - middle.x) - Math.atan2(start.y - middle.y, start.x - middle.x);
+    const angle = Math.abs((radians * 180.0) / Math.PI);
+    return angle > 180.0 ? 360 - angle : angle;
+  };
 
   private calculateAngleBetweenThreePoints(
     A: { x: number; y: number; z: number },
@@ -710,11 +678,17 @@ export class PoseComparisonComponent implements OnInit, AfterViewInit {
 
       if (results.poseLandmarks) {
         const tolerance = 3;
-        const leftShoulder = results.poseLandmarks[24];
-        const leftElbow = results.poseLandmarks[26];
-        const leftWrist = results.poseLandmarks[15];
-        const rightShoulder = results.poseLandmarks[23];
-        const rightWrist = results.poseLandmarks[25];
+        const leftHip = results.poseLandmarks[23];
+        const leftShoulder = results.poseLandmarks[11];
+        const leftElbow = results.poseLandmarks[13];
+        const rightHip = results.poseLandmarks[24];
+        const rightShoulder = results.poseLandmarks[12];
+        const rightElbow = results.poseLandmarks[14];
+
+        // const leftShoulder = results.poseLandmarks[11];
+        // const leftWrist = results.poseLandmarks[15];
+        // const rightShoulder = results.poseLandmarks[12];
+        // const rightWrist = results.poseLandmarks[16];
         // console.log(leftShoulder, leftElbow, leftWrist);
 
         // const frameData = this.getCoordinatesForFrame(this.currentFrameIndex);
@@ -732,15 +706,28 @@ export class PoseComparisonComponent implements OnInit, AfterViewInit {
         //   { x: leftWrist.x, y: leftWrist.y, z: leftWrist.z }
         // );
 
-        const leftAngle = this.calculateAngleBetweenPoints(
-          { x: leftShoulder.x, y: leftShoulder.y, z: leftShoulder.z },
-          { x: leftElbow.x, y: leftElbow.y, z: leftElbow.z }
+        // const leftAngle = this.calculateAngleBetweenPoints(
+        //   { x: leftShoulder.x, y: leftShoulder.y, z: leftShoulder.z },
+        //   { x: leftWrist.x, y: leftWrist.y, z: leftWrist.z }
+        // );
+
+        // const rightAngle = this.calculateAngleBetweenPoints(
+        //   { x: rightShoulder.x, y: rightShoulder.y, z: rightShoulder.z },
+        //   { x: rightWrist.x, y: rightWrist.y, z: rightWrist.z }
+        // );
+
+        const leftAngle = this.getAngleBetweenPoints(
+          leftHip,
+          leftShoulder,
+          leftElbow
         );
 
-        const rightAngle = this.calculateAngleBetweenPoints(
-          { x: rightShoulder.x, y: rightShoulder.y, z: rightShoulder.z },
-          { x: rightWrist.x, y: rightWrist.y, z: rightWrist.z }
+        const rightAngle = this.getAngleBetweenPoints(
+          rightHip,
+          rightShoulder,
+          rightElbow
         );
+
         const elapsedTime = ((new Date().getTime() - this.startTime) / 1000).toFixed(3);
         this.matchingVideoData.push({
           timestamp: `${elapsedTime}`,
@@ -846,7 +833,7 @@ export class PoseComparisonComponent implements OnInit, AfterViewInit {
         // Additional code to draw pose landmarks and connections on the canvas
 
         results.poseLandmarks.forEach((landmark, index) => {
-          if (index === 24 || index === 26 || index == 28 || index === 23 || index === 25 || index == 27) {
+          if ([11, 15, 12, 16, 13, 14, 23, 24].includes(index)) {
             canvasCtx.beginPath();
             canvasCtx.arc(
               landmark.x * canvasElement.width,
@@ -861,7 +848,7 @@ export class PoseComparisonComponent implements OnInit, AfterViewInit {
         });
 
         POSE_CONNECTIONS.forEach(([start, end]) => {
-          if ((start === 24 && end === 26) || (start === 26 && end === 28) || (start === 23 && end === 25) || (start === 25 && end === 27)) {
+          if ((start === 11 && end === 13) || (start === 11 && end === 23) || (start === 13 && end === 15) || (start === 12 && end === 14) || (start === 12 && end === 24) || (start === 14 && end === 16)) {
             const startLandmark = results.poseLandmarks[start];
             const endLandmark = results.poseLandmarks[end];
             canvasCtx.beginPath();
@@ -898,20 +885,38 @@ export class PoseComparisonComponent implements OnInit, AfterViewInit {
       );
 
       if (results.poseLandmarks) {
+        // const leftShoulder = results.poseLandmarks[11];
+        // const leftWrist = results.poseLandmarks[15];
+        // const rightShoulder = results.poseLandmarks[12];
+        // const rightWrist = results.poseLandmarks[16];
+        const leftHip = results.poseLandmarks[23];
         const leftShoulder = results.poseLandmarks[11];
-        const leftWrist = results.poseLandmarks[15];
+        const leftElbow = results.poseLandmarks[13];
+        const rightHip = results.poseLandmarks[24];
         const rightShoulder = results.poseLandmarks[12];
-        const rightWrist = results.poseLandmarks[16];
+        const rightElbow = results.poseLandmarks[14];
 
         // Calculate angles for left and right wrists
-        const leftAngle = this.calculateAngleBetweenPoints(
-          { x: leftShoulder.x, y: leftShoulder.y, z: leftShoulder.z },
-          { x: leftWrist.x, y: leftWrist.y, z: leftWrist.z }
+        // const leftAngle = this.calculateAngleBetweenPoints(
+        //   { x: leftShoulder.x, y: leftShoulder.y, z: leftShoulder.z },
+        //   { x: leftWrist.x, y: leftWrist.y, z: leftWrist.z }
+        // );
+
+        // const rightAngle = this.calculateAngleBetweenPoints(
+        //   { x: rightShoulder.x, y: rightShoulder.y, z: rightShoulder.z },
+        //   { x: rightWrist.x, y: rightWrist.y, z: rightWrist.z }
+        // );
+
+        const leftAngle = this.getAngleBetweenPoints(
+          leftHip,
+          leftShoulder,
+          leftElbow
         );
 
-        const rightAngle = this.calculateAngleBetweenPoints(
-          { x: rightShoulder.x, y: rightShoulder.y, z: rightShoulder.z },
-          { x: rightWrist.x, y: rightWrist.y, z: rightWrist.z }
+        const rightAngle = this.getAngleBetweenPoints(
+          rightHip,
+          rightShoulder,
+          rightElbow
         );
 
         this.cameraAngle['leftWrist'] = leftAngle;
@@ -927,7 +932,7 @@ export class PoseComparisonComponent implements OnInit, AfterViewInit {
 
         // Additional code to draw pose landmarks and connections on the canvas
         results.poseLandmarks.forEach((landmark, index) => {
-          if (index === 11 || index === 12 || index === 13 || index === 14 || index === 15 || index === 16 || index === 23 || index === 24) {
+          if ([11, 15, 12, 16, 13, 14, 23, 24].includes(index)) {
             canvasCtx.beginPath();
             canvasCtx.arc(
               landmark.x * canvasElement.width,

@@ -330,7 +330,8 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
 
       if (results.poseLandmarks && this.joints.length > 0 && this.connections.length > 0) {
         results.poseLandmarks.forEach((landmark, index) => {
-          if (this.joints.includes(index)) {
+          const poseData = this.joints.filter(c => c.index === index);
+          if (poseData.length > 0 && poseData.includes(index)) {
             canvasCtx.beginPath();
             canvasCtx.arc(
               landmark.x * canvasElement.width,
@@ -339,30 +340,30 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
               0,
               2 * Math.PI
             );
-            canvasCtx.fillStyle = 'rgba(255, 255, 255)';
+            canvasCtx.fillStyle = poseData[0].color;
             canvasCtx.fill();
           }
         });
 
-        POSE_CONNECTIONS.forEach(([start, end]) => {
-          const poseData = this.connections.filter(c => c.start === start && c.end === end);
-          if (poseData.length > 0 && start === poseData[0].start && end === poseData[0].end) {
-            const startLandmark = results.poseLandmarks[start];
-            const endLandmark = results.poseLandmarks[end];
-            canvasCtx.beginPath();
-            canvasCtx.moveTo(
-              startLandmark.x * canvasElement.width,
-              startLandmark.y * canvasElement.height
-            );
-            canvasCtx.lineTo(
-              endLandmark.x * canvasElement.width,
-              endLandmark.y * canvasElement.height
-            );
-            canvasCtx.lineWidth = 4;
-            canvasCtx.strokeStyle = poseData[0].color;
-            canvasCtx.stroke();
-          }
-        });
+        // POSE_CONNECTIONS.forEach(([start, end]) => {
+        //   const poseData = this.connections.filter(c => c.start === start && c.end === end);
+        //   if (poseData.length > 0 && start === poseData[0].start && end === poseData[0].end) {
+        //     const startLandmark = results.poseLandmarks[start];
+        //     const endLandmark = results.poseLandmarks[end];
+        //     canvasCtx.beginPath();
+        //     canvasCtx.moveTo(
+        //       startLandmark.x * canvasElement.width,
+        //       startLandmark.y * canvasElement.height
+        //     );
+        //     canvasCtx.lineTo(
+        //       endLandmark.x * canvasElement.width,
+        //       endLandmark.y * canvasElement.height
+        //     );
+        //     canvasCtx.lineWidth = 4;
+        //     canvasCtx.strokeStyle = poseData[0].color;
+        //     canvasCtx.stroke();
+        //   }
+        // });
       }
     }
   }
