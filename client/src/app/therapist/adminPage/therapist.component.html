@@ -49,8 +49,8 @@
             </div>
             <div class="user" *ngFor="let user of filteredPatients" (click)="onSelect(user)" [ngClass]="{
                 selected: user === selectedUser,
-                'remove-hover-plus': user.isInSession || user.waitingForSession || !user.hasCamera
-              }" title="{{ user.isInSession || user.waitingForSession || !user.hasCamera ? '' : 'Connect to patient' }}">
+                'remove-hover-plus': user.isInSession || user.waitingForSession || !user.hasCamera || user.availabilityStatus !== 'available'
+              }" title="{{ user.isInSession || user.waitingForSession || !user.hasCamera || user.availabilityStatus !== 'available' ? '' : 'Connect to patient' }}">
               {{ user.username }} - {{ user.firstName }} {{ user.lastName }}
               <div *ngIf="!user.hasCamera" class="no-camera" title="Error: Patient webcam disconnected"></div>
               <div *ngIf="user.waitingForSession" class="ringing">
@@ -58,6 +58,9 @@
               </div>
               <div *ngIf="user.missedLastCall" class="missed-call" title="Click to retry"></div>
               <div *ngIf="user.isInSession" class="call-duration">{{ user.callDurationInSeconds | durationpipe }}</div>
+              <div class="patient-status" *ngIf="getPatientStatusIcon(user)">
+                <mat-icon [class]="getPatientStatusClass(user)">{{ getPatientStatusIcon(user) }}</mat-icon>
+              </div>
             </div>
           </div>
           <video *ngIf="therapistHasCamera" id="therapist-video" class="therapist-video" [ngClass]="{ 'hide-video': connectedPaitents.length > 0 || isCurrentTab(tabOptions.patient_list) }" playsinline autoplay muted></video>

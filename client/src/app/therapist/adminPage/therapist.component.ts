@@ -81,7 +81,6 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
   iframesColSpan = 2;
   iframesRowSpan = 2;
   currentUserInFullScreenMode: any;
-  therapistActiveCalls = [];
   patientInitialStreams = {};
   emptySessionText = displayConstanst.no_session_place_holder_text;
   noResponseFrom = displayConstanst.no_response_from;
@@ -121,6 +120,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
   rustdeskId: string | null = null;
   newRustdeskId = '';
   isPatientOnRinging: string = '';
+  therapistActiveCalls: any[] = [];
   constructor(
     private authenticationService: AuthenticationService,
     private webRtcService: WebRtcService,
@@ -147,7 +147,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
           mergeMap((search) => of(search).pipe(delay(500)))
         )
         .subscribe((data) => {
-        console.log("========serach text=====",data);
+          // console.log("========serach text=====",data);
           this.filterUsersByName(data);
         })
     );
@@ -208,7 +208,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   openRdpModal = async (conn) => {
-    await this.fetchRustDeskId(conn); // Wait for the RustDesk ID to be fetched    
+    await this.fetchRustDeskId(conn); // Wait for the RustDesk ID to be fetched
     if (this.rustdeskId) {
       this.connectToRdp();
     } else {
@@ -243,10 +243,10 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   /* fetchRustDeskId(conn) {
-     this.ajax.getRustDeskId(conn.user.patientId).subscribe((response) => {     
-      this.rustdeskId = response; 
-     });
-   }*/
+    this.ajax.getRustDeskId(conn.user.patientId).subscribe((response) => {     
+     this.rustdeskId = response; 
+    });
+  }*/
   fetchRustDeskId(conn): Promise<void> {
     return new Promise((resolve, reject) => {
       this.ajax.getRustDeskId(conn.user.patientId).subscribe(
@@ -265,17 +265,20 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
 
   saveRustDeskId() {
     if (!this.newRustdeskId) {
-      console.log('Please enter a valid RustDesk ID.');
+      // console.log('Please enter a valid RustDesk ID.');
       return;
     }
     const rustdeskIdAsString = this.newRustdeskId.toString();
-    this.ajax.saveRustDeskId(this.patientId, rustdeskIdAsString).subscribe(() => {
-      this.rustdeskId = rustdeskIdAsString;
-      this.newRustdeskId = '';
-      console.log('RustDesk ID saved successfully.');
-    }, error => {
-      console.error('Failed to save RustDesk ID:', error);
-    });
+    this.ajax.saveRustDeskId(this.patientId, rustdeskIdAsString).subscribe(
+      () => {
+        this.rustdeskId = rustdeskIdAsString;
+        this.newRustdeskId = '';
+        // console.log('RustDesk ID saved successfully.');
+      },
+      (error) => {
+        console.error('Failed to save RustDesk ID:', error);
+      }
+    );
   }
 
   redirectToHome(conn) {
@@ -308,13 +311,49 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
   };
 
   async onSelect(user: User): Promise<void> {
+    console.log('onSelect:', {
+      patientId: user.id,
+      peerId: user.peerId,
+      availabilityStatus: user.availabilityStatus,
+      hasCamera: user.hasCamera,
+      isInSession: user.isInSession,
+      waitingForSession: user.waitingForSession,
+    });
+
     const userHasCamera = await this.hasUserCamera();
     if (!userHasCamera) {
+      // console.log('[Therapist Session] Therapist has no camera available');
       this.showNoCameraMessage();
       return;
     }
 
+    // Check if patient is available before allowing ring
+    if (!user.availabilityStatus || user.availabilityStatus !== 'available') {
+      let message = 'Patient is not available for video call';
+      if (user.availabilityStatus === 'do_not_disturb') {
+        message = 'Patient has enabled Do Not Disturb mode';
+      } else if (user.availabilityStatus === 'offline') {
+        message = 'Patient is offline';
+      } else if (user.availabilityStatus === 'unavailable') {
+        message = 'Patient is unavailable';
+      } else {
+        message = 'Patient status is unknown';
+      }
+      // console.log('[Therapist Session] Cannot start session:', {
+      //   reason: message,
+      //   patientStatus: user.availabilityStatus,
+      //   patientId: user.id,
+      // });
+      this.appActions.setMessageRTMModal(message);
+      return;
+    }
+
     if (!this.isPatientVideoInSession && user.hasCamera) {
+      console.log('[Therapist Session] Starting session with patient:', {
+        patientId: user.id,
+        peerId: user.peerId,
+        hasCamera: user.hasCamera,
+      });
       this.selectedUser = user;
       const connectedPaitent = this.connectedPaitents.find(
         (paitent) => paitent.connection.peer === this.selectedUser.peerId
@@ -323,8 +362,11 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
         this.selectedUser.missedLastCall = false;
         this.selectedUser.waitingForSession = true;
         const onRingingCallSession = await this.fetchLastSessionStatus(this.selectedUser.patientId);
+        console.log('[Therapist Session] Last session status:', onRingingCallSession);
         if (onRingingCallSession.type !== 'ringing') {
+          console.log('[Therapist Session] Initiating ringing call');
           this.ajax.updateStartSessionWithPatient(this.selectedUser.peerId, 'ringing');
+          console.log("here here here");
           this.joinSession(this.selectedUser.peerId, this.selectedUser);
         }
       }
@@ -425,7 +467,6 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   handleConnection = (conn, user) => {
-
     this.isPatientOnMobile = user.is_mobile;
     this.remotePeerIds.push(conn.peer);
 
@@ -609,20 +650,20 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       this.filteredPatients = this.filteredPatients.filter((t) => t.username.includes(text));
     }
   }*/
-    filterUsersByName(text) {
-      this.nameFilter = text;
-      if (text && text.trim() !== '') {
-        const lowerText = text.toLowerCase();
-        this.filteredPatients = this.allPatients.filter((t) =>
-          (t.username && t.username.toLowerCase().includes(lowerText)) ||
-          (t.firstName && t.firstName.toLowerCase().includes(lowerText)) ||
-          (t.lastName && t.lastName.toLowerCase().includes(lowerText))
-        );
-      } else {
-        this.filteredPatients = [...this.allPatients];
-      }
+  filterUsersByName(text) {
+    this.nameFilter = text;
+    if (text && text.trim() !== '') {
+      const lowerText = text.toLowerCase();
+      this.filteredPatients = this.allPatients.filter((t) =>
+        (t.username && t.username.toLowerCase().includes(lowerText)) ||
+        (t.firstName && t.firstName.toLowerCase().includes(lowerText)) ||
+        (t.lastName && t.lastName.toLowerCase().includes(lowerText))
+      );
+    } else {
+      this.filteredPatients = [...this.allPatients];
     }
-    
+  }
+
 
   handleMessage = (data, conn, user) => {
     let iframeEl = document.getElementById('games-iframe-' + conn.connectionId);
@@ -956,7 +997,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       }
       return false;
     } catch (err) {
-      console.log('NO CAMERA DETECTED ==> ', err);
+      // console.log('NO CAMERA DETECTED ==> ', err);
       return false;
     }
   };
@@ -1356,27 +1397,20 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       .getOpenPeers()
       .toPromise()
       .then((list) => {
-        const availableList = list.filter(
-          (peer) => {
-            if (peer.peerStatus === PeersStatus.AVAILABLE || peer.peerStatus === PeersStatus.CONNECTED) {
-              return true;
-            }
-            if (peer.peerStatus === PeersStatus.RINGING) {
-              return peer.therapist_id === this.connectedTherapist.id;
-            }
-            return false;
+        const availableList = list.filter((peer) => {
+          if (peer.peerStatus === PeersStatus.AVAILABLE || peer.peerStatus === PeersStatus.CONNECTED) {
+            return true;
           }
-        );
+          if (peer.peerStatus === PeersStatus.RINGING) {
+            return peer.therapist_id === this.connectedTherapist.id;
+          }
+          return false;
+        });
         this.ajax
           .getConnectedPeers()
           .toPromise()
           .then((peerUsers) => {
-            /*this.allPatients =  this.filteredPatients = this.patients.filter((patient) =>
-              availableList.some(
-                (a) => a.user_id === Number(patient.peerId) && patient.username.includes(this.nameFilter)
-              )
-            );*/
-            this.allPatients = this.filteredPatients = this.patients.filter((patient) =>
+            let newFilteredPatients = this.patients.filter((patient) =>
               availableList.some((a) => a.user_id === Number(patient.peerId)) &&
               (
                 (patient.username && patient.username.toLowerCase().includes(this.nameFilter.toLowerCase())) ||
@@ -1384,37 +1418,33 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
                 (patient.lastName && patient.lastName.toLowerCase().includes(this.nameFilter.toLowerCase()))
               )
             );
-            this.allPatients =  this.filteredPatients = this.filteredPatients.filter((patient) =>
+            newFilteredPatients = newFilteredPatients.filter((patient) =>
               peerUsers.some((a) => a.id === patient.peerId)
             );
 
-            // update hasCamera
-            this.allPatients = this.filteredPatients = this.filteredPatients.map((patient) => {
+            // Update hasCamera, availabilityStatus, and isMobile for each patient
+            newFilteredPatients.forEach((patient) => {
               const availablePatient = availableList.find((avp) => avp.user_id == patient.peerId);
               if (availablePatient) {
                 patient.hasCamera = availablePatient.has_camera;
+                patient.availabilityStatus = availablePatient.availability_status ?? 'unavailable';
+                patient.isMobile = availablePatient.is_mobile;
+                console.log('[Therapist] Updated patient status:', {
+                  patientId: patient.peerId,
+                  hasCamera: patient.hasCamera,
+                  availabilityStatus: patient.availabilityStatus,
+                  isMobile: patient.isMobile,
+                });
               }
-              return patient;
             });
 
-            // update isMobile
-            this.allPatients = this.filteredPatients = this.filteredPatients.map((patient) => {
-              const availablePatientismobile = availableList.find((avp) => avp.user_id == patient.peerId);
-              if (availablePatientismobile) {
-                patient.isMobile = availablePatientismobile.is_mobile;
-              }
-              return patient;
-            });
-
+            this.allPatients = this.filteredPatients = newFilteredPatients;
             this.initializeDisconnectedPatients();
             this.loggedInUserCount = this.filteredPatients.length;
-            // this.ref.detectChanges();
+            this.ref.detectChanges();
           });
-          //this.allPatients = this.filteredPatients;
       });
   };
-
-  
 
   initializeDisconnectedPatients = () => {
     const disconnectedPatients = _.differenceBy(this.patients, this.filteredPatients, 'peerId');
@@ -1845,6 +1875,28 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       communicationUtil.sendMessageToIframe(iframeEl, url, MESSAGES.IMAGE_UPLOADED);
     });
   };
+
+  getPatientStatusIcon(user: User): string {
+    if (user.availabilityStatus === 'unavailable') {
+      return 'person_off'; // Shows a person with a slash through it
+    }
+    if (user.availabilityStatus === 'do_not_disturb') {
+      return 'do_not_disturb'; // Red DND icon
+    }
+    if (user.availabilityStatus === 'offline') {
+      return 'offline_pin'; // Shows an offline status icon
+    }
+    return ''; // No icon for available status
+  }
+
+  getPatientStatusClass(user: User): string {
+    if (user.availabilityStatus === 'unavailable' ||
+      user.availabilityStatus === 'do_not_disturb' ||
+      user.availabilityStatus === 'offline') {
+      return 'status-icon-red';
+    }
+    return '';
+  }
 
   /******************************************************************************************/
 }

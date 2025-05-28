@@ -54,7 +54,11 @@ export class CalendarItemModalComponent {
     patient.selected = false;
   };
   saveReason = (patient: IAssignment) => {
-    const updatePatient = { id: patient.patientId, techReason: this.techReason };
+    const updatePatient = { 
+      id: patient.patientId, 
+      techReason: this.techReason,
+      availabilityStatus: 'available' as 'available' | 'offline' | 'unavailable' | 'do_not_disturb'
+    };
     patient.techReason = this.techReason;
     this.onReasonSave.emit(updatePatient);
     this.currentPatientIdInEdit = null;
