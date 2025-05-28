@@ -2408,8 +2408,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           // Additional code to draw pose landmarks and connections on the canvas
           results.poseLandmarks.forEach((landmark, index) => {
             // if (this.videoIndex == 3) {
-            // if (this.landmarksPointer.includes(index)) {
-            if (index == 11 || index == 12) {
+            if (this.landmarksPointer.includes(index)) {
+              // if (index == 11 || index == 12) {
               canvasCtx.beginPath();
               canvasCtx.arc(
                 landmark.x * canvasElement.width,
