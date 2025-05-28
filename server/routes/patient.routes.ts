@@ -20,6 +20,7 @@ router.post('/gameSettings/saveNewGameSettings', GameSettingsController.saveNewS
 
 router.post('/cameraAvailability', PatientController.updatePatientCameraAvailability);
 router.post('/mobileAvailability', PatientController.updatePatientMobileAvailability);
+router.post('/availabilityStatus', PatientController.updatePatientAvailabilityStatus);
 router.post('/getGameSettings', GameSettingsController.getGameSettings);
 router.post(
 	'/gameactivities/uploadgamerelatedimage',

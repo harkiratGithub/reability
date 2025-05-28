@@ -177,6 +177,7 @@ export class AdminScheduleComponent implements OnInit {
           this.updatePatient({
             id: this.currentCoPatient.patientId,
             techIssue: issue,
+            availabilityStatus: 'available',
             ...techReason,
           });
           this.currentCoPatient.techIssue = issue;

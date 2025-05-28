@@ -28,6 +28,7 @@ export interface IPatientModel {
 	techReason?: string;
 	hasCamera?: boolean;
 	disabledSkeleton?: boolean;
+	availabilityStatus?: PatientAvailabilityStatus;
 }
 enum SuspendValues {
 	empty = '<Empty>',
@@ -41,6 +42,13 @@ enum TechIssueValues {
 	empty = '<Empty>',
 	nonBlocking = 'Non-blocking',
 	blocking = 'Blocking',
+}
+
+enum PatientAvailabilityStatus {
+	UNAVAILABLE = 'unavailable',
+	AVAILABLE = 'available',
+	DO_NOT_DISTURB = 'do_not_disturb',
+	OFFLINE = 'offline'
 }
 
 const squelPostgres = squel.useFlavour('postgres');
@@ -911,4 +919,16 @@ export const getPatientRustdeskId = async (patientId: number) => {
 	const encryptedRustdeskId = result.rows[0].rustdesk_id;
 	const decryptedRustdeskId = EncryptHelper.decryptPersonalData(encryptedRustdeskId);
 	return decryptedRustdeskId;
+};
+
+export const updatePatientAvailabilityStatus = async (id, availabilityStatus, client = null) => {
+	const query = squelPostgres
+		.update()
+		.table(TABLE_NAME.PATIENT)
+		.set('availability_status', availabilityStatus)
+		.where(`id = ?`, id)
+		.returning('*')
+		.toParam();
+	const result = await BaseModel.runQuery(query, client);
+	return result.rows;
 };
