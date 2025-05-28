@@ -1385,7 +1385,6 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       .getOpenPeers()
       .toPromise()
       .then((list) => {
-        // console.log('[Therapist] Raw peer list:', list);
         const availableList = list.filter((peer) => {
           if (peer.peerStatus === PeersStatus.AVAILABLE || peer.peerStatus === PeersStatus.CONNECTED) {
             return true;
@@ -1395,24 +1394,13 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
           }
           return false;
         });
-        // console.log('[Therapist] Filtered available list:', availableList);
         this.ajax
           .getConnectedPeers()
           .toPromise()
           .then((peerUsers) => {
-            // console.log('[Therapist] Connected peers:', peerUsers);
-            // Filter patients based on availableList and peerUsers
             let newFilteredPatients = this.patients.filter((patient) =>
               availableList.some(
                 (a) => a.user_id === Number(patient.peerId) && patient.username.includes(this.nameFilter)
-              )
-            );
-            this.allPatients = this.filteredPatients = this.patients.filter((patient) =>
-              availableList.some((a) => a.user_id === Number(patient.peerId)) &&
-              (
-                (patient.username && patient.username.toLowerCase().includes(this.nameFilter.toLowerCase())) ||
-                (patient.firstName && patient.firstName.toLowerCase().includes(this.nameFilter.toLowerCase())) ||
-                (patient.lastName && patient.lastName.toLowerCase().includes(this.nameFilter.toLowerCase()))
               )
             );
             newFilteredPatients = newFilteredPatients.filter((patient) =>
@@ -1436,20 +1424,10 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
             });
 
             this.filteredPatients = newFilteredPatients;
-            // update isMobile
-            this.allPatients = this.filteredPatients = this.filteredPatients.map((patient) => {
-              const availablePatientismobile = availableList.find((avp) => avp.user_id == patient.peerId);
-              if (availablePatientismobile) {
-                patient.isMobile = availablePatientismobile.is_mobile;
-              }
-              return patient;
-            });
-
             this.initializeDisconnectedPatients();
             this.loggedInUserCount = this.filteredPatients.length;
             this.ref.detectChanges();
           });
-          //this.allPatients = this.filteredPatients;
       });
   };
 
@@ -1884,22 +1862,22 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
   };
 
   getPatientStatusIcon(user: User): string {
-    // console.log('user', user, 'user.hasCamera', user.hasCamera, 'user.availabilityStatus', user.availabilityStatus);
-    // if (!user.hasCamera) {
-    //   return 'camera_off'; // Red camera icon
-    // }
     if (user.availabilityStatus === 'unavailable') {
-      return 'camera_off'; // Red camera icon
+      return 'person_off'; // Shows a person with a slash through it
     }
     if (user.availabilityStatus === 'do_not_disturb') {
       return 'do_not_disturb'; // Red DND icon
+    }
+    if (user.availabilityStatus === 'offline') {
+      return 'offline_pin'; // Shows an offline status icon
     }
     return ''; // No icon for available status
   }
 
   getPatientStatusClass(user: User): string {
-    // console.log('user1', user, 'user.hasCamera', user.hasCamera, 'user.availabilityStatus', user.availabilityStatus);
-    if (!user.hasCamera || user.availabilityStatus === 'do_not_disturb') {
+    if (user.availabilityStatus === 'unavailable' || 
+        user.availabilityStatus === 'do_not_disturb' || 
+        user.availabilityStatus === 'offline') {
       return 'status-icon-red';
     }
     return '';
