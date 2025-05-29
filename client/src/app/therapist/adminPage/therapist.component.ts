@@ -142,7 +142,6 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
           mergeMap((search) => of(search).pipe(delay(500)))
         )
         .subscribe((data) => {
-        // console.log("========serach text=====",data);
           this.filterUsersByName(data);
         })
     );
