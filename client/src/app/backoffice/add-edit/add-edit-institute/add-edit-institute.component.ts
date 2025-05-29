@@ -104,11 +104,24 @@ export class AddEditInstituteComponent implements OnInit, OnDestroy {
   isDepartmentFieldDisabled(index) {
     return this.editedEntity && index < this.editedEntity.departments.length;
   }
-
-  onFileChange(event) {
+  /*onFileChange(event) {
     this.setFile(event.target.files[0]);
     this.setLogoFileName(event.target.files[0] && event.target.files[0].name);
-  }
+  }*/
+
+    onFileChange(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const instituteName = this.customForm.get('name').value || 'Unknown'; 
+        const sanitizedInstituteName = instituteName.replace(/\s+/g, '_'); 
+        const originalFileName = file.name.split('.').slice(0, -1).join('.'); 
+        const fileExtension = file.name.split('.').pop(); 
+        const newFileName = `${sanitizedInstituteName}_${originalFileName}.${fileExtension}`;
+        const renamedFile = new File([file], newFileName, { type: file.type });
+        this.setFile(renamedFile);
+        this.setLogoFileName(renamedFile.name);
+      }
+    }
 
   deleteImage() {
     this.setFile(null);
