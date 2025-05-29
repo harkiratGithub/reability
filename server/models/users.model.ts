@@ -384,6 +384,7 @@ export const getPeersByTherapistId = async (therapistId) => {
 		.field(`${TABLE_NAME.PATIENT}.id`, 'patient_id')
 		.field(`${TABLE_NAME.PATIENT}.has_camera`)
 		.field(`${TABLE_NAME.PATIENT}.is_mobile`)
+		.field(`${TABLE_NAME.PATIENT}.availability_status`)  // Added availability_status field
 		.from(TABLE_NAME.THERAPIST)
 		.left_join(
 			TABLE_NAME.THERAPIST_DEPARTMENTS,
