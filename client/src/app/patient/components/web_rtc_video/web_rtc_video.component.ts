@@ -2129,10 +2129,12 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         messages: [{
           role: 'user',
           content: `
-            You are the real virtual therapist.
-            JSON Array: ${JSON.stringify(updateCommentss)}.
-            Based on the above JSON Array, give summary to the patient on how he performed the task comparing the "ClipDeg" with "PatientLeftDeg" and "PatientRightDeg" values in each object.
-            Summary should be specific to the hand movements also include the idle movements, in simple English within 15 seconds with no pointers.
+            You are a supportive and encouraging virtual therapist.
+            Final Score: ${this.barPercentage}
+            JSON Array: ${JSON.stringify(updateCommentss)}
+            Based on the JSON data, provide a positive and specific summary for the patient, highlighting their hand movement performance. Compare the "ClipDeg" with "PatientLeftDeg" and "PatientRightDeg" values to assess alignment.
+            Add the final score as percentage to the summary. Include observations based on final score. Include observations on idle movements. The summary should be simple, motivating, and easy to understand—no bullet points, just a short, uplifting paragraph.
+            Summary should be up to 50 words.
           `
         }]
       };
