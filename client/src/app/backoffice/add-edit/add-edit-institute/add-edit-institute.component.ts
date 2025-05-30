@@ -1,7 +1,8 @@
 import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
-import { FormGroup, FormControl, FormArray } from '@angular/forms';
-import { Subscription } from 'rxjs';
-
+import { FormGroup, FormControl, FormArray,Validators } from '@angular/forms';
+import { Subscription, of } from 'rxjs';
+import { debounceTime, switchMap, catchError } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
 @Component({
   selector: 'app-add-edit-institute',
   templateUrl: './add-edit-institute.component.html',
@@ -17,20 +18,45 @@ export class AddEditInstituteComponent implements OnInit, OnDestroy {
   addDepartmentPlaceHolder = 'Write Department Name';
   file;
 
-  constructor() {}
+  constructor(private http: HttpClient) {}
 
   ngOnInit() {
     this.customForm = new FormGroup({
-      name: new FormControl(this.getDefaultValue(this.editedEntity, 'name')),
+     // name: new FormControl(this.getDefaultValue(this.editedEntity, 'name')),
+     name: new FormControl(
+      this.getDefaultValue(this.editedEntity, 'name'),
+      {
+        validators: [Validators.required],
+        asyncValidators: [this.instituteNameExistsValidator.bind(this)],
+        updateOn: 'blur' 
+      }
+    ),
       logo: new FormControl(this.getDefaultValue(this.editedEntity, 'logo_url')),
       departments: new FormArray(this.getDefaultValueArray(this.editedEntity, 'departments'))
     });
-
+    if (this.editedEntity?.name) {
+      this.customForm.controls.name.markAsTouched();
+    }
     this.setDisabledState();
     this.onChanges();
     // tslint:disable-next-line:no-string-literal
     window['form'] = this.customForm;
   }
+
+  instituteNameExistsValidator = (control: FormControl) => {
+    if (!control.value || control.value.trim() === '') {
+      return of(null); 
+    }
+    return this.http
+      .get<{ exists: boolean }>(`/admin/checkInstName/${encodeURIComponent(control.value)}`)
+      .pipe(
+        debounceTime(300),
+        switchMap((response) => {
+          return response ? of({ nameExists: true }) : of(null);
+        }),
+        catchError(() => of(null))
+      );
+  };
 
   ngOnDestroy() {
     this.subscription.unsubscribe();

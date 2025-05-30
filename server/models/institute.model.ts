@@ -124,3 +124,16 @@ export const updateInstituteNotActive = async (id, client = null) => {
 	const result = await BaseModel.runQuery(query, client);
 	return result.rows[0];
 };
+
+export const doesInstituteNameExist = async (name, client = null) => {
+	const query = squelPostgres
+	  .select()
+	  .field('COUNT(*)', 'count')
+	  .from(TABLE_NAME.INSTITUTE)
+	  .where('name = ?', name)
+	  .where('active = ?', true)
+	  .toParam();  
+	const result = await BaseModel.runQuery(query, client);  
+	// Check if the count is greater than 0
+	return parseInt(result.rows[0].count, 10) > 0;
+  };

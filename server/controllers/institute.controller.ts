@@ -36,6 +36,13 @@ export const deleteInstitute = (req, res, next) => {
 		.catch((err) => next(err));
 };
 
+export const checkInstitutename = (req, res, next) => {
+	const { instname } = req.params;
+	InstituteHelper.checkinstitutename(instname)
+		.then((checkinstitutename) => res.json(checkinstitutename))
+		.catch((err) => next(err));
+};
+
 export const getAll = (req, res, next) => {
 	InstituteHelper.getAll()
 		.then((institutes) => res.json(institutes))
