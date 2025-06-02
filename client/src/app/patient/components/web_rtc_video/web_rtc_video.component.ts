@@ -44,6 +44,7 @@ import { SkeletonProgressBarService } from 'src/app/common/services/skeleton-pro
 import { SkeletonService } from 'src/app/common/services/skeleton.service';
 declare var LivekitClient: any;
 import { HttpClient } from '@angular/common/http';
+import e from 'cors';
 
 let therapistToPatientConnection = null;
 declare var MediaRecorder: any;
@@ -189,6 +190,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   checkIdle = true;
   lastIdleLength = 0;
   lastTriggerTime = 0;
+  leftElbowAngle = 0;
+  rightElbowAngle = 0;
 
   rustdeskId: string | null = null;
   showPopup = false;
@@ -330,6 +333,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                       this.heygenAPIService.onStart();
                     }
                     if (performedLength > 0 && performedLength % 4 == 0 && this.checkIdle && !this.callChatGPT && this.lastIdleLength != performedLength && now - this.lastTriggerTime > cooldown) {
+                      let elbowComment = "";
+                      let elbowAngle = false;
                       const { allLeftSame, allRightSame } = await this.checkIdleCondition(mainComments);
                       // console.log("allLeftSame===", allLeftSame, "allRightSame===", allRightSame);
                       const leftMessages = [
@@ -362,7 +367,17 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                         'Activity paused on both hands.'
                       ];
 
-                      if (allLeftSame || allRightSame) {
+                      if (this.rightElbowAngle <= 140 && this.rightElbowAngle >= 180) {
+                        elbowAngle = true;
+                        elbowComment = 'Please keep your right elbow slightly straight.';
+                      }
+
+                      if (this.leftElbowAngle <= 140 && this.leftElbowAngle >= 180) {
+                        elbowAngle = true;
+                        elbowComment = elbowComment == "" ? 'Please keep your left elbow slightly straight.' : 'Please keep your both elbows slightly straight.';
+                      }
+
+                      if (allLeftSame || allRightSame || elbowAngle) {
                         let content = "";
                         this.checkIdle = false
                         this.showMarker = false
@@ -377,7 +392,12 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                         } else if (allRightSame) {
                           content = rightMessages[Math.floor(Math.random() * rightMessages.length)];
                         }
-                        this.playCommentAudio(content)
+
+                        if (elbowAngle) {
+                          this.playCommentAudio(elbowComment)
+                        } else {
+                          this.playCommentAudio(content)
+                        }
                       }
                     }
                     if (performedPercentage > 10 && performedPercentage % 19 >= 0 && performedPercentage % 19 <= 5 && Math.abs(performedPercentage - this.lastPerformedPercentage) >= 15 && this.checkIdle && now - this.lastTriggerTime > cooldown) {
@@ -2298,9 +2318,11 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         const leftHip = results.poseLandmarks[23];
         const leftShoulder = results.poseLandmarks[11];
         const leftElbow = results.poseLandmarks[13];
+        const leftWrist = results.poseLandmarks[15];
         const rightHip = results.poseLandmarks[24];
         const rightShoulder = results.poseLandmarks[12];
         const rightElbow = results.poseLandmarks[14];
+        const rightWrist = results.poseLandmarks[16];
 
         // const leftShoulder = results.poseLandmarks[this.landmarks[0]];
         // const leftWrist = results.poseLandmarks[this.landmarks[1]];
@@ -2362,6 +2384,18 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           rightElbow
         );
 
+        this.leftElbowAngle = this.getAngleBetweenPoints(
+          leftShoulder,
+          leftElbow,
+          leftWrist,
+        );
+
+        this.rightElbowAngle = this.getAngleBetweenPoints(
+          rightShoulder,
+          rightElbow,
+          rightWrist,
+        );
+
         this.cameraAngle['leftWrist'] = leftAngle;
         this.cameraAngle['rightWrist'] = rightAngle;
 
@@ -2385,7 +2419,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           tolerance: number
         ) => time >= target - tolerance && time <= target + tolerance;
 
-        const currentVideoAngle = this.videoMinMax[this.currentVideoIndex]
+        const currentVideoAngle = thbbbbbbb    is.videoMinMax[this.currentVideoIndex]
         // console.log(currentVideoAngle, this.currentVideoIndex);
 
         if (currentVideoAngle) {
