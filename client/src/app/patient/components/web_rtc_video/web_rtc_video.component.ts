@@ -2419,7 +2419,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           tolerance: number
         ) => time >= target - tolerance && time <= target + tolerance;
 
-        const currentVideoAngle = thbbbbbbb    is.videoMinMax[this.currentVideoIndex]
+        const currentVideoAngle = this.videoMinMax[this.currentVideoIndex]
         // console.log(currentVideoAngle, this.currentVideoIndex);
 
         if (currentVideoAngle) {
