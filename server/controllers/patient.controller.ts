@@ -252,7 +252,7 @@ export const updatePatientAvailabilityStatus = (req, res, next) => {
 			res.json(response);
 		})
 		.catch((err) => {
-			console.error('[Patient Availability] Error updating status:', err);
+			console.log('[Patient Availability] Error updating status:', err);
 			next(err);
 		});
 };
