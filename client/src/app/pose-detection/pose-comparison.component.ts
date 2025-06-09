@@ -606,7 +606,7 @@ export class PoseComparisonComponent implements OnInit, AfterViewInit {
       width: 640,
       height: 480,
     });
-    this.camera.start();
+    // this.camera.start();
   }
 
   private calculateAngleBetweenPoints(
@@ -635,6 +635,39 @@ export class PoseComparisonComponent implements OnInit, AfterViewInit {
     const angle = Math.abs((radians * 180.0) / Math.PI);
     return angle > 180.0 ? 360 - angle : angle;
   };
+
+  private getAngleBetweenYZPoints(start, middle, end) {
+    const radians = Math.atan2(end.y - middle.y, end.z - middle.z) - Math.atan2(start.y - middle.y, start.z - middle.z);
+    const angle = Math.abs((radians * 180.0) / Math.PI);
+    return angle > 180.0 ? 360 - angle : angle;
+  };
+
+  private getAngleBetweenZPoints(start: { x: number, y: number, z: number }, middle: { x: number, y: number, z: number }, end: { x: number, y: number, z: number }): number {
+    // Create vectors from middle to start and middle to end
+    const vectorA = {
+      x: start.x - middle.x,
+      y: start.y - middle.y,
+      z: start.z - middle.z
+    };
+
+    const vectorB = {
+      x: end.x - middle.x,
+      y: end.y - middle.y,
+      z: end.z - middle.z
+    };
+
+    // Dot product and magnitudes
+    const dotProduct = vectorA.x * vectorB.x + vectorA.y * vectorB.y + vectorA.z * vectorB.z;
+    const magnitudeA = Math.sqrt(vectorA.x ** 2 + vectorA.y ** 2 + vectorA.z ** 2);
+    const magnitudeB = Math.sqrt(vectorB.x ** 2 + vectorB.y ** 2 + vectorB.z ** 2);
+
+    // Calculate angle in radians
+    const angleRadians = Math.acos(dotProduct / (magnitudeA * magnitudeB));
+
+    // Convert to degrees
+    const angleDegrees = angleRadians * (180.0 / Math.PI);
+    return angleDegrees;
+  }
 
   private calculateAngleBetweenThreePoints(
     A: { x: number; y: number; z: number },
@@ -716,13 +749,13 @@ export class PoseComparisonComponent implements OnInit, AfterViewInit {
         //   { x: rightWrist.x, y: rightWrist.y, z: rightWrist.z }
         // );
 
-        const leftAngle = this.getAngleBetweenPoints(
+        const leftAngle = this.getAngleBetweenYZPoints(
           leftHip,
           leftShoulder,
           leftElbow
         );
 
-        const rightAngle = this.getAngleBetweenPoints(
+        const rightAngle = this.getAngleBetweenYZPoints(
           rightHip,
           rightShoulder,
           rightElbow
