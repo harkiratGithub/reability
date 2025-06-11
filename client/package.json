@@ -4,6 +4,7 @@
     "node": "20.19.0"
   },
   "scripts": {
+    "heroku-postbuild": "npm run config-angular && cd client && npm install && npm run postinstall-peerjs && npm run build",
     "start": "ng serve",
     "build": "node --max_old_space_size=8192 ./node_modules/@angular/cli/bin/ng build --configuration=production",
     "build:develop": "node --max_old_space_size=8192 ./node_modules/@angular/cli/bin/ng build",

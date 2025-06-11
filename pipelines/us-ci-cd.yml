@@ -78,25 +78,7 @@ stages:
         echo "NEW_RELIC_APPLICATION_LOGGING_FORWARDING_ENABLED=${NEW_RELIC_APPLICATION_LOGGING_FORWARDING_ENABLED}" >> .env
         echo "EMAIL_LANGUAGE=${EMAIL_LANGUAGE}" >> .env
         cat .env
-    - task: Docker@0
-      displayName: 'Build an image'
-      inputs:
-        azureSubscription: 'ReAbility Subscription (61728cdf-71a4-41b8-806c-71e77423fcaa)'
-        azureContainerRegistry: 'acrreability.azurecr.io'
-        dockerFile: Dockerfile
-        imageName: '$(Build.DefinitionName):$(Build.BuildId)'
-        includeLatestTag: true
-        arguments: >
-          --build-arg ENV_FILE=.env
-    
-    - task: Docker@0
-      displayName: 'Push an image'
-      inputs:
-        azureSubscription: 'ReAbility Subscription (61728cdf-71a4-41b8-806c-71e77423fcaa)'
-        azureContainerRegistry: 'acrreability.azurecr.io'
-        action: 'Push an image'
-        imageName: '$(Build.DefinitionName):$(Build.BuildId)'
-        includeLatestTag: true
+    - template: /pipelines/CI/ci.yaml@Pipelines
 
 - stage: DeployStage
   jobs:
@@ -108,7 +90,7 @@ stages:
     - script: |
         if [ "$(Build.SourceBranchName)" == "demo-env" ]; then
           echo "##vso[task.setvariable variable=WebAppName]demo-reability"
-        elif [ "$(Build.SourceBranchName)" == "new-us-env" ]; then
+        elif [ "$(Build.SourceBranchName)" == "us-env" ]; then
           echo "##vso[task.setvariable variable=WebAppName]us-reability"
         elif [ "$(Build.SourceBranchName)" == "app-env" ]; then
           echo "##vso[task.setvariable variable=WebAppName]app-reability"

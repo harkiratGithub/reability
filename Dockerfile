@@ -19,7 +19,7 @@ COPY . .
 
 COPY .env .env
 
-# Run the heroku-postbuild script (typically for Angular or frontend builds)
+# Run the heroku-postbuild script, including Angular build
 RUN npm run heroku-postbuild
 
 # Expose the port your app runs on
