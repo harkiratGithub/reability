@@ -2162,10 +2162,12 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       if (datas.choices && datas.choices.length > 0) {
         content = datas?.choices[0].message?.content
       }
-      this.heygenShow = true;
-      const response = await this.heygenAPIService.sendText(content);
-      if (response && response.data && response.data.duration_ms) {
-        timeout = response.data.duration_ms + 1000;
+      if (content != "") {
+        this.heygenShow = true;
+        const response = await this.heygenAPIService.sendText(content);
+        if (response && response.data && response.data.duration_ms) {
+          timeout = response.data.duration_ms + 1000;
+        }
       }
       setTimeout(() => {
         this.heygenShow = false;
@@ -2499,7 +2501,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
               canvasCtx.arc(
                 landmark.x * canvasElement.width,
                 landmark.y * canvasElement.height,
-                10,
+                7,
                 0,
                 2 * Math.PI
               );
@@ -2647,6 +2649,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       const blobData = await response.blob();
       const audioUrl = URL.createObjectURL(blobData);
       const audio = new Audio(audioUrl);
+      audio.volume = 0.8;
       audio.play();
       audio.onended = () => {
         this.firstTimeSpeech = false;
