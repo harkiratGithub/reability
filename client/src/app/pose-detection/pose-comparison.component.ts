@@ -712,11 +712,11 @@ export class PoseComparisonComponent implements OnInit, AfterViewInit {
       if (results.poseLandmarks) {
         const tolerance = 3;
         const leftHip = results.poseLandmarks[23];
-        const leftShoulder = results.poseLandmarks[11];
-        const leftElbow = results.poseLandmarks[13];
+        const leftShoulder = results.poseLandmarks[25];
+        const leftElbow = results.poseLandmarks[27];
         const rightHip = results.poseLandmarks[24];
-        const rightShoulder = results.poseLandmarks[12];
-        const rightElbow = results.poseLandmarks[14];
+        const rightShoulder = results.poseLandmarks[26];
+        const rightElbow = results.poseLandmarks[28];
 
         // const leftShoulder = results.poseLandmarks[11];
         // const leftWrist = results.poseLandmarks[15];
@@ -749,13 +749,13 @@ export class PoseComparisonComponent implements OnInit, AfterViewInit {
         //   { x: rightWrist.x, y: rightWrist.y, z: rightWrist.z }
         // );
 
-        const leftAngle = this.getAngleBetweenYZPoints(
+        const leftAngle = this.getAngleBetweenPoints(
           leftHip,
           leftShoulder,
           leftElbow
         );
 
-        const rightAngle = this.getAngleBetweenYZPoints(
+        const rightAngle = this.getAngleBetweenPoints(
           rightHip,
           rightShoulder,
           rightElbow
@@ -866,7 +866,7 @@ export class PoseComparisonComponent implements OnInit, AfterViewInit {
         // Additional code to draw pose landmarks and connections on the canvas
 
         results.poseLandmarks.forEach((landmark, index) => {
-          if ([11, 15, 12, 16, 13, 14, 23, 24].includes(index)) {
+          if ([23, 24, 25, 26, 27, 28].includes(index)) {
             canvasCtx.beginPath();
             canvasCtx.arc(
               landmark.x * canvasElement.width,
@@ -881,7 +881,7 @@ export class PoseComparisonComponent implements OnInit, AfterViewInit {
         });
 
         POSE_CONNECTIONS.forEach(([start, end]) => {
-          if ((start === 11 && end === 13) || (start === 11 && end === 23) || (start === 13 && end === 15) || (start === 12 && end === 14) || (start === 12 && end === 24) || (start === 14 && end === 16)) {
+          if ((start === 23 && end === 25) || (start === 25 && end === 27) || (start === 24 && end === 26) || (start === 26 && end === 28)) {
             const startLandmark = results.poseLandmarks[start];
             const endLandmark = results.poseLandmarks[end];
             canvasCtx.beginPath();
