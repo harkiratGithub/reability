@@ -297,7 +297,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
             this.cdr.detectChanges();
           } else {
             this.resetTracking();
-            const videoName = action.msg?.data?.source?.split('/')[5];
+            const parts = action.msg?.data?.source?.split('/');
+            const videoName = parts[parts.length - 2];
             this.ajaxService.getGameMetaData(videoName).subscribe(async (gamesettings) => {
               if (gamesettings.length > 0) {
                 this.firstTimeSpeech = true;
