@@ -310,8 +310,8 @@ export class PoseComparisonComponent implements OnInit, AfterViewInit {
       if (+entry['Deg'] < min) min = +entry['Deg'] > 3 ? +entry['Deg'] : 3;
       if (+entry['Deg'] > max) max = +entry['Deg'];
     });
-    // min = 15;
-    // max = 83;
+    // min = 135;
+    // max = 177;
 
     const mid = (min + max) / 2;
 

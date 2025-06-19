@@ -1095,6 +1095,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     });
     communicationUtil.registerToCallback(MESSAGES.SHOW_END_GAME_MODAL, (e) => {
+      console.log('SHOW_END_GAME_MODAL', e, new Date());
       const { peerId } = e;
       delete e.peerId;
 

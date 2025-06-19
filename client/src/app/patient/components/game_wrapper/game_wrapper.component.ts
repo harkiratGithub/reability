@@ -316,6 +316,7 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
       delete e.peerId;
       if (peerId === this.authenticationService.currentUserValue.peerId) {
         if (e.showModal) {
+          console.log('showing end game modal', new Date());
           this.appActions.stopTimer(true);
           this.isEndGameModalOpen = true;
           setTimeout(() => {
@@ -574,6 +575,7 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
 
     this.subscription.add(
       this.patientWebRtcService.shouldShowEndGameModal.subscribe((data) => {
+        console.log(data, this.peerId);
         if (data !== null && data.peerId === this.peerId) {
           if (data.showModal) {
             this.isEndGameModalOpen = true;

@@ -1181,6 +1181,7 @@ export default function sdk() {
           callbacks[MESSAGES.SEND_QUIT_MESSAGE](data.msg);
           break;
         case MESSAGES.SHOW_END_GAME_MODAL:
+          console.log('SHOW_END_GAME_MODAL 1', data.msg);
           callbacks[MESSAGES.SHOW_END_GAME_MODAL](data.msg);
           break;
         case MESSAGES.SEND_RESTART_GAME_MESSAGE:

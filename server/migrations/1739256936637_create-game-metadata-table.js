@@ -7,6 +7,7 @@ exports.up = (pgm) => {
 		id: 'id',
 		video_name: { type: 'varchar(255)', onDelete: 'SET NULL' },
 		video_index: { type: 'integer', onDelete: 'SET NULL' },
+		zindex: { type: 'boolean', notNull: true, default: false },
 		game_id: { type: 'integer', references: 'game', onDelete: 'SET NULL' },
 		settings: { type: 'jsonb', notNull: 'true', default: '{}' },
 		landmarks: { type: 'jsonb', notNull: 'true', default: '{}' },
