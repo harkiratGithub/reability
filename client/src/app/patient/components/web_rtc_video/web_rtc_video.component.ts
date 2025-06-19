@@ -367,14 +367,16 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
                         'Activity paused on both hands.'
                       ];
 
-                      if (this.rightElbowAngle <= 140 && this.rightElbowAngle >= 180) {
-                        elbowAngle = true;
-                        elbowComment = 'Please keep your right elbow slightly straight.';
-                      }
+                      if (videoName === 'P017') {
+                        if (this.rightElbowAngle <= 140 && this.rightElbowAngle >= 180) {
+                          elbowAngle = true;
+                          elbowComment = 'Please keep your right elbow slightly straight.';
+                        }
 
-                      if (this.leftElbowAngle <= 140 && this.leftElbowAngle >= 180) {
-                        elbowAngle = true;
-                        elbowComment = elbowComment == "" ? 'Please keep your left elbow slightly straight.' : 'Please keep your both elbows slightly straight.';
+                        if (this.leftElbowAngle <= 140 && this.leftElbowAngle >= 180) {
+                          elbowAngle = true;
+                          elbowComment = elbowComment == "" ? 'Please keep your left elbow slightly straight.' : 'Please keep your both elbows slightly straight.';
+                        }
                       }
 
                       if (allLeftSame || allRightSame || elbowAngle) {
@@ -1822,9 +1824,9 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
 
       // Store the comparison data
       results.push({
-        "ClipValue": clipEntry.ClipValue,
-        "PatientValue": clipEntry.ClipValue,
-        "ClipDeg": clipEntry.ClipDeg,
+        ClipValue: clipEntry.ClipValue,
+        PatientValue: clipEntry.ClipValue,
+        ClipDeg: clipEntry.ClipDeg,
         PatientLeftDeg: closestPatient?.patientEntry['LSA Deg'],
         PatientRightDeg: closestPatient?.patientEntry['RSA Deg'],
         ClipTimestamp: clipEntry.ClipTimestamp,
@@ -2142,18 +2144,28 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         }
       }
     } else {
+      const mainComments = updateCommentss.map(data => ({
+        ClipDeg: data.ClipDeg,
+        PatientLeftDeg: data.PatientLeftDeg,
+        PatientRightDeg: data.PatientRightDeg,
+        ClipTimestamp: data.ClipTimestamp,
+        PatientTimestamp: data.PatientTimestamp
+      }));
+      console.log("mainComments===", mainComments);
       let timeout = 5000;
       this.finalFeedback = false;
+      // Final Score: ${ this.barPercentage }
+      // Add the final score as a percentage to the summary.
       const bodys = {
         model: 'gpt-4o-mini',
         messages: [{
           role: 'user',
           content: `
-            You are a supportive and encouraging virtual therapist.
-            Final Score: ${this.barPercentage}
-            JSON Array: ${JSON.stringify(updateCommentss)}
-            Based on the JSON data, provide a positive and specific summary for the patient, highlighting their hand movement performance. Compare the "ClipDeg" with "PatientLeftDeg" and "PatientRightDeg" values to assess alignment.
-            Add the final score as percentage to the summary. Include observations based on final score. Include observations on idle movements. The summary should be simple, motivating, and easy to understand—no bullet points, just a short, uplifting paragraph.
+            JSON Array: ${JSON.stringify(mainComments)}
+            You are a supportive and encouraging virtual physical therapy expert specializing in both orthopedic and neurological rehab.
+            Based on the JSON data, provide a positive and specific summary for the patient, highlighting their hand movement performance. Compare the "ClipDeg" with "PatientLeftDeg" and "PatientRightDeg" values to assess performance.
+            Include observations based on the final score, including total amount of repetitions performed as highlighted by max ROM and min ROM cycles, and quality of movement in relation to amount of compensations. Include observations on idle movements. The summary should be simple, motivating, and easy to understand—no bullet points, just a short, uplifting paragraph.
+            Please advise an overall performance score between 0% to 100% of how well the actual met the desired.
             Summary should be up to 50 words.
           `
         }]
@@ -2317,20 +2329,21 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
         // const rightWrist = results.poseLandmarks[12];
         // const rightElbow = results.poseLandmarks[14];
 
-        const leftHip = results.poseLandmarks[23];
-        const leftShoulder = results.poseLandmarks[11];
-        const leftElbow = results.poseLandmarks[13];
-        const leftWrist = results.poseLandmarks[15];
-        const rightHip = results.poseLandmarks[24];
-        const rightShoulder = results.poseLandmarks[12];
-        const rightElbow = results.poseLandmarks[14];
-        const rightWrist = results.poseLandmarks[16];
+        // const leftHip = results.poseLandmarks[23];
+        // const leftShoulder = results.poseLandmarks[11];
+        // const leftElbow = results.poseLandmarks[13];
+        // const leftWrist = results.poseLandmarks[15];
+        // const rightHip = results.poseLandmarks[24];
+        // const rightShoulder = results.poseLandmarks[12];
+        // const rightElbow = results.poseLandmarks[14];
+        // const rightWrist = results.poseLandmarks[16];
 
-        // const leftShoulder = results.poseLandmarks[this.landmarks[0]];
-        // const leftWrist = results.poseLandmarks[this.landmarks[1]];
-        // const rightShoulder = results.poseLandmarks[this.landmarks[2]];
-        // const rightWrist = results.poseLandmarks[this.landmarks[3]];
-
+        const leftHip = results.poseLandmarks[this.landmarks[0]];
+        const leftShoulder = results.poseLandmarks[this.landmarks[1]];
+        const leftElbow = results.poseLandmarks[this.landmarks[2]];
+        const rightHip = results.poseLandmarks[this.landmarks[3]];
+        const rightShoulder = results.poseLandmarks[this.landmarks[4]];
+        const rightElbow = results.poseLandmarks[this.landmarks[5]];
         // if (this.videoIndex == 1) {
         //   leftShoulder = results.poseLandmarks[23];
         //   leftWrist = results.poseLandmarks[15];
@@ -2386,17 +2399,17 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           rightElbow
         );
 
-        this.leftElbowAngle = this.getAngleBetweenPoints(
-          leftShoulder,
-          leftElbow,
-          leftWrist,
-        );
+        // this.leftElbowAngle = this.getAngleBetweenPoints(
+        //   leftShoulder,
+        //   leftElbow,
+        //   leftWrist,
+        // );
 
-        this.rightElbowAngle = this.getAngleBetweenPoints(
-          rightShoulder,
-          rightElbow,
-          rightWrist,
-        );
+        // this.rightElbowAngle = this.getAngleBetweenPoints(
+        //   rightShoulder,
+        //   rightElbow,
+        //   rightWrist,
+        // );
 
         this.cameraAngle['leftWrist'] = leftAngle;
         this.cameraAngle['rightWrist'] = rightAngle;
@@ -2521,60 +2534,60 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
             }
           });
 
-          // POSE_CONNECTIONS.forEach(([start, end]) => {
-          //   // if (this.videoIndex == 3) {
-          //   const conditionString = this.landmarksLinePointer.map(item => {
-          //     if (Array.isArray(item.end)) {
-          //       return item.end.map(e => `(start === ${item.start} && end === ${e})`).join(' || ');
-          //     }
-          //     return `(start === ${item.start} && end === ${item.end})`;
-          //   }).join(' || ');
-          //   const condition = `(${conditionString})`;
+          POSE_CONNECTIONS.forEach(([start, end]) => {
+            // if (this.videoIndex == 3) {
+            const conditionString = this.landmarksLinePointer.map(item => {
+              if (Array.isArray(item.end)) {
+                return item.end.map(e => `(start === ${item.start} && end === ${e})`).join(' || ');
+              }
+              return `(start === ${item.start} && end === ${item.end})`;
+            }).join(' || ');
+            const condition = `(${conditionString})`;
 
-          //   if (eval(condition)) {
-          //     const startLandmark = results.poseLandmarks[start];
-          //     const endLandmark = results.poseLandmarks[end];
-          //     canvasCtx.beginPath();
-          //     canvasCtx.moveTo(
-          //       startLandmark.x * canvasElement.width,
-          //       startLandmark.y * canvasElement.height
-          //     );
-          //     canvasCtx.lineTo(
-          //       endLandmark.x * canvasElement.width,
-          //       endLandmark.y * canvasElement.height
-          //     );
-          //     canvasCtx.lineWidth = 4;
-          //     // canvasCtx.strokeStyle = 'rgba(128, 128, 128, 0.8)';
-          //     canvasCtx.strokeStyle = 'rgba(0, 255, 0)';
+            if (eval(condition)) {
+              const startLandmark = results.poseLandmarks[start];
+              const endLandmark = results.poseLandmarks[end];
+              canvasCtx.beginPath();
+              canvasCtx.moveTo(
+                startLandmark.x * canvasElement.width,
+                startLandmark.y * canvasElement.height
+              );
+              canvasCtx.lineTo(
+                endLandmark.x * canvasElement.width,
+                endLandmark.y * canvasElement.height
+              );
+              canvasCtx.lineWidth = 4;
+              // canvasCtx.strokeStyle = 'rgba(128, 128, 128, 0.8)';
+              canvasCtx.strokeStyle = 'rgba(0, 255, 0)';
 
-          //     if (this.timeMatching && start % 2) {
-          //       if (this.leftCondition === 'Bad') {
-          //         canvasCtx.strokeStyle = 'rgba(128, 128, 128, 0.8)';
-          //         // if (this.leftComment === "Perfect") {
-          //         //   canvasCtx.strokeStyle = 'rgba(0, 255, 0)';
-          //         // } else if (this.leftComment === "Nice") {
-          //         //   canvasCtx.strokeStyle = 'rgb(94, 255, 0)';
-          //         // } else {
-          //         //   canvasCtx.strokeStyle = 'rgb(145, 255, 0)';
-          //         // }
-          //       }
-          //     }
-          //     if (this.timeMatching && start % 2 === 0) {
-          //       if (this.rightCondition === 'Bad') {
-          //         canvasCtx.strokeStyle = 'rgba(128, 128, 128, 0.8)';
-          //         // if (this.rightComment === "Perfect") {
-          //         //   canvasCtx.strokeStyle = 'rgba(0, 255, 0)';
-          //         // } else if (this.rightComment === "Nice") {
-          //         //   canvasCtx.strokeStyle = 'rgb(94, 255, 0)';
-          //         // } else {
-          //         //   canvasCtx.strokeStyle = 'rgb(145, 255, 0)';
-          //         // }
-          //       }
-          //     }
-          //     canvasCtx.stroke();
-          //     connections.push({ start, end, color: canvasCtx.strokeStyle });
-          //   }
-          // });
+              if (this.timeMatching && start % 2) {
+                if (this.leftCondition === 'Bad') {
+                  canvasCtx.strokeStyle = 'rgba(128, 128, 128, 0.8)';
+                  // if (this.leftComment === "Perfect") {
+                  //   canvasCtx.strokeStyle = 'rgba(0, 255, 0)';
+                  // } else if (this.leftComment === "Nice") {
+                  //   canvasCtx.strokeStyle = 'rgb(94, 255, 0)';
+                  // } else {
+                  //   canvasCtx.strokeStyle = 'rgb(145, 255, 0)';
+                  // }
+                }
+              }
+              if (this.timeMatching && start % 2 === 0) {
+                if (this.rightCondition === 'Bad') {
+                  canvasCtx.strokeStyle = 'rgba(128, 128, 128, 0.8)';
+                  // if (this.rightComment === "Perfect") {
+                  //   canvasCtx.strokeStyle = 'rgba(0, 255, 0)';
+                  // } else if (this.rightComment === "Nice") {
+                  //   canvasCtx.strokeStyle = 'rgb(94, 255, 0)';
+                  // } else {
+                  //   canvasCtx.strokeStyle = 'rgb(145, 255, 0)';
+                  // }
+                }
+              }
+              canvasCtx.stroke();
+              connections.push({ start, end, color: canvasCtx.strokeStyle });
+            }
+          });
 
           // this.skeletonService.updateSkeleton({ joints, connections });
           if (therapistToPatientConnection) {
