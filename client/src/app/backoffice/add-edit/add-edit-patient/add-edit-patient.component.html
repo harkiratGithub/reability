@@ -23,13 +23,7 @@
       </label>
       <label class="field-container">
         <span class="description">Departments</span>
-        <app-select
-          formControlName="departments_ids"
-          required
-          [items]="filteredDepartments"
-          [multiSelect]="true"
-        ></app-select
-      ></label>
+        <app-select formControlName="departments_ids" required [items]="filteredDepartments" [multiSelect]="true"></app-select></label>
       <label class="field-container" [hidden]="true">
         <span class="description">Username</span>
         <input type="text" formControlName="username" [class.disabled]="true" />
@@ -114,25 +108,9 @@
     </div>
   </ng-container>
 
-  <app-add-edit-patient-treatment
-    *ngSwitchCase="viewType.Treatments"
-    [editedEntity]="editedEntity"
-    [professions]="professions"
-    [expertises]="expertises"
-    [deletePatientTreatmentFunc]="deletePatientTreatmentFunc"
-    (innerAction)="onInnerAction($event)"
-    (setScheduleView)="backClicked(viewType.Schedule)"
-  >
+  <app-add-edit-patient-treatment *ngSwitchCase="viewType.Treatments" [editedEntity]="editedEntity" [professions]="professions" [expertises]="expertises" [deletePatientTreatmentFunc]="deletePatientTreatmentFunc" (innerAction)="onInnerAction($event)" (setScheduleView)="backClicked(viewType.Schedule)">
   </app-add-edit-patient-treatment>
 
-  <app-patient-schedule
-    *ngSwitchCase="viewType.Schedule"
-    [editedEntity]="editedEntity"
-    (goBack)="backClicked()"
-    (weekChanged)="onWeekChanged($event)"
-    (bookingViewShown)="onBookingViewShown($event)"
-    (createBooking)="onCreateBooking($event)"
-    (deleteBooking)="onDeleteBooking($event)"
-  >
+  <app-patient-schedule *ngSwitchCase="viewType.Schedule" [editedEntity]="editedEntity" (goBack)="backClicked()" (weekChanged)="onWeekChanged($event)" (bookingViewShown)="onBookingViewShown($event)" (createBooking)="onCreateBooking($event)" (deleteBooking)="onDeleteBooking($event)">
   </app-patient-schedule>
 </ng-container>

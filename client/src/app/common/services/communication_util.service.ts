@@ -57,6 +57,7 @@ export const MESSAGES = {
   SEND_LOG_TO_SERVER: 'send_log_to_server',
   REDIRECT_TO_HOME: 'redirect_to_home',
   SESSION_FEEDBACK: 'session_feedback',
+  RDP_REQUEST:'rdp_request',
 };
 
 export interface IEnlargeVideoMessage {
@@ -181,6 +182,9 @@ export const communicationUtil = (() => {
           case MESSAGES.SEND_LOG_TO_SERVER:
             callbacks[MESSAGES.SEND_LOG_TO_SERVER](data.msg);
             break;
+            case MESSAGES.RDP_REQUEST:
+              callbacks[MESSAGES.RDP_REQUEST](data.msg);
+              break;
           default:
             break;
         }
@@ -311,6 +315,9 @@ export const communicationUtil = (() => {
             break;
           case MESSAGES.SEND_LOG_TO_SERVER:
             callbacks[MESSAGES.SEND_LOG_TO_SERVER](data.msg);
+            break;
+          case MESSAGES.RDP_REQUEST:
+            callbacks[MESSAGES.RDP_REQUEST](data.msg);
             break;
           default:
             break;

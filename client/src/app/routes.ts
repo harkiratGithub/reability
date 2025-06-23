@@ -13,6 +13,8 @@ import { TwoFactorAuthVerifyComponent } from './common/password-routes/two-facto
 import { PainScaleComponent } from './patient/components/pain-scale/pain-scale.component';
 import { TermsConditionsComponent } from './patient/components/terms-conditions/terms-conditions.component';
 import { MobilePopupComponent } from './patient/components/mobile-popup/mobile-popup.component';
+import { PoseComparisonComponent } from './pose-detection/pose-comparison.component';
+
 export const ROUTES = {
   LOGIN: 'login',
   VERIFY_2FA: 'verify-2fa/:id',
@@ -45,6 +47,10 @@ export const routes = [
     component: FastLoginComponent,
   },
   { path: ROUTES.FORGET_PASSWORD, component: ForgotPasswordComponent },
+  {
+    path: 'pose-detection',
+    component: PoseComparisonComponent,
+  },
   {
     path: ROUTES.PATIENT_HOME_PAGE,
     component: MenuOptionsComponent,

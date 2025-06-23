@@ -21,21 +21,11 @@ export class AuthenticationService implements OnDestroy {
   inTherapistSession = false;
   heartBeatInterval;
 
-  constructor(
-    private ajax: AjaxService,
-    private menuOptionsActions: MenuOptionsAppActions,
-    private router: Router
-  ) {
+  constructor(private ajax: AjaxService, private menuOptionsActions: MenuOptionsAppActions, private router: Router) {
     this.currentUserSubject = new BehaviorSubject<User>(null);
     this.currentUser = this.currentUserSubject.asObservable();
-    this.subscription.add(
-      this.isInGame$.subscribe((inGame) => (this.isInGame = inGame))
-    );
-    this.subscription.add(
-      this.inTherapistSession$.subscribe(
-        (inSession) => (this.inTherapistSession = inSession)
-      )
-    );
+    this.subscription.add(this.isInGame$.subscribe((inGame) => (this.isInGame = inGame)));
+    this.subscription.add(this.inTherapistSession$.subscribe((inSession) => (this.inTherapistSession = inSession)));
   }
 
   ngOnDestroy() {
@@ -46,10 +36,7 @@ export class AuthenticationService implements OnDestroy {
   startHeartBeatInterval = () => {
     this.heartBeatInterval = setInterval(() => {
       if (this.currentUserValue && this.currentUserValue.peerId) {
-        this.ajax.sendHeartBeat(
-          this.inTherapistSession,
-          this.isInGame
-        );
+        this.ajax.sendHeartBeat(this.inTherapistSession, this.isInGame);
       }
     }, heartbeatTimer);
   };
@@ -69,35 +56,48 @@ export class AuthenticationService implements OnDestroy {
       this.startHeartBeatInterval();
       if (!user.isTherapist) {
         this.menuOptionsActions.setValidGames(user.validGames);
+        // Remove default setting of availabilityStatus to 'unavailable'
+        // user.availabilityStatus = 'unavailable';
+        // Remove update call to backend with 'unavailable' status
+        // this.ajax.updatePatientAvailabilityStatus(user.patientId, 'unavailable').subscribe();
       }
       this.currentUserSubject.next(user);
     }
     return user;
   };
 
-  // logout = async () => {
-  //   try {
-  //     await this.ajax.logout().toPromise();
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  //   this.currentUserSubject.next(null);
-  //   this.closeHeartBeatInterval();
-  //   this.router.navigate([ROUTES.LOGIN]);
-  // };
-
   logout = async () => {
     try {
+      // Store user info before clearing
+      const currentUser = this.currentUserValue;
+
+      if (currentUser?.patientId) {
+        console.log('Updating patient status to offline before logout', currentUser.patientId);
+        try {
+          // Update status to offline first
+          await this.ajax.updatePatientAvailabilityStatus(currentUser.patientId, 'offline').toPromise();
+          // Add a small delay to ensure the status update completes
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        } catch (statusError) {
+          console.error('Failed to update patient status:', statusError);
+          // Continue with logout even if status update fails
+        }
+      }
+
+      // Then proceed with logout
       await this.ajax.logout().toPromise();
+
+      // Log success to New Relic if available
       if (window && (window as any).NREUM) {
         (window as any).NREUM.addPageAction('LogoutSuccess', {
-          username: this.currentUserValue?.username,
-          isTherapist: this.currentUserValue?.isTherapist,
-          userRole: this.currentUserValue?.role,
+          username: currentUser?.username,
+          isTherapist: currentUser?.isTherapist,
+          userRole: currentUser?.role,
         });
       }
     } catch (err) {
-      console.log('Logout failed:', err);
+      console.error('Logout failed:', err);
+      // Log error to New Relic if available
       if (window && (window as any).NREUM) {
         (window as any).NREUM.addPageAction('LogoutError', {
           username: this.currentUserValue?.username,
@@ -105,10 +105,10 @@ export class AuthenticationService implements OnDestroy {
         });
       }
     } finally {
+      // Clear user data and navigate to login
       this.currentUserSubject.next(null);
       this.closeHeartBeatInterval();
       this.router.navigate([ROUTES.LOGIN]);
     }
   };
-    
 }

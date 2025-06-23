@@ -53,7 +53,7 @@ export class AppActions {
   static SET_CURRENT_GAME_APP_DATA = 'SET_CURRENT_GAME_APP_DATA';
   static OPEN_PATIENT_GENERAL_MODAL = 'open_patient_general_modal';
 
-  constructor(private ngRedux: NgRedux<IAppState>) {}
+  constructor(private ngRedux: NgRedux<IAppState>) { }
 
   updateInitGameSettings = (data) => {
     this.ngRedux.dispatch({
@@ -70,6 +70,7 @@ export class AppActions {
   };
 
   stopTimer = (data) => {
+    console.log('stopTimer', new Date(), data);
     this.ngRedux.dispatch({
       type: AppActions.SHOW_END_GAME_MODAL,
       payload: data,

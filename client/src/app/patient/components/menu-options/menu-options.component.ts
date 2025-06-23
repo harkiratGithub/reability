@@ -38,6 +38,7 @@ import {
 import { AjaxService } from '../../../therapist/services/ajax.service';
 import { IGame, IOrganAngle } from '../../../../types';
 import { IGameAppData } from '../../../../app/app.state';
+import { SkeletonProgressBarService } from 'src/app/common/services/skeleton-progress-bar.service';
 
 const MAX_GAMES_IN_PAGE = 10;
 const GAME_ICON_BASE_URL = '../../../../assets/game-icons/';
@@ -101,6 +102,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
   patientCtx: any;
   patientSkeletonCtx: any;
   isInGame: boolean = false;
+  gameId: number;
   currentPageIndex: number = 0;
   subscription: Subscription = new Subscription();
   movedRight = false;
@@ -131,8 +133,11 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
   currentGameDescription: string = '';
   gameMessage: string = '';
   therapistPeerId: string = '';
-  InstituteLogo: string ;
-
+  InstituteLogo: string;
+  sliderValue: number = 0;
+  thumbUpValue: number = 0;
+  showThumbUp: boolean = false;
+  showProgressBar: boolean = false;
   constructor(
     private authenticationService: AuthenticationService,
     private bodyHandleService: BodyHandleService,
@@ -142,6 +147,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
     private menuOptionsActions: MenuOptionsAppActions,
     private patientWebRtcService: PatientWebRtcService,
     private ajax: AjaxService,
+    private skeltonProgressBarService: SkeletonProgressBarService,
     private ref: ChangeDetectorRef
   ) {
     if (!this.isTherapistMode) {
@@ -157,7 +163,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
         this.currentUser = user;
         this.InstituteLogo = this.currentUser?.instituteLogo || '';
       })
-    );   
+    );
     if (!this.isTherapistMode) {
       if (MOBILE_OR_SMALL_RESOLUTION) {
         this.isMobile = true;
@@ -169,12 +175,16 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
           this.isMobile = false;
         }
       });
-    } 
+    }
+  }
+
+  formatLabel(value: number): string {
+    return `${value} %`;
   }
 
   ngOnInit() {
-    console.log("=======isPatientOnMobile===========",this.isPatientOnMobile);
-    console.log("=======isTherapistMode===========",this.isTherapistMode);
+    console.log("=======isPatientOnMobile===========", this.isPatientOnMobile);
+    console.log("=======isTherapistMode===========", this.isTherapistMode);
     this.appActions.setCurrentGame({ url: 'menu-options', gameId: undefined });
     const canvas: any = document.getElementById('patient-canvas') as HTMLCanvasElement;
     if (canvas) {
@@ -183,7 +193,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
     const skeletonCanvas: any = document.getElementById('patient-canvas-skeleton') as HTMLCanvasElement;
     if (skeletonCanvas) {
       this.patientSkeletonCtx = skeletonCanvas.getContext('2d');
-    }   
+    }
 
     if (!this.isTherapistMode) {
       this.subscription.add(
@@ -215,6 +225,8 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
 
       this.subscription.add(
         this.currentGame$.subscribe((currentGame) => {
+          console.log("current game===", currentGame);
+          this.gameId = currentGame.id;
           this.currentGameDescription = currentGame.description;
         })
       );
@@ -234,7 +246,6 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
     );
 
     this.subscription.add(
-      
       this.validGames$.subscribe((games) => {
         this.games = games;
         this.menuApps = [];
@@ -428,11 +439,40 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
           this.toggleVideoSessionView();
         }
       })
-    ); 
-    
+    );
+
+    this.subscription.add(
+      this.skeltonProgressBarService.progressBarElement$.subscribe(value => {
+        if (+value > this.sliderValue || +value == 0) {
+          this.sliderValue = +value;
+        }
+      })
+    );
+
+    this.subscription.add(
+      this.skeltonProgressBarService.thumbUpElement$.subscribe(value => {
+        if (+value > 0 && +value % 3 === 0 && this.thumbUpValue != +value && this.thumbUpValue < +value) {
+          this.showThumbUp = true;
+          this.thumbUpValue = +value;
+          setTimeout(() => {
+            this.showThumbUp = false;
+          }, 3000);
+        }
+      })
+    );
+
+    this.subscription.add(
+      this.skeltonProgressBarService.showProgressBarElement$.subscribe(value => {
+        this.showProgressBar = value == 'true';
+      })
+    );
   }
 
   ngOnChanges(changes: SimpleChanges) {
+    console.log("we are under ngOnChanges function ");
+    if (changes.gameIdTherapist?.currentValue) {
+      this.gameId = changes.gameIdTherapist?.currentValue;
+    }
     if (changes.showPercentageScoreForTherapist?.currentValue) {
       this.showPercentageScoreForTherapist = changes.showPercentageScoreForTherapist.currentValue;
     }
@@ -540,11 +580,14 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   navigate(index) {
+    console.log("we are in navigate function");
+
     if (!this.currentMenuApps[index].url) {
       return;
     }
 
     this.currentGameIndex = index;
+    // this.gameId = this.currentMenuApps[index].gameId;
 
     if (this.isTherapistMode) {
       this.bodyHandleService.removeHands(this.connectedUser.peerId);
@@ -557,8 +600,8 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
       return;
     }
 
-    this.bodyHandleService.removeHands(this.currentUser.peerId);
     this.isInGame = true;
+    this.bodyHandleService.removeHands(this.currentUser.peerId);
 
     this.appActions.setCurrentGame({
       url: this.currentMenuApps[index].url,
@@ -572,9 +615,11 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
       this.appActions.toggleBodyTracking(false);
     }
     this.menuOptionsActions.setIsInGame(true);
+    console.log("setappaction==", this.appActions)
   }
 
   handleNewGameFromTherapist(url) {
+    console.log("we are in handleNewGameFromTherapist function", url);
     const newGame = this.menuApps.find((game) => game.url === url);
     if (newGame) {
       this.isInGame = true;
@@ -594,6 +639,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   toggleVideoSessionView = () => {
+    console.log("we are in toggleVideoSessionView function");
     this.videoSessionDisplay = !this.videoSessionDisplay;
     if (!this.videoSessionDisplay) {
       this.patientWebRtcService.setShouldPauseGameState(false);
@@ -634,6 +680,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
   };
 
   handleQuitGame() {
+    this.gameId = null;
     this.isInGame = false;
     if (this.isTherapistMode) {
       this.isConnectedUserInGame = false;
@@ -642,6 +689,7 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   gameReadyToStart(status) {
+    console.log("we are in gameReadyToStart function", status);
     this.isGameReadyToStart = status;
   }
 
@@ -710,7 +758,9 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
+
   handleIframeLoad = () => {
+
     this.onIframeLoad.emit();
   };
 
@@ -742,6 +792,8 @@ export class MenuOptionsComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   getUrlGame(url) {
+    console.log("we are in getUrlGame function==", url);
+
     return url + 'index.html';
   }
 

@@ -12,6 +12,7 @@ import { select, NgRedux } from '@angular-redux/store';
 import { communicationUtil, MESSAGES } from 'src/app/common/services/communication_util.service';
 import { Subscription } from 'rxjs';
 import { AppActions } from 'src/app/app.actions';
+import { SkeletonProgressBarService } from 'src/app/common/services/skeleton-progress-bar.service';
 
 @Component({
   selector: 'app-game-history-session',
@@ -20,7 +21,8 @@ import { AppActions } from 'src/app/app.actions';
 })
 export class GameHistorySessionComponent implements OnInit {
   patient;
-  gameId;  
+  gameId;
+  gameScore;
   currentDay = 0;
   patientList = [];
   intervalId = undefined;
@@ -38,10 +40,11 @@ export class GameHistorySessionComponent implements OnInit {
   constructor(
     private ajax: AjaxService,
     private authenticationService: AuthenticationService,
+    private skeltonProgressBarService: SkeletonProgressBarService,
     public dialog: MatDialog,
     public appActions: AppActions,
     @Inject(MAT_DIALOG_DATA) public data: any
-  ) {}
+  ) { }
   ngOnInit() {
     this.gameId = this.data.gameId;
     this.patient = this.authenticationService.currentUserValue;
@@ -52,6 +55,10 @@ export class GameHistorySessionComponent implements OnInit {
       this.allGames?.map((game) => this.getGameIcon(game));
     });
     this.getPatientActivities();
+    this.skeltonProgressBarService.scoreElement$.subscribe(value => {
+      this.gameScore = +value
+    })
+
   }
 
   ngOnDestroy() {
@@ -83,7 +90,7 @@ export class GameHistorySessionComponent implements OnInit {
           });
           this.patientListGrouped = groupBy(this.patientList, (p) => p.status);
           this.patientListFiltered = this.patientList;
-          this.openLogModal(this.patient?.peerId, this.gameId );
+          this.openLogModal(this.patient?.peerId, this.gameId);
         });
       });
   };
@@ -328,7 +335,7 @@ export class GameHistorySessionComponent implements OnInit {
         );
       });
     }
-  
+
     // Transform the gameMap into the expected structure
     this.patientLog = Array.from(gameMap.entries()).map(([gameName, sessions]) => {
       sessions?.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -341,9 +348,9 @@ export class GameHistorySessionComponent implements OnInit {
         showMore: false,
       };
     });
-};
+  };
 
-  
+
   objectKeys = Object.keys;
 
   isArray(value: any): boolean {
@@ -371,7 +378,7 @@ export class GameHistorySessionComponent implements OnInit {
   closeModal = () => {
     this.dialog.closeAll();
     this.isLogModalOpen = false;
-    
+
   };
 
   closeEraseLogModal = () => {
@@ -382,8 +389,8 @@ export class GameHistorySessionComponent implements OnInit {
     const convertToSeconds = (timeStr: {
       split: (arg0: string) => {
         (): any;
-        new (): any;
-        map: { (arg0: NumberConstructor): [any, any, any]; new (): any };
+        new(): any;
+        map: { (arg0: NumberConstructor): [any, any, any]; new(): any };
       };
     }) => {
       const [hours, minutes, seconds] = timeStr.split(':').map(Number);
@@ -418,9 +425,8 @@ export class GameHistorySessionComponent implements OnInit {
             if (feedback && feedback.questions) {
               const feedbackText = feedback.questions
                 .map((q: { question: any; answer: string }) => {
-                  return `* ${q.question}: ${
-                    options?.find((o) => o?.value == q.answer)?.label || 'No answer provided'
-                  }`;
+                  return `* ${q.question}: ${options?.find((o) => o?.value == q.answer)?.label || 'No answer provided'
+                    }`;
                 })
                 .join('\n');
 
@@ -457,17 +463,15 @@ export class GameHistorySessionComponent implements OnInit {
 
       let summary = '';
       if (latestGame.latestSession?.gameSummary) {
-        summary += `Total Squats: ${
-          latestGame.latestSession.gameSummary.totalSquats !== undefined
-            ? latestGame.latestSession.gameSummary.totalSquats
-            : 'N/A'
-        }\n`;
+        summary += `Total Squats: ${latestGame.latestSession.gameSummary.totalSquats !== undefined
+          ? latestGame.latestSession.gameSummary.totalSquats
+          : 'N/A'
+          }\n`;
         summary += `Squats Per Set: ${latestGame.latestSession.gameSummary.squatsPerSet?.join(', ') || 'N/A'}\n`;
-        summary += `Game Time (seconds): ${
-          latestGame.latestSession.gameSummary.gameTimeSeconds !== null
-            ? latestGame.latestSession.gameSummary.gameTimeSeconds
-            : 'N/A'
-        }\n`;
+        summary += `Game Time (seconds): ${latestGame.latestSession.gameSummary.gameTimeSeconds !== null
+          ? latestGame.latestSession.gameSummary.gameTimeSeconds
+          : 'N/A'
+          }\n`;
       } else {
         summary += 'No game summary available\n';
       }

@@ -6,7 +6,7 @@
     <div class="left" *ngIf="InstituteLogo">
       <img class="web-logo" [src]="InstituteLogo" />
     </div>
-   
+
     <div class="middle">
       <p>For Emergency dial: 911</p>
       <p>Tech Support: (212)-470-1452</p>
@@ -16,25 +16,13 @@
         {{ connectedTherapist.username || '' }}
       </div>
       <div class="tabs">
-        <div
-          class="tab"
-          [ngClass]="{ 'not-active': !isCurrentTab(tabOptions.session) }"
-          (click)="setCurrentTab(tabOptions.session)"
-        >
+        <div class="tab" [ngClass]="{ 'not-active': !isCurrentTab(tabOptions.session) }" (click)="setCurrentTab(tabOptions.session)">
           sessions
         </div>
-        <div
-          class="tab"
-          [ngClass]="{ 'not-active': !isCurrentTab(tabOptions.patient_list) }"
-          (click)="setCurrentTab(tabOptions.patient_list)"
-        >
+        <div class="tab" [ngClass]="{ 'not-active': !isCurrentTab(tabOptions.patient_list) }" (click)="setCurrentTab(tabOptions.patient_list)">
           patient list
         </div>
-        <div
-          class="tab"
-          [ngClass]="{ 'not-active': !isCurrentTab(tabOptions.schedule) }"
-          (click)="setCurrentTab(tabOptions.schedule)"
-        >
+        <div class="tab" [ngClass]="{ 'not-active': !isCurrentTab(tabOptions.schedule) }" (click)="setCurrentTab(tabOptions.schedule)">
           schedule
         </div>
       </div>
@@ -59,32 +47,23 @@
               <div class="description">LOGGED IN PATIENTS</div>
               <div class="count">{{ loggedInUserCount || 0 }}</div>
             </div>
-            <div
-              class="user"
-              *ngFor="let user of filteredPatients"
-              (click)="onSelect(user)"
-              [ngClass]="{
+            <div class="user" *ngFor="let user of filteredPatients" (click)="onSelect(user)" [ngClass]="{
                 selected: user === selectedUser,
-                'remove-hover-plus': user.isInSession || user.waitingForSession || !user.hasCamera
-              }"
-              title="{{ user.isInSession || user.waitingForSession || !user.hasCamera ? '' : 'Connect to patient' }}"
-            >
+                'remove-hover-plus': user.isInSession || user.waitingForSession || !user.hasCamera || user.availabilityStatus !== 'available'
+              }" title="{{ user.isInSession || user.waitingForSession || !user.hasCamera || user.availabilityStatus !== 'available' ? '' : 'Connect to patient' }}">
               {{ user.username }} - {{ user.firstName }} {{ user.lastName }}
               <div *ngIf="!user.hasCamera" class="no-camera" title="Error: Patient webcam disconnected"></div>
-              <div *ngIf="user.waitingForSession" class="ringing">RINGING...</div>
+              <div *ngIf="user.waitingForSession" class="ringing">
+                {{ isPatientOnRinging == 'ringing' ? "Busy" : "RINGING..." }}
+              </div>
               <div *ngIf="user.missedLastCall" class="missed-call" title="Click to retry"></div>
               <div *ngIf="user.isInSession" class="call-duration">{{ user.callDurationInSeconds | durationpipe }}</div>
+              <div class="patient-status" *ngIf="getPatientStatusIcon(user)">
+                <mat-icon [class]="getPatientStatusClass(user)">{{ getPatientStatusIcon(user) }}</mat-icon>
+              </div>
             </div>
           </div>
-          <video
-            *ngIf="therapistHasCamera"
-            id="therapist-video"
-            class="therapist-video"
-            [ngClass]="{ 'hide-video': connectedPaitents.length > 0 || isCurrentTab(tabOptions.patient_list) }"
-            playsinline
-            autoplay
-            muted
-          ></video>
+          <video *ngIf="therapistHasCamera" id="therapist-video" class="therapist-video" [ngClass]="{ 'hide-video': connectedPaitents.length > 0 || isCurrentTab(tabOptions.patient_list) }" playsinline autoplay muted></video>
           <div *ngIf="connectedPaitents.length === 0" class="camera-details">
             <div class="row-camera-details">
               <div class="camera-img"></div>
@@ -96,15 +75,7 @@
             Please connect a web camera<br />and refresh your browser.
           </div>
         </div>
-        <app-full-screen-view-component
-          [therapistActiveCalls]="therapistActiveCalls"
-          (selectCurrentUserInFullScreenEmitter)="selectCurrentUserInFullScreen($event)"
-          (onLeaveFullScreenModeEmitter)="onLeaveFullScreenMode()"
-          [connectedTherapist]="connectedTherapist"
-          [videoSessionComponents]="videoSessionComponents"
-          [currentUserInFullScreenMode]="currentUserInFullScreenMode"
-          *ngIf="isFullScreenMode"
-        >
+        <app-full-screen-view-component [therapistActiveCalls]="therapistActiveCalls" (selectCurrentUserInFullScreenEmitter)="selectCurrentUserInFullScreen($event)" (onLeaveFullScreenModeEmitter)="onLeaveFullScreenMode()" [connectedTherapist]="connectedTherapist" [videoSessionComponents]="videoSessionComponents" [currentUserInFullScreenMode]="currentUserInFullScreenMode" *ngIf="isFullScreenMode">
         </app-full-screen-view-component>
       </div>
       <div class="data">
@@ -116,20 +87,9 @@
               <p class="no-session-subtitle">{{ emptySessionText.subtitle }}</p>
             </div>
           </div>
-          <div
-            *ngIf="connectedPaitents.length > 0"
-            class="therapist-split-screen"
-            [ngClass]="{ 'hide-session': videoSessionDisplay }"
-          >
+          <div *ngIf="connectedPaitents.length > 0" class="therapist-split-screen" [ngClass]="{ 'hide-session': videoSessionDisplay }">
             <mat-grid-list cols=" 2" rowHeight="2:1" rows="2" [gutterSize]="'10px'">
-              <mat-grid-tile
-                id="iframes-container"
-                class="iframes-container"
-                *ngFor="let therapistPatientConnection of connectedPaitents; let i = index"
-                [colspan]="iframesColSpan"
-                [rowspan]="iframesRowSpan"
-                [ngStyle]="styleGridObject(therapistPatientConnection, i)"
-                [ngClass]="{
+              <mat-grid-tile id="iframes-container" class="iframes-container" *ngFor="let therapistPatientConnection of connectedPaitents; let i = index" [colspan]="iframesColSpan" [rowspan]="iframesRowSpan" [ngStyle]="styleGridObject(therapistPatientConnection, i)" [ngClass]="{
                   'disabled-click': isFullScreenMode,
                   'hide-session':
                     isFullScreenMode &&
@@ -138,40 +98,23 @@
                   'full-screen-session':
                     isFullScreenMode &&
                     currentUserInFullScreenMode.connection.peer === therapistPatientConnection.connection.peer
-                }"
-              >
-                <div
-                  [ngClass]="{
+                }">
+                <div [ngClass]="{
                     'disabled-click': isFullScreenMode || connectedPaitents.length === 1
-                  }"
-                  class="session-container-header"
-                >
+                  }" class="session-container-header">
                   <div class="header-buttons-wrapper">
                     <!-- HANG UP -->
-                    <div
-                      class="btn hang-up"
-                      title="Disconnect from patient"
-                      (click)="showHangUpBtns(true)"
-                      [ngClass]="{ 'show-hang-up-button': hangupConfirmBtn }"
-                      *ngIf="!hangupConfirmBtn"
-                    >
+                    <div class="btn hang-up" title="Disconnect from patient" (click)="showHangUpBtns(true)" [ngClass]="{ 'show-hang-up-button': hangupConfirmBtn }" *ngIf="!hangupConfirmBtn">
                       <img src="../../../assets/therapist/header-icons/hang_up.svg" />
                     </div>
 
                     <!-- HANG UP BUTTON -->
-                    <div
-                      *ngIf="hangupConfirmBtn"
-                      class="btn hang-up show-hang-up-button"
-                      (mouseout)="hangupConfirmBtn = false"
-                    >
-                      <div
-                        title="Confirm hang up"
-                        (click)="
+                    <div *ngIf="hangupConfirmBtn" class="btn hang-up show-hang-up-button" (mouseout)="hangupConfirmBtn = false">
+                      <div title="Confirm hang up" (click)="
                           hangUpSession(therapistPatientConnection.user);
                           $event.stopPropagation();
                           $event.preventDefault()
-                        "
-                      >
+                        ">
                         <p class="hang-up-confirm-icon">&#10004;</p>
                       </div>
                     </div>
@@ -179,206 +122,100 @@
                     <!-- SEPARATOR -->
                     <div class="buttons-seperator"></div>
                     <!-- SWAP -->
-                    <div
-                      class="btn toggle-btn"
-                      (click)="toggleSwapScreens(therapistPatientConnection.connection.peer)"
-                      title="{{
+                    <div class="btn toggle-btn" (click)="toggleSwapScreens(therapistPatientConnection.connection.peer)" title="{{
                         therapistPatientConnection.isSwappedScreens ? 'Game full-screen' : 'Patient full-screen'
-                      }}"
-                      [ngClass]="{
+                      }}" [ngClass]="{
                         'btn-disabled': therapistPatientConnection.isSwappedScreens
-                      }"
-                    >
+                      }">
                       <img src="../../../assets/therapist/header-icons/swap.svg" />
                     </div>
                     <!-- GAME MUTE -->
-                    <div
-                      class="btn toggle-btn"
-                      title="{{ therapistPatientConnection.muteGameSound ? 'Patient music on' : 'Patient music off' }}"
-                      (click)="
+                    <div class="btn toggle-btn" title="{{ therapistPatientConnection.muteGameSound ? 'Patient music on' : 'Patient music off' }}" (click)="
                         toggleMutePatientGame(therapistPatientConnection.connection.peer);
                         $event.stopPropagation();
                         $event.preventDefault()
-                      "
-                      [ngClass]="{
+                      " [ngClass]="{
                         'btn-disabled': therapistPatientConnection.muteGameSound
-                      }"
-                    >
-                      <img
-                        src="../../../assets/therapist/header-icons/music.svg"
-                        *ngIf="!therapistPatientConnection.muteGameSound"
-                      />
-                      <img
-                        src="../../../assets/therapist/header-icons/music_off.svg"
-                        *ngIf="therapistPatientConnection.muteGameSound"
-                      />
+                      }">
+                      <img src="../../../assets/therapist/header-icons/music.svg" *ngIf="!therapistPatientConnection.muteGameSound" />
+                      <img src="../../../assets/therapist/header-icons/music_off.svg" *ngIf="therapistPatientConnection.muteGameSound" />
                     </div>
                     <!-- PATIENT MUTE -->
-                    <div
-                      class="btn toggle-btn"
-                      title="{{
+                    <div class="btn toggle-btn" title="{{
                         isPatientMuted(therapistPatientConnection.connection.peer) ? 'Unmute patient' : 'Mute patient'
-                      }}"
-                      (click)="
+                      }}" (click)="
                         toggleMutePatientSpeaker(therapistPatientConnection.connection.peer);
                         $event.stopPropagation();
                         $event.preventDefault()
-                      "
-                      [ngClass]="{
+                      " [ngClass]="{
                         'btn-disabled': isPatientMuted(therapistPatientConnection.connection.peer)
-                      }"
-                    >
-                      <img
-                        src="../../../assets/therapist/header-icons/volume.svg"
-                        *ngIf="!isPatientMuted(therapistPatientConnection.connection.peer)"
-                      />
-                      <img
-                        src="../../../assets/therapist/header-icons/volume_off.svg"
-                        *ngIf="isPatientMuted(therapistPatientConnection.connection.peer)"
-                      />
+                      }">
+                      <img src="../../../assets/therapist/header-icons/volume.svg" *ngIf="!isPatientMuted(therapistPatientConnection.connection.peer)" />
+                      <img src="../../../assets/therapist/header-icons/volume_off.svg" *ngIf="isPatientMuted(therapistPatientConnection.connection.peer)" />
                     </div>
 
                     <!-- VOICE -->
-                    <div
-                      class="btn toggle-btn"
-                      title="{{ therapistPatientConnection === this.activeSessionWithAudio ? 'Mute' : 'Unmute' }}"
-                      (click)="
+                    <div class="btn toggle-btn" title="{{ therapistPatientConnection === this.activeSessionWithAudio ? 'Mute' : 'Unmute' }}" (click)="
                         muteMicrophone(therapistPatientConnection.connection.peer);
                         $event.stopPropagation();
                         $event.preventDefault()
-                      "
-                      [ngClass]="{
+                      " [ngClass]="{
                         'btn-disabled': therapistPatientConnection !== activeSessionWithAudio
-                      }"
-                    >
-                      <img
-                        src="../../../assets/therapist/header-icons/voice.svg"
-                        *ngIf="therapistPatientConnection === activeSessionWithAudio"
-                      />
-                      <img
-                        src="../../../assets/therapist/header-icons/voice_off.svg"
-                        *ngIf="therapistPatientConnection !== activeSessionWithAudio"
-                      />
+                      }">
+                      <img src="../../../assets/therapist/header-icons/voice.svg" *ngIf="therapistPatientConnection === activeSessionWithAudio" />
+                      <img src="../../../assets/therapist/header-icons/voice_off.svg" *ngIf="therapistPatientConnection !== activeSessionWithAudio" />
                     </div>
                     <!-- HAND -->
-                    <div
-                      class="btn toggle-btn"
-                      title="{{ !therapistPatientConnection.trackBody ? 'Show hands' : 'Hide hands' }}"
-                      (click)="toggleTracking(therapistPatientConnection.connection.peer)"
-                      [ngClass]="{
+                    <div class="btn toggle-btn" title="{{ !therapistPatientConnection.trackBody ? 'Show hands' : 'Hide hands' }}" (click)="toggleTracking(therapistPatientConnection.connection.peer)" [ngClass]="{
                         'btn-disabled':
                           !therapistPatientConnection.trackBody && therapistPatientConnection.trackBody !== null
-                      }"
-                    >
-                      <img
-                        src="../../../assets/therapist/header-icons/hand_black.svg"
-                        *ngIf="therapistPatientConnection.trackBody === null"
-                      />
-                      <img
-                        src="../../../assets/therapist/header-icons/hand_red.svg"
-                        *ngIf="!therapistPatientConnection.trackBody && therapistPatientConnection.trackBody !== null"
-                      />
-                      <img
-                        src="../../../assets/therapist/header-icons/hand_white.svg"
-                        *ngIf="therapistPatientConnection.trackBody"
-                      />
+                      }">
+                      <img src="../../../assets/therapist/header-icons/hand_black.svg" *ngIf="therapistPatientConnection.trackBody === null" />
+                      <img src="../../../assets/therapist/header-icons/hand_red.svg" *ngIf="!therapistPatientConnection.trackBody && therapistPatientConnection.trackBody !== null" />
+                      <img src="../../../assets/therapist/header-icons/hand_white.svg" *ngIf="therapistPatientConnection.trackBody" />
                     </div>
                     <!-- SEPARATOR -->
                     <div class="buttons-seperator"></div>
                     <!-- SETTINGS -->
-                    <div
-                      [ngClass]="{ 'btn-disabled': !therapistPatientConnection.isGameShown }"
-                      class="btn toggle-btn"
-                      (click)="
+                    <div [ngClass]="{ 'btn-disabled': !therapistPatientConnection.isGameShown }" class="btn toggle-btn" (click)="
                         onClickSettings(
                           therapistPatientConnection.connection.connectionId,
                           therapistPatientConnection.isGameShown
                         )
-                      "
-                      title="{{ therapistPatientConnection.isGameShown ? 'Show settings' : 'Not active' }}"
-                    >
+                      " title="{{ therapistPatientConnection.isGameShown ? 'Show settings' : 'Not active' }}">
                       <img src="../../../assets/therapist/header-icons/settings.svg" />
                     </div>
                     <!-- HOME -->
                     <div class="btn toggle-btn" (click)="navigateHome(therapistPatientConnection)">
                       <img src="../../../assets/therapist/header-icons/home.svg" />
                     </div>
+                    <!-- RDP -->
+                    <div class="btn toggle-btn" (click)="openRdpModal(therapistPatientConnection)">
+                      <!--<img src="../../../assets/therapist/header-icons/rdp-off.svg" />
+                      <img src="../../../assets/therapist/header-icons/rdp-on.png" />--> RDP
+                    </div>
                   </div>
                 </div>
 
-                <a
-                  *ngIf="!isFullScreenMode && connectedPaitents.length > 1"
-                  (click)="
+                <a *ngIf="!isFullScreenMode && connectedPaitents.length > 1" (click)="
                     onSessionInFullScreen(therapistPatientConnection); $event.stopPropagation(); $event.preventDefault()
-                  "
-                  [ngStyle]="styleObject()"
-                  class="full-screen-link"
-                >
+                  " [ngStyle]="styleObject()" class="full-screen-link">
                 </a>
-                <div
-                  class="menu-container"
-                  [ngStyle]="setMenuAndIFrameScale(therapistPatientConnection.connection.peer)"
-                  [ngClass]="
+                <div class="menu-container" [ngStyle]="setMenuAndIFrameScale(therapistPatientConnection.connection.peer)" [ngClass]="
                     therapistPatientConnection.isSwappedScreens ? 'game-iframe-swapped-screens' : 'game-iframe'
-                  "
-                >
-                  <div
-                    class="menu-options-wrapper"
-                    id="{{ 'games-iframe-wrapper-' + therapistPatientConnection.connection.connectionId }}"
-                  >
-                    <app-menu-options
-                      #homePage
-                      [isSwappedScreen]="therapistPatientConnection.isSwappedScreens"
-                      [isInSplitScreen]="!isFullScreenMode && connectedPaitents.length > 1"
-                      [isTherapistMode]="true"
-                      [isPatientOnMobile]="therapistPatientConnection.user.isMobile"
-                      [currentGameName]="therapistPatientConnection.gameName"
-                      [connectionId]="therapistPatientConnection.connection.connectionId"
-                      (onIframeLoad)="onIframeLoad(therapistPatientConnection.connection)"
-                      [connectedUser]="therapistPatientConnection.user"
-                      [gameIdTherapist]="therapistPatientConnection.gameId"
-                      [connectedPatientGameUrl]="therapistPatientConnection.gameUrl"
-                      [isConnectedUserInGame]="therapistPatientConnection.isInGame"
-                      [gameOptionsState]="therapistPatientConnection.options_menu_state"
-                      [allowStartGame]="therapistPatientConnection.allowStartGame"
-                      (setShowTimerForTherapist)="
+                  ">
+                  <div class="menu-options-wrapper" id="{{ 'games-iframe-wrapper-' + therapistPatientConnection.connection.connectionId }}">
+                    <app-menu-options #homePage [isSwappedScreen]="therapistPatientConnection.isSwappedScreens" [isInSplitScreen]="!isFullScreenMode && connectedPaitents.length > 1" [isTherapistMode]="true" [isPatientOnMobile]="therapistPatientConnection.user.isMobile" [currentGameName]="therapistPatientConnection.gameName" [connectionId]="therapistPatientConnection.connection.connectionId" (onIframeLoad)="onIframeLoad(therapistPatientConnection.connection)" [connectedUser]="therapistPatientConnection.user" [gameIdTherapist]="therapistPatientConnection.gameId" [connectedPatientGameUrl]="therapistPatientConnection.gameUrl" [isConnectedUserInGame]="therapistPatientConnection.isInGame" [gameOptionsState]="therapistPatientConnection.options_menu_state" [allowStartGame]="therapistPatientConnection.allowStartGame" (setShowTimerForTherapist)="
                         setShowTimerForTherapist(therapistPatientConnection.connection, $event)
-                      "
-                      (gameIsShown)="onGameShown(therapistPatientConnection.connection)"
-                      (redirectToHome)="redirectToHome(therapistPatientConnection.connection)"
-                      [gameAppDataFromPatient]="therapistPatientConnection.gameAppDataFromPatient"
-                      [showTimerForTherapist]="therapistPatientConnection.showTimerForTherapist"
-                      [showPercentageScoreForTherapist]="therapistPatientConnection.showPercentageScoreForTherapist"
-                      [initGameSettingsForTherapist]="therapistPatientConnection.initGameSettingsForTherapist"
-                      (setInitGameSettingsForTherapist)="
+                      " (gameIsShown)="onGameShown(therapistPatientConnection.connection)" (redirectToHome)="redirectToHome(therapistPatientConnection.connection)" [gameAppDataFromPatient]="therapistPatientConnection.gameAppDataFromPatient" [showTimerForTherapist]="therapistPatientConnection.showTimerForTherapist" [showPercentageScoreForTherapist]="therapistPatientConnection.showPercentageScoreForTherapist" [initGameSettingsForTherapist]="therapistPatientConnection.initGameSettingsForTherapist" (setInitGameSettingsForTherapist)="
                         setInitGameSettingsForTherapist(therapistPatientConnection.connection, $event)
-                      "
-                      [scoreForTherapist]="therapistPatientConnection.scoreForTherapist"
-                      [skeletonTrackingData]="therapistPatientConnection.skeletonTrackingData"
-                    >
+                      " [scoreForTherapist]="therapistPatientConnection.scoreForTherapist" [skeletonTrackingData]="therapistPatientConnection.skeletonTrackingData">
                     </app-menu-options>
                   </div>
                 </div>
-                <app-therapist-web-rtc-video
-                  [showWebRtcVideos]="therapistPatientConnection.showWebRtcVideos"
-                  [therapistPatientConnection]="therapistPatientConnection.connection"
-                  [activeCallStream]="getCurrentStream(therapistPatientConnection.connection.peer)"
-                  [localStream]="getLocalStream(therapistPatientConnection.connection.peer)"
-                  [isSplitScreenView]="!isFullScreenMode && connectedPaitents.length > 1"
-                  [shouldSwapViews]="isFullScreenMode || connectedPaitents.length === 1"
-                  [isSwappedScreens]="therapistPatientConnection.isSwappedScreens"
-                  (handleVideoSessionView)="handleVideoSessionView()"
-                  (handleStreamSending)="handleStreamSending(therapistPatientConnection.connection.peer)"
-                  [isDisabledSkeletonVideo]="therapistPatientConnection.user.disabledSkeleton"
-                  [isDepthCameraConnected]="therapistPatientConnection.isDepthCamConnected"
-                  [isActiveSkeleton]="
+                <app-therapist-web-rtc-video [showWebRtcVideos]="therapistPatientConnection.showWebRtcVideos" [therapistPatientConnection]="therapistPatientConnection.connection" [activeCallStream]="getCurrentStream(therapistPatientConnection.connection.peer)" [localStream]="getLocalStream(therapistPatientConnection.connection.peer)" [isSplitScreenView]="!isFullScreenMode && connectedPaitents.length > 1" [shouldSwapViews]="isFullScreenMode || connectedPaitents.length === 1" [isSwappedScreens]="therapistPatientConnection.isSwappedScreens" (handleVideoSessionView)="handleVideoSessionView()" (handleStreamSending)="handleStreamSending(therapistPatientConnection.connection.peer)" [isDisabledSkeletonVideo]="therapistPatientConnection.user.disabledSkeleton" [isDepthCameraConnected]="therapistPatientConnection.isDepthCamConnected" [isActiveSkeleton]="
                     therapistPatientConnection.options_menu_state.skeletonBuffer ||
-                    therapistPatientConnection.options_menu_state.skeletonInGame
-                  "
-                  [volume]="therapistPatientConnection.volume"
-                  (enlargeVideoChanged)="sendEnlargeVideoToPatient($event)"
-                  (handlePatientVideo)="togglePatientVideo(therapistPatientConnection.connection.peer)"                  
-                >
+                    therapistPatientConnection.options_menu_state.skeletonInGame" [volume]="therapistPatientConnection.volume" (enlargeVideoChanged)="sendEnlargeVideoToPatient($event)" (handlePatientVideo)="togglePatientVideo(therapistPatientConnection.connection.peer)">
                 </app-therapist-web-rtc-video>
               </mat-grid-tile>
             </mat-grid-list>
@@ -386,29 +223,29 @@
         </div>
       </div>
     </ng-container>
-    <app-patient-patient-list-component
-      *ngSwitchCase="tabOptions.patient_list"
-      class="patient-list-body"
-      [audioStreams]="getActiveStreams()"
-    ></app-patient-patient-list-component>
-    <app-therapist-schedule
-      *ngSwitchCase="tabOptions.schedule"
-      class="patient-list-body"
-      [loggedInUser]="connectedTherapist"
-      [audioStreams]="getActiveStreams()"
-    ></app-therapist-schedule>
+    <app-patient-patient-list-component *ngSwitchCase="tabOptions.patient_list" class="patient-list-body" [audioStreams]="getActiveStreams()"></app-patient-patient-list-component>
+    <app-therapist-schedule *ngSwitchCase="tabOptions.schedule" class="patient-list-body" [loggedInUser]="connectedTherapist" [audioStreams]="getActiveStreams()"></app-therapist-schedule>
   </div>
 </div>
-<app-full-screen-video-session-component
-  *ngIf="videoSessionDisplay"
-  [isTherapist]="true"
-  [localStream]="getTherapistClonedStream()"
-  [isVideoPaitentSession]="isPatientVideoInSession"
-  [currSession]="getActiveCallOfVideoSession()"
-  (leaveFullScreenVideo)="toggleVideoSessionView()"
-  (startShareScreen)="handleShareScreen($event)"
-  (mirrorVideo)="handleMirrorPatientVideo($event)"
-  [remotePeerUserName]="getActiveCallUser()"
->
+<app-full-screen-video-session-component *ngIf="videoSessionDisplay" [isTherapist]="true" [localStream]="getTherapistClonedStream()" [isVideoPaitentSession]="isPatientVideoInSession" [currSession]="getActiveCallOfVideoSession()" (leaveFullScreenVideo)="toggleVideoSessionView()" (startShareScreen)="handleShareScreen($event)" (mirrorVideo)="handleMirrorPatientVideo($event)" [remotePeerUserName]="getActiveCallUser()">
 </app-full-screen-video-session-component>
 <video id="hidden-video" class="hide" width="320" height="240" playsinline autoplay muted></video>
+
+<div *ngIf="isRdpModalOpen" class="rdp-modal">
+  <div class="modal-content">
+    <h2>Remote Desktop Connection</h2>
+    <div *ngIf="rustdeskId; else enterRustDeskId">
+      <!-- <p>RustDesk ID: <span>{{ rustdeskId }}</span></p>
+      <button (click)="copyToClipboard(rustdeskId)">Copy Rustdesk ID</button>-->
+      <button (click)="connectToRdp()">Connect</button>
+    </div>
+    <ng-template #enterRustDeskId>
+      <div>
+        <label for="rustdesk-id" style="font-weight: bold;">RustDesk ID:</label>
+        <input id="rustdesk-id" type="number" [(ngModel)]="newRustdeskId" placeholder="Enter RustDesk ID" />
+        <button (click)="saveRustDeskId()">Save</button>
+      </div>
+    </ng-template>
+    <button (click)="closeRdpModal()">Cancel</button>
+  </div>
+</div>

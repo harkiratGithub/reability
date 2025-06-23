@@ -40,9 +40,9 @@ router.put(
 router.get('/users/getUserData', permitAccess(), UserController.authenticate);
 router.post('/logout', (req: any, res, next) => {
 	try {
-		if (req.isAuthenticated()) {
-			req.session.destroy();
-			req.logout();
+		if (req?.isAuthenticated()) {
+			req?.session?.destroy();
+			req?.logout(()=> {})
 		}
 		res.status(200).json({ message: 'success!' });
 	} catch (err) {

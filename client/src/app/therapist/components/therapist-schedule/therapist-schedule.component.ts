@@ -268,6 +268,7 @@ export class TherapistScheduleComponent implements OnInit {
   };
 
   setCoPatientPersonalMenuOptions = (): void => {
+    console.log('[Camera Status] Current patient tech issue:', this.currentCoPatient.techIssue);
     this.coPatientPersonalMenuOptions = map(TechIssueValues, (issue) => {
       const iconPath =
         this.currentCoPatient.techIssue === issue ? { iconPath: '../../../../assets/backoffice/icon_check.svg' } : {};
@@ -276,15 +277,22 @@ export class TherapistScheduleComponent implements OnInit {
         title: getTitleByTechIssue(issue),
         ...iconPath,
         callback: () => {
+          console.log('[Camera Status] Updating patient tech issue:', {
+            patientId: this.currentCoPatient.patientId,
+            newIssue: issue,
+            currentIssue: this.currentCoPatient.techIssue
+          });
           this.updatePatient({
             id: this.currentCoPatient.patientId,
             techIssue: issue,
+            availabilityStatus: 'available',
             ...techReason,
           });
           this.currentCoPatient.techIssue = issue;
           if (issue === TechIssueValues.empty) {
             this.currentCoPatient.techReason = '';
           }
+          console.log('[Camera Status] Patient tech issue updated:', this.currentCoPatient.techIssue);
         },
       };
     });
