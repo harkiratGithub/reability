@@ -222,7 +222,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
   closeRdpModal() {
     this.isRdpModalOpen = false;
   }
-
+/*
   connectToRdp() {
     if (!this.rustdeskId) {
       alert('RustDesk ID is required to connect.');
@@ -240,7 +240,34 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       `width=${width},height=${height},top=${top},left=${left},resizable=yes,scrollbars=yes`
     );
     this.isRdpModalOpen = false;
+  }*/
+
+  connectToRdp() {
+    if (!this.rustdeskId) {
+        alert('RustDesk ID is required to connect.');
+        return;
+    }
+   navigator.clipboard.writeText(this.rustdeskId)
+        .then(() => {
+            console.log(`RustDesk ID "${this.rustdeskId}" copied to clipboard!`);
+            const rdpUrl = `https://rustdesk.com/web/?id=${this.rustdeskId}`;
+            const width = 800;
+            const height = 600;
+            const left = (window.screen.width - width) / 2;
+            const top = (window.screen.height - height) / 2;
+            window.open(
+                rdpUrl,
+                '_blank',
+                `width=${width},height=${height},top=${top},left=${left},resizable=yes,scrollbars=yes`
+            );
+            this.isRdpModalOpen = false;
+        })
+        .catch((err) => {
+            console.error('Failed to copy RustDesk ID to clipboard:', err);
+            alert('Failed to copy RustDesk ID to clipboard. Please copy it manually.');
+        });
   }
+  
 
   /* fetchRustDeskId(conn) {
     this.ajax.getRustDeskId(conn.user.patientId).subscribe((response) => {     
