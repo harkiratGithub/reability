@@ -36,6 +36,9 @@ import { AppActions } from 'src/app/app.actions';
 import { setCameraFrameRate } from '../../common/helpers/webRTC-common-utils';
 import { isMobileDevice } from '../../common/utils';
 import { MenuOptionsComponent } from '../../patient/components/menu-options/menu-options.component';
+import { SkeletonService } from 'src/app/common/services/skeleton.service';
+import { SkeletonProgressBarService } from 'src/app/common/services/skeleton-progress-bar.service';
+
 import { HttpClient } from '@angular/common/http';
 declare var MediaRecorder: any;
 enum tabs {
@@ -128,7 +131,9 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
     private patientWebRtcService: PatientWebRtcService,
     private ref: ChangeDetectorRef,
     public appActions: AppActions,
-    private http: HttpClient
+    private skeletonService: SkeletonService,
+    private skeltonProgressBarService: SkeletonProgressBarService,
+    private http: HttpClient,
   ) {
     this.connectedTherapist = this.authenticationService.currentUserValue;
     this.InstituteLogo = this.connectedTherapist?.instituteLogo || '';
@@ -142,7 +147,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
           mergeMap((search) => of(search).pipe(delay(500)))
         )
         .subscribe((data) => {
-        // console.log("========serach text=====",data);
+          // console.log("========serach text=====",data);
           this.filterUsersByName(data);
         })
     );
@@ -217,7 +222,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
   closeRdpModal() {
     this.isRdpModalOpen = false;
   }
-
+/*
   connectToRdp() {
     if (!this.rustdeskId) {
       alert('RustDesk ID is required to connect.');
@@ -235,7 +240,34 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       `width=${width},height=${height},top=${top},left=${left},resizable=yes,scrollbars=yes`
     );
     this.isRdpModalOpen = false;
+  }*/
+
+  connectToRdp() {
+    if (!this.rustdeskId) {
+        alert('RustDesk ID is required to connect.');
+        return;
+    }
+   navigator.clipboard.writeText(this.rustdeskId)
+        .then(() => {
+            console.log(`RustDesk ID "${this.rustdeskId}" copied to clipboard!`);
+            const rdpUrl = `https://rustdesk.com/web/?id=${this.rustdeskId}`;
+            const width = 800;
+            const height = 600;
+            const left = (window.screen.width - width) / 2;
+            const top = (window.screen.height - height) / 2;
+            window.open(
+                rdpUrl,
+                '_blank',
+                `width=${width},height=${height},top=${top},left=${left},resizable=yes,scrollbars=yes`
+            );
+            this.isRdpModalOpen = false;
+        })
+        .catch((err) => {
+            console.error('Failed to copy RustDesk ID to clipboard:', err);
+            alert('Failed to copy RustDesk ID to clipboard. Please copy it manually.');
+        });
   }
+  
 
   /* fetchRustDeskId(conn) {
     this.ajax.getRustDeskId(conn.user.patientId).subscribe((response) => {     
@@ -400,8 +432,8 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
         content: 'You need to connect a web camera to make calls',
         acceptBtnImg: '../../../assets/buttons/btn_accept_hover.png',
         acceptBtnImgHover: '../../../assets/buttons/btn_accept_hover.png',
-        approveCallback: () => {},
-        declineCallback: () => {},
+        approveCallback: () => { },
+        declineCallback: () => { },
         timeout: 60000,
       },
       false
@@ -645,20 +677,20 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       this.filteredPatients = this.filteredPatients.filter((t) => t.username.includes(text));
     }
   }*/
-    filterUsersByName(text) {
-      this.nameFilter = text;
-      if (text && text.trim() !== '') {
-        const lowerText = text.toLowerCase();
-        this.filteredPatients = this.allPatients.filter((t) =>
-          (t.username && t.username.toLowerCase().includes(lowerText)) ||
-          (t.firstName && t.firstName.toLowerCase().includes(lowerText)) ||
-          (t.lastName && t.lastName.toLowerCase().includes(lowerText))
-        );
-      } else {
-        this.filteredPatients = [...this.allPatients];
-      }
+  filterUsersByName(text) {
+    this.nameFilter = text;
+    if (text && text.trim() !== '') {
+      const lowerText = text.toLowerCase();
+      this.filteredPatients = this.allPatients.filter((t) =>
+        (t.username && t.username.toLowerCase().includes(lowerText)) ||
+        (t.firstName && t.firstName.toLowerCase().includes(lowerText)) ||
+        (t.lastName && t.lastName.toLowerCase().includes(lowerText))
+      );
+    } else {
+      this.filteredPatients = [...this.allPatients];
     }
-    
+  }
+
 
   handleMessage = (data, conn, user) => {
     let iframeEl = document.getElementById('games-iframe-' + conn.connectionId);
@@ -677,6 +709,14 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       case 'patients_game':
         this.connectedPaitents = handlePatientsGamesMessage(this.connectedPaitents, data, conn);
         this.ref.detectChanges();
+        break;
+      case 'progress_bar':
+        this.skeltonProgressBarService.setBarElement('' + data.data.barPercentage);
+        this.skeltonProgressBarService.setThumbUpElement('' + data.data.barThumbsUp);
+        this.skeltonProgressBarService.setShowProgressBar(data.data.showProgressBar);
+        break;
+      case 'skeleton_tracking':
+        this.skeletonService.updateSkeleton(data.data.frame);
         break;
       case 'skeleton_buffer':
         this.setPatientFrame(conn, data.skeletonTrackingData);
@@ -839,7 +879,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
   initiateCall = (patientPeerId, user) => {
     const track = this.hiddenVideo.srcObject.clone();
     const localClone = this.localStream.clone();
-    const displayName = this.connectedTherapist.firstName + ' ' + this.connectedTherapist.lastName;
+    const displayName = this.connectedTherapist.first_name + ' ' + this.connectedTherapist.last_name;
     this.activeSessionWithAudio = null;
     this.audioTracks = this.streamHandlerService.muteAllActiveStreams(this.audioTracks);
     const existingTrack = this.audioTracks.find((track) => track.peer_id === patientPeerId);
@@ -850,7 +890,6 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       metadata: displayName,
     });
     const senders = this.therapistCall.peerConnection.getSenders();
-
     const audioTrack = localClone.getAudioTracks()[0];
     const videoTrack = localClone.getVideoTracks()[0].enabled;
     senders[0].replaceTrack(audioTrack);
@@ -940,7 +979,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
 
   sendEmailAfterConnection = (user) => {
     this.sendEmailTimeoutConnection = setTimeout(() => {
-      this.ajax.sendEmailAfterConnection(user, this.connectedTherapist).subscribe((data) => {});
+      this.ajax.sendEmailAfterConnection(user, this.connectedTherapist).subscribe((data) => { });
     }, this.EMAIL_CONNECTION_MESSAGE_DELAY);
   };
 
@@ -1083,6 +1122,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     });
     communicationUtil.registerToCallback(MESSAGES.SHOW_END_GAME_MODAL, (e) => {
+      console.log('SHOW_END_GAME_MODAL', e, new Date());
       const { peerId } = e;
       delete e.peerId;
 
@@ -1309,7 +1349,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       (activeCall) => activeCall['call'].peer === peer_id
     );
     if (currStream && currStream.stream) {
-      return currStream.stream.getAudioTracks()[0].enabled ? false : true;
+      return currStream.stream.getAudioTracks()[0]?.enabled ? false : true;
     }
   };
 
@@ -1878,9 +1918,9 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   getPatientStatusClass(user: User): string {
-    if (user.availabilityStatus === 'unavailable' || 
-        user.availabilityStatus === 'do_not_disturb' || 
-        user.availabilityStatus === 'offline') {
+    if (user.availabilityStatus === 'unavailable' ||
+      user.availabilityStatus === 'do_not_disturb' ||
+      user.availabilityStatus === 'offline') {
       return 'status-icon-red';
     }
     return '';

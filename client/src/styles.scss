@@ -24,6 +24,7 @@ body {
   .mat-menu-content {
     max-height: 350px !important;
   }
+
   /* width */
   &::-webkit-scrollbar {
     width: 4px;
@@ -41,6 +42,7 @@ body {
     border-radius: 4px;
   }
 }
+
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -80,6 +82,7 @@ body {
   transform: scale(0.5);
   transform-origin: center center;
   max-width: 100vw !important;
+
   .main-section {
     font-size: 1.5rem !important;
     padding: 50px 50px 50px 30px !important;
@@ -92,6 +95,7 @@ body {
   max-width: 100vw !important;
   margin-left: 0 !important;
   margin-top: 0 !important;
+
   .main-section {
     font-size: 1.5rem !important;
     padding: 50px 50px 50px 30px !important;
@@ -101,21 +105,26 @@ body {
 .hide-modal {
   visibility: hidden;
 }
+
 .ellipsis {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 .selectable {
   user-select: text;
 }
+
 .pointer {
   cursor: pointer;
 }
+
 .init-pointer {
   cursor: initial;
 }
-.shiba-logo{
+
+.shiba-logo {
   height: 40px;
   width: 25px;
   margin-right: 10px;
@@ -160,6 +169,7 @@ body {
   z-index: 1000;
   opacity: 0;
 }
+
 .ng-tooltip:after {
   content: '';
   position: absolute;
@@ -177,37 +187,48 @@ body {
 .ng-tooltip-show {
   opacity: 1;
 }
+
 .mat-menu-panel {
   border-radius: 8px !important;
   background-color: white !important;
   box-shadow: 0 2px 8px 0 rgba(25, 148, 192, 0.3) !important;
   min-height: auto !important;
 }
+
 @media only screen and (min-width: 280px) and (max-width: 640px) and (orientation: portrait) {
   body {
     overflow: hidden !important;
     height: 100%;
   }
+
   html {
     height: 100%;
   }
 }
+
 @media only screen and (min-height: 260px) and (max-height: 640px) and (orientation: landscape) {
   body {
     overflow: hidden !important;
     height: 100%;
   }
+
   html {
     height: 100%;
   }
 }
+
 // end
 input {
-  -webkit-user-select: text; /* Chrome, Opera, Safari */
-  -moz-user-select: text; /* Firefox 2+ */
-  -ms-user-select: text; /* IE 10+ */
-  user-select: text; /* Standard syntax */
+  -webkit-user-select: text;
+  /* Chrome, Opera, Safari */
+  -moz-user-select: text;
+  /* Firefox 2+ */
+  -ms-user-select: text;
+  /* IE 10+ */
+  user-select: text;
+  /* Standard syntax */
 }
+
 @media screen and (min-width: 300px) and (max-width: 640px) and (orientation: portrait) {
   .mobile-view {
     display: block;
@@ -219,6 +240,7 @@ input {
     bottom: 100%;
     left: 0;
   }
+
   .screen-panel-popup-mobile {
     display: block;
     /* Rotate the content container */
@@ -229,6 +251,7 @@ input {
     bottom: 40%;
     left: 0;
   }
+
   .mat-dialog-container {
     padding: 26px !important;
     padding-bottom: 38px !important;
@@ -248,4 +271,109 @@ input {
 // remove underline from mat input
 ::ng-deep .mat-form-field-appearance-legacy .mat-form-field-underline {
   display: none !important;
+}
+
+.mat-slider-vertical.mat-accent {
+  &.thumbs-up {
+    .mat-slider-focus-ring {
+      width: 180px;
+      height: 180px;
+      left: 45px;
+      opacity: 1;
+      bottom: -80px;
+      display: block;
+      transform: none;
+      border-radius: 0px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-color: transparent;
+      background-image: url('./assets/bar-images/thumbs_up.gif');
+    }
+  }
+
+  .mat-slider-wrapper {
+    height: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    // background: linear-gradient(to top, #00BEF1,
+    //     /* Yellow */
+    //     #2F54D2 60%,
+    //     /* Green */
+    //     #fff 60%,
+    //     #fff 62%,
+    //     /* Green */
+    //     #76C300 62%,
+    //     #76C300 98%,
+    //     #fff 98%);
+    outline: none;
+    position: relative;
+    width: 100%;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    border-radius: inherit;
+
+    .mat-slider-track-wrapper {
+      width: 100%;
+      border-radius: inherit;
+
+      .mat-slider-track-background {
+        z-index: 2;
+        width: 100%;
+        background-color: #fff;
+      }
+
+      .mat-slider-track-fill {
+        z-index: 1;
+        width: 100%;
+        transform: none !important;
+        background: url('./assets/bar-images/level_divider.png'), linear-gradient(to top, #00BEF1,
+            /* Yellow */
+            #2F54D2 60%,
+            /* Green */
+            #fff 60%,
+            #fff 62%,
+            /* Green */
+            #76C300 62%,
+            #76C300 97%,
+            #fff 97%);
+        background-position: center 39%;
+        background-size: 110%;
+        background-repeat: no-repeat;
+      }
+    }
+
+    .mat-slider-thumb-container {
+      left: 30%;
+
+      .mat-slider-thumb {
+        width: 0;
+        height: 0;
+        right: -40px;
+        bottom: -11px;
+        background: none;
+        border-radius: 0;
+        transform: none !important;
+        border-right: 15px solid #545454 !important;
+        border-top: 10px solid transparent !important;
+        border-bottom: 10px solid transparent !important;
+      }
+
+      .mat-slider-thumb-label {
+        left: 43px;
+        width: 35px;
+        transform: none !important;
+        background: none !important;
+        border-radius: 0px !important;
+      }
+
+      .mat-slider-thumb-label-text {
+        font-size: 14px;
+        font-weight: bold;
+        opacity: 1 !important;
+        transform: none !important;
+        color: #545454 !important;
+      }
+    }
+  }
 }

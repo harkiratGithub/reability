@@ -13,10 +13,12 @@ import {
 } from '@angular/core';
 import { select } from '@angular-redux/store';
 import { Subscription, Observable } from 'rxjs';
-
+import { Pose, POSE_CONNECTIONS, Results } from '@mediapipe/pose';
 import { WebRtcService } from '../../services/therapist_web_rtc.service';
 import { AppActions } from '../../../app.actions';
 import { IEnlargeVideoMessage } from '../../../common/services/communication_util.service';
+import { SkeletonFrame, SkeletonService } from 'src/app/common/services/skeleton.service';
+import { SkeletonProgressBarService } from 'src/app/common/services/skeleton-progress-bar.service';
 
 const isVideoPlaying = (video) => !!(video.currentTime > 0 && !video.paused && !video.ended && video.readyState > 2);
 @Component({
@@ -41,7 +43,9 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
   @Output() handleStreamSending = new EventEmitter();
   @Output() handlePatientVideo = new EventEmitter();
   @Output() enlargeVideoChanged = new EventEmitter<IEnlargeVideoMessage>();
-  @ViewChild('patientVideo') patientVideo: ElementRef<HTMLInputElement>;
+  @ViewChild('patientVideo') patientVideo!: ElementRef;
+  @ViewChild('canvasRef') canvasRef!: ElementRef;
+  private cameraPose!: Pose;
 
   @select((state) => state.global.enlargeVideo) readonly enlargeVideo$: Observable<boolean>;
 
@@ -55,9 +59,15 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
   ctx;
   patientRotation = 0;
   enlargeVideo = false;
+  hideVideo = false;
   subscription: Subscription = new Subscription();
+  joints = [];
+  connections = [];
+  sliderValue: number = 0;
+  thumbUpValue: number = 0;
+  showThumbUp: boolean = false;
 
-  constructor(private webRtcService: WebRtcService, private appActions: AppActions) {
+  constructor(private webRtcService: WebRtcService, private appActions: AppActions, private skeletonService: SkeletonService, private skeltonProgressBarService: SkeletonProgressBarService) {
     this.initialize();
   }
 
@@ -65,6 +75,36 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
     this.subscription.add(
       this.enlargeVideo$.subscribe((enlargeVideo) => {
         this.enlargeVideo = enlargeVideo;
+      })
+    );
+
+    this.subscription.add(
+      this.skeletonService.skeleton$.subscribe((data: any) => {
+        if (data) {
+          this.joints = data.joints;
+          this.connections = data.connections;
+        }
+        // this.drawSkeleton(data.frame);
+      })
+    )
+
+    this.subscription.add(
+      this.skeltonProgressBarService.progressBarElement$.subscribe(value => {
+        if (+value > this.sliderValue || +value == 0) {
+          this.sliderValue = +value;
+        }
+      })
+    );
+
+    this.subscription.add(
+      this.skeltonProgressBarService.thumbUpElement$.subscribe(value => {
+        if (+value > 0 && +value % 3 === 0 && this.thumbUpValue != +value) {
+          this.showThumbUp = true;
+          this.thumbUpValue = +value;
+          setTimeout(() => {
+            this.showThumbUp = false;
+          }, 5000);
+        }
       })
     );
   }
@@ -125,6 +165,7 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
     if (this.enlargeVideo) {
       this.toggleEnlargeVideo();
     }
+    this.subscription.unsubscribe();
   }
 
   initialize() {
@@ -136,6 +177,7 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
   }
 
   handleCall() {
+    this.initializePoseModels();
     this.remoteVideo.srcObject = this.activeCallStream;
     this.remoteStream = this.activeCallStream;
     this.remoteVideo.onloadeddata = (e) => {
@@ -149,6 +191,7 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
       this.remoteVideo.play();
       this.receivedRemoteVideo = true;
       this.handleStreamSending.emit();
+      this.processVideoFrames();
     };
   }
 
@@ -233,4 +276,96 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
       }
     }
   };
+
+  private initializePoseModels() {
+
+    this.cameraPose = new Pose({
+      locateFile: (file) =>
+        `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`,
+    });
+
+    const poseOptions: any = {
+      modelComplexity: 1,
+      smoothLandmarks: true,
+      enableSegmentation: false,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5,
+    };
+    this.cameraPose.setOptions(poseOptions);
+
+    this.cameraPose.onResults((results: Results) => {
+      this.onPoseCameraResults(results, this.canvasRef.nativeElement);
+    });
+
+    // this.patientVideo.nativeElement.onloadeddata = () => {
+    //   this.processVideoFrames();
+    // };
+  }
+
+  private async processVideoFrames() {
+    const video = this.patientVideo.nativeElement;
+    const renderFrame = async () => {
+      if (video.paused || video.ended) return;
+      await this.cameraPose.send({ image: video });
+      requestAnimationFrame(renderFrame);
+    };
+    renderFrame();
+    this.hideVideo = true
+  }
+
+  private onPoseCameraResults(
+    results: Results,
+    canvasElement: HTMLCanvasElement
+  ) {
+    const canvasCtx = canvasElement.getContext('2d');
+    if (canvasCtx) {
+      canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+      canvasCtx.drawImage(
+        results.image,
+        0,
+        0,
+        canvasElement.width,
+        canvasElement.height
+      );
+
+      if (results.poseLandmarks && this.joints.length > 0 && this.connections.length > 0) {
+        results.poseLandmarks.forEach((landmark, index) => {
+          const poseData = this.joints.filter(c => c.index === index);
+          if (poseData.length > 0 && poseData.includes(index)) {
+            canvasCtx.beginPath();
+            canvasCtx.arc(
+              landmark.x * canvasElement.width,
+              landmark.y * canvasElement.height,
+              7,
+              0,
+              2 * Math.PI
+            );
+            canvasCtx.fillStyle = poseData[0].color;
+            canvasCtx.fill();
+          }
+        });
+
+        // POSE_CONNECTIONS.forEach(([start, end]) => {
+        //   const poseData = this.connections.filter(c => c.start === start && c.end === end);
+        //   if (poseData.length > 0 && start === poseData[0].start && end === poseData[0].end) {
+        //     const startLandmark = results.poseLandmarks[start];
+        //     const endLandmark = results.poseLandmarks[end];
+        //     canvasCtx.beginPath();
+        //     canvasCtx.moveTo(
+        //       startLandmark.x * canvasElement.width,
+        //       startLandmark.y * canvasElement.height
+        //     );
+        //     canvasCtx.lineTo(
+        //       endLandmark.x * canvasElement.width,
+        //       endLandmark.y * canvasElement.height
+        //     );
+        //     canvasCtx.lineWidth = 4;
+        //     canvasCtx.strokeStyle = poseData[0].color;
+        //     canvasCtx.stroke();
+        //   }
+        // });
+      }
+    }
+  }
+
 }

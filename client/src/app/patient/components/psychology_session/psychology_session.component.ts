@@ -99,31 +99,32 @@ export class VideoPatientComponent implements OnInit, OnDestroy {
     }
   }*/
 
-    prepareLocalRTCSpecs() {
-      if (this.hasUserMedia()) {
-        navigator.mediaDevices.getUserMedia(this.mediaStreamConstraints).then(
-          (stream) => {
-            this.localVideo = document.getElementById('patient-video') as HTMLVideoElement;
-            this.localStream = stream;
-            if (this.localStream.getAudioTracks()[0]?.muted) {
-              this.handleMicMute();
-            }
-            this.monitorMicAudio();
-            this.localVideo.srcObject = stream;
-            this.localVideo.muted = true;
-            this.localVideo.onloadeddata = () => {
-              this.localVideo.play();
-            };
-          },
-          (err) => {
-            console.warn('Error displaying WebRTC: ', err);
+  prepareLocalRTCSpecs() {
+    if (this.hasUserMedia()) {
+      navigator.mediaDevices.getUserMedia(this.mediaStreamConstraints).then(
+        (stream) => {
+          this.localVideo = document.getElementById('patient-video') as HTMLVideoElement;
+          this.localStream = stream;
+          if (this.localStream.getAudioTracks()[0]?.muted) {
+            this.handleMicMute();
           }
-        );
-      } else {
-        alert('WebRTC is not supported');
-      }
+          this.monitorMicAudio();
+          this.localVideo.srcObject = stream;
+          this.localVideo.muted = true;
+          this.localVideo.onloadeddata = () => {
+            this.localVideo.play();
+          };
+        },
+        (err) => {
+          console.warn('Error displaying WebRTC: ', err);
+        }
+      );
+    } else {
+      alert('WebRTC is not supported');
     }
-    
+  }
+
+
 
   hasUserMedia() {
     //return navigator.getUserMedia;
@@ -350,7 +351,7 @@ export class VideoPatientComponent implements OnInit, OnDestroy {
       } else if (navigator['mozGetUserMedia']) {
         (this.remoteVideo as any).mozSrcObject = stream;
       } else {
-       // (this.remoteVideo as any).src = (window.URL || window.webkitURL).createObjectURL(stream);
+        // (this.remoteVideo as any).src = (window.URL || window.webkitURL).createObjectURL(stream);
         (this.remoteVideo as any).srcObject = stream;
       }
 
@@ -390,8 +391,8 @@ export class VideoPatientComponent implements OnInit, OnDestroy {
     }
 
     if ('srcObject' in this.remoteVideo) {
-     // this.remoteVideo.srcObject = stream;
-     (this.remoteVideo as any).srcObject = stream;
+      // this.remoteVideo.srcObject = stream;
+      (this.remoteVideo as any).srcObject = stream;
     } else if (navigator['mozGetUserMedia']) {
       (this.remoteVideo as any).mozSrcObject = stream;
     } else {
@@ -452,8 +453,8 @@ export class VideoPatientComponent implements OnInit, OnDestroy {
         content: VIDEO_PATIENT_MESSAGES.muted_mic_message,
         acceptBtnImg: '../../../assets/modal/btn_hover_request_timer.png',
         acceptBtnImgHover: '../../../assets/modal/btn_accept_hover.png',
-        approveCallback: () => {},
-        declineCallback: () => {},
+        approveCallback: () => { },
+        declineCallback: () => { },
       });
     }
   };

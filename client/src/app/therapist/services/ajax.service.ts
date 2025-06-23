@@ -88,7 +88,7 @@ export class AjaxService {
           onTherapistSession,
           onGameSession,
         })
-        .subscribe(() => {});
+        .subscribe(() => { });
     } catch (err) {
       console.error(err);
     }
@@ -167,7 +167,7 @@ export class AjaxService {
           patientId,
           gameId,
         })
-        .subscribe(() => {});
+        .subscribe(() => { });
     } catch (err) {
       console.error(err);
     }
@@ -180,7 +180,7 @@ export class AjaxService {
           patientId,
           gameId,
         })
-        .subscribe(() => {});
+        .subscribe(() => { });
     } catch (err) {
       console.error(err);
     }
@@ -198,7 +198,7 @@ export class AjaxService {
           userId,
           type,
         })
-        .subscribe(() => {});
+        .subscribe(() => { });
     } catch (err) {
       console.error(err);
     }
@@ -310,15 +310,18 @@ export class AjaxService {
     }
   };
 
+  getGameMetaData = (videoName) => {
+    return this.http.get<any>(`${this.baseUrl}/patient/gameMetaData/get/${videoName}`);
+  };
+
+  savePatientMetaData = (data) => {
+    return this.http.post<any>(`${this.baseUrl}/patient/metaData/create`, data);
+  };
+
   // patient RTM routes
   sendPatientPainScale = (patientId, painValue, patient_note, userTimezone) => {
     try {
-      return this.http.post<any>(`${this.baseUrl}/patient/rtmSession`, {
-        patientId,
-        painValue,
-        patient_note,
-        userTimezone,
-      });
+      return this.http.post<any>(`${this.baseUrl}/patient/rtmSession`, { patientId, painValue, patient_note, userTimezone });
     } catch (err) {
       console.error(err);
     }
@@ -337,7 +340,7 @@ export class AjaxService {
 
   sendRtmTherapistSession = (patientId, timestamp, data) => {
     try {
-      this.http.post<any>(`${this.baseUrl}/therapist/rtmSession`, { patientId, timestamp, data }).subscribe(() => {});
+      this.http.post<any>(`${this.baseUrl}/therapist/rtmSession`, { patientId, timestamp, data }).subscribe(() => { });
     } catch (err) {
       console.error(err, 'message');
     }
@@ -388,7 +391,7 @@ export class AjaxService {
           gameId,
           settings,
         })
-        .subscribe(() => {});
+        .subscribe(() => { });
     } catch (err) {
       console.error(err);
     }
@@ -402,7 +405,7 @@ export class AjaxService {
           gameId,
           settings,
         })
-        .subscribe(() => {});
+        .subscribe(() => { });
     } catch (err) {
       console.error(err);
     }
@@ -444,7 +447,7 @@ export class AjaxService {
           patientId,
           hasCamera,
         })
-        .subscribe(() => {});
+        .subscribe(() => { });
     } catch (err) {
       console.error(err);
     }
@@ -457,7 +460,7 @@ export class AjaxService {
           patientId,
           hasMobile,
         })
-        .subscribe(() => {});
+        .subscribe(() => { });
     } catch (err) {
       console.error(err);
     }
@@ -695,7 +698,8 @@ export class AjaxService {
       console.error(err);
     }
   };
-  
+
+
   getRustDeskId = (patientId) => {
     try {
       return this.http.get<any>(`${this.baseUrl}/therapist/get-rustdesk-id/${patientId}`);

@@ -4,6 +4,7 @@
     "node": "20.19.0"
   },
   "scripts": {
+    "heroku-postbuild": "npm run config-angular && cd client && npm install && npm run postinstall-peerjs && npm run build",
     "start": "ng serve",
     "build": "node --max_old_space_size=8192 ./node_modules/@angular/cli/bin/ng build --configuration=production",
     "build:develop": "node --max_old_space_size=8192 ./node_modules/@angular/cli/bin/ng build",
@@ -49,6 +50,7 @@
     "moment": "^2.30.1",
     "ng-recaptcha": "^13.2.1",
     "node-sass": "9.0.0",
+    "papaparse": "^5.4.1",
     "peerjs": "https://github.com/0crypto0/peerjs.git#master",
     "redux": "^5.0.1",
     "redux-devtools-extension": "^2.13.9",

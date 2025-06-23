@@ -14,21 +14,20 @@
             <p><strong>Duration:</strong></p>
             {{ log.latestSession.duration }}
           </div>
+          <div class="duration" *ngIf="gameId === 3">
+            <p><strong>Score:</strong></p>
+            {{ gameScore }}
+          </div>
 
-          <div
-            class="game-summary"
-            *ngIf="log.latestSession.gameSummary && hasValidProperties(log.latestSession.gameSummary)"
-          >
+          <div class="game-summary" *ngIf="log.latestSession.gameSummary && hasValidProperties(log.latestSession.gameSummary)">
             <p><strong>Game Summary:</strong></p>
             <div>
               <ng-container *ngFor="let key of getKeys(log.latestSession.gameSummary)">
-                <p
-                  *ngIf="
+                <p *ngIf="
                     log.latestSession.gameSummary[key] !== null &&
                     log.latestSession.gameSummary[key] !== undefined &&
                     log.latestSession.gameSummary[key] !== '{}'
-                  "
-                >
+                  ">
                   <strong>{{ key | titlecase }}:</strong>
                   {{ log.latestSession.gameSummary[key] }}
                 </p>
@@ -37,11 +36,7 @@
           </div>
 
           <div class="button-container">
-            <button
-              class="submit-button"
-              *ngIf="log.remainingSessions.length > 0"
-              (click)="log.showMore = !log.showMore"
-            >
+            <button class="submit-button" *ngIf="log.remainingSessions.length > 0" (click)="log.showMore = !log.showMore">
               {{ log.showMore ? 'Show Less' : 'Show More' }}
             </button>
           </div>
@@ -52,13 +47,11 @@
               <hr />
               <div class="additional-session">
                 <ng-container *ngFor="let key of getKeys(session.gameSummary)">
-                  <p
-                    *ngIf="
+                  <p *ngIf="
                       session.gameSummary[key] !== null &&
                       session.gameSummary[key] !== undefined &&
                       session.gameSummary[key] !== '{}'
-                    "
-                  >
+                    ">
                     <strong>{{ key | titlecase }}:</strong>
                     {{ session.gameSummary[key] }}
                   </p>
