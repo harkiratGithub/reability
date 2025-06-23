@@ -28,8 +28,7 @@ export class AjaxService {
     }
   };
 
-  login = (username, password, captchaToken,userTimezone) => {
-    console.log("====userTimezone=====",userTimezone);
+  login = (username, password, captchaToken, userTimezone) => {
     try {
       return this.http.post<any>(`${this.baseUrl}/login`, {
         username,
@@ -89,7 +88,7 @@ export class AjaxService {
           onTherapistSession,
           onGameSession,
         })
-        .subscribe(() => {});
+        .subscribe(() => { });
     } catch (err) {
       console.error(err);
     }
@@ -168,7 +167,7 @@ export class AjaxService {
           patientId,
           gameId,
         })
-        .subscribe(() => {});
+        .subscribe(() => { });
     } catch (err) {
       console.error(err);
     }
@@ -181,7 +180,7 @@ export class AjaxService {
           patientId,
           gameId,
         })
-        .subscribe(() => {});
+        .subscribe(() => { });
     } catch (err) {
       console.error(err);
     }
@@ -192,13 +191,14 @@ export class AjaxService {
     return this.http.post<User[]>(`${this.baseUrl}/therapist/users/getAll`, {});
   }
 
-  updateStartSessionWithPatient = (userId) => {
+  updateStartSessionWithPatient = (userId, type = null) => {
     try {
       this.http
         .post<any>(`${this.baseUrl}/therapist/sessions/therapistStartTime`, {
           userId,
+          type,
         })
-        .subscribe(() => {});
+        .subscribe(() => { });
     } catch (err) {
       console.error(err);
     }
@@ -310,10 +310,18 @@ export class AjaxService {
     }
   };
 
+  getGameMetaData = (videoName) => {
+    return this.http.get<any>(`${this.baseUrl}/patient/gameMetaData/get/${videoName}`);
+  };
+
+  savePatientMetaData = (data) => {
+    return this.http.post<any>(`${this.baseUrl}/patient/metaData/create`, data);
+  };
+
   // patient RTM routes
-  sendPatientPainScale = (patientId, painValue, patient_note,userTimezone) => {
+  sendPatientPainScale = (patientId, painValue, patient_note, userTimezone) => {
     try {
-      return this.http.post<any>(`${this.baseUrl}/patient/rtmSession`, { patientId, painValue, patient_note,userTimezone });
+      return this.http.post<any>(`${this.baseUrl}/patient/rtmSession`, { patientId, painValue, patient_note, userTimezone });
     } catch (err) {
       console.error(err);
     }
@@ -332,15 +340,15 @@ export class AjaxService {
 
   sendRtmTherapistSession = (patientId, timestamp, data) => {
     try {
-      this.http.post<any>(`${this.baseUrl}/therapist/rtmSession`, { patientId, timestamp, data }).subscribe(() => {});
+      this.http.post<any>(`${this.baseUrl}/therapist/rtmSession`, { patientId, timestamp, data }).subscribe(() => { });
     } catch (err) {
       console.error(err, 'message');
     }
   };
 
-  sendRtmTherapistSessions = (patientId, data, timestamp,userTimezone) => {
+  sendRtmTherapistSessions = (patientId, data, timestamp, userTimezone) => {
     try {
-      return this.http.post<any>(`${this.baseUrl}/therapist/rtmSession`, { patientId, data, timestamp ,userTimezone});
+      return this.http.post<any>(`${this.baseUrl}/therapist/rtmSession`, { patientId, data, timestamp, userTimezone });
     } catch (err) {
       console.error(err, 'message');
     }
@@ -383,7 +391,7 @@ export class AjaxService {
           gameId,
           settings,
         })
-        .subscribe(() => {});
+        .subscribe(() => { });
     } catch (err) {
       console.error(err);
     }
@@ -397,7 +405,7 @@ export class AjaxService {
           gameId,
           settings,
         })
-        .subscribe(() => {});
+        .subscribe(() => { });
     } catch (err) {
       console.error(err);
     }
@@ -439,7 +447,7 @@ export class AjaxService {
           patientId,
           hasCamera,
         })
-        .subscribe(() => {});
+        .subscribe(() => { });
     } catch (err) {
       console.error(err);
     }
@@ -452,7 +460,18 @@ export class AjaxService {
           patientId,
           hasMobile,
         })
-        .subscribe(() => {});
+        .subscribe(() => { });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  updatePatientAvailabilityStatus = (patientId: number, availabilityStatus: string) => {
+    try {
+      return this.http.post<any>(`${this.baseUrl}/patient/availabilityStatus`, {
+        patientId,
+        availabilityStatus,
+      });
     } catch (err) {
       console.error(err);
     }
@@ -639,7 +658,7 @@ export class AjaxService {
   getFeedbackQuestions(): Observable<FeedbackQuestion[]> {
     return this.http.get<FeedbackQuestion[]>(`${this.baseUrl}/patient/feedback/questions`);
   }
-  
+
   // patient create routes from therapist end
   getAllInstitutes() {
     return this.http.get<any[]>(`${this.baseUrl}/therapist/institute`);
@@ -652,33 +671,67 @@ export class AjaxService {
   createPatient(patient) {
     return this.http.post<any>(`${this.baseUrl}/therapist/patient/create`, { patient });
   }
-// therapist rtm report
-    getAllRtmReport(params: { month?: string; year?: string } = {}) {
-      let httpParams = new HttpParams();
-      Object.keys(params).forEach((key) => {
-        if (params[key] !== undefined) {
-          httpParams = httpParams.set(key, params[key]!);
-        }
-      });
-      const url = `${this.baseUrl}/therapist/rtm-details`;
-      return this.http.get<any>(url, { params: httpParams });
+  // therapist rtm report
+  getAllRtmReport(params: { month?: string; year?: string } = {}) {
+    let httpParams = new HttpParams();
+    Object.keys(params).forEach((key) => {
+      if (params[key] !== undefined) {
+        httpParams = httpParams.set(key, params[key]!);
+      }
+    });
+    const url = `${this.baseUrl}/therapist/rtm-details`;
+    return this.http.get<any>(url, { params: httpParams });
+  }
+
+  getActivePatient = (patientId) => {
+    try {
+      return this.http.get<any>(`${this.baseUrl}/patient/users/${patientId}`);
+    } catch (error) {
+      console.error(error);
     }
+  };
 
-    getActivePatient = (patientId) => {
-      try {        
-        return this.http.get<any>(`${this.baseUrl}/patient/users/${patientId}`);
-      } catch (error) {
-        console.error(error);
-      }
-    };
+  sendEmailAfterLogin = (patient) => {
+    try {
+      return this.http.post<any>(`${this.baseUrl}/patient/users/sendEmail`, { patient });
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-    sendEmailAfterLogin = (patient) => {
-      try {
-        return this.http.post<any>(`${this.baseUrl}/patient/users/sendEmail`, { patient });
-      } catch (err) {
-        console.error(err);
-      }
-    };  
-    
-  
+
+  getRustDeskId = (patientId) => {
+    try {
+      return this.http.get<any>(`${this.baseUrl}/therapist/get-rustdesk-id/${patientId}`);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  getpatientRustDeskId = (patientId) => {
+    try {
+      return this.http.get<any>(`${this.baseUrl}/patient/get-rustdesk-id/${patientId}`);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  saveRustDeskId = (patientId, rustdeskId) => {
+    try {
+      return this.http.post<any>(`${this.baseUrl}/therapist/save-rustdesk-id`, {
+        patientId,
+        rustdeskId,
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  getLastTherapistSessionStatus = (patientId: number): Observable<any> => {
+    try {
+      return this.http.get<any>(`${this.baseUrl}/therapist/sessions/lastStatus/${patientId}`);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 }

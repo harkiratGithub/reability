@@ -300,6 +300,9 @@ export const updatePatientCameraAvailability = async (id, has_camera, client = n
 export const updatePatientMobileAvailability = async (id, is_mobile, client = null) =>
 	await PatientModel.updatePatientMobileAvailability(id, is_mobile, client);
 
+export const updatePatientAvailabilityStatus = async (id, availabilityStatus, client = null) =>
+	await PatientModel.updatePatientAvailabilityStatus(id, availabilityStatus, client);
+
 export const updatePatient = async (patientId: number, patient: PatientModel.IPatientModel, client = null) => {
 	const updatedPatient = await BaseModel.updateRowByField(
 		TABLE_NAME.PATIENT,
@@ -443,3 +446,15 @@ const getPreparedContactArrayForDiff = (contacts: any[]) => {
 	}
 	return contacts;
 };
+
+export const updatePatientRustdeskId = async (id, rustdesk_id, client = null) =>
+	await PatientModel.updatePatientRustdeskId(id, rustdesk_id, client);
+
+
+export const getPatientRustdeskId = async (patientId: number) => {
+	if (!patientId) {
+	  throw new Error("Patient ID is not valid.");
+	}
+	return await PatientModel.getPatientRustdeskId(patientId);
+  };
+  

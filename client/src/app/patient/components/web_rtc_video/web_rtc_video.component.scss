@@ -48,11 +48,13 @@
   font-family: 'Open Sans';
   letter-spacing: 0;
 }
+
 .skeleton-loading-percentage {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
 }
+
 .skeleton-loading-title {
   color: #ececed;
   font-size: 18px;
@@ -60,6 +62,7 @@
   line-height: 24px;
   margin-bottom: 10px;
 }
+
 .skeleton-loading-text {
   color: #ffffff;
   font-size: 18px;
@@ -75,6 +78,7 @@
   padding: 8px;
   margin-bottom: 10px;
 }
+
 .loading-fill {
   background-color: #f832cd;
   border-radius: 3px;
@@ -82,22 +86,27 @@
   height: 100%;
   animation: loadingBar 20s linear;
 }
+
 @keyframes loadingBar {
   0% {
     width: 0;
   }
+
   100% {
     width: 100%;
   }
 }
+
 .skeleton-please-wait-message {
   display: flex;
   flex-direction: row;
   align-items: center;
 }
+
 .skeleton-loading-message-image {
   margin-right: 15px;
 }
+
 .skeleton-loading-message-text {
   color: #b5b5ba;
   font-size: 16px;
@@ -111,6 +120,7 @@
 .skeleton-ready {
   height: 80px;
 }
+
 .skeleton-ready-section {
   padding: 18px 0 18px 24px;
   height: 100%;
@@ -118,23 +128,27 @@
   flex-direction: row;
   z-index: 1;
 }
+
 .skeleton-ready-message {
   display: flex;
   flex-direction: column;
   height: 100%;
 }
+
 .skeleton-ready-title,
 .skeleton-ready-text {
   margin: 0;
   font-family: 'Open Sans';
   letter-spacing: 0;
 }
+
 .skeleton-ready-title {
   color: #ececed;
   font-size: 18px;
   font-weight: 600;
   line-height: 24px;
 }
+
 .skeleton-ready-text {
   color: #b5b5ba;
   font-size: 16px;
@@ -147,6 +161,7 @@
   top: 0;
   z-index: 10;
 }
+
 .patient-canvas {
   position: absolute;
   left: 0;
@@ -177,6 +192,7 @@
 .hidden-video {
   position: fixed;
 }
+
 .remote-video {
   position: absolute;
   bottom: 500px;
@@ -204,40 +220,50 @@
   max-height: 50px;
   max-width: 50px;
   height: 7%;
+
   img {
     position: absolute;
   }
+
   .toggle-button {
     background-repeat: no-repeat;
     background-size: contain;
     height: 100%;
     width: 100%;
   }
+
   .enabled {
     background-image: url('/assets/skel/enabled_hand.png');
   }
+
   .disabled {
     background-image: url('/assets/skel/disabled_hand.png');
   }
+
   .unavailable {
     background-image: url('/assets/skel/unavailable_hand.png');
     cursor: auto;
   }
 }
+
 :host ::ng-deep .hide-video {
   visibility: hidden;
 }
+
 :host ::ng-deep .ios-hide {
   z-index: -1 !important;
 }
+
 .video-content-container {
-  height: 100%;
+  // height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: end;
+
   .remoteVideo {
     position: relative;
     margin-bottom: 3%;
+
     .therapist-busy-message {
       position: absolute;
       background-size: 30%;
@@ -257,6 +283,7 @@
       display: flex;
       align-items: center;
     }
+
     .therapist-busy-message-text {
       width: 100%;
       color: white;
@@ -269,10 +296,12 @@
       margin: 0;
     }
   }
+
   .video-content-container-inner {
     position: relative;
     border-radius: 25px;
   }
+
   .video-content-container-inner-enlarge-video {
     width: 30%;
   }
@@ -333,18 +362,22 @@
   width: 100%;
   z-index: 12;
 }
+
 .body-tracking-disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
 .body-tracking-enabled {
   cursor: pointer;
 }
+
 :host ::ng-deep .active {
   border: 2px solid #80ff00;
   box-shadow: 5px 5px 5px 0px rgba(0, 0, 0, 0.3);
   z-index: 11;
 }
+
 :host ::ng-deep .not-active {
   border-color: grey;
   border-width: 2px;
@@ -446,9 +479,11 @@
   color: white;
   font-size: 1rem;
   font-weight: bold;
+
   .angle-left {
     margin-left: 0;
   }
+
   .angle-right {
     margin-right: 0;
   }
@@ -464,10 +499,220 @@
   height: 25%;
   border-width: 3px;
 }
+
 @media screen and (min-width: 300px) and (max-width: 640px) and (orientation: portrait) {
   .mute-message {
     z-index: 13;
     color: #ececed;
     text-align: center;
   }
+}
+
+.distance-warning {
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  background-color: #415a6b;
+  /* Dark background */
+  color: #ffffff;
+  /* White text */
+  border-radius: 10px;
+  /* Rounded corners */
+  padding: 10px 20px;
+  font-family: 'Arial', sans-serif;
+  /* Adjust font family if needed */
+  font-size: 16px;
+  /* Adjust font size */
+  line-height: 1.5;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+
+  .icon {
+    margin-right: 10px;
+
+    img {
+      width: 24px;
+      /* Adjust icon size */
+      height: 24px;
+    }
+  }
+
+  .message {
+    font-weight: 400;
+  }
+
+
+}
+
+/* Component CSS */
+.text-container {
+  background-color: #333c4400;
+  /* Black background */
+  color: white;
+  /* White text color */
+  font-family: "Courier New", Courier, monospace;
+  /* Monospaced font */
+  font-size: 14px;
+  /* Adjust font size */
+  display: flex;
+  /* Align items in a row */
+  justify-content: center;
+  /* Center content horizontally */
+  align-items: center;
+  /* Center content vertically */
+  padding: 20px;
+}
+
+.text-group {
+  margin: 0 10px 0 10px;
+  /* Space between text groups */
+}
+
+.separator {
+  margin: 0 10px 0 10px;
+  /* Slightly larger margin for separator */
+}
+
+.videoWrapParent {
+  width: auto !important;
+  height: 223px;
+  border-radius: 0.7rem;
+  margin-top: 0.5rem;
+}
+
+.videoWrap {
+  height: 219px;
+}
+
+/*
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+
+.popup {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+}
+
+.popup h3 {
+  margin-top: 0;
+  font-size: 1.5em; 
+}
+.popup button {
+  background-color: #007bff; 
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 12px 24px; 
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: calc(50% - 10px); 
+  margin: 10px 5px;
+}
+
+.popup button:hover {
+  background-color: #0056b3; 
+}
+*/
+
+/* Popup Overlay */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup {
+  position: absolute;
+  background-color: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  font-family: Open Sans;
+  width: 300px;
+  text-align: center;
+}
+
+.popup p {
+  font-size: 18px;
+  margin-bottom: 16px;
+  color: #333;
+  font-weight: bold;
+}
+
+.popup div {
+  margin-bottom: 20px;
+}
+
+.popup label {
+  font-size: 15px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: bold;
+}
+
+.popup input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+}
+
+.popup a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.popup a:hover {
+  text-decoration: underline;
+}
+
+button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.download-btn {
+  background-color: #007bff;
+  color: white;
+}
+
+.download-btn:hover {
+  background-color: #0056b3;
+}
+
+.disabled-btn {
+  background-color: #aaa;
+  color: #ddd;
+  cursor: not-allowed;
+}
+
+button+button {
+  margin-left: 10px;
 }

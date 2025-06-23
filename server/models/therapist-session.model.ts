@@ -36,6 +36,24 @@ export const getLastTherapistPatientSession = async (
 		.from(TABLE_NAME.THERAPIST_SESSION)
 		.where('patient_id = ?', patient_id)
 		.where('therapist_id = ?', therapist_id)
+		.where('type != ?', 'ringing')
+		.order('id', false)
+		.limit(1)
+		.toParam();
+	const res = await BaseModel.runQuery(query);
+	return res.rows[0];
+};
+
+export const getLastTherapistRingingPatientSession = async (
+	patient_id,
+	therapist_id
+) => {
+	const query = squelPostgres
+		.select()
+		.from(TABLE_NAME.THERAPIST_SESSION)
+		.where('patient_id = ?', patient_id)
+		.where('therapist_id = ?', therapist_id)
+		.where('type = ?', 'ringing')
 		.order('id', false)
 		.limit(1)
 		.toParam();
@@ -67,6 +85,18 @@ export const updateTherapistSessionEndTime = async (userId) => {
 	return res.rows[0];
 };
 
+export const getLastSessionByPatientId = async (patientId) => {
+	const query = squelPostgres
+		.select()
+		.from(TABLE_NAME.THERAPIST_SESSION)
+		.where('patient_id = ?', patientId)
+		.order('id', false)
+		.limit(1)
+		.toParam();
+	const res = await BaseModel.runQuery(query);
+	return res.rows[0];
+};
+
 // get all peers by there activeness
 export const getBusyPeers = async () => {
 	const time = new Date();
@@ -76,6 +106,22 @@ export const getBusyPeers = async () => {
 		.select()
 		.from(TABLE_NAME.THERAPIST_SESSION)
 		.where('end_time > ?', utcTime)
+		.toParam();
+	const res = await BaseModel.runQuery(query);
+	return res.rows;
+};
+
+// get all peers by there activeness
+export const getRingingPeers = async () => {
+	// console.log('getRingingPeers');
+	const time = new Date();
+	time.setMilliseconds(time.getMilliseconds() - delayedHeartbeat);
+	const utcTime = time.toUTCString();
+	const query = squelPostgres
+		.select()
+		.from(TABLE_NAME.THERAPIST_SESSION)
+		.where('end_time > ?', utcTime)
+		.where('type = ?', 'ringing')
 		.toParam();
 	const res = await BaseModel.runQuery(query);
 	return res.rows;

@@ -13,6 +13,7 @@ import * as BookingHelper from '../helpers/booking.helper';
 import * as UserHelper from '../helpers/users.helper';
 import * as FeedbackHelper from '../helpers/feedback.helper';
 import { getAllPatientRTMDetails } from '../models/patient.model';
+import * as PatientMetaDataModel from '../models/patient-metadata.model';
 
 export interface IPatientContact {
 	patient_id: number;
@@ -90,7 +91,7 @@ export const createPatient = (req, res, next) => {
 		.then(async (createdPatient) => {
 			const encryptedPatientContacts = PatientHelper.flattenAndEncryptPatientContacts(patientContacts, true);
 			const encryptedPatient = EncryptHelper.encryptJson(createdPatient);
-			const { first_name, last_name, phone, suspend, tech_issue, tech_reason, notification_email,login_notification_email, department_names } =
+			const { first_name, last_name, phone, suspend, tech_issue, tech_reason, notification_email, login_notification_email, department_names } =
 				encryptedPatient;
 			try {
 				if (lead_id) {
@@ -223,6 +224,40 @@ export const updatePatientMobileAvailability = (req, res, next) => {
 		});
 };
 
+export const updatePatientAvailabilityStatus = (req, res, next) => {
+	const { patientId, availabilityStatus } = req.body;
+	console.log('[Patient Availability] Updating status:', { patientId, availabilityStatus });
+	
+	// Validate input
+	if (!patientId || !availabilityStatus) {
+		console.log('[Patient Availability] Missing parameters:', { patientId, availabilityStatus });
+		return res.status(400).json({ error: 'Missing required parameters' });
+	}
+
+	// Validate status is one of the allowed values
+	if (!['unavailable', 'available', 'do_not_disturb', 'offline'].includes(availabilityStatus)) {
+		console.log('[Patient Availability] Invalid status:', availabilityStatus);
+		return res.status(400).json({ error: 'Invalid availability status' });
+	}
+
+	PatientHelper.updatePatientAvailabilityStatus(patientId, availabilityStatus)
+		.then((updatedPatient) => {
+			if (!updatedPatient || updatedPatient.length === 0) {
+				console.log('[Patient Availability] Patient not found:', patientId);
+				return res.status(404).json({ error: 'Patient not found' });
+			}
+			// Return the original status in the response
+			const response = updatedPatient[0];
+			response.availability_status = availabilityStatus;
+			console.log('[Patient Availability] Status updated successfully:', response);
+			res.json(response);
+		})
+		.catch((err) => {
+			console.log('[Patient Availability] Error updating status:', err);
+			next(err);
+		});
+};
+
 export const getActive = (req: Request, res: Response, next: NextFunction) => {
 	const { id } = req.params;
 	PatientHelper.getPatientById(+id)
@@ -306,3 +341,35 @@ export const updateUserTermsConditions = (req, res, next) => {
 			next(err);
 		});
 };
+
+export const createPatientMetaData = (req, res, next) => {
+	const userId = req.user.id;
+
+	PatientMetaDataModel.createPatientMetaData(userId, req.body)
+		.then((createdGameMetaData) => res.json(createdGameMetaData))
+		.catch((err) => next(err));
+};
+export const updatePatientRustdeskId = (req, res, next) => {
+	const { patientId, rustdeskId } = req.body;
+	PatientHelper.updatePatientRustdeskId(patientId, rustdeskId)
+		.then((updatedPatient) => res.json(updatedPatient))
+		.catch((err) => {
+			next(err);
+		});
+};
+
+export const getPatientRustdeskId = async (req, res, next) => {
+	try {
+		const { patientId } = req.params;
+		if (!patientId) {
+			return res.status(400).json({ error: "Patient ID is required." });
+		}
+		const data = await PatientHelper.getPatientRustdeskId(patientId);
+		//console.log("Fetched RustDesk ID:", data);
+		res.json(data);
+	} catch (error) {
+		console.error("Error in getPatientRustdeskId:", error);
+		next(error);
+	}
+};
+

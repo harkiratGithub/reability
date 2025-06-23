@@ -21,4 +21,6 @@ export class User {
   login_notification_email?: string;
   instituteLogo?: string; 
   isMobile: boolean;
+  patientId?: number;
+  availabilityStatus: 'offline' | 'unavailable' | 'available' | 'do_not_disturb';
 }

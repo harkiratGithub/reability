@@ -56,13 +56,12 @@ export class SearchComponent implements OnInit, OnDestroy, AfterViewInit {
   @Output() sendmonthChanged = new EventEmitter<{ month: string; year: string }>();
   //monthControl = new FormControl(moment().toISOString(), [Validators.required, this.monthValidator]);
   monthControl = new FormControl(moment(), [Validators.required, this.monthValidator]); // Use Moment type directly
-
   keyUp = new Subject<KeyboardEvent>();
   subscription: Subscription = new Subscription();
   minDate: Moment;
   maxDate: Moment;
 
-  constructor() {}
+  constructor() { }
 
   ngOnInit() {
     if (this.rtmTab == this.currentTabIndex) {
@@ -116,7 +115,6 @@ export class SearchComponent implements OnInit, OnDestroy, AfterViewInit {
     datepicker.close();
   }
 
-  
   ngAfterViewInit() {
     this.filterFunc(this.data, this.filterBy);
   }

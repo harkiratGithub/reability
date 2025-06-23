@@ -16,16 +16,17 @@ export const isHerokuDomain = (req, res, next) => {
 
 export const permitAccess = (roles = []) => {
 	return (req, res, next) => {
-		if (
-			!req.isAuthenticated() ||
-			!req.user ||
-			(roles.length && !roles.includes(req.user.role))
-		) {
-			return res.status(401).json({ message: ERROR_NAME.PERMISSION });
+		try {
+			if (!req.isAuthenticated() || !req.user || (roles.length && !roles.includes(req.user.role))) {
+				return res.status(401).json({ message: ERROR_NAME.PERMISSION });
+			}
+			next();
+		} catch (err) {
+			console.log('PERMIT ACCESS ERROR => ', err);
 		}
-		next();
 	};
 };
+
 
 export const permitTherapistAccessToPatient = () => {
 	return async (req, res, next) => {
@@ -33,14 +34,9 @@ export const permitTherapistAccessToPatient = () => {
 			const { id: userId, isTherapist } = req.user;
 			if (isTherapist) {
 				const patientId = req.body.patientId;
-				const isAuthorize = await TherapistModel.isTherapistUserCanUpdatePatient(
-					userId,
-					patientId
-				);
+				const isAuthorize = await TherapistModel.isTherapistUserCanUpdatePatient(userId, patientId);
 				if (!isAuthorize) {
-					return res
-						.status(401)
-						.json({ message: ERROR_NAME.THERAPIST_PERMISSION_NOT_VALID });
+					return res.status(401).json({ message: ERROR_NAME.THERAPIST_PERMISSION_NOT_VALID });
 				}
 			}
 			next();
@@ -52,7 +48,7 @@ export const permitTherapistAccessToPatient = () => {
 
 export const verifyRecaptcha = () => {
 	return async (req, res, next) => {
-		return next()
+		return next();
 		console.log(process.env.CAPTCHA_SERVER_KEY);
 
 		try {
@@ -67,18 +63,13 @@ export const verifyRecaptcha = () => {
 					},
 				}
 			);
-			if (
-				result &&
-				result.data &&
-				result.data.success &&
-				result.data.score > getRecaptchaScore()
-			) {
+			if (result && result.data && result.data.success && result.data.score > getRecaptchaScore()) {
 				return next();
 			}
-			console.log("RECAPTCHA DECLINE => ", result.data);
+			console.log('RECAPTCHA DECLINE => ', result.data);
 			return res.status(403).json({ msg: 'Recaptcha error' });
 		} catch (err) {
-			console.log("RECAPTCHA ERROR => ", err);
+			console.log('RECAPTCHA ERROR => ', err);
 			return res.status(403).json({ msg: 'Recaptcha error' });
 		}
 	};
@@ -89,10 +80,7 @@ export const removeOldSessionAndPeers = () => {
 		try {
 			const user = req.user;
 			await UserSession.deleteOtherSessionsForUser(user.id);
-			await axios.post(
-				`https://${process.env.SIGNALING_SERVER}/peerjs/disconnectConnectedPeers`,
-				{ peerId: user.id }
-			);
+			await axios.post(`https://${process.env.SIGNALING_SERVER}/peerjs/disconnectConnectedPeers`, { peerId: user.id });
 			next();
 		} catch (err) {
 			return res.status(401).json({ message: err });
@@ -103,4 +91,4 @@ export const removeOldSessionAndPeers = () => {
 const getRecaptchaScore = (): number => {
 	const reCaptchaScore = parseFloat(process.env.RECAPTCHA_MIN_SCORE);
 	return isNaN(reCaptchaScore) ? DEFAULT_RECAPTCHA_MIN_SCORE : reCaptchaScore;
-}
+};

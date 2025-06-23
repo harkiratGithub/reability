@@ -7,6 +7,7 @@ import * as UserGameDataController from '../controllers/user-game-data.controlle
 import * as ServerLogController from '../controllers/server-log.controller';
 import * as GameDataController from '../controllers/game-data.controller';
 import * as UserController from '../controllers/user.controller';
+import * as GameMetaDataController from '../controllers/game-metadata.controller';
 
 import express from 'express';
 import multer from 'multer';
@@ -15,12 +16,16 @@ const router = express.Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
+router.get('/gameMetaData/get/:videoName', GameMetaDataController.getShortGameMetaData);
+router.post('/metaData/create', PatientController.createPatientMetaData);
+
 router.post('/gameSession/startGameSession', GameSessionController.startGameSession);
 router.post('/gameSession/updateSession', GameSessionController.endGameSession);
 router.post('/gameSettings/saveNewGameSettings', GameSettingsController.saveNewSettings);
 
 router.post('/cameraAvailability', PatientController.updatePatientCameraAvailability);
 router.post('/mobileAvailability', PatientController.updatePatientMobileAvailability);
+router.post('/availabilityStatus', PatientController.updatePatientAvailabilityStatus);
 router.post('/getGameSettings', GameSettingsController.getGameSettings);
 router.post(
 	'/gameactivities/uploadgamerelatedimage',
@@ -41,4 +46,6 @@ router.post('/rtmSession', RtmController.updatePatientRTMSession);
 router.patch('/termsConditions', PatientController.updateUserTermsConditions);
 router.post('/users/sendEmail', UserController.sendEmailAfterlogin);
 router.get('/users/:id', PatientController.getActive);
+//Rustdesk API route
+router.get('/get-rustdesk-id/:patientId', PatientController.getPatientRustdeskId);
 export default router;
