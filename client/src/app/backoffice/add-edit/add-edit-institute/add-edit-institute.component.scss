@@ -29,7 +29,7 @@ form {
   input {
     background: inherit;
     height: 40px;
-    width: 280px;
+    width: $FORM-WIDTH;
     padding-left: 8px;
     padding-right: 8px;
     font-size: 16px;
@@ -53,6 +53,15 @@ form {
     color: #d2d2d2;
     font-family: Roboto;
     font-size: 16px;
+  }
+
+  /* Error Message Styling */
+  .error {
+    color: #ff4d4f; /* Bright red for visibility */
+    font-family: 'Roboto';
+    font-size: 14px;
+    margin-top: 5px;
+    display: block; /* Ensure error messages appear on a new line */
   }
 
   &.group {
@@ -138,4 +147,16 @@ form {
 .disabled {
   pointer-events: none;
   opacity: 0.4;
+}
+
+/* Error Container Enhancement */
+.error {
+  background-color: #fff6f6; /* Light red background for better visibility */
+  padding: 5px 10px;
+  border: 1px solid #ff4d4f;
+  border-radius: 5px;
+  margin-top: 8px;
+  line-height: 1.4;
+  width: calc($FORM-WIDTH - 20px); /* Maintain alignment */
+  box-sizing: border-box;
 }

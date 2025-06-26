@@ -107,3 +107,7 @@ export const getAll = async () => {
 export const getAllInstitutes = async () => {
 	return InstituteModel.getAllInstitutes();
 };
+
+export const checkinstitutename =  async (instname)  => {
+	return InstituteModel.doesInstituteNameExist(instname);
+};

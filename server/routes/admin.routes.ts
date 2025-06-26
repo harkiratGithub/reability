@@ -29,7 +29,7 @@ router.post('/institute/create', upload.single('file'), InstituteController.crea
 router.post('/institute/edit', upload.single('file'), InstituteController.editInstitute);
 router.delete('/institute/:id', InstituteController.deleteInstitute);
 router.get('/institute', InstituteController.getAll);
-
+router.get('/checkInstName/:instname', InstituteController.checkInstitutename);
 // department routes
 router.post('/department/create', DepartmentController.createDepartment);
 router.delete('/department/:id', DepartmentController.deleteDepartment);

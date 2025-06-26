@@ -96,7 +96,8 @@ app.use('/', AuthRouter);
 // common
 app.post('/users/sendHeartBeat', permitAccess(), UserController.updateHeartBeat);
 app.post('/patient/validGames', permitAccess(), permitTherapistAccessToPatient(), PatientController.getValidGames);
-app.get('/ice_servers', permitAccess(), xirsysController.getIceServers);
+app.get('/ice_servers', permitAccess(), twilioController.getIceServers);
+//app.get('/ice_servers', permitAccess(), xirsysController.getIceServers); 
 app.post('/users/authenticate_user', UserController.authenticatePeerjsUser);
 // routes by roles
 app.use('/patient', permitAccess([ROLE.PATIENT, ROLE.VIDEO_PATIENT]), PatientRouter);
