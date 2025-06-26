@@ -13,6 +13,7 @@ import * as AdminController from '../controllers/admin.controller';
 import * as LeadController from '../controllers/lead.controller';
 import * as UserFiltersController from '../controllers/user-filters.controller';
 import * as GameDataController from '../controllers/game-data.controller';
+import * as GameMetaDataController from '../controllers/game-metadata.controller';
 import * as GameActivitiesController from '../controllers/game-activities.controller';
 import * as ServerLogController from '../controllers/server-log.controller';
 
@@ -122,6 +123,11 @@ router.put('/gameData/delete', GameDataController.deleteGameData);
 router.put('/gameData/updatestatus', GameDataController.updateGameDataStatus);
 router.get('/gameData/get/:gameId', GameDataController.getShortGameData);
 router.post('/gameData/getbyids', GameDataController.getGameDataByIds);
+
+router.post('/gameMetaData/create', GameMetaDataController.createGameMetaData);
+router.put('/gameMetaData/update', GameMetaDataController.editGameMetaData);
+router.put('/gameMetaData/delete', GameMetaDataController.deleteGameMetaData);
+router.post('/gameMetaData/getbyids', GameMetaDataController.getGameMetaDataByIds);
 
 router.get('/serverLogs', ServerLogController.getServerLogs);
 

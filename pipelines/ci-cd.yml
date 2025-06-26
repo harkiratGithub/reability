@@ -4,10 +4,10 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  - group: demo-env-variables
+  - group: us-env-variables
   # # Dynamically set variable group based on source branch
   # - ${{ if eq(variables['Build.SourceBranchName'], 'refs/heads/demo-env') }}:
-      
+  #     - group: demo-env-variables
   # - ${{ if eq(variables['Build.SourceBranchName'], 'refs/heads/app-env') }}:
   #     - group: app-env-variables
   # - ${{ if eq(variables['Build.SourceBranchName'], 'refs/heads/us-env') }}:
@@ -88,7 +88,7 @@ stages:
         includeLatestTag: true
         arguments: >
           --build-arg ENV_FILE=.env
-
+    
     - task: Docker@0
       displayName: 'Push an image'
       inputs:
@@ -106,9 +106,9 @@ stages:
         clean: all
     steps:
     - script: |
-        if [ "$(Build.SourceBranchName)" == "demo-node-20" ]; then
+        if [ "$(Build.SourceBranchName)" == "demo-env" ]; then
           echo "##vso[task.setvariable variable=WebAppName]demo-reability"
-        elif [ "$(Build.SourceBranchName)" == "us-env" ]; then
+        elif [ "$(Build.SourceBranchName)" == "new-us-env" ]; then
           echo "##vso[task.setvariable variable=WebAppName]us-reability"
         elif [ "$(Build.SourceBranchName)" == "app-env" ]; then
           echo "##vso[task.setvariable variable=WebAppName]app-reability"

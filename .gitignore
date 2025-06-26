@@ -41,10 +41,10 @@ Thumbs.db
 
 .env
 .vscode
-.env.local
-.env.demo
-.env.prod
-.env.us
+#.env.local
+#.env.demo
+#.env.prod
+#.env.us
 
 #newrelic log
 newrelic_agent.log
@@ -54,3 +54,4 @@ newrelic_agent.log
 /package-lock.json
 /client/.angular
 /client/src/environments
+client/src/assets/st-video/
