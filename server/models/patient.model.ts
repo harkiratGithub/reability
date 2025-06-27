@@ -72,13 +72,29 @@ const patientValidator = (patientObject) => {
 const rtmValidator = (rtmObject) => {
 	return UtilModel.modelValidator(rtmValidationObject, rtmObject, 'rtmValidator');
 };
-
+/*
 export const create = (patient, client = null) => {
 	return BaseModel.createRow(TABLE_NAME.PATIENT, EncryptHelper.encryptJson(patient), patientValidator, client);
+};*/
+export const create = (patient, client = null) => {    
+    if (patient.rustdesk_id) {
+        patient.rustdesk_id = EncryptHelper.encryptPersonalData(String(patient.rustdesk_id));
+    }
+    const encryptedPatient = EncryptHelper.encryptJson(patient);
+    return BaseModel.createRow(TABLE_NAME.PATIENT, encryptedPatient, patientValidator, client);
 };
-
+/*
 export const edit = (id, patient, client = null) => {
 	return BaseModel.updateRowByField(TABLE_NAME.PATIENT, EncryptHelper.encryptJson(patient), 'id', id, client);
+};
+*/
+
+export const edit = (id, patient, client = null) => {
+    if (patient.rustdesk_id) {
+        patient.rustdesk_id = EncryptHelper.encryptPersonalData(String(patient.rustdesk_id));
+    }
+    const encryptedPatient = EncryptHelper.encryptJson(patient);
+    return BaseModel.updateRowByField(TABLE_NAME.PATIENT, encryptedPatient, 'id', id, client);
 };
 
 export const remove = async (arrayOfIds, client = null) => {
@@ -151,6 +167,7 @@ export const getAllActive = async () => {
 		.field(`${TABLE_NAME.PATIENT}.last_name`)
 		.field(`${TABLE_NAME.PATIENT}.id`)
 		.field(`${TABLE_NAME.PATIENT}.phone`)
+		.field(`${TABLE_NAME.PATIENT}.rustdesk_id`)
 		.field(`${TABLE_NAME.PATIENT}.suspend`)
 		.field(`${TABLE_NAME.PATIENT}.tech_issue`)
 		.field(`${TABLE_NAME.PATIENT}.tech_reason`)
@@ -245,11 +262,20 @@ export const getAllActive = async () => {
 			`${TABLE_NAME.PROFESSION}.id = ${TABLE_NAME.EXPERTISE}.profession_id AND ${TABLE_NAME.PROFESSION}.active = true`
 		)
 		.group(
-			'result.id,result.first_name,result.last_name,result.phone,result.suspend,result.tech_issue,result.tech_reason,result.referral,result.logged_in_at,result.email,result.user_name,result.department_name, result.department_id, result.institute_name, result.institute_id,result.role,result.updated_at, result.no_prescription, result.no_booking, result.under_booked, result.over_booked, result.has_followup, result.final_sessions,result.created_at'
+			'result.id,result.first_name,result.last_name,result.phone,result.suspend,result.tech_issue,result.tech_reason,result.rustdesk_id,result.referral,result.logged_in_at,result.email,result.user_name,result.department_name, result.department_id, result.institute_name, result.institute_id,result.role,result.updated_at, result.no_prescription, result.no_booking, result.under_booked, result.over_booked, result.has_followup, result.final_sessions,result.created_at'
 		)
 		.order(`result.updated_at`, false)
 		.toParam();
 	const result = await BaseModel.runQuery(query);
+	result.rows.forEach((row) => {
+		if (row.rustdesk_id) {
+			try {
+				row.rustdesk_id = EncryptHelper.decryptPersonalData(row.rustdesk_id);
+			} catch (err) {
+				row.rustdesk_id = null;
+			}
+		}
+	});
 	return result.rows;
 };
 
@@ -440,6 +466,7 @@ export const getPatientById = async (id: number) => {
 		.field(`${TABLE_NAME.PATIENT}.tech_reason`)
 		.field(`${TABLE_NAME.PATIENT}.notification_email`)
 		.field(`${TABLE_NAME.PATIENT}.login_notification_email`)
+		.field(`${TABLE_NAME.PATIENT}.rustdesk_id`)
 		.field(`${TABLE_NAME.PATIENT}.referral`)
 		.field(`${TABLE_NAME.PATIENT}.has_camera`)
 		.field(`${TABLE_NAME.PATIENT}.is_mobile`)
@@ -471,6 +498,15 @@ export const getPatientById = async (id: number) => {
 		.group(`${TABLE_NAME.INSTITUTE}.id`)
 		.toParam();
 	const result = await BaseModel.runQuery(query);
+	result.rows.forEach((row) => {
+		if (row.rustdesk_id) {
+			try {
+				row.rustdesk_id = EncryptHelper.decryptPersonalData(row.rustdesk_id);
+			} catch (err) {
+				row.rustdesk_id = null;
+			}
+		}
+	});
 	return result.rows?.[0];
 };
 

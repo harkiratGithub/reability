@@ -123,6 +123,7 @@ export const getPatientsByTherapist = async (therapistId: any) => {
 			username: decryptPatient.user_name,
 			notification_email: decryptPatient.notification_email,
 			login_notification_email: decryptPatient.login_notification_email,
+			rustdesk_id:decryptPatient.rustdesk_id,
 			disabledSkeleton: decryptPatient.disabled_skeleton,
 			hasCamera: decryptPatient.has_camera,
 			isMobile: decryptPatient.is_mobile,
