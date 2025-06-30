@@ -42,7 +42,7 @@ export class AddEditPatientComponent implements OnInit, OnDestroy {
 
   subscription: Subscription = new Subscription();
   customForm: FormGroup;
-  filteredDepartments = [];
+  filteredDepartments:any = [];
   suspendOptions: IDropItem[] = [];
   techIssues: IDropItem[] = [];
   patientView: PatientView;
