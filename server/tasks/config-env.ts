@@ -15,8 +15,8 @@ const envConfigFile = `
 export const environment = {
     production: ${production},
     secretKey: '${secret}',
-    signalingServerPort:${port},
-    signalingServer:'${signalingServer}',
+    signalingServerPort: ${port},
+    signalingServer: '${signalingServer}',
     signalingServerUrl: '${signalingServerUrl}',
     recaptchaKey: '${recaptchaKey}',
     serverUrl: ''
