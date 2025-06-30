@@ -24,7 +24,7 @@ export class AddEditTherapistComponent implements OnInit, OnDestroy {
 
   subscription: Subscription = new Subscription();
   customForm: FormGroup;
-  filteredDepartments = [];
+  filteredDepartments:any = [];
   filteredExpertises = [];
   therapistTypes: IDropItem[] = [];
 

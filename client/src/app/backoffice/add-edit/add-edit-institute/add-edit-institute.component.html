@@ -1,8 +1,14 @@
 <form [formGroup]="customForm">
-    <label class='field-container'>
-      <span class='description'>Name</span>
-      <input type="text" formControlName="name" required>
-    </label>
+  <label class="field-container">
+    <span class="description">Name</span>
+    <input type="text" formControlName="name" required>
+   <div *ngIf="customForm.controls.name.errors?.nameExists && customForm.controls.name.touched" class="error">
+      Intitute {{ customForm.controls.name.value }} is already exists.
+    </div>
+    <div *ngIf="customForm.controls.name.errors?.required && customForm.controls.name.touched" class="error">
+      Name is required.
+    </div>
+  </label>
     <label class='field-container'>
       <span class='description'>Logo<span class='secondary'> (JPG, PNG, PDF)</span></span>
       <div class='input-container'>

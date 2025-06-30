@@ -32,7 +32,7 @@ import * as PatientController from './controllers/patient.controller';
 import * as twilioController from './controllers/twilio.controller';
 import * as LoggerController from './controllers/logger.controller';
 import * as LeadController from './controllers/lead.controller';
-
+import * as xirsysController from './controllers/xirsys.controller';
 import { ROLE } from './const';
 
 import helmet from 'helmet';
@@ -97,6 +97,7 @@ app.use('/', AuthRouter);
 app.post('/users/sendHeartBeat', permitAccess(), UserController.updateHeartBeat);
 app.post('/patient/validGames', permitAccess(), permitTherapistAccessToPatient(), PatientController.getValidGames);
 app.get('/ice_servers', permitAccess(), twilioController.getIceServers);
+//app.get('/ice_servers', permitAccess(), xirsysController.getIceServers); 
 app.post('/users/authenticate_user', UserController.authenticatePeerjsUser);
 // routes by roles
 app.use('/patient', permitAccess([ROLE.PATIENT, ROLE.VIDEO_PATIENT]), PatientRouter);
