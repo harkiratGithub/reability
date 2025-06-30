@@ -42,7 +42,7 @@ export class AddEditPatientComponent implements OnInit, OnDestroy {
 
   subscription: Subscription = new Subscription();
   customForm: FormGroup;
-  filteredDepartments:any = [];
+  filteredDepartments: any = [];
   suspendOptions: IDropItem[] = [];
   techIssues: IDropItem[] = [];
   patientView: PatientView;
@@ -50,7 +50,7 @@ export class AddEditPatientComponent implements OnInit, OnDestroy {
   userLog: IUserLogEntry[] = [];
   currentRemark = '';
 
-  constructor(private ajax: AjaxService) {}
+  constructor(private ajax: AjaxService) { }
 
   ngOnInit() {
     if (this.editedEntity) {
@@ -179,7 +179,7 @@ export class AddEditPatientComponent implements OnInit, OnDestroy {
         this.filteredDepartments.length > 0
           ? this.customForm.controls.departments_ids.enable()
           : this.customForm.controls.departments_ids.disable();
-        const teleItem = _.remove(this.filteredDepartments, (item) => {
+        const teleItem = _.remove(this.filteredDepartments, (item: any) => {
           return item.name.toLowerCase() == 'tele';
         });
         if (teleItem.length) {
