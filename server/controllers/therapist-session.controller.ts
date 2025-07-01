@@ -13,7 +13,7 @@ export const getLastSessionStatusByPatientId = (req, res, next) => {
 	TherapistSessionHelper.getLastSessionStatusByPatientId(Number(patientId))
 		.then((result) => {
 			if (!result) {
-				return res.status(404).json({ message: 'No session found for the patient' });
+				return res.status(200).json({ message: 'No session found for the patient' });
 			}
 			res.json(result);
 		})

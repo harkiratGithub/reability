@@ -24,11 +24,11 @@ export class AddEditTherapistComponent implements OnInit, OnDestroy {
 
   subscription: Subscription = new Subscription();
   customForm: FormGroup;
-  filteredDepartments = [];
+  filteredDepartments: any = [];
   filteredExpertises = [];
   therapistTypes: IDropItem[] = [];
 
-  constructor() {}
+  constructor() { }
 
   ngOnInit() {
     this.customForm = new FormGroup({
@@ -85,7 +85,7 @@ export class AddEditTherapistComponent implements OnInit, OnDestroy {
 
     this.filteredExpertises = this.filterExpertisesByProfessionId(this.customForm.value.profession_id, this.expertises);
     this.setDropDownAvailability(this.filteredExpertises, 'expertises_ids');
-    
+
     if (this.editedEntity) {
       this.customForm.controls.institute_id.disable();
     }
@@ -116,7 +116,7 @@ export class AddEditTherapistComponent implements OnInit, OnDestroy {
         this.filteredDepartments.length > 0
           ? this.customForm.controls.departments_ids.enable()
           : this.customForm.controls.departments_ids.disable();
-        const teleItem = _.remove(this.filteredDepartments, (item) => {
+        const teleItem = _.remove(this.filteredDepartments, (item: any) => {
           return item.name.toLowerCase() == 'tele';
         });
         if (teleItem.length) {
