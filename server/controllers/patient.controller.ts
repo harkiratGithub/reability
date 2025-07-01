@@ -34,6 +34,7 @@ const extractBodyParams = (body, patientId = null) => {
 		tech_reason,
 		notification_email,
 		login_notification_email,
+		rustdesk_id,
 		referral,
 		is_patient_video: isPatientVideo,
 		primary_contact_email,
@@ -54,6 +55,7 @@ const extractBodyParams = (body, patientId = null) => {
 		tech_reason,
 		notification_email,
 		login_notification_email,
+		rustdesk_id,
 		referral,
 		departmentsIds,
 		isPatientVideo,
@@ -91,7 +93,7 @@ export const createPatient = (req, res, next) => {
 		.then(async (createdPatient) => {
 			const encryptedPatientContacts = PatientHelper.flattenAndEncryptPatientContacts(patientContacts, true);
 			const encryptedPatient = EncryptHelper.encryptJson(createdPatient);
-			const { first_name, last_name, phone, suspend, tech_issue, tech_reason, notification_email, login_notification_email, department_names } =
+			const { first_name, last_name, phone, suspend, tech_issue, tech_reason, notification_email, login_notification_email, rustdesk_id, department_names } =
 				encryptedPatient;
 			try {
 				if (lead_id) {
@@ -113,6 +115,7 @@ export const createPatient = (req, res, next) => {
 						tech_reason,
 						notification_email,
 						login_notification_email,
+						rustdesk_id,
 						department_names,
 						...encryptedPatientContacts,
 					}

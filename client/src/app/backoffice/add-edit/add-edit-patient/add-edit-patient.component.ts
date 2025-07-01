@@ -79,6 +79,9 @@ export class AddEditPatientComponent implements OnInit, OnDestroy {
       login_notification_email: new FormControl(
         this.getDefaultValue(this.editedEntity, 'login_notification_email') || ''
       ),
+      rustdesk_id: new FormControl(
+        this.getDefaultValue(this.editedEntity, 'rustdesk_id') || ''
+      ),
       secondary_contact_full_name: new FormControl(
         this.getDefaultValue(this.editedEntity, 'secondary_contact_full_name')
       ),
