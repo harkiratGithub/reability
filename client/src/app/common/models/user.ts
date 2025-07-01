@@ -19,6 +19,7 @@ export class User {
   hasCamera: boolean;
   notification_email?: string;
   login_notification_email?: string;
+  rustdesk_id?:number;
   instituteLogo?: string; 
   isMobile: boolean;
   patientId?: number;
