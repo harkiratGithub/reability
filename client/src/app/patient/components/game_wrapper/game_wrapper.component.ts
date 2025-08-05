@@ -168,12 +168,12 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
       if (event.data) {
         const parsedResponse = JSON.parse(event.data);
         const type = parsedResponse.msg.type;
-        const index = parsedResponse.msg.data.index;
+        const index = parsedResponse.msg.data?.index;
         const shouldPlay = parsedResponse.msg.data.shouldPlay;
-        const vidTime = parsedResponse.msg.data.currentPlayTime.vidTime;
-        const sourceUrl = parsedResponse.msg.data.source;
+        const vidTime = parsedResponse.msg.data?.currentPlayTime?.vidTime;
+        const sourceUrl = parsedResponse.msg.data?.source;
 
-        const videoIdMatch = sourceUrl.match(/P\d+/);
+        const videoIdMatch = sourceUrl?.match(/P\d+/);
         const videoId = videoIdMatch ? videoIdMatch[0] : null;
 
         if (this.currentVideoID !== videoId) {
@@ -183,8 +183,7 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
         const integerVidTime = Math.floor(vidTime);
         this.currentVideoID = videoId;
 
-
-        if (this.currentGameSettings[index]?.fileName === videoId) {
+        if (index != undefined && this.currentGameSettings && this.currentGameSettings[index]?.fileName === videoId) {
           const additionalInfo = this.currentGameSettings[index]?.additionalInfo?.trim();
           this.carouselText = additionalInfo ? [additionalInfo] : [];
         } else {

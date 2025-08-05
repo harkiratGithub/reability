@@ -278,195 +278,6 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           // this.saveToCSV(updateComments, 'min_max_matches.csv');
           // this.saveToCSV(this.timeLog, 'time_matching.csv');
         }
-        if (action.msg && action.msg.data && action.msg.data.shouldPlay) {
-          const videoTime = action.msg.data.currentPlayTime.vidTime;
-          if (this.videoIndex == action.msg.data.index) {
-            this.startTime = Date.now() - Math.floor(videoTime * 1000);
-            const closestVideoIndex = this.videoMinMax.reduce((closestIdx, currentItem, currentIndex, array) => {
-              const currentDiff = Math.abs(currentItem.ClipTimestamp - videoTime);
-              const closestDiff = Math.abs(array[closestIdx].ClipTimestamp - videoTime);
-              return currentDiff < closestDiff ? currentIndex : closestIdx;
-            }, 0);
-            const closestPatientIndex = this.matchingCameraData.reduce((closestIdx, currentItem, currentIndex, array) => {
-              const currentDiff = Math.abs(+currentItem.timestamp - videoTime);
-              const closestDiff = Math.abs(+array[closestIdx].timestamp - videoTime);
-              return currentDiff < closestDiff ? currentIndex : closestIdx;
-            }, 0);
-            this.currentVideoIndex = closestVideoIndex;
-            this.matchingCameraData = this.matchingCameraData.slice(0, closestPatientIndex);
-            this.cdr.detectChanges();
-          } else {
-            this.resetTracking();
-            const parts = action.msg?.data?.source?.split('/');
-            const videoName = parts[parts.length - 2];
-            this.ajaxService.getGameMetaData(videoName).subscribe(async (gamesettings) => {
-              if (gamesettings.length > 0) {
-                this.firstTimeSpeech = true;
-                this.landmarks = gamesettings[0].landmarks;
-                this.videoMinMax = gamesettings[0].settings;
-                this.landmarksPointer = gamesettings[0].landmarksPointer;
-                this.landmarksLinePointer = gamesettings[0].landmarksLinePointer;
-                this.skeltonProgressBarService.setShowProgressBar('true');
-                this.newInterval = setInterval(async () => {
-                  const results = await this.matchClipAndPatientData(this.videoMinMax, this.matchingCameraData);
-                  const updateComments = await this.updateComments(results);
-                  const mainLength = this.videoMinMax.length;
-                  const mainComments = updateComments.filter((data) => data.PatientTimestamp != undefined);
-                  const updateLength = mainComments.filter((data) => (data.RightCondition == 'Good' || data.LeftCondition == 'Good')).length;
-                  const thumbUpLength = mainComments.filter((data) => (data.RightComments == 'Perfect' && data.LeftComments == 'Perfect')).length;
-                  const percentage = Math.floor((updateLength / mainLength) * 100);
-                  this.barPercentage = percentage;
-                  this.barThumbsUp = thumbUpLength;
-                  this.skeltonProgressBarService.setBarElement('' + percentage);
-                  this.skeltonProgressBarService.setThumbUpElement('' + thumbUpLength);
-
-                  if (!therapistToPatientConnection) {
-                    if (!this.lastTriggerTime) this.lastTriggerTime = 0;
-                    const now = Date.now();
-                    const cooldown = 6000;
-
-                    const performedLength = mainComments.length;
-                    const performedPercentage = Math.floor((performedLength / mainLength) * 100);
-                    // console.log("performedPercentage===", performedPercentage, performedLength, performedLength % 4 == 0, this.checkIdle, this.callChatGPT, this.heygenActive);
-                    if (performedPercentage >= 60 && !this.heygenActive) {
-                      this.heygenActive = true;
-                      this.heygenAPIService = new HeygenAPIService();
-                      this.heygenAPIService.onStart();
-                    }
-                    if (performedLength > 0 && performedLength % 4 == 0 && this.checkIdle && !this.callChatGPT && this.lastIdleLength != performedLength && now - this.lastTriggerTime > cooldown) {
-                      let elbowComment = "";
-                      let elbowAngle = false;
-                      const { allLeftSame, allRightSame } = await this.checkIdleCondition(mainComments);
-                      // console.log("allLeftSame===", allLeftSame, "allRightSame===", allRightSame);
-                      const leftMessages = [
-                        'It looks like the left hand has been idle for a while.',
-                        'No movement detected on the left hand.',
-                        'The left hand seems to be resting.',
-                        'Left hand is showing signs of inactivity.',
-                        'Left hand activity has paused.',
-                        'Left hand remains unmoved.',
-                        'Stillness noticed in the left hand.'
-                      ];
-
-                      const rightMessages = [
-                        'It looks like the right hand has been idle for a while.',
-                        'No movement detected on the right hand.',
-                        'The right hand seems to be resting.',
-                        'Right hand is showing signs of inactivity.',
-                        'Right hand activity has paused.',
-                        'Right hand remains unmoved.',
-                        'Stillness noticed in the right hand.'
-                      ];
-
-                      const bothMessages = [
-                        'Idle movements detected for both hands.',
-                        'No activity observed from either hand.',
-                        'Both hands appear to be inactive.',
-                        'Looks like both hands are idle.',
-                        'Neither hand has shown movement.',
-                        'Both hands are staying still.',
-                        'Activity paused on both hands.'
-                      ];
-
-                      if (videoName === 'P017') {
-                        if (this.rightElbowAngle <= 140 && this.rightElbowAngle >= 180) {
-                          elbowAngle = true;
-                          elbowComment = 'Please keep your right elbow slightly straight.';
-                        }
-
-                        if (this.leftElbowAngle <= 140 && this.leftElbowAngle >= 180) {
-                          elbowAngle = true;
-                          elbowComment = elbowComment == "" ? 'Please keep your left elbow slightly straight.' : 'Please keep your both elbows slightly straight.';
-                        }
-                      }
-
-                      if (allLeftSame || allRightSame || elbowAngle) {
-                        let content = "";
-                        this.checkIdle = false
-                        this.showMarker = false
-                        this.callChatGPT = true
-                        this.lastIdleLength = performedLength
-                        // this.lastPerformedIndex = performedLength
-                        this.patientWebRtcService.setShouldPauseGameState(true);
-                        if (allLeftSame && allRightSame) {
-                          content = bothMessages[Math.floor(Math.random() * bothMessages.length)];
-                        } else if (allLeftSame) {
-                          content = leftMessages[Math.floor(Math.random() * leftMessages.length)];
-                        } else if (allRightSame) {
-                          content = rightMessages[Math.floor(Math.random() * rightMessages.length)];
-                        }
-
-                        if (elbowAngle) {
-                          this.playCommentAudio(elbowComment)
-                        } else {
-                          this.playCommentAudio(content)
-                        }
-                      }
-                    }
-                    if (performedPercentage > 10 && performedPercentage % 19 >= 0 && performedPercentage % 19 <= 5 && Math.abs(performedPercentage - this.lastPerformedPercentage) >= 15 && this.checkIdle && now - this.lastTriggerTime > cooldown) {
-                      this.lastPerformedPercentage = performedPercentage
-                      setTimeout(() => {
-                        if (!this.callChatGPT) {
-                          this.generatefeedback();
-                        }
-                      }, 1000);
-                    }
-                    if (performedPercentage >= 97) {
-                      clearInterval(this.newInterval);
-                      // console.log("performedPercentage===", performedPercentage);
-                      this.patientWebRtcService.setShouldPauseGameState(true);
-                      this.finalFeedback = true;
-                      this.generatefeedback();
-                    }
-                  }
-                }, 2000);
-
-                const currentPlayTime = new Date(action.msg.data.currentPlayTime.sysTime).getSeconds();
-
-                if (this.videoSeconds == 0) {
-                  this.videoSeconds = currentPlayTime
-                }
-
-                if (Math.abs(this.videoSeconds - currentPlayTime) > 1 || videoTime > 0 || action.msg.data.index > 0) {
-                  this.videoSeconds = currentPlayTime
-                  if (!this.startTime) {
-                    this.startTime = Date.now();
-                  }
-
-                  if (this.videoIndex != action.msg.data.index) {
-                    this.videoIndex = action.msg.data.index
-                    this.processedTimestamps = new Set();
-                    this.startTime = Date.now();
-                    this.currentVideoIndex = 0;
-                    this.initializeCameraPoseModels()
-
-                    if (this.videoIndex > 0) {
-                      const results = await this.matchClipAndPatientData(this.lastVideoMinMax, this.matchingCameraData);
-                      const updateComments = await this.updateComments(results);
-
-                      this.ajaxService.savePatientMetaData({
-                        game_id: this.gameId,
-                        settings: updateComments,
-                        video_name: this.lastVideoName,
-                        game_score: this.barPercentage
-                      }).subscribe((gamesettings) => {
-                        // console.log("gamesettings===", gamesettings);
-                      });
-                      this.resetTracking();
-                      // this.saveToCSV(updateComments, 'min_max_matches.csv');
-                      // this.saveToCSV(this.timeLog, 'time_matching.csv');
-                    }
-                    this.lastVideoName = videoName;
-                    this.lastVideoMinMax = this.videoMinMax;
-                  }
-                }
-              } else {
-                this.resetTracking();
-                this.skeltonProgressBarService.setShowProgressBar('false');
-              }
-            });
-          }
-        }
       }
     });
   }
@@ -734,7 +545,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
 
     // if (this.currentUser.id == 1802 || this.currentUser.id == 1793) {
     // this.initializeCamera();
-    this.initializePoseModels();
+    // this.initializePoseModels();
     // }
   }
 
@@ -1022,7 +833,7 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           }
           this.localVideo.onloadeddata = (e) => {
             this.localVideo.play();
-            this.processVideoFrames();
+            // this.processVideoFrames();
             if (this.isBodyTrackingAvailable) {
               this.webCamSkeletonService.bindPage(this.localVideoForSkeleton, true);
             }
