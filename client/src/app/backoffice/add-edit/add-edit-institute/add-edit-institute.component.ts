@@ -43,10 +43,34 @@ export class AddEditInstituteComponent implements OnInit, OnDestroy {
     window['form'] = this.customForm;
   }
 
-  instituteNameExistsValidator = (control: FormControl) => {
+  /*instituteNameExistsValidator = (control: FormControl) => {
     if (!control.value || control.value.trim() === '') {
       return of(null); 
     }
+    return this.http
+      .get<{ exists: boolean }>(`/admin/checkInstName/${encodeURIComponent(control.value)}`)
+      .pipe(
+        debounceTime(300),
+        switchMap((response) => {
+          return response ? of({ nameExists: true }) : of(null);
+        }),
+        catchError(() => of(null))
+      );
+  };*/
+  instituteNameExistsValidator = (control: FormControl) => {
+    const currentName = this.editedEntity?.name?.trim().toLowerCase();
+  
+    // 1. Empty check
+    if (!control.value || control.value.trim() === '') {
+      return of(null);
+    }
+  
+    // 2. If editing and value equals original name → skip validation
+    if (currentName && control.value.trim().toLowerCase() === currentName) {
+      return of(null);
+    }
+  
+    // 3. Otherwise call API
     return this.http
       .get<{ exists: boolean }>(`/admin/checkInstName/${encodeURIComponent(control.value)}`)
       .pipe(
