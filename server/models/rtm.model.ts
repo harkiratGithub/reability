@@ -92,11 +92,11 @@ export const getInstituteLogoById = async (idForLogo, role) => {
 			return imageResult.rows[0].url;
 		} else {
 			console.warn("Institute Logo URL not found, using default.");
-			return 'assets/therapist/success_logo.png';
+			return 'assets/therapist/success_logo.jpg';
 		}
 	} catch (error) {
 		console.error("Error fetching institute logo:", error);
-		return 'assets/therapist/success_logo.png';
+		return 'assets/therapist/success_logo.jpg';
 	}
 };
 /*
