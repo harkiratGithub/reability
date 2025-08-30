@@ -415,7 +415,7 @@ export const enable2FAForUser = async (userId: any) => {
 	if (user.role !== ROLE.ADMIN) {
 		throw new Error('2FA can only be enabled for Admin roles.');
 	}
-	const secret = speakeasy.generateSecret({ name: 'ReAbility Online Auth' });
+	const secret = speakeasy.generateSecret({ name: 'Success Auth' });
 	user.two_factor_secret = secret.base32;
 	// user.is_two_factor_enabled = false;
 	await UserModel.updateById(user.id, user);
@@ -450,7 +450,7 @@ export const reVerify2FAToken = async (userId: any) => {
 	try {
 		let user = await UserModel.findById(userId);
 		user = EncryptHelper.decryptJson(user[0]);
-		const secret = speakeasy.generateSecret({ name: 'ReAbility Online Re-Auth' });
+		const secret = speakeasy.generateSecret({ name: 'Success Re-Auth' });
 		user.two_factor_secret = secret.base32;
 		user.is_two_factor_enabled = true;
 		await UserModel.updateById(user.id, user);

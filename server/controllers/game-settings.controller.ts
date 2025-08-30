@@ -1,5 +1,7 @@
 import * as GameSettingHelper from '../helpers/game-settings.helper';
 import * as ActivityLogHelper from '../helpers/activity-log.helper';
+import * as PatientHelper from '../helpers/patient.helper';
+
 import * as GameModel from '../models/game.model';
 import { LogAction } from '../models/activity-log.model';
 import { TABLE_NAME } from '../const';
@@ -12,23 +14,48 @@ export const saveNewSettings = (req, res, next) => {
 		.catch((err) => next(err));
 };
 
-export const saveNewSettingsFromTherapist = (req, res, next) => {
-	const { patientId, gameId, settings } = req.body;
-	const user = req.user;
-	GameSettingHelper.saveNewSettings(patientId, gameId, settings)
-		.then(async ([newSettings, oldSettings]) => {
-			await ActivityLogHelper.createLog(
-				user.id,
-				newSettings.patient_id,
-				TABLE_NAME.GAME_SESSION,
-				LogAction.Update,
-				newSettings.id,
-				oldSettings.settings,
-				settings
-			);
-			res.json({});
-		})
-		.catch((err) => next(err));
+// export const saveNewSettingsFromTherapist = (req, res, next) => {
+// 	const { patientId, gameId, settings } = req.body;
+// 	const user = req.user;
+// 	GameSettingHelper.saveNewSettings(patientId, gameId, settings)
+// 		.then(async ([newSettings, oldSettings]) => {
+// 			await ActivityLogHelper.createLog(
+// 				user.id,
+// 				newSettings.patient_id,
+// 				TABLE_NAME.GAME_SESSION,
+// 				LogAction.Update,
+// 				newSettings.id,
+// 				oldSettings.settings,
+// 				settings
+// 			);
+// 			res.json({});
+// 		})
+// 		.catch((err) => next(err));
+// };
+
+export const saveNewSettingsFromTherapist = async (req, res, next) => {
+	try {
+		const { patientId, gameId, settings } = req.body;
+		const user = req.user;
+		const PatientUserId = await PatientHelper.getPatientUserId(patientId);		
+		const [newSettings, oldSettings] = await GameSettingHelper.saveNewSettings(
+			patientId,
+			gameId,
+			settings
+		);
+		await ActivityLogHelper.createLog(
+			user.id,
+			PatientUserId,
+			TABLE_NAME.GAME_SESSION,
+			LogAction.Update,
+			newSettings.id,
+			oldSettings.settings,
+			settings
+		);
+		res.json({});
+	} catch (err) {
+		next(err);
+	}
 };
 
 export const getGameSettingsForPatient = (req, res, next) => {

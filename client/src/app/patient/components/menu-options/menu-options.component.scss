@@ -35,8 +35,12 @@ $top_bottom-padding: 6%;
       z-index: 3;
 
       .logo {
+        height: 33px;
+        width: auto;
+      }
+      .web-logo {
         width: 120px;
-        height: 70px;
+        height: 48px;
         object-fit: contain;
       }
 

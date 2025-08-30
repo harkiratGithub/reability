@@ -30,7 +30,7 @@ export class LoginPageComponent implements OnInit, OnDestroy {
   mainMenu;
   ShowLoginErrorMobile = false;
   patient_data: any = [];
-
+  
   constructor(
     private formBuilder: FormBuilder,
     private route: ActivatedRoute,

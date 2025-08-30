@@ -7,7 +7,7 @@ export const sendMail = async (to, subject, html, cc?,attachments?: any[], bcc? 
 	let nameFrom: string;
 	if (process.env.EMAIL_LANGUAGE === 'english') {
 		emailFrom = process.env.SENGRID_FROM_EMAIL ? process.env.SENGRID_FROM_EMAIL : 'yoramfeld@gmail.com'; 
-		nameFrom = 'TheRPT';
+		nameFrom = 'Reability Online';
 	} else {
 		emailFrom = process.env.SENGRID_FROM_EMAIL ? process.env.SENGRID_FROM_EMAIL : 'yoramfeld@gmail.com';
 		nameFrom = 'ReAbility';

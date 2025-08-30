@@ -39,17 +39,17 @@ export const sendPatientCredentialsEmail = async (userEmail, userName, password)
 	let subject;
 	let html;
 	if (process.env.EMAIL_LANGUAGE === 'english') {
-		subject = 'Welcome to TheRPT';		
+		subject = 'Welcome to ReAbility Online';		
 		html = `<div style="direction:ltr; font-family: Arial, sans-serif; font-size: 16px; line-height: 1.5; color: #333;">
 		<p>Hello,</p>
-		<p>We’re excited to have you on board and look forward to supporting you on your journey to better health.</p>
-		<p>To ensure you get the most out of your sessions, we kindly ask that you enable the camera & microphone features when you log in. This is essential for two key reasons:</p>
+		<p>We’re excited to have you on board and look forward to supporting you/your child on a journey towards better health.</p>
+		<p>To ensure you all get the most out of the sessions, we kindly ask that the camera & microphone features are enabled when you log in. This is essential for two key reasons:</p>
 		<ol style="margin-left: 20px;">
-		<li>A licensed physical therapist will be interacting with you through the platform, face to face. </li>
-		<li>Many of the engaging, exercise-based games you'll be playing use skeletal tracking technology, which operates through your webcam to monitor your movements and provide feedback.</li>		
+		<li>A licensed therapist will be interacting with you through the platform, face to face.</li>
+		<li>Many of the engaging, exercise-based games use skeletal tracking technology, which operates through the webcam to monitor your movements and provide feedback.</li>		
 		</ol>
-		<p>Rest assured, nothing from your sessions is being recorded.</p>		
-		<p>You can connect to our sessions using this link:</p>
+		<p>Rest assured, nothing from your video images are being recorded.</p>		
+		<p>Please connect to our platform using this link:</p>
 		<p style="font-weight: bold;">
 		<a href="${url}" style="color: #007BFF; text-decoration: none;">${process.env.SERVER_URL}</a>
 		</p>
@@ -58,10 +58,8 @@ export const sendPatientCredentialsEmail = async (userEmail, userName, password)
 		<p><strong>Note: On your first login, the browser will ask your permission to use the microphone and camera. Please confirm. The browser will also ask you to confirm saving the username and password. Please confirm.</strong></p>
 		<p>We also suggest adding the site to the bookmarks and/or the Desktop for easy access.</p>
 		<p>If you have any questions or concerns, don’t hesitate to reach out to us—we’re here to help!</p>
-		<p>A self-explanatory video is available <a href="https://mediaus.blob.core.windows.net/videos/WelcomeEmailVideo2.mp4" target="_blank">here</a></p>
 		<p>Best regards,</p>
-		<p style="font-weight: bold;">Arthur Shevardnadze<br>COO, TheRPT</p>
-		<p>212-470-1452</p>
+		<p style="font-weight: bold;">The Reability Online team<br></p>
 		</div>`;		
 	} else {
 		subject = 'Welcome to ReAbility';
@@ -90,10 +88,10 @@ export const sendQrReVerify2FA = async (userEmail, qrLink) => {
 			disposition: 'attachment',
 		},
 	];
-	const subject = 'ReAbility Online Re-Auth';
+	const subject = 'Success Re-Auth';
 	const html = `
 	<div style="font-family: Arial, sans-serif; text-align: center;">
-	  <h2>ReAbility Online Re-Auth</h2>
+	  <h2>Success Re-Auth</h2>
 	  <p>Welcome to ReAbility system.</p>
 	  <p>Re-Scan the attach QR code using your authentication app to verify your identity.</p>
 	</div>
@@ -103,7 +101,7 @@ export const sendQrReVerify2FA = async (userEmail, qrLink) => {
 
 export const sendUserLoggedInEmail = async (patient) => {
 	const subject = `${patient.user_name}  patient is online` ;
-	const html = `<div>This is an automated message from TheRPT platform. I was instructed to send you this email as soon as patient ${patient.user_name} logs in.
-					<br><br>Guess what, it has just happened. <br><br> TheRPT platform</div>`;
+	const html = `<div>This is an automated message from Success Charity platform. I was instructed to send you this email as soon as patient ${patient.user_name} logs in.
+					<br><br>Guess what, it has just happened. <br><br> Success Charity platform</div>`;
 	await EmailHelper.sendMail(patient.login_notification_email, subject, html);
 };
