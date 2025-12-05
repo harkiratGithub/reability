@@ -120,3 +120,10 @@ export const sendEmailAfterlogin = (req, res, next) => {
 		.then(() => res.json({ message: 'success' }))
 		.catch((err) => res.status(400).json({ message: err }));
 };
+
+export const clearRingingStatus = (req, res, next) => {
+	//console.log("controller Patient id for changing ringing type====",req.body.patientId);
+	UserHelper.clearRingingStatus(req.body.patientId)
+		.then(() => res.json({ message: 'success' }))
+		.catch((err) => res.status(400).json({ message: err }));
+};

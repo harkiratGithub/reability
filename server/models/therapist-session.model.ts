@@ -126,3 +126,41 @@ export const getRingingPeers = async () => {
 	const res = await BaseModel.runQuery(query);
 	return res.rows;
 };
+/*
+export const clearRingingStatus = async (patient_id) => {
+	const query = squelPostgres
+		.update()
+		.table(TABLE_NAME.THERAPIST_SESSION)
+		.set('end_time', Helper.createTimeForDb())
+		.set('type', null) 
+		.where('patient_id = ?', patient_id)
+		.where('type = ?', 'ringing')
+		.toParam();
+		//console.log("==========query=====",query);
+	return BaseModel.runQuery(query);
+};
+*/
+export const clearRingingStatus = async (patient_id) => {
+	const query = `
+	  UPDATE ${TABLE_NAME.THERAPIST_SESSION} ts
+	  SET 
+		type = NULL,
+		end_time = '${Helper.createTimeForDb()}'
+	  WHERE ts.id IN (
+		SELECT id FROM (
+		  SELECT DISTINCT ON (therapist_id)
+			id,
+			type
+		  FROM ${TABLE_NAME.THERAPIST_SESSION}
+		  WHERE patient_id = ${patient_id}
+		  ORDER BY therapist_id, start_time DESC
+		) AS last_rows
+		WHERE last_rows.type = 'ringing'
+	  );
+	`;
+
+	//console.log("===query====", query);
+	return BaseModel.runQuery({ text: query });
+};
+
+  

@@ -46,6 +46,7 @@ router.post('/rtmSession', RtmController.updatePatientRTMSession);
 router.patch('/termsConditions', PatientController.updateUserTermsConditions);
 router.post('/users/sendEmail', UserController.sendEmailAfterlogin);
 router.get('/users/:id', PatientController.getActive);
+router.post('/clearRinging', UserController.clearRingingStatus);
 //Rustdesk API route
 router.get('/get-rustdesk-id/:patientId', PatientController.getPatientRustdeskId);
 export default router;

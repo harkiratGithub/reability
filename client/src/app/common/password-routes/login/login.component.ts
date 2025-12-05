@@ -98,6 +98,13 @@ export class LoginPageComponent implements OnInit, OnDestroy {
         }
         this.appActions.setTherapist(user?.isTherapist);
         this.authenticationService.updateUser(user);
+        // CLEAR RINGING TYPE IF USER IS PATIENT
+        /*if (user.role === 'patient') {
+          this.ajax.clearRingingStatus(user.patientId).subscribe(
+            () => console.log("Ringing type cleared"),
+            (err) => console.error("Failed to clear ringing type", err)
+          );
+        }*/
         if (['admin'].includes(user.role)) {
           localStorage.setItem('verified2FA', 'false');
           if (user?.is_two_factor_enabled) {

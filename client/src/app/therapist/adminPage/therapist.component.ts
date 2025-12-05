@@ -877,25 +877,82 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
   };
 
   initiateCall = (patientPeerId, user) => {
-    const track = this.hiddenVideo.srcObject.clone();
-    const localClone = this.localStream.clone();
-    const displayName = this.connectedTherapist.first_name + ' ' + this.connectedTherapist.last_name;
-    this.activeSessionWithAudio = null;
-    this.audioTracks = this.streamHandlerService.muteAllActiveStreams(this.audioTracks);
-    const existingTrack = this.audioTracks.find((track) => track.peer_id === patientPeerId);
-    if (!existingTrack) {
-      this.audioTracks.push({ peer_id: patientPeerId, track: localClone });
+    // PATCH: Validate peer is ready before calling
+    if (!this.therapistPeer || !this.therapistPeer.open || this.therapistPeer.destroyed || this.therapistPeer.disconnected) {
+      console.error('[Call Error] Peer not ready:', {
+        exists: !!this.therapistPeer,
+        open: this.therapistPeer?.open,
+        destroyed: this.therapistPeer?.destroyed,
+        disconnected: this.therapistPeer?.disconnected
+      });
+      this.hangUpSession(user);
+      this.appActions.setMessageRTMModal('Connection error. Please try again.');
+      return;
     }
-    this.therapistCall = (this.therapistPeer as Peer).call(patientPeerId, track, {
-      metadata: displayName,
-    });
-    const senders = this.therapistCall.peerConnection.getSenders();
-    const audioTrack = localClone.getAudioTracks()[0];
-    const videoTrack = localClone.getVideoTracks()[0].enabled;
-    senders[0].replaceTrack(audioTrack);
-    senders[1].replaceTrack(videoTrack);
-    this.muteMicrophone(patientPeerId);
-    this.handleCall(this.therapistCall, user, patientPeerId);
+
+    // PATCH: Wrap in try-catch to handle exceptions
+    try {
+      const track = this.hiddenVideo.srcObject.clone();
+      const localClone = this.localStream.clone();
+      const displayName = this.connectedTherapist.first_name + ' ' + this.connectedTherapist.last_name;
+      this.activeSessionWithAudio = null;
+      this.audioTracks = this.streamHandlerService.muteAllActiveStreams(this.audioTracks);
+      const existingTrack = this.audioTracks.find((track) => track.peer_id === patientPeerId);
+      if (!existingTrack) {
+        this.audioTracks.push({ peer_id: patientPeerId, track: localClone });
+      }
+      
+      this.therapistCall = this.therapistPeer.call(patientPeerId, track, {
+        metadata: displayName,
+      });
+      
+      // PATCH: Validate call succeeded
+      if (!this.therapistCall) {
+        throw new Error('Call failed to initialize');
+      }
+      
+      // PATCH: Handle peerConnection timing issue
+      if (this.therapistCall.peerConnection) {
+        this.setupCallAudioVideo(localClone, patientPeerId, user);
+      } else {
+        // Wait for peerConnection to initialize
+        const checkConnection = setInterval(() => {
+          if (this.therapistCall.peerConnection) {
+            clearInterval(checkConnection);
+            this.setupCallAudioVideo(localClone, patientPeerId, user);
+          }
+        }, 50);
+        
+        // Timeout after 3 seconds
+        setTimeout(() => {
+          clearInterval(checkConnection);
+          if (!this.therapistCall.peerConnection) {
+            throw new Error('Peer connection timeout');
+          }
+        }, 3000);
+      }
+    } catch (error) {
+      console.error('[Call Error]', error);
+      this.hangUpSession(user);
+      this.appActions.setMessageRTMModal('Failed to start call. Please try again.');
+    }
+  };
+
+  // PATCH: New helper method to setup call audio/video with error handling
+  setupCallAudioVideo = (localClone, patientPeerId, user) => {
+    try {
+      const senders = this.therapistCall.peerConnection.getSenders();
+      const audioTrack = localClone.getAudioTracks()[0];
+      const videoTrack = localClone.getVideoTracks()[0].enabled;
+      senders[0].replaceTrack(audioTrack);
+      senders[1].replaceTrack(videoTrack);
+      this.muteMicrophone(patientPeerId);
+      this.handleCall(this.therapistCall, user, patientPeerId);
+    } catch (error) {
+      console.error('[Call Setup Error]', error);
+      this.hangUpSession(user);
+      this.appActions.setMessageRTMModal('Failed to setup call. Please try again.');
+    }
   };
 
   handleStreamSending = (patientPeerId) => {

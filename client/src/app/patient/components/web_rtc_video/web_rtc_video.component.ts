@@ -318,7 +318,8 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
 
     // Handle camera availability
     this.handleCameraAvailability();
-
+    // Handle  AjaxclearRingingStatus
+    this.clearRingingStatusOfPatient();
     // Handle mobile availability
     this.handleMobileAvailability(this.isMobile);
 
@@ -566,6 +567,13 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     this.ajaxService.updatePatientMobileAvailability(this.currentUser.patientId, isMobile);
   }
 
+  clearRingingStatusOfPatient() {
+    console.log('clearRingingStatus', this.currentUser.patientId);
+    this.ajaxService.clearRingingStatus(this.currentUser.patientId).subscribe(
+      () => console.log("Ringing type cleared"),
+      (err) => console.error("Failed to clear ringing type", err)
+    );
+  }
   skeletonLoadingBar = () => {
     if (this.isMobile) {
       return;
