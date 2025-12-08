@@ -463,3 +463,21 @@ export const reVerify2FAToken = async (userId: any) => {
 		console.error('In finally block');
 	}
 };
+
+export const clearRingingStatus = async (patientId: number) => {
+	try {
+		if (!patientId) {
+			throw new Error("Patient ID is required");
+		}
+		// Calls the Model function (update query inside model)
+		//console.log("helper Patient id for changing ringing type====",patientId);
+		await TherapistSessionModel.clearRingingStatus(patientId);
+		return {
+			success: true,
+			message: `Ringing status cleared for patient ${patientId}`,
+		};
+	} catch (error) {
+		console.error("Error in clearRingingStatus Helper:", error);
+		throw error;
+	}
+};

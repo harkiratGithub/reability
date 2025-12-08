@@ -734,4 +734,12 @@ export class AjaxService {
       console.error(err);
     }
   };
+
+  clearRingingStatus(patientId: number) {
+    try {
+       return this.http.post<any>(`${this.baseUrl}/patient/clearRinging`, { patientId });
+    } catch (err) {
+      console.error(err);
+    } 
+  }
 }
