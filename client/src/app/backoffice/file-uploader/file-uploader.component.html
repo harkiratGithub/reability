@@ -10,7 +10,7 @@
         <div>Drag files or directory</div>
         <div>
           <button type="button" class="browse-btn" (click)="browseFiles()">Browse Files</button>
-          <input type="file" #fileInput multiple (change)="onFileSelect($event)" hidden />
+          <input type="file" #fileInput multiple webkitdirectory directory (change)="onFileSelect($event)" hidden />
         </div>
       </div>
       <div class="upload-table" *ngIf="files.length">
