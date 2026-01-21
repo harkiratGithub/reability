@@ -18,7 +18,7 @@
         'video-wrapper-rotate-regular-video': !isSwappedScreens && !isSplitScreenView && !enlargeVideo,
         'video-wrapper-rotate-enlarge-video': !isSwappedScreens && !isSplitScreenView && enlargeVideo
       }">
-      <video id="{{ 'local-video-' + therapistPatientConnection.peer }}" autoplay playsinline [ngClass]="{
+      <video #localVideoRef id="{{ 'local-video-' + therapistPatientConnection.peer }}" autoplay playsinline [ngClass]="{
           'hide-video': isInWebcamContainer || !shouldSwapViews,
           'local-video-full-screen-swapped': isSwappedScreens,
           'local-video': !isSwappedScreens,
@@ -88,7 +88,7 @@
           'patient-video-full-screen-swapped-split-screen-no-skeleton':
             isSwappedScreens && isSplitScreenView && isDisabledSkeletonVideo
         }"></video>
-      <canvas [ngStyle]="{ display: hideVideo ? 'block' : 'none' }" style="transform: scaleX(1)" id="{{ 'patient-video-' + therapistPatientConnection.peer }}" #canvasRef width="257" height="192" [ngClass]="{
+      <canvas [ngStyle]="{ display: hideVideo ? 'block' : 'none' }" style="transform: scaleX(1)" id="{{ 'patient-canvas-' + therapistPatientConnection.peer }}" #canvasRef width="257" height="192" [ngClass]="{
           'zoom-video': enlargeVideo,
           'hide-video': !receivedRemoteVideo,
           'patient-video-full-screen-swapped': isSwappedScreens && !isSplitScreenView,
