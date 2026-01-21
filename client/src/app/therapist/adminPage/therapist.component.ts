@@ -323,6 +323,28 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
 
   redirectToHome(conn) {
     this.webRtcService.privateMessage(conn.peer, { type: MESSAGES.REDIRECT_TO_HOME }, this.connectedPaitents);
+
+    // [Mode Fix] After returning to lobby, ensure the menu grid resets to centered state
+    try {
+      const connectionId = (conn && (conn as any).connectionId) || (conn && (conn as any).id);
+      if (connectionId) {
+        setTimeout(() => {
+          try {
+            const wrapper = document.getElementById(`games-iframe-wrapper-${connectionId}`);
+            const menu = wrapper ? (wrapper.querySelector('#menu-container') as HTMLElement) : null;
+            if (menu) {
+              menu.style.transform = 'translateX(0)';
+              menu.style.animation = 'none';
+              menu.style.marginLeft = 'auto';
+              menu.style.marginRight = 'auto';
+              menu.style.width = 'auto';
+            }
+          } catch (e) {
+            console.warn('[Mode Fix] Failed to normalize lobby grid after quit', e);
+          }
+        }, 300);
+      }
+    } catch (_) {}
   }
 
   toggleSwapScreens = (peer_id) => {
