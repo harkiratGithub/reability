@@ -1,0 +1,40 @@
+/* FIX: Video Layout Mode CSS - Prevents 1:1 vs 1:many mode confusion */
+
+/* Single participant mode - large video */
+body.video-mode-1-to-1 video,
+body.video-mode-1-to-1 [class*='video'],
+body.video-mode-1-to-1 [id*='video'] {
+  max-width: 100% !important;
+  max-height: 100% !important;
+}
+
+/* Grid mode - thumbnail-sized remote videos (scope narrowly to the thumbnails component) */
+body.video-mode-1-to-many app-therapist-web-rtc-video video {
+  max-width: 300px !important;
+  max-height: 225px !important;
+}
+
+/* Prevent controls from overlaying in grid mode */
+body.video-mode-1-to-many [class*='control'],
+body.video-mode-1-to-many [id*='toolbar'],
+body.video-mode-1-to-many [class*='toolbar'] {
+  position: relative !important;
+  z-index: auto !important;
+}
+
+/* Improve thumbnail video rendering to avoid edgy/jagged borders in grid */
+body.video-mode-1-to-many app-therapist-web-rtc-video {
+  border-radius: 8px;
+  overflow: hidden;
+}
+body.video-mode-1-to-many app-therapist-web-rtc-video video {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+  object-fit: cover !important;            /* fill and crop smoothly */
+  border-radius: inherit;
+  backface-visibility: hidden;  /* reduce flicker on transforms */
+  transform: translateZ(0);     /* GPU hint for smoother edges */
+  image-rendering: auto;
+}
+

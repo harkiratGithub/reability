@@ -250,13 +250,12 @@
   height: 100%;
   transform: scaleX(-1);
   z-index: 10;
-  transform: translate(-50%, -50%) scaleX(-1);
   display: block;
-  margin-left: auto;
-  margin-right: auto;
   position: absolute;
-  top: 50%;
-  left: 50%;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  top: auto;
 }
 .remote-video {
   position: absolute;

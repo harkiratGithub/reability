@@ -650,6 +650,24 @@ $SIDE_BAR_BACKGROUND: linear-gradient(270.06deg, #385f7c 0%, #294259 100%, #2725
           height: 100%;
         }
 
+        /* Ensure game grid stays centered and visible when returning from games */
+        .menu-options-wrapper .content-background {
+          justify-content: center !important;
+        }
+        .menu-options-wrapper .content-background #menu-container,
+        .menu-options-wrapper .content-background .menu-container {
+          /* neutralize default off-screen position */
+          transform: translateX(0) !important;
+          animation: none !important;
+          margin-left: auto !important;
+          margin-right: auto !important;
+          width: auto !important;
+        }
+        .menu-options-wrapper .content-background #menu-container.movingRightAnimation,
+        .menu-options-wrapper .content-background #menu-container.movingLeftAnimation {
+          transform: translateX(0) !important;
+        }
+
         .no-sessions {
           margin: 0;
           position: absolute;

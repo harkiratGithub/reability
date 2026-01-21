@@ -72,8 +72,8 @@ export class AppComponent implements OnInit, OnDestroy {
         localStorage.page_available = Date.now();
       }
       if (e.key == 'page_available') {
-        alert('The site is open in another tab');
-        window.location.href = 'https://google.com';
+        // No popups or redirects; log only
+        console.warn('[Mode Fix] Duplicate tab detected (logging only, no redirect)');
       }
     };
     window.addEventListener('storage', onLocalStorageEvent, false);

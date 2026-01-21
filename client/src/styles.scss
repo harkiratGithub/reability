@@ -43,6 +43,20 @@ body {
   }
 }
 
+/* Keep therapist lobby grid centered after quitting a game */
+.therapist-split-screen .menu-options-wrapper .menu-container {
+  transform: none !important;
+}
+
+/* Stronger override: neutralize slide-in animation that keeps grid offset */
+.therapist-split-screen .menu-options-wrapper #menu-container {
+  animation: none !important;
+  transform: translateX(0) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  width: auto !important;
+}
+
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -291,6 +305,8 @@ input {
     }
   }
 
+/* Mode fix CSS import */
+@import './video-mode-fix.scss';
   .mat-slider-wrapper {
     height: 100%;
     -webkit-appearance: none;
