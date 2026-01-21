@@ -121,6 +121,9 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
   newRustdeskId = '';
   isPatientOnRinging: string = '';
   therapistActiveCalls: any[] = [];
+  // [Mode Fix] monitoring
+  private modeFixInterval: any = null;
+  private lastParticipantCount: number = 0;
   constructor(
     private authenticationService: AuthenticationService,
     private webRtcService: WebRtcService,
@@ -201,6 +204,16 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngAfterViewInit() {
     this.turnOnCamera();
+    // [Mode Fix] Start monitoring participant count in therapist view
+    try {
+      if (!this.modeFixInterval) {
+        this.checkAndUpdateParticipantMode();
+        this.modeFixInterval = setInterval(() => this.checkAndUpdateParticipantMode(), 500);
+        console.log('[Mode Fix] Participant monitoring activated (therapist page)');
+      }
+    } catch (e) {
+      console.warn('[Mode Fix] Failed to start participant monitoring (therapist page)', e);
+    }
   }
 
   sendRdpRequestToPatient(conn) {
@@ -225,7 +238,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
 /*
   connectToRdp() {
     if (!this.rustdeskId) {
-      alert('RustDesk ID is required to connect.');
+      console.warn('[Popup removed] RustDesk ID is required to connect.');
       return;
     }
     const rdpUrl = `https://rustdesk.com/web/?id=${this.rustdeskId}`;
@@ -244,7 +257,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
 
   connectToRdp() {
     if (!this.rustdeskId) {
-        alert('RustDesk ID is required to connect.');
+        console.warn('[Popup removed] RustDesk ID is required to connect.');
         return;
     }
    navigator.clipboard.writeText(this.rustdeskId)
@@ -264,7 +277,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
         })
         .catch((err) => {
             console.error('Failed to copy RustDesk ID to clipboard:', err);
-            alert('Failed to copy RustDesk ID to clipboard. Please copy it manually.');
+            console.warn('[Popup removed] Failed to copy RustDesk ID to clipboard. Please copy it manually.');
         });
   }
   
@@ -860,7 +873,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
           }
         );
       } else {
-        alert('WebRTC is not supported');
+        console.warn('[Popup removed] WebRTC is not supported');
       }
     } else {
       this.initiateCall(patientPeerId, user);
@@ -1100,7 +1113,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
         }
       );
     } else {
-      alert('WebRTC is not supported');
+      console.warn('[Popup removed] WebRTC is not supported');
     }
   };
 
@@ -1129,6 +1142,51 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
     this.webRtcService.destroyPeer();
     clearInterval(this.therapistPing);
     clearInterval(this.peerjsHeartbeat);
+    if (this.modeFixInterval) {
+      clearInterval(this.modeFixInterval);
+      this.modeFixInterval = null;
+      console.log('[Mode Fix] Participant monitoring stopped (therapist page)');
+    }
+  }
+
+  // [Mode Fix] helpers
+  private getParticipantCount(): number {
+    try {
+      const byState = Array.isArray(this.connectedPaitents) ? this.connectedPaitents.length : 0;
+      if (byState && byState > 0) return byState;
+      const videos = document.querySelectorAll('video:not(#therapist-video)');
+      if (videos && videos.length > 0) return videos.length;
+      const tiles = document.querySelectorAll('.therapist-split-screen .mat-grid-tile, .therapist-split-screen .iframes-container');
+      return tiles ? tiles.length : 0;
+    } catch (_) {
+      return 0;
+    }
+  }
+
+  private checkAndUpdateParticipantMode(): void {
+    const count = this.getParticipantCount();
+    if (count !== this.lastParticipantCount) {
+      console.log('[Mode Fix] Participant count changed:', this.lastParticipantCount, '→', count);
+      this.lastParticipantCount = count;
+      this.updateVideoLayoutMode(count);
+    }
+  }
+
+  private updateVideoLayoutMode(count: number): void {
+    const body = document.body;
+    body.classList.remove('video-mode-single', 'video-mode-grid', 'video-mode-1-to-1', 'video-mode-1-to-many');
+    if (count === 1) {
+      console.log('[Mode Fix] Applying 1:1 focus mode CSS');
+      body.classList.add('video-mode-single', 'video-mode-1-to-1');
+    } else if (count >= 2) {
+      console.log('[Mode Fix] Applying 1:many grid mode CSS');
+      body.classList.add('video-mode-grid', 'video-mode-1-to-many');
+    }
+    try {
+      window.dispatchEvent(new CustomEvent('videoModeChanged', {
+        detail: { mode: count === 1 ? '1:1' : 'grid', participantCount: count },
+      }));
+    } catch (_) {}
   }
 
   initTherapistCallbacksFromSdk = () => {

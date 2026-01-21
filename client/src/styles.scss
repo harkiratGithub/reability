@@ -291,6 +291,8 @@ input {
     }
   }
 
+/* Mode fix CSS import */
+@import './video-mode-fix.scss';
   .mat-slider-wrapper {
     height: 100%;
     -webkit-appearance: none;
