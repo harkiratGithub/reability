@@ -5,14 +5,14 @@ import { BehaviorSubject } from 'rxjs';
   providedIn: 'root'
 })
 export class SkeltonVideoService {
-  private gameVideoElementSubject = new BehaviorSubject<string | null>(null);
+  private gameVideoElementSubject = new BehaviorSubject<string | object | null>(null);
   gameVideoElement$ = this.gameVideoElementSubject.asObservable();
 
-  setGameVideoElement(iframeaction: string | null): void {
+  setGameVideoElement(iframeaction: string | object | null): void {
     this.gameVideoElementSubject.next(iframeaction);
   }
 
-  getGameVideoElement(): string | null {
+  getGameVideoElement(): string | object | null {
     return this.gameVideoElementSubject.value;
   }
 }

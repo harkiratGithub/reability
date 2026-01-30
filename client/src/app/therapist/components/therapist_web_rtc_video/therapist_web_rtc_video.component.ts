@@ -397,9 +397,7 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
     };
     renderFrame();
     // Only hide the video and show canvas when skeleton is active
-    if (this.shouldRenderSkeleton()) {
-      this.hideVideo = true;
-    }
+    this.hideVideo = true;
   }
 
   private onPoseCameraResults(
