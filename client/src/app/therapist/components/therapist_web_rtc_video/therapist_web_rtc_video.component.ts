@@ -70,6 +70,10 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
   thumbUpValue: number = 0;
   showThumbUp: boolean = false;
   private iceMonitoringWired = false;
+  private poseStarted = false;
+  private isDestroyed = false;
+  private animationFrameId: number | null = null;
+
 
   constructor(private webRtcService: WebRtcService, private appActions: AppActions, private skeletonService: SkeletonService, private skeltonProgressBarService: SkeletonProgressBarService) {
     this.initialize();
@@ -169,7 +173,8 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
     if (inWebcamChange && inWebcamChange.currentValue === false) {
       if (this.remoteVideo && this.activeCallStream) {
         if (this.shouldRenderSkeleton()) {
-          this.processVideoFrames();
+          //this.processVideoFrames();
+          this.safeStartPose();
         } else {
           this.hideVideo = false;
         }
@@ -180,7 +185,8 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
     if (disabledSkeletonChange || activeSkeletonChange) {
       if (this.shouldRenderSkeleton()) {
         if (this.remoteVideo && this.activeCallStream) {
-          this.processVideoFrames();
+          //this.processVideoFrames();
+          this.safeStartPose();
         }
       } else {
         this.hideVideo = false;
@@ -214,6 +220,17 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
   }
 
   ngOnDestroy() {
+
+    this.isDestroyed = true;
+  
+    if (this.animationFrameId) {
+      cancelAnimationFrame(this.animationFrameId);
+    }
+  
+    if (this.cameraPose) {
+      this.cameraPose.close();
+    }
+  
     if (this.enlargeVideo) {
       this.toggleEnlargeVideo();
     }
@@ -223,6 +240,7 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
     }
     this.subscription.unsubscribe();
   }
+  
 
   initialize() {
     this.therapistPeer = this.webRtcService.getTherapistPeer();
@@ -241,7 +259,7 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
     this.remoteVideo = this.patientVideo?.nativeElement || this.remoteVideo;
     this.remoteVideo.srcObject = this.activeCallStream;
     this.remoteStream = this.activeCallStream;
-    this.remoteVideo.onloadeddata = (e) => {
+    this.remoteVideo.onloadeddata = async (e) => {
       let isVertical = false;
       if (this.remoteVideo.videoHeight > this.remoteVideo.videoWidth) {
         isVertical = true;
@@ -249,13 +267,14 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
       if (isVertical) {
         this.remoteVideo.style.cssText += 'object-fit: contain;background: black';
       }
-      this.remoteVideo.play();
+      await this.remoteVideo.play();
       this.receivedRemoteVideo = true;
       this.handleStreamSending.emit();
 
       // Only process frames for skeleton when enabled/active
       if (this.shouldRenderSkeleton()) {
-        this.processVideoFrames();
+        //this.processVideoFrames();
+        this.safeStartPose();
       } else {
         this.hideVideo = false;
       }
@@ -267,6 +286,29 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
     this.wireIceMonitoring();
   }
 
+  private safeStartPose() {
+
+    if (this.isDestroyed) return;
+  
+    if (!this.patientVideo || !this.patientVideo.nativeElement) {
+      console.log('⏳ patientVideo not ready, retrying...');
+      setTimeout(() => this.safeStartPose(), 200);
+      return;
+    }
+  
+    if (this.poseStarted) return; // prevent multiple loops
+  
+    this.poseStarted = true;
+  
+    const video = this.patientVideo.nativeElement;
+  
+    video.play().then(() => {
+      this.processVideoFrames(video);
+    }).catch(err => {
+      console.error('Video play error:', err);
+    });
+  }
+  
   hangUpSession() {
     if (this.activeCallStream) {
       this.receivedRemoteVideo = !this.receivedRemoteVideo;
@@ -368,10 +410,8 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
     this.cameraPose.setOptions(poseOptions);
 
     this.cameraPose.onResults((results: Results) => {
-      const canvasEl = this.canvasRef?.nativeElement as HTMLCanvasElement | undefined;
-      if (!canvasEl) {
-        return;
-      }
+      const canvasEl = this.canvasRef?.nativeElement as HTMLCanvasElement | undefined;      
+      if (!this.canvasRef || !this.canvasRef.nativeElement) return;
       this.onPoseCameraResults(results, canvasEl);
     });
 
@@ -380,25 +420,32 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
     // };
   }
 
-  private async processVideoFrames() {
-    if (!this.patientVideo?.nativeElement) {
-      return;
-    }
-    const video = this.patientVideo.nativeElement;
+  
+  private async processVideoFrames(video: HTMLVideoElement) {
+
     const renderFrame = async () => {
-      // If skeleton not active, stop processing and show the video again
-      if (!this.shouldRenderSkeleton()) {
-        this.hideVideo = false;
-        return;
+  
+      if (this.isDestroyed) return;
+  
+      // 🔐 DOM safety
+      if (!this.patientVideo || !this.patientVideo.nativeElement) return;
+  
+      if (!video.paused && !video.ended && this.cameraPose) {
+        try {
+          await this.cameraPose.send({ image: video });
+        } catch (e) {
+          console.error('MediaPipe error:', e);
+        }
       }
-      if (video.paused || video.ended) return;
-      await this.cameraPose.send({ image: video });
-      requestAnimationFrame(renderFrame);
+  
+      this.animationFrameId = requestAnimationFrame(renderFrame);
     };
+  
     renderFrame();
     // Only hide the video and show canvas when skeleton is active
     this.hideVideo = true;
   }
+  
 
   private onPoseCameraResults(
     results: Results,
@@ -418,7 +465,7 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
       if (results.poseLandmarks && this.joints.length > 0 && this.connections.length > 0) {
         results.poseLandmarks.forEach((landmark, index) => {
           const poseData = this.joints.filter(c => c.index === index);
-          if (poseData.length > 0 && poseData.includes(index)) {
+          if (poseData.length > 0 ) {
             canvasCtx.beginPath();
             canvasCtx.arc(
               landmark.x * canvasElement.width,
