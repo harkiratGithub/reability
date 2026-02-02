@@ -276,7 +276,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
             this.isRdpModalOpen = false;
         })
         .catch((err) => {
-            console.error('Failed to copy RustDesk ID to clipboard:', err);
+            console.warn('Failed to copy RustDesk ID to clipboard:', err);
             console.warn('[Popup removed] Failed to copy RustDesk ID to clipboard. Please copy it manually.');
         });
   }
@@ -295,7 +295,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
           resolve(); // Resolve the Promise after setting the ID
         },
         (error) => {
-          console.error('Failed to fetch RustDesk ID', error);
+          console.warn('Failed to fetch RustDesk ID', error);
           this.rustdeskId = null; // Set ID to null in case of an error
           resolve(); // Resolve even on error to prevent blocking
         }
@@ -316,7 +316,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
         // console.log('RustDesk ID saved successfully.');
       },
       (error) => {
-        console.error('Failed to save RustDesk ID:', error);
+        console.warn('Failed to save RustDesk ID:', error);
       }
     );
   }
@@ -476,7 +476,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
   };
 
   handleConnetionErrorToSignalingServer = () => {
-    console.error('LOST CONNECTION TO SYSTEM');
+    console.warn('LOST CONNECTION TO SYSTEM');
   };
 
   silence = () => {
@@ -914,7 +914,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
   initiateCall = (patientPeerId, user) => {
     // PATCH: Validate peer is ready before calling
     if (!this.therapistPeer || !this.therapistPeer.open || this.therapistPeer.destroyed || this.therapistPeer.disconnected) {
-      console.error('[Call Error] Peer not ready:', {
+      console.warn('[Call Error] Peer not ready:', {
         exists: !!this.therapistPeer,
         open: this.therapistPeer?.open,
         destroyed: this.therapistPeer?.destroyed,
@@ -967,7 +967,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
         }, 3000);
       }
     } catch (error) {
-      console.error('[Call Error]', error);
+      console.warn('[Call Error]', error);
       this.hangUpSession(user);
       this.appActions.setMessageRTMModal('Failed to start call. Please try again.');
     }
@@ -978,13 +978,30 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
     try {
       const senders = this.therapistCall.peerConnection.getSenders();
       const audioTrack = localClone.getAudioTracks()[0];
-      const videoTrack = localClone.getVideoTracks()[0].enabled;
-      senders[0].replaceTrack(audioTrack);
-      senders[1].replaceTrack(videoTrack);
+      const videoTrack = localClone.getVideoTracks()[0]; // Fixed: removed .enabled (was returning boolean instead of track)
+      
+      // Validate senders and tracks before replacing
+      if (!senders || senders.length < 2) {
+        console.warn('[Call Setup Error] Insufficient senders:', senders?.length);
+        throw new Error('Peer connection does not have enough senders');
+      }
+      
+      if (audioTrack) {
+        senders[0].replaceTrack(audioTrack);
+      } else {
+        console.warn('[Call Setup] No audio track available');
+      }
+      
+      if (videoTrack) {
+        senders[1].replaceTrack(videoTrack);
+      } else {
+        console.warn('[Call Setup] No video track available');
+      }
+      
       this.muteMicrophone(patientPeerId);
       this.handleCall(this.therapistCall, user, patientPeerId);
     } catch (error) {
-      console.error('[Call Setup Error]', error);
+      console.warn('[Call Setup Error]', error);
       this.hangUpSession(user);
       this.appActions.setMessageRTMModal('Failed to setup call. Please try again.');
     }
@@ -992,14 +1009,29 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
 
   handleStreamSending = (patientPeerId) => {
     setTimeout(() => {
-      const localClone = this.localStream.clone();
-      const senders = this.therapistCall.peerConnection.getSenders();
-      const videoTrack = localClone.getVideoTracks()[0];
-      senders[1].replaceTrack(videoTrack);
-      let stream = this.audioTracks.find((activeStream) => activeStream.peer_id === patientPeerId);
-      if (stream && stream.track) {
-        this.setAciveSessionWithAudio(patientPeerId);
-        stream = this.streamHandlerService.unMuteMicrophone(stream);
+      try {
+        if (!this.localStream || !this.therapistCall?.peerConnection) {
+          console.warn('[handleStreamSending] Missing localStream or peerConnection');
+          return;
+        }
+        
+        const localClone = this.localStream.clone();
+        const senders = this.therapistCall.peerConnection.getSenders();
+        const videoTrack = localClone.getVideoTracks()[0];
+        
+        if (senders && senders.length > 1 && videoTrack) {
+          senders[1].replaceTrack(videoTrack);
+        } else {
+          console.warn('[handleStreamSending] Cannot replace track - insufficient senders or no video track');
+        }
+        
+        let stream = this.audioTracks.find((activeStream) => activeStream.peer_id === patientPeerId);
+        if (stream && stream.track) {
+          this.setAciveSessionWithAudio(patientPeerId);
+          stream = this.streamHandlerService.unMuteMicrophone(stream);
+        }
+      } catch (error) {
+        console.warn('[handleStreamSending] Error:', error);
       }
     }, 1500);
   };
@@ -1653,7 +1685,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       }, 1000);
     });
     this.therapistPeer.on('error', (err) => {
-      console.error(err);
+      console.warn(err);
       if (err.message && err.message.includes('Lost connection to server')) {
         if (!this.peerHasErrors) {
           this.peerHasErrors = true;

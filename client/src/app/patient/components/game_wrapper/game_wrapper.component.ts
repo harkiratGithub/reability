@@ -443,8 +443,8 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
 
     this.subscription.add(
       this.patientWebRtcService.genericMessageFromTherapistToPatient.subscribe((message) => {
-        if (!this.isTherapist) {
-          if (message != null && message.score != undefined) {
+        if (!this.isTherapist && message != null) {
+          if (message.score != undefined) {
             this.appActions.updateGameScore(message.score);
           }
           communicationUtil.sendMessageToIframe(this.iframeEl, message, MESSAGES.GENERIC_MESSAGE);
