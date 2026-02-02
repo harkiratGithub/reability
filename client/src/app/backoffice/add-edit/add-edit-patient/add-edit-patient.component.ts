@@ -150,7 +150,7 @@ export class AddEditPatientComponent implements OnInit, OnDestroy {
       this.filteredDepartments = [];
     }
 
-    if (this.editedEntity) {
+    if (this.editedEntity?.id) {
       this.customForm.controls.institute_id.disable();
     }
 
