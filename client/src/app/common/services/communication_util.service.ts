@@ -103,15 +103,27 @@ export const communicationUtil = (() => {
       iframe.contentWindow.postMessage(msg, '*');
     }
   };
+  const parseMessageData = (raw: any): any => {
+    if (raw == null) return null;
+    if (typeof raw === 'object') return raw;
+    if (typeof raw === 'string') {
+      try {
+        return JSON.parse(raw);
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  };
+
   const subscribeToPatientMessage = () => {
     bindEvent(window, 'message', (e) => {
-      if (!e.data || typeof e.data !== 'string') {
-        return;
-      }
+      if (!e.data && e.data !== 0) return;
+      if (typeof e.data === 'string' && e.data === 'recaptcha-setup') return;
 
       try {
-        // Parse a JSON
-        const data = JSON.parse(e.data);
+        const data = parseMessageData(e.data);
+        if (!data) return;
         switch (data.type) {
           case MESSAGES.APP_DISPLAY_STATUS:
             callbacks[MESSAGES.APP_DISPLAY_STATUS](data.msg);
@@ -199,11 +211,12 @@ export const communicationUtil = (() => {
 
   const subscribeToTherapistMessage = () => {
     bindEvent(window, 'message', (e) => {
-      if (!e.data || typeof e.data !== 'string' || e.data === 'recaptcha-setup') {
-        return;
-      }
+      if (!e.data && e.data !== 0) return;
+      if (typeof e.data === 'string' && e.data === 'recaptcha-setup') return;
+
       try {
-        const data = JSON.parse(e.data);
+        const data = parseMessageData(e.data);
+        if (!data) return;
         switch (data.type) {
           case MESSAGES.APP_DISPLAY_STATUS:
             callbacks[MESSAGES.APP_DISPLAY_STATUS](data.msg);

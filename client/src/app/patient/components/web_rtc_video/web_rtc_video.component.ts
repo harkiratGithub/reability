@@ -257,27 +257,32 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
      */
 
     this.skeltonVideoService.gameVideoElement$.subscribe(async (iframeaction) => {
-      // console.log(" in webrtccomponents iframeaction===", iframeaction);
+      if (iframeaction == null) return;
+      let action: any;
       if (typeof iframeaction === 'string') {
-        const action = JSON.parse(iframeaction);
-        // console.log("action.msg.data.currentPlayTime.vidTime===", action);
-        if (action.msg && action.msg.gameSummaryContent == "Session Ended") {
-          const results = await this.matchClipAndPatientData(this.videoMinMax, this.matchingCameraData);
-          const updateComments = await this.updateComments(results);
-
-          this.ajaxService.savePatientMetaData({
-            game_id: this.gameId,
-            settings: updateComments,
-            video_name: this.lastVideoName,
-            game_score: this.barPercentage
-          }).subscribe((gamesettings) => {
-            this.skeltonProgressBarService.setScoreElement('' + this.barPercentage);
-            // console.log("gamesettings===", gamesettings);50216-41549
-          });
-          this.resetTracking();
-          // this.saveToCSV(updateComments, 'min_max_matches.csv');
-          // this.saveToCSV(this.timeLog, 'time_matching.csv');
+        try {
+          action = JSON.parse(iframeaction);
+        } catch {
+          return;
         }
+      } else if (typeof iframeaction === 'object') {
+        action = iframeaction;
+      } else {
+        return;
+      }
+      if (action?.msg?.gameSummaryContent === 'Session Ended') {
+        const results = await this.matchClipAndPatientData(this.videoMinMax, this.matchingCameraData);
+        const updateComments = await this.updateComments(results);
+
+        this.ajaxService.savePatientMetaData({
+          game_id: this.gameId,
+          settings: updateComments,
+          video_name: this.lastVideoName,
+          game_score: this.barPercentage
+        }).subscribe((gamesettings) => {
+          this.skeltonProgressBarService.setScoreElement('' + this.barPercentage);
+        });
+        this.resetTracking();
       }
     });
   }
@@ -718,10 +723,10 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
       }, 2000);
     } else {
       const videoWrapper = document.getElementById('remoteVideo');
-      if (this.remoteVideo && videoWrapper) {
+      if (this.remoteVideo && videoWrapper && videoWrapper.contains(this.remoteVideo)) {
         videoWrapper.removeChild(this.remoteVideo);
-        this.remoteVideo = null;
       }
+      this.remoteVideo = null;
       this.remoteVideo = document.createElement('video');
       if (videoWrapper) {
         videoWrapper.appendChild(this.remoteVideo);
@@ -758,10 +763,10 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     stream.addTrack(mediaStreamVideoTracks[0]);
     stream.addTrack(mediaStream.getAudioTracks()[0]);
     const videoWrapper = document.getElementById('remoteVideo');
-    if (this.remoteVideo && videoWrapper) {
+    if (this.remoteVideo && videoWrapper && videoWrapper.contains(this.remoteVideo)) {
       videoWrapper.removeChild(this.remoteVideo);
-      this.remoteVideo = null;
     }
+    this.remoteVideo = null;
     this.remoteVideo = document.createElement('video');
     if (videoWrapper) {
       videoWrapper.appendChild(this.remoteVideo);
@@ -841,7 +846,6 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
           }
           this.localVideo.onloadeddata = (e) => {
             this.localVideo.play();
-            // this.processVideoFrames();
             if (this.isBodyTrackingAvailable) {
               this.webCamSkeletonService.bindPage(this.localVideoForSkeleton, true);
             }
@@ -1072,7 +1076,9 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
   handleRemoveTherapistVideo = () => {
     const videoWrapper = document.getElementById('remoteVideo');
     if (this.remoteVideo && videoWrapper && this.remoteVideo.srcObject) {
-      videoWrapper.removeChild(this.remoteVideo);
+      if (videoWrapper.contains(this.remoteVideo)) {
+        videoWrapper.removeChild(this.remoteVideo);
+      }
       this.remoteVideo.srcObject.getTracks().forEach(function (track) {
         track.stop();
       });
@@ -1411,14 +1417,21 @@ export class WebRTCVideoComponent implements OnInit, AfterViewInit, OnDestroy, O
     this.replaceVideoStream(false);
   };
 
-  handlePosenetLoad = () => {
+  handlePosenetLoad = async () => {
     if (!this.isBodyTrackingAvailable) {
       return;
     }
 
     this.bodyTrackingLoading = true;
-    this.webCamSkeletonService.bindPage(this.localVideoForSkeleton);
-    this.replaceVideoStream(true);
+    try {
+      await this.webCamSkeletonService.bindPage(this.localVideoForSkeleton);
+      this.replaceVideoStream(true);
+      if (therapistToPatientConnection) {
+        therapistToPatientConnection.send({ type: 'track_body', payload: this.trackBody });
+      }
+    } catch (err) {
+      this.bodyTrackingLoading = false;
+    }
   };
 
   sendInitialTrackingStatusToTherapist = () => {
@@ -2547,7 +2560,9 @@ export class HeygenAPIService {
     this.webSocket = new WebSocket(wsUrl);
 
     this.webSocket.addEventListener("message", (event: MessageEvent) => {
-      const eventData = JSON.parse(event.data);
+      const raw = event.data;
+      const eventData = typeof raw === 'string' ? (() => { try { return JSON.parse(raw); } catch { return null; } })() : (typeof raw === 'object' && raw !== null ? raw : null);
+      if (!eventData) return;
       // console.log("Raw WebSocket event:", eventData);
     });
   }

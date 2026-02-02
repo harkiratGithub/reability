@@ -165,47 +165,58 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
     }
 
     window.addEventListener('message', (event) => {
-      if (event.data) {
-        const parsedResponse = JSON.parse(event.data);
-        const type = parsedResponse.msg.type;
-        const index = parsedResponse.msg.data?.index;
-        const shouldPlay = parsedResponse.msg.data.shouldPlay;
-        const vidTime = parsedResponse.msg.data?.currentPlayTime?.vidTime;
-        const sourceUrl = parsedResponse.msg.data?.source;
+      if (!event.data) return;
+      let parsedResponse: any;
+      if (typeof event.data === 'string') {
+        try {
+          parsedResponse = JSON.parse(event.data);
+        } catch {
+          return;
+        }
+      } else if (typeof event.data === 'object' && event.data !== null) {
+        parsedResponse = event.data;
+      } else {
+        return;
+      }
+      if (!parsedResponse?.msg) return;
+      const type = parsedResponse.msg.type;
+      const index = parsedResponse.msg.data?.index;
+      const shouldPlay = parsedResponse.msg.data?.shouldPlay;
+      const vidTime = parsedResponse.msg.data?.currentPlayTime?.vidTime;
+      const sourceUrl = parsedResponse.msg.data?.source;
 
-        const videoIdMatch = sourceUrl?.match(/P\d+/);
-        const videoId = videoIdMatch ? videoIdMatch[0] : null;
+      const videoIdMatch = sourceUrl?.match(/P\d+/);
+      const videoId = videoIdMatch ? videoIdMatch[0] : null;
 
-        if (this.currentVideoID !== videoId) {
-          this.resetTimer();
+      if (this.currentVideoID !== videoId) {
+        this.resetTimer();
+      }
+
+      const integerVidTime = Math.floor(vidTime ?? 0);
+      this.currentVideoID = videoId;
+
+      if (index != undefined && this.currentGameSettings && this.currentGameSettings[index]?.fileName === videoId) {
+        const additionalInfo = this.currentGameSettings[index]?.additionalInfo?.trim();
+        this.carouselText = additionalInfo ? [additionalInfo] : [];
+      } else {
+        this.carouselText = [];
+      }
+
+
+      if (type === 'sync_video_data') {
+        if (this.isEmpty(this.carouselText)) {
+          this.isPopupVisible = false;
         }
 
-        const integerVidTime = Math.floor(vidTime);
-        this.currentVideoID = videoId;
-
-        if (index != undefined && this.currentGameSettings && this.currentGameSettings[index]?.fileName === videoId) {
-          const additionalInfo = this.currentGameSettings[index]?.additionalInfo?.trim();
-          this.carouselText = additionalInfo ? [additionalInfo] : [];
-        } else {
-          this.carouselText = [];
+        if (!this.timer) {
+          this.startTimer();
         }
 
-
-        if (type === 'sync_video_data') {
-          if (this.isEmpty(this.carouselText)) {
-            this.isPopupVisible = false;
-          }
-
-          if (!this.timer) {
-            this.startTimer();
-          }
-
-          if (this.elapsedTime >= 2 && integerVidTime >= 2 && !this.isPopupVisible && !this.isEmpty(this.carouselText)) {
-            this.isPopupVisible = true;
-            this.startCarousel();
-          } else if (integerVidTime < 2 || this.isEmpty(this.carouselText)) {
-            this.isPopupVisible = false;
-          }
+        if (this.elapsedTime >= 2 && integerVidTime >= 2 && !this.isPopupVisible && !this.isEmpty(this.carouselText)) {
+          this.isPopupVisible = true;
+          this.startCarousel();
+        } else if (integerVidTime < 2 || this.isEmpty(this.carouselText)) {
+          this.isPopupVisible = false;
         }
       }
     });
