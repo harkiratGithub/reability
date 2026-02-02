@@ -147,7 +147,7 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
         setTimeout(() => {
           if (this.remoteVideo && this.remoteVideo.paused) {
             this.remoteVideo.play().catch((err) => {
-              console.error(`[${this.therapistPatientConnection?.peer}] Remote video play error:`, err);
+              console.warn(`[${this.therapistPatientConnection?.peer}] Remote video play error:`, err);
             });
           }
         }, 100);
@@ -305,7 +305,7 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
     video.play().then(() => {
       this.processVideoFrames(video);
     }).catch(err => {
-      console.error('Video play error:', err);
+      console.warn('Video play error:', err);
     });
   }
   
@@ -434,7 +434,7 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
         try {
           await this.cameraPose.send({ image: video });
         } catch (e) {
-          console.error('MediaPipe error:', e);
+          console.warn('MediaPipe error:', e);
         }
       }
   
@@ -534,14 +534,14 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
         this.remoteVideo.style.cssText += 'object-fit: contain;background: black';
       }
       this.remoteVideo.play().catch((err) => {
-        console.error(`[${this.therapistPatientConnection?.peer}] Remote play error:`, err);
+        console.warn(`[${this.therapistPatientConnection?.peer}] Remote play error:`, err);
       });
     };
 
     // If already loaded, play immediately
     if (this.remoteVideo.readyState >= 2) {
       this.remoteVideo.play().catch((err) => {
-        console.error(`[${this.therapistPatientConnection?.peer}] Remote play error:`, err);
+        console.warn(`[${this.therapistPatientConnection?.peer}] Remote play error:`, err);
       });
     }
 
@@ -553,7 +553,7 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
           readyState: track.readyState,
           enabled: track.enabled,
         });
-        track.onended = () => console.error(`[${this.therapistPatientConnection?.peer}] ${track.kind} track ended`);
+        track.onended = () => console.log(`[${this.therapistPatientConnection?.peer}] ${track.kind} track ended`);
         if (typeof (track as any).onmute !== 'undefined') {
           (track as any).onmute = () => console.warn(`[${this.therapistPatientConnection?.peer}] ${track.kind} track muted`);
         }
@@ -584,12 +584,12 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
       this.localVideo.muted = true;
       this.localVideo.onloadeddata = () => {
         this.localVideo.play().catch((err) => {
-          console.error(`[${this.therapistPatientConnection?.peer}] Local play error:`, err);
+          console.warn(`[${this.therapistPatientConnection?.peer}] Local play error:`, err);
         });
       };
       if (this.localVideo.readyState >= 2) {
         this.localVideo.play().catch((err) => {
-          console.error(`[${this.therapistPatientConnection?.peer}] Local play error:`, err);
+          console.warn(`[${this.therapistPatientConnection?.peer}] Local play error:`, err);
         });
       }
     } else {
