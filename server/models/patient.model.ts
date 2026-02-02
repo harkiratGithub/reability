@@ -414,6 +414,45 @@ export const getPatientRelevantSessions = async (patientIds: number[], startTime
 	const result = await BaseModel.runQuery(getPatientSessions);
 	return result.rows;
 };
+/*
+export const getPatientRelevantSessions = async (
+	patientIds: number[],
+	startTime: string,
+	endTime: string
+  ) => {
+	const patientIdsStr = patientIds.join(',');
+	const newEndTime = endTime + ' 23:59:59';
+  
+	const getPatientSessions = squelPostgres
+	  .select()
+	  .field(`${TABLE_NAME.GAME_SESSION}.patient_id`)
+	  .field(`${TABLE_NAME.GAME_SESSION}.start_time`)
+	  .field(`(${TABLE_NAME.GAME_SESSION}.end_time - ${TABLE_NAME.GAME_SESSION}.start_time) as duration`)
+	  .field(`${TABLE_NAME.GAME_SESSION}.game_id`)
+	  .field(`${TABLE_NAME.GAME_SESSION}.game_summary`)
+	  .field(`${TABLE_NAME.GAME_SESSION}.session_feedback`)
+	  .field(`${TABLE_NAME.GAME_SESSION}.therapist_session_id`)
+	  .field(`ts.therapist_id`) // ✅ therapist id
+  
+	  .from(TABLE_NAME.GAME_SESSION)
+	  .left_join(
+		'${TABLE_NAME.THERAPIST_SESSION}',
+		'ts',
+		`ts.id = ${TABLE_NAME.GAME_SESSION}.therapist_session_id`
+	  )
+  
+	  .where(
+		`patient_id IN (${patientIdsStr}) 
+		 AND (${TABLE_NAME.GAME_SESSION}.start_time >= ? 
+		 AND ${TABLE_NAME.GAME_SESSION}.start_time <= ?)`,
+		startTime,
+		newEndTime
+	  )
+	  .toParam();
+  
+	const result = await BaseModel.runQuery(getPatientSessions);
+	return result.rows;
+  };*/
 
 export const updatePatientCameraAvailability = async (id, has_camera, client = null) => {
 	const query = squelPostgres

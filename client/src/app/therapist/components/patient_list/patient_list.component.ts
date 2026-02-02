@@ -511,7 +511,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
     this.selectedPatientId = patientId;
 
     const selectedPatient = this.patientListFiltered.find((patient) => patient.userId === patientId);
-
+    console.log("===========selectedPatient===============",selectedPatient);
     const gameMap = new Map<string, any[]>();
 
     if (selectedPatient && selectedPatient.lastWeekActivity) {
