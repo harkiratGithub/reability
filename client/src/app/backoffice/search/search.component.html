@@ -3,7 +3,7 @@
     <input
       type="text"
       [disabled]="disabled"
-      (keyup)="keyUp.next($event)"
+      (input)="onSearchInput($event)"
       class="form-control"
       placeholder="Search"
       [value]="filterBy"

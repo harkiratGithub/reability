@@ -8,6 +8,7 @@ import {
   EventEmitter,
   ChangeDetectionStrategy,
   ViewEncapsulation,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { Validators, FormControl } from '@angular/forms';
 import { Subject, Subscription } from 'rxjs';
@@ -61,7 +62,7 @@ export class SearchComponent implements OnInit, OnDestroy, AfterViewInit {
   minDate: Moment;
   maxDate: Moment;
 
-  constructor() { }
+  constructor(private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     if (this.rtmTab == this.currentTabIndex) {
@@ -81,9 +82,9 @@ export class SearchComponent implements OnInit, OnDestroy, AfterViewInit {
             distinctUntilChanged()
           )
           .subscribe((text) => {
-            this.filterBy = text;
             this.filterTextChanged.emit(text);
             this.filterFunc(this.data, text);
+            this.cdr.markForCheck();
           })
       );
     }
@@ -117,6 +118,13 @@ export class SearchComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngAfterViewInit() {
     this.filterFunc(this.data, this.filterBy);
+  }
+
+  onSearchInput(event: Event): void {
+    const value = (event.target as HTMLInputElement)?.value ?? '';
+    this.filterBy = value;
+    this.keyUp.next(event as KeyboardEvent);
+    this.cdr.markForCheck();
   }
 
   ngOnDestroy() {

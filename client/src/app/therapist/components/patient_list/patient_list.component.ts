@@ -152,17 +152,20 @@ export class PatientListComponent implements OnInit, OnDestroy {
   setFilteredData = (filteredData: any[]) => (this.patientListFiltered = filteredData);
 
   filterByName = (data: any[], filterText: string) => {
-    if (!filterText) {
-      this.setFilteredData(data);
+    const trimmed = typeof filterText === 'string' ? filterText.trim() : '';
+    if (!trimmed) {
+      this.setFilteredData(data ?? []);
       return;
     }
-    const lowerCaseFilter = filterText.toLowerCase();
-    const filteredData = filter(
-      data,
-      (element) =>
-        element?.fullName?.toLowerCase().includes(lowerCaseFilter) ||
-        element?.userName?.toLowerCase().includes(lowerCaseFilter)
-    );
+    const lowerCaseFilter = trimmed.toLowerCase();
+    const filteredData = filter(data ?? [], (element) => {
+      const userName = element?.userName ?? element?.user_name ?? '';
+      const fullName = element?.fullName ?? element?.full_name ?? '';
+      return (
+        String(userName).toLowerCase().includes(lowerCaseFilter) ||
+        String(fullName).toLowerCase().includes(lowerCaseFilter)
+      );
+    });
     this.setFilteredData(filteredData);
   };
 

@@ -132,7 +132,7 @@
       </app-game-mission-progress>
       <app-game-score #gamescoreregular *ngIf="(!showPercentageScore && showTimer) || (!showPercentageScoreForTherapist && showTimerForTherapist)" [stopTimer]="stopTimer" [scoreForTherapist]="scoreForTherapist" [isTherapist]="isTherapistMode">
       </app-game-score>
-      <!--<app-game-timer #gametimer *ngIf="showTimer || showTimerForTherapist" class="timer-display"></app-game-timer>-->
+      <app-game-timer #gametimer *ngIf="showTimer || showTimerForTherapist" class="timer-display"></app-game-timer>
       <app-game-logs *ngIf="isTherapistMode && showTimerForTherapist" [connectedUser]="connectedUser" [gameLog]="gameLog" [currentGameName]="currentGameName"></app-game-logs>
     </div>
   </div>
