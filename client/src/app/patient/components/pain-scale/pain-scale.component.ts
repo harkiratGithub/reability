@@ -32,14 +32,13 @@ export class PainScaleComponent implements OnInit {
   async ngOnInit() {
     try {
       const userData = await this.ajax.getUserData().toPromise();      
-      /*if (userData?.isPainModelOpen) {
+      if (userData?.isPainModelOpen) {
         this.isPainModelOpen = userData.isPainModelOpen;
         this.patientId = userData.patientId;
         this.router.navigate(['/pain_scale']);
       } else {
         this.router.navigate(['/games_lobby']);
-      }*/
-        this.router.navigate(['/games_lobby']);
+      }
     } catch (error) {
       console.error('Error fetching user data:', error);
     }

@@ -17,4 +17,10 @@ export const environment = {
   serverUrl: `https://${MY_IP}:8080`,
   secretKey: 'gertner-little-secret',
   recaptchaKey: '6LfH9NQZAAAAAHwE5RHsubonW58QHvqMWQJXwMzf',
+  gameIdWithComp: ['4', '9', '10', '15', '16'],
+  redCmeraFlag: true,
+  tncFlag: false,
+  scorePopupFlag: true,
+  rtmPopupFlag: false,
+  carouselTextFlag: true,
 };
