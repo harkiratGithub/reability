@@ -235,7 +235,7 @@ export const tabsData: ITabData[] = [
     editButtonText: 'EDIT LEAD',
     newButtonText: 'NEW LEAD',
   },
-  {
+  /*{
     name: Tabs[Tabs.rtm],
     displayName: 'RTM REPORT',
     messageDisplayName: 'rtm',
@@ -243,7 +243,7 @@ export const tabsData: ITabData[] = [
     backButtonText: '',
     editButtonText: '',
     newButtonText: '',
-  },
+  },*/
 ];
 
 export const getRemoveEntityVerificationText = (tabData: ITabData, entityName: string): string => {

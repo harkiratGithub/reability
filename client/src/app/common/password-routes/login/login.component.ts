@@ -118,13 +118,15 @@ export class LoginPageComponent implements OnInit, OnDestroy {
           }
         } else {
           localStorage.setItem('verified2FA', 'true');
-          if (user?.role === 'patient' && user?.date_agreed_terms) {
+          /*if (user?.role === 'patient' && user?.date_agreed_terms) {
             this.router.navigate([`${roleMainRoute('TERMS_CONDITIONS')}`]);
-          }/*else if(this.isMobile ===true && user?.isRTM===true && user?.role === 'patient'  && user?.isMobileModelOpen) { 
+          }*/
+         /*else if(this.isMobile ===true && user?.isRTM===true && user?.role === 'patient'  && user?.isMobileModelOpen) { 
             this.router.navigate([`${roleMainRoute('MOBILE_POPUP')}`]);
-          } */else if (user?.role === 'patient' && user?.isPainModelOpen) {
+          } */
+         /*else if (user?.role === 'patient' && user?.isPainModelOpen) {
             this.router.navigate([`${roleMainRoute('RTM')}`]);
-          } else {
+          } else {*/
             if (user?.role === 'patient' && user?.isPainModelOpen===false && user?.isRTM===true) {
               this.patient_data =  this.ajax.getActivePatient(user?.patientId).subscribe((response)=>{
                 this.patient_data = response;
@@ -137,7 +139,7 @@ export class LoginPageComponent implements OnInit, OnDestroy {
               }); 
             }
             this.router.navigate([`${roleMainRoute(user.role)}`]);
-          }
+          //}
         }
       }
     } catch (error) {

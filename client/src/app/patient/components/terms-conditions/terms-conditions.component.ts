@@ -55,7 +55,7 @@ export class TermsConditionsComponent implements OnInit {
             if (this.userPainLevel) {
               this.router.navigate(['/games_lobby']);
             }
-            this.router.navigate(['/pain_scale']);
+            //this.router.navigate(['/pain_scale']);
           },
           error: (error) => {
             console.error('Error while sending terms acceptance:', error);

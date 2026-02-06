@@ -194,11 +194,11 @@ export class AppComponent implements OnInit, OnDestroy {
               });
             }
             return;
-          } else if (userDataResult?.role === 'patient' && userDataResult?.date_agreed_terms) {
+          } /*else if (userDataResult?.role === 'patient' && userDataResult?.date_agreed_terms) {
             this.router.navigate([`${roleMainRoute('TERMS_CONDITIONS')}`]);
           } else if (userDataResult?.role === 'patient' && userDataResult?.isPainModelOpen) {
             this.router.navigate([`${roleMainRoute('RTM')}`]);
-          } else this.router.navigate([`${roleMainRoute(userDataResult.role)}`]);
+          }*/ else this.router.navigate([`${roleMainRoute(userDataResult.role)}`]);
         }
       }
     } catch (err) {
