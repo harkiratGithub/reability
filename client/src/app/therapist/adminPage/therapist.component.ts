@@ -2075,7 +2075,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
 
   getPatientStatusIcon(user: User): string {
     if (user.availabilityStatus === 'unavailable') {
-      return 'person_off'; // Shows a person with a slash through it
+      return 'hourglass_empty'; // Shows a person with a slash through it
     }
     if (user.availabilityStatus === 'do_not_disturb') {
       return 'do_not_disturb'; // Red DND icon
@@ -2083,14 +2083,14 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
     if (user.availabilityStatus === 'offline') {
       return 'offline_pin'; // Shows an offline status icon
     }
-    return ''; // No icon for available status
+    return ''; // Empty hourglass for available/waiting status
   }
 
   getPatientStatusClass(user: User): string {
     if (user.availabilityStatus === 'unavailable' ||
       user.availabilityStatus === 'do_not_disturb' ||
       user.availabilityStatus === 'offline') {
-      return 'status-icon-red';
+      return '';
     }
     return '';
   }

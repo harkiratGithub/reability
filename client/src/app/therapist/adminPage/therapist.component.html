@@ -60,9 +60,9 @@
               </div>
               <div *ngIf="user.missedLastCall" class="missed-call" title="Click to retry"></div>
               <div *ngIf="user.isInSession" class="call-duration">{{ user.callDurationInSeconds | durationpipe }}</div>
-              <!--<div class="patient-status" *ngIf="getPatientStatusIcon(user)">
+              <div class="patient-status" *ngIf="getPatientStatusIcon(user)">
                 <mat-icon [class]="getPatientStatusClass(user)">{{ getPatientStatusIcon(user) }}</mat-icon>
-              </div>-->
+              </div>
             </div>
           </div>
           <video *ngIf="therapistHasCamera" id="therapist-video" class="therapist-video" [ngClass]="{ 'hide-video': connectedPaitents.length > 0 || isCurrentTab(tabOptions.patient_list) }" playsinline autoplay muted></video>
