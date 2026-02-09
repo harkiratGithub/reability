@@ -20,7 +20,7 @@ import { FeedbackFormComponent } from '../feedback-form/feedback-form.component'
 import { GameHistorySessionComponent } from '../game-history-session/game-history-session.component';
 import { User } from '../../../common/models/user';
 import { SkeltonVideoService } from '../../../common/services/skelton-video.service';
-
+import { environment } from '../../../../environments/environment';
 @Component({
   selector: 'app-game-wrapper',
   templateUrl: './game_wrapper.component.html',
@@ -854,28 +854,31 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
     if (this.dialogRef) {
       this.dialogRef.close();
       this.dialogRef = null;
-      // this.isEndGameModalOpen = false;
+      if(environment.scorePopupFlag){
+        this.isEndGameModalOpen = false;
+      }       
     }
+    if(environment.scorePopupFlag){
+      if (!this.isTherapist && !this.inTherapistSession) {
+        this.dialogRef = this.dialog.open(GameHistorySessionComponent, {
+          hasBackdrop: true,
+          data: {
+            has_backdrop: false,
+            gameId: this.gameId,
+            iframeEl: this.iframeEl,
+          },
+        });
+      }
+      this.isEndGameModalOpen = true;
 
-    // if (!this.isTherapist && !this.inTherapistSession) {
-    //   this.dialogRef = this.dialog.open(GameHistorySessionComponent, {
-    //     hasBackdrop: true,
-    //     data: {
-    //       has_backdrop: false,
-    //       gameId: this.gameId,
-    //       iframeEl: this.iframeEl,
-    //     },
-    //   });
-    // }
-    // this.isEndGameModalOpen = true;
-
-    // setTimeout(() => {
-    //   if (this.dialogRef) {
-    //     this.dialogRef.close();
-    //     this.dialogRef = null;
-    //     this.isEndGameModalOpen = false;
-    //   }
-    // }, 5000);
+      setTimeout(() => {
+        if (this.dialogRef) {
+          this.dialogRef.close();
+          this.dialogRef = null;
+          this.isEndGameModalOpen = false;
+        }
+      }, 5000);
+    }
 
     // let newdialogRef;
     // newdialogRef.afterClosed().subscribe(() => {  
