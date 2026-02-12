@@ -742,4 +742,12 @@ export class AjaxService {
       console.error(err);
     } 
   }
+  getFeatureFlag(id: string, role: string) {
+    const apiRole = role === 'therapist' ? 'therapist' : 'patient';
+    try {
+      return this.http.get<any>(`${this.baseUrl}/${apiRole}/getFeatureFlag/${id}/${role}`);
+    } catch (err) {
+      console.error(err);
+    } 
+  }
 }

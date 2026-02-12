@@ -21,6 +21,8 @@ import { AjaxService } from './therapist/services/ajax.service';
 import { PatientGeneralModalComponent } from './common/patient-general-modal/patient_general_modal.component';
 import { MOBILE_OR_SMALL_RESOLUTION } from './common/utils';
 import { environment } from '../environments/environment';
+import { FeatureFlagService } from './common/services/feature-flag.service';
+
 window.addEventListener('securitypolicyviolation', console.error.bind(console));
 @Component({
   selector: 'app-root',
@@ -57,7 +59,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private dialog: MatDialog,
     private appActions: AppActions,
     private ajax: AjaxService,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private flagService: FeatureFlagService,
   ) {
     this.isMobile = MOBILE_OR_SMALL_RESOLUTION ? true : false;
     window.addEventListener('resize', () => {
@@ -174,11 +177,13 @@ export class AppComponent implements OnInit, OnDestroy {
           this.router.navigate(['login']);
         }
         return;
-      } else {
+      } else {        
         const userDataResult = await this.ajax.getUserData().toPromise();
         if (!userDataResult) {
           return;
         } else {
+          const tncFlag = this.flagService.isEnabled('TERM_CONDITION_POPUP_FLAG');
+        console.log("======tncflag===2222==",tncFlag);
           this.authenticationService.updateUser(userDataResult);
           if (
             (!localStorage.getItem('verified2FA') || localStorage.getItem('verified2FA') == 'false') &&
@@ -194,7 +199,7 @@ export class AppComponent implements OnInit, OnDestroy {
               });
             }
             return;
-          } else if (userDataResult?.role === 'patient' && environment.tncFlag && userDataResult?.date_agreed_terms) {
+          } else if (userDataResult?.role === 'patient' && tncFlag && userDataResult?.date_agreed_terms) {
             this.router.navigate([`${roleMainRoute('TERMS_CONDITIONS')}`]);
           } else if (userDataResult?.role === 'patient' && environment.rtmPopupFlag && userDataResult?.isPainModelOpen) {
             this.router.navigate([`${roleMainRoute('RTM')}`]);

@@ -481,3 +481,19 @@ export const clearRingingStatus = async (patientId: number) => {
 		throw error;
 	}
 };
+
+export const getFeatureFlag = async (userId: number, role: string) => {
+	try {
+	  if (!userId || !role) {
+		throw new Error('UserId and role are required');
+	  }  
+	  // Call Model layer (you must create this in UserModel)
+	  const flags = await UserModel.getInstituteFeatureFlags(userId, role);  
+	  // If encrypted data in DB → decrypt
+	  // const decryptedFlags = EncryptHelper.decryptJson(flags); // Only if encrypted  
+	  return flags;
+	} catch (error) {
+	  console.error('Error in getFeatureFlag helper:', error);
+	  throw error;
+	}
+  };

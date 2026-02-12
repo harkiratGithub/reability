@@ -47,6 +47,7 @@ router.patch('/termsConditions', PatientController.updateUserTermsConditions);
 router.post('/users/sendEmail', UserController.sendEmailAfterlogin);
 router.get('/users/:id', PatientController.getActive);
 router.post('/clearRinging', UserController.clearRingingStatus);
+router.get('/getFeatureFlag/:id/:role', UserController.getFeatureFlag);
 //Rustdesk API route
 router.get('/get-rustdesk-id/:patientId', PatientController.getPatientRustdeskId);
 export default router;

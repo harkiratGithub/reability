@@ -79,5 +79,5 @@ router.get('/rtm-details', PatientController.getAllRTMDetails);
 // Rustdesk api route 
 router.post('/save-rustdesk-id', PatientController.updatePatientRustdeskId);
 router.get('/get-rustdesk-id/:patientId', PatientController.getPatientRustdeskId);
-
+router.get('/getFeatureFlag/:id/:role', UserController.getFeatureFlag);
 export default router;

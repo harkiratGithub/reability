@@ -127,3 +127,17 @@ export const clearRingingStatus = (req, res, next) => {
 		.then(() => res.json({ message: 'success' }))
 		.catch((err) => res.status(400).json({ message: err }));
 };
+
+export const getFeatureFlag = async (req, res, next) => {
+	try {
+	  const { id, role } = req.params;  
+	  const flags = await UserHelper.getFeatureFlag(id, role);  
+	  return res.json({
+		success: true,
+		data: flags
+	  });
+	} catch (err) {
+	  console.error('getFeatureFlag error:', err);
+	  return res.status(500).json({ success: false, message: err.message });
+	}
+  };

@@ -20,7 +20,8 @@ import { FeedbackFormComponent } from '../feedback-form/feedback-form.component'
 import { GameHistorySessionComponent } from '../game-history-session/game-history-session.component';
 import { User } from '../../../common/models/user';
 import { SkeltonVideoService } from '../../../common/services/skelton-video.service';
-import { environment } from '../../../../environments/environment';
+import { FeatureFlagService } from '../../../common/services/feature-flag.service';
+
 @Component({
   selector: 'app-game-wrapper',
   templateUrl: './game_wrapper.component.html',
@@ -82,7 +83,7 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
   currentVideoID = "";
   currentUser: User;
   currentGameSettings = null;
-
+  public isCarouselEnabled = this.flagService.isEnabled('STUDIO_CAROUSEL_FLAG');
   //@ViewChild('iframeRef') iframeRef!: ElementRef<HTMLIFrameElement>;
   @ViewChild('videoElement') videoElement!: ElementRef<HTMLVideoElement>;
   @ViewChild('iframeRef', { static: false }) iframeRef!: ElementRef;
@@ -97,6 +98,7 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
     private appActions: AppActions,
     private menuOptionsAppActions: MenuOptionsAppActions,
     private skeltonVideoService: SkeltonVideoService,
+    private flagService: FeatureFlagService,
   ) {
 
     this.subscription.add(
@@ -729,6 +731,7 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
             playerId: this.authenticationService.currentUserValue.id,
             playerFirstName: this.authenticationService.currentUserValue.firstName,
             playerLastName: this.authenticationService.currentUserValue.lastName,
+            enableCarouselText: this.flagService.isEnabled('STUDIO_CAROUSEL_FLAG'),
           },
           MESSAGES.IS_THERAPIST
         );
@@ -744,6 +747,7 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
             playerId: this.authenticationService.currentUserValue.id,
             playerFirstName: this.authenticationService.currentUserValue.firstName,
             playerLastName: this.authenticationService.currentUserValue.lastName,
+            enableCarouselText: this.flagService.isEnabled('STUDIO_CAROUSEL_FLAG'),
           },
           MESSAGES.IS_THERAPIST
         );
@@ -851,14 +855,16 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
   }
 
   closeModal() {
+    const scorePopupFlag = this.flagService.isEnabled('SCORE_POPUP_FLAG');
+    console.log("======scorePopupFlag=====",scorePopupFlag);
     if (this.dialogRef) {
       this.dialogRef.close();
       this.dialogRef = null;
-      if(environment.scorePopupFlag){
+      if(scorePopupFlag){
         this.isEndGameModalOpen = false;
       }       
     }
-    if(environment.scorePopupFlag){
+    if(scorePopupFlag){
       if (!this.isTherapist && !this.inTherapistSession) {
         this.dialogRef = this.dialog.open(GameHistorySessionComponent, {
           hasBackdrop: true,
