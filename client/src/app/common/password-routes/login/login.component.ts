@@ -11,6 +11,8 @@ import { version } from '../../../../../../package.json';
 import { AjaxService } from '../../../therapist/services/ajax.service';
 import { roleMainRoute, ROUTES } from '../../../routes';
 import { isMobileDevice, MOBILE_OR_SMALL_RESOLUTION } from '../../utils';
+import { environment } from '../../../../environments/environment';
+import { FeatureFlagService } from '../../services/feature-flag.service';
 
 @Component({
   selector: 'app-login',
@@ -40,7 +42,8 @@ export class LoginPageComponent implements OnInit, OnDestroy {
     private appActions: AppActions,
     private ajax: AjaxService,
     private recaptchaV3Service: ReCaptchaV3Service,
-    private ref: ChangeDetectorRef
+    private ref: ChangeDetectorRef,
+    private flagService: FeatureFlagService,
   ) {
     this.isMobile = MOBILE_OR_SMALL_RESOLUTION ? true : false;
     window.addEventListener('resize', () => {
@@ -96,15 +99,10 @@ export class LoginPageComponent implements OnInit, OnDestroy {
             userRole: user.role,
           });
         }
+        // Find the feature flag   
+        await this.loadFeatureFlags(user.id, user.role); 
         this.appActions.setTherapist(user?.isTherapist);
-        this.authenticationService.updateUser(user);
-        // CLEAR RINGING TYPE IF USER IS PATIENT
-        /*if (user.role === 'patient') {
-          this.ajax.clearRingingStatus(user.patientId).subscribe(
-            () => console.log("Ringing type cleared"),
-            (err) => console.error("Failed to clear ringing type", err)
-          );
-        }*/
+        this.authenticationService.updateUser(user);          
         if (['admin'].includes(user.role)) {
           localStorage.setItem('verified2FA', 'false');
           if (user?.is_two_factor_enabled) {
@@ -118,15 +116,16 @@ export class LoginPageComponent implements OnInit, OnDestroy {
           }
         } else {
           localStorage.setItem('verified2FA', 'true');
-          /*if (user?.role === 'patient' && user?.date_agreed_terms) {
+          const tncFlag = this.flagService.isEnabled('TERM_CONDITION_POPUP_FLAG');
+          console.log("======tncflag=1111====",tncFlag);
+          if (user?.role === 'patient' && tncFlag && user?.date_agreed_terms) {
             this.router.navigate([`${roleMainRoute('TERMS_CONDITIONS')}`]);
-          }*/
-         /*else if(this.isMobile ===true && user?.isRTM===true && user?.role === 'patient'  && user?.isMobileModelOpen) { 
+          }
+         else if(this.isMobile ===true && user?.isRTM===true && user?.role === 'patient'  && user?.isMobileModelOpen) { 
             this.router.navigate([`${roleMainRoute('MOBILE_POPUP')}`]);
-          } */
-         /*else if (user?.role === 'patient' && user?.isPainModelOpen) {
+          } else if (user?.role === 'patient' && environment.rtmPopupFlag && user?.isPainModelOpen) {
             this.router.navigate([`${roleMainRoute('RTM')}`]);
-          } else {*/
+          } else {
             if (user?.role === 'patient' && user?.isPainModelOpen===false && user?.isRTM===true) {
               this.patient_data =  this.ajax.getActivePatient(user?.patientId).subscribe((response)=>{
                 this.patient_data = response;
@@ -139,7 +138,7 @@ export class LoginPageComponent implements OnInit, OnDestroy {
               }); 
             }
             this.router.navigate([`${roleMainRoute(user.role)}`]);
-          //}
+          }
         }
       }
     } catch (error) {
@@ -188,4 +187,13 @@ export class LoginPageComponent implements OnInit, OnDestroy {
       document.getElementById('grecaptcha_badge').style.display = 'none';
     }
   };
+
+  async loadFeatureFlags(userId: string, role: string) {
+    await this.ajax.getFeatureFlag(userId, role).subscribe(res => {
+      if (res.success) {
+        this.flagService.saveFlags(res);
+        console.log('Feature Flags Saved:', this.flagService.getFlags());
+      }
+    });
+  }
 }

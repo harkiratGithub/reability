@@ -229,34 +229,34 @@ export const updatePatientMobileAvailability = (req, res, next) => {
 
 export const updatePatientAvailabilityStatus = (req, res, next) => {
 	const { patientId, availabilityStatus } = req.body;
-	console.log('[Patient Availability] Updating status:', { patientId, availabilityStatus });
+	//console.log('[Patient Availability] Updating status:', { patientId, availabilityStatus });
 	
 	// Validate input
 	if (!patientId || !availabilityStatus) {
-		console.log('[Patient Availability] Missing parameters:', { patientId, availabilityStatus });
+		//console.log('[Patient Availability] Missing parameters:', { patientId, availabilityStatus });
 		return res.status(400).json({ error: 'Missing required parameters' });
 	}
 
 	// Validate status is one of the allowed values
 	if (!['unavailable', 'available', 'do_not_disturb', 'offline'].includes(availabilityStatus)) {
-		console.log('[Patient Availability] Invalid status:', availabilityStatus);
+		//console.log('[Patient Availability] Invalid status:', availabilityStatus);
 		return res.status(400).json({ error: 'Invalid availability status' });
 	}
 
 	PatientHelper.updatePatientAvailabilityStatus(patientId, availabilityStatus)
 		.then((updatedPatient) => {
 			if (!updatedPatient || updatedPatient.length === 0) {
-				console.log('[Patient Availability] Patient not found:', patientId);
+				//console.log('[Patient Availability] Patient not found:', patientId);
 				return res.status(404).json({ error: 'Patient not found' });
 			}
 			// Return the original status in the response
 			const response = updatedPatient[0];
 			response.availability_status = availabilityStatus;
-			console.log('[Patient Availability] Status updated successfully:', response);
+			//console.log('[Patient Availability] Status updated successfully:', response);
 			res.json(response);
 		})
 		.catch((err) => {
-			console.log('[Patient Availability] Error updating status:', err);
+			//console.log('[Patient Availability] Error updating status:', err);
 			next(err);
 		});
 };

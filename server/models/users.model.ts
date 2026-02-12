@@ -419,3 +419,60 @@ export const findById = (userId) => {
 export const findByFastLoginToken = (fastLoginToken) => {
 	return BaseModel.itemsByField(TABLE_NAME.USER, 'fast_login_token', fastLoginToken);
 };
+
+// ================= GET INSTITUTE FEATURE FLAGS =================
+export const getInstituteFeatureFlags = async (userId, role) => {
+	try {
+		let institute_id = 0;
+		// Find institute id based on role
+		if (role === 'therapist') {
+			institute_id = await getInstituteIdByTherapistId(userId);
+		} 
+		else if (role === 'patient') {
+			institute_id = await getInstituteIdByPatientId(userId);
+		}
+		if (!institute_id) {
+			throw new Error('Institute ID not found');
+		}
+		const query = squelPostgres
+			.select()
+			.field('fe.feature_id')
+			.field('f.feature_name')
+			.field('fe.enabled_status')
+			.field('fe.institute_id')
+			.from('feature_enabled', 'fe')
+			.join('features', 'f', 'f.id = fe.feature_id')
+			.where('fe.institute_id = ?', institute_id)
+			.toParam();
+		const result = await BaseModel.runQuery(query);
+		return result.rows;
+	} catch (error) {
+		console.error('Error in getInstituteFeatureFlags:', error);
+		throw error;
+	}
+};
+
+const getInstituteIdByPatientId = async (patient_id) => {
+	const query = squelPostgres
+		.select()
+		.field('d.institute_id')
+		.from(TABLE_NAME.PATIENT_DEPARTMENTS, 'pd')
+		.join(TABLE_NAME.DEPARTMENT, 'd', 'd.id = pd.department_id')
+		.where('pd.patient_id = ?', patient_id)
+		.toParam();
+	const result = await BaseModel.runQuery(query);
+	const institute_id = result?.rows?.[0]?.institute_id;
+	return institute_id;
+};
+const getInstituteIdByTherapistId = async (therapist_id) => {
+	const query = squelPostgres
+		.select()
+		.field('d.institute_id')
+		.from(TABLE_NAME.THERAPIST_DEPARTMENTS, 'pd')
+		.join(TABLE_NAME.DEPARTMENT, 'd', 'd.id = pd.department_id')
+		.where('pd.therapist_id = ?', therapist_id)
+		.toParam();
+	const result = await BaseModel.runQuery(query);
+	const institute_id = result?.rows?.[0]?.institute_id;
+	return institute_id;
+};

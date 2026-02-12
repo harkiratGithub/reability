@@ -90,12 +90,12 @@ export const roleMainRoute = (role) => {
       return ROUTES.ADMIN_HOME_PAGE;
     case Role.Patient:
       return ROUTES.PATIENT_HOME_PAGE;
-    /*case 'RTM':
-      return ROUTES.PAIN_SCALE;*/
+    case 'RTM':
+      return ROUTES.PAIN_SCALE;
     case 'MOBILE_POPUP':
       return ROUTES.MOBILE_POPUP;
-    /*case 'TERMS_CONDITIONS':
-      return ROUTES.TERMS_CONDITIONS;*/
+    case 'TERMS_CONDITIONS':
+      return ROUTES.TERMS_CONDITIONS;
     case Role.Video_Patient:
       return ROUTES.PATIENT_VIDEO_HOME_PAGE;
     case Role.Therapist:
