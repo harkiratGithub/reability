@@ -26,11 +26,7 @@ export const environment = {
     recaptchaKey: '${recaptchaKey}',
     serverUrl: '',
     gameIdWithComp: ${gameIdWithComp},
-    redCmeraFlag: ${redCmeraFlag},
-    tncFlag: ${tncFlag},
-    scorePopupFlag: ${scorePopupFlag},
-    rtmPopupFlag: ${rtmPopupFlag},
-    carouselTextFlag: ${carouselTextFlag},
+    
   };`;
 writeFile(targetPath, envConfigFile, (err) => {
   if (err) {
