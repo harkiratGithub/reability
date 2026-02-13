@@ -11,7 +11,6 @@ import { version } from '../../../../../../package.json';
 import { AjaxService } from '../../../therapist/services/ajax.service';
 import { roleMainRoute, ROUTES } from '../../../routes';
 import { isMobileDevice, MOBILE_OR_SMALL_RESOLUTION } from '../../utils';
-import { environment } from '../../../../environments/environment';
 import { FeatureFlagService } from '../../services/feature-flag.service';
 
 @Component({
@@ -123,7 +122,7 @@ export class LoginPageComponent implements OnInit, OnDestroy {
           }
          else if(this.isMobile ===true && user?.isRTM===true && user?.role === 'patient'  && user?.isMobileModelOpen) { 
             this.router.navigate([`${roleMainRoute('MOBILE_POPUP')}`]);
-          } else if (user?.role === 'patient' && environment.rtmPopupFlag && user?.isPainModelOpen) {
+          } else if (user?.role === 'patient'  && user?.isPainModelOpen) {
             this.router.navigate([`${roleMainRoute('RTM')}`]);
           } else {
             if (user?.role === 'patient' && user?.isPainModelOpen===false && user?.isRTM===true) {
