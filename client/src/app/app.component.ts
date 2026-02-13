@@ -20,7 +20,6 @@ import { roleMainRoute, ROUTES } from './routes';
 import { AjaxService } from './therapist/services/ajax.service';
 import { PatientGeneralModalComponent } from './common/patient-general-modal/patient_general_modal.component';
 import { MOBILE_OR_SMALL_RESOLUTION } from './common/utils';
-import { environment } from '../environments/environment';
 import { FeatureFlagService } from './common/services/feature-flag.service';
 
 window.addEventListener('securitypolicyviolation', console.error.bind(console));
@@ -201,7 +200,7 @@ export class AppComponent implements OnInit, OnDestroy {
             return;
           } else if (userDataResult?.role === 'patient' && tncFlag && userDataResult?.date_agreed_terms) {
             this.router.navigate([`${roleMainRoute('TERMS_CONDITIONS')}`]);
-          } else if (userDataResult?.role === 'patient' && environment.rtmPopupFlag && userDataResult?.isPainModelOpen) {
+          } else if (userDataResult?.role === 'patient' && userDataResult?.isPainModelOpen) {
             this.router.navigate([`${roleMainRoute('RTM')}`]);
           } else this.router.navigate([`${roleMainRoute(userDataResult.role)}`]);
         }
