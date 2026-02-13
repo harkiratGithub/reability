@@ -173,7 +173,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
     }
     return false;
   };
-
+/*
   buildPatientActivities = (patientList: any) => {
     const patients = chain(patientList)
       .groupBy('id')
@@ -209,14 +209,14 @@ export class PatientListComponent implements OnInit, OnDestroy {
       .values()
       .uniqBy('id')
       .orderBy([(p) => (p.status === 'online' ? 1 : 0), (p) => new Date(p.lastLogin)], ['desc', 'desc'])
-      /*.orderBy(
-        [
-          (p) => (p.status === 'online' ? 1 : 0), // Online patients first
-          (p) => (p.created_at ? new Date(p.created_at) : new Date(p.lastLogin)), // Sort by created_at if no lastLogin        
-          (p) => (p.lastLogin ? 1 : 0),           // Patients with a lastLogin next
-        ],
-        ['desc', 'desc', 'desc'] // Descending for online status, descending for lastLogin existence, ascending by date
-        )*/
+      //.orderBy(
+       // [
+        //  (p) => (p.status === 'online' ? 1 : 0), // Online patients first
+        //  (p) => (p.created_at ? new Date(p.created_at) : new Date(p.lastLogin)), // Sort by created_at if no lastLogin        
+        //  (p) => (p.lastLogin ? 1 : 0),           // Patients with a lastLogin next
+       // ],
+       // ['desc', 'desc', 'desc'] // Descending for online status, descending for lastLogin existence, ascending by date
+       // )
       .value();
     patients.forEach((patient) => {
       for (let i = 0; i < this.lastWeekActivityArray.length; i++) {
@@ -272,7 +272,125 @@ export class PatientListComponent implements OnInit, OnDestroy {
     });
 
     return patients;
+  };*/
+
+  buildPatientActivities = (patientList: any) => {
+    const patients = chain(patientList)
+      .groupBy('id')
+      .mapValues((items) => ({
+        id: items[0].id,
+        fullName: items[0].full_name,
+        userName: items[0].user_name,
+        status: items[0].status,
+        lastLogin: items[0].logged_in_at,
+        created_at: items[0].created_at,
+  
+        gameSummary: head(
+          items
+            ?.filter((item) => Object.keys(item?.game_summary || {})?.length)
+            ?.map((item) => ({
+              start_time: item.start_time,
+              game_summary: item?.game_summary,
+              session_feedback: item?.session_feedback,
+            }))
+            ?.sort((a, b) => new Date(b?.start_time)?.getTime() - new Date(a?.start_time)?.getTime())
+        )?.game_summary,
+  
+        lastWeekActivity: [],
+        settingMenuOpen: this.checkIfSettingModalOpened(items[0]),
+        userId: items[0].user_id,
+        phone: items[0].phone,
+        contacts: items[0].contacts,
+        therapistSessionId: items[0].therapist_session_id,
+        isRTM: items[0].isRTM,
+      }))
+      .values()
+      .uniqBy('id')
+      .orderBy([(p) => (p.status === 'online' ? 1 : 0), (p) => new Date(p.lastLogin)], ['desc', 'desc'])
+      .value();
+  
+    patients.forEach((patient) => {
+      for (let i = 0; i < this.lastWeekActivityArray.length; i++) {
+  
+        const checkActivity = filter(
+          patientList,
+          (element) =>
+            element &&
+            element.start_time &&
+            element.start_time.includes(this.lastWeekActivityArray[i]) &&
+            element.id === patient.id
+        );
+  
+        const sumActivity = reduce(
+          checkActivity,
+          (acc, a) => {
+  
+            // ✅ PARSE game_summary JSON if needed
+            let summary = a.game_summary;
+            if (typeof summary === 'string') {
+              try {
+                summary = JSON.parse(summary);
+              } catch {}
+            }
+            
+            if (Number(a.therapist_id) === Number(this.therapistId)) {
+              console.log("====matching =======",a.therapist_id,acc);
+              //return acc; 
+            }
+            // ✅ THERAPIST FILTER (IMPORTANT)
+            if (Number(a.therapist_id) !== Number(this.therapistId)) {
+              console.log("====skipping =======",a.therapist_id,acc);
+              return acc; 
+            }
+  
+            if (!a.duration) {
+              return acc;
+            }
+  
+            acc.duration = addTwoDurationTimeTogether(acc.duration, a.duration);
+            acc.withTherapistSession = (a && a.therapist_session_id) || acc.withTherapistSession;
+  
+            const seconds = getSecondsFromTimeString(a.duration);
+            if (seconds < this.minDurationToShowOnTooltip) {
+              return acc;
+            }  
+            if (!this?.allGames || this?.allGames.length === 0) {
+              return acc;
+            }  
+            const game = this?.allGames.find((game) => game.id === a.game_id);
+            if (!game) {
+              return acc;
+            }  
+            const gameName = game ? game.name : a.game_id.toString();
+            const sessionFeedback = a.session_feedback;
+            const gameSummary = summary;  
+            const gameDuration = acc.gamesDuration.find((g) => g.gameName === gameName);
+            if (gameDuration) {
+              gameDuration.duration = addTwoDurationTimeTogether(gameDuration.duration, a.duration);
+            } else {
+              acc.gamesDuration.push({
+                gameName,
+                duration: a.duration,
+                gameSummary,
+                sessionFeedback,
+              });
+            }
+  
+            return acc;
+          },
+          { duration: '00:00:00', withTherapistSession: false, gamesDuration: [] }
+        );
+  
+        sumActivity.duration = sumActivity.duration === '00:00:00' ? '' : sumActivity.duration;
+        patient.lastWeekActivity[i] = sumActivity;
+      }
+  
+      this.getPatientRecentGameActivity(patient);
+    });
+  
+    return patients;
   };
+  
 
   getPeerStatusColor = (status: any) => {
     switch (status) {
@@ -505,15 +623,16 @@ export class PatientListComponent implements OnInit, OnDestroy {
     return `${contact.full_name}: ${contact.phone}`;
   };
 
-  openLogModal = (patientId: any) => {
+ /* openLogModal = (patientId: any) => {
     this.isLogModalOpen = true;
     this.shownLogs[patientId] = true;
     this.selectedPatientId = patientId;
 
     const selectedPatient = this.patientListFiltered.find((patient) => patient.userId === patientId);
-    console.log("===========selectedPatient===============",selectedPatient);
-    const gameMap = new Map<string, any[]>();
 
+    const gameMap = new Map<string, any[]>(); 
+    console.log("========selectedpatient========",selectedPatient); 
+    console.log("==========currenttherapist========",this.therapistId);
     if (selectedPatient && selectedPatient.lastWeekActivity) {
       selectedPatient.lastWeekActivity.forEach((activity: { gamesDuration: any[] }) => {
         activity.gamesDuration.forEach(
@@ -543,7 +662,63 @@ export class PatientListComponent implements OnInit, OnDestroy {
         showMore: false,
       };
     });
+  };*/
+
+  openLogModal = (patientId: any) => {
+    this.isLogModalOpen = true;
+    this.shownLogs[patientId] = true;
+    this.selectedPatientId = patientId;
+    const selectedPatient = this.patientListFiltered.find(
+      (patient) => patient.userId === patientId
+    );  
+    const gameMap = new Map<string, any[]>();  
+    console.log("Selected Patient:", selectedPatient);
+    console.log("Current Therapist ID:", this.therapistId);  
+    if (selectedPatient && selectedPatient.lastWeekActivity) {
+      selectedPatient.lastWeekActivity.forEach((activity: { gamesDuration: any[] }) => {  
+        activity.gamesDuration.forEach((game: any) => {  
+          // therapist filter
+          const therapistIdFromGame = Number(game?.gameSummary?.therapist_id);
+          if (therapistIdFromGame !== Number(this.therapistId)) {
+           // return;
+          }  
+          // ✅ Clone summary to avoid mutating original object
+          const filteredSummary = game?.gameSummary
+            ? JSON.parse(JSON.stringify(game?.gameSummary))
+            : null;
+  
+          // ✅ Remove checkpoints array
+          if (filteredSummary?.CheckpointsArray) {
+            delete filteredSummary.CheckpointsArray;
+          }  
+          if (!gameMap.has(game.gameName)) {
+            gameMap.set(game.gameName, []);
+          }  
+          gameMap.get(game.gameName)?.push({
+            duration: game?.duration,
+            gameSummary: filteredSummary, // ✅ cleaned summary
+            sessionFeedback: game?.sessionFeedback?.questions,
+            date: game?.date || filteredSummary?.date
+          });
+  
+        });
+  
+      });
+    }
+    this.patientLog = Array.from(gameMap.entries()).map(([gameName, sessions]) => {
+      sessions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());  
+      const latestSession = sessions[0];
+      const remainingSessions = sessions.slice(1);  
+      return {
+        gameName,
+        latestSession,
+        remainingSessions,
+        showMore: false,
+      };
+    });  
+    console.log("Filtered patientLog:", this.patientLog);
   };
+  
 
   objectKeys = Object.keys;
 

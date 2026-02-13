@@ -391,7 +391,7 @@ export const getPatientsActivitiesData = async (patientId, startTime, endTime) =
 	const patientDetails = await BaseModel.runQuery(getPatientDetails);
 	return patientDetails.rows;
 };
-
+/*
 export const getPatientRelevantSessions = async (patientIds: number[], startTime: string, endTime: string) => {
 	const patientIdsStr = patientIds.join(',');
 	const newEndTime = endTime + ' 23:59:59';
@@ -413,8 +413,8 @@ export const getPatientRelevantSessions = async (patientIds: number[], startTime
 		.toParam();
 	const result = await BaseModel.runQuery(getPatientSessions);
 	return result.rows;
-};
-/*
+};*/
+
 export const getPatientRelevantSessions = async (
 	patientIds: number[],
 	startTime: string,
@@ -432,19 +432,21 @@ export const getPatientRelevantSessions = async (
 	  .field(`${TABLE_NAME.GAME_SESSION}.game_summary`)
 	  .field(`${TABLE_NAME.GAME_SESSION}.session_feedback`)
 	  .field(`${TABLE_NAME.GAME_SESSION}.therapist_session_id`)
-	  .field(`ts.therapist_id`) // ✅ therapist id
+	  .field(`ts.therapist_id`) // ✅ therapist_id (NULL if no match)
   
 	  .from(TABLE_NAME.GAME_SESSION)
+  
+	  // ✅ LEFT JOIN therapist_session
 	  .left_join(
-		'${TABLE_NAME.THERAPIST_SESSION}',
+		TABLE_NAME.THERAPIST_SESSION, // or 'therapist_session'
 		'ts',
 		`ts.id = ${TABLE_NAME.GAME_SESSION}.therapist_session_id`
 	  )
   
 	  .where(
-		`patient_id IN (${patientIdsStr}) 
-		 AND (${TABLE_NAME.GAME_SESSION}.start_time >= ? 
-		 AND ${TABLE_NAME.GAME_SESSION}.start_time <= ?)`,
+		`${TABLE_NAME.GAME_SESSION}.patient_id IN (${patientIdsStr})
+		 AND ${TABLE_NAME.GAME_SESSION}.start_time >= ?
+		 AND ${TABLE_NAME.GAME_SESSION}.start_time <= ?`,
 		startTime,
 		newEndTime
 	  )
@@ -452,7 +454,8 @@ export const getPatientRelevantSessions = async (
   
 	const result = await BaseModel.runQuery(getPatientSessions);
 	return result.rows;
-  };*/
+  };
+  
 
 export const updatePatientCameraAvailability = async (id, has_camera, client = null) => {
 	const query = squelPostgres
