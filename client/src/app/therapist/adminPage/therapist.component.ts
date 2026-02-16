@@ -638,7 +638,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
     if (!isPatientVideoInSession) {
       this.webRtcService.privateMessage(user.peerId, { type: 'hang_up_session' }, this.connectedPaitents);
       // Update the session type to null if the call is hung up
-      this.ajax.updateStartSessionWithPatient(user.peerId, null);
+      this.ajax.updateStartSessionWithPatient(user.peerId, 'hang_up');
     }
     setTimeout(() => {
       if (user === this.selectedUser) {
@@ -1050,7 +1050,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
           (activeCall) => activeCall['call'].peer === therapistCall.peer
         )
       ) {
-        this.ajax.updateStartSessionWithPatient(patientPeerId);
+        this.ajax.updateStartSessionWithPatient(patientPeerId, 'connected');
         if (user.notification_email) {
           this.sendEmailAfterConnection(user);
         }

@@ -35,7 +35,8 @@ export const TABLE_NAME = {
 	GAME_METADATA: 'game_metadata',
 	PATIENT_METADATA: 'patient_metadata',
 	SERVER_LOG: 'server_log',
-	RTM: 'rtm'
+	RTM: 'rtm',
+	SESSION_LOG: 'session_log',
 };
 
 export const TABLE_SEQUENCE = {

@@ -3,17 +3,34 @@ import * as UserModel from '../models/users.model';
 import * as Helper from '../services/util.helper';
 import { delayedHeartbeat } from '../../constants/heartbeat';
 import * as RtmHelper from '../helpers/rtm.helper';
+import * as SessionLogModel from '../models/session-log.model';
 
 export const createTherapistSession = async (userId, therapistId, type = null) => {
 	console.log('userId', userId);
 	const newDbTime = Helper.createTimeForDb();
 	const patient = await UserModel.getUserDetails(userId);
+	const patientId = patient[0].id;
+	const status = type || 'connected';
+	try {
+		await SessionLogModel.create({
+			peer_id: Number(userId),
+			therapist_id: Number(therapistId),
+			patient_id: Number(patientId),
+			status,
+		});
+	} catch (e) {
+		console.error('Failed to create session_log entry', e);
+	}
+	if (type === 'hang_up') {
+		return;
+	}
+
 	const checkLastTherapistPatientSession = await TherapistSessionModel.getLastTherapistPatientSession(
-		patient[0].id,
+		patientId,
 		therapistId
 	);
 	const checkLastTherapistRingingPatientSession = await TherapistSessionModel.getLastTherapistRingingPatientSession(
-		patient[0].id,
+		patientId,
 		therapistId
 	);
 	// prevent from create two times in a row...
@@ -42,7 +59,7 @@ export const createTherapistSession = async (userId, therapistId, type = null) =
 		// futureTime.setSeconds(futureTime.getSeconds() + 30); // 30 seconds timeout for ringing
 
 		therapistSessionData = await TherapistSessionModel.create({
-			patient_id: patient[0].id,
+			patient_id: patientId,
 			therapist_id: therapistId,
 			start_time: newDbTime,
 			end_time: newDbTime,
@@ -50,7 +67,7 @@ export const createTherapistSession = async (userId, therapistId, type = null) =
 		});
 	} else {
 		therapistSessionData = await TherapistSessionModel.create({
-			patient_id: patient[0].id,
+			patient_id: patientId,
 			therapist_id: therapistId,
 			start_time: newDbTime,
 			end_time: newDbTime,
