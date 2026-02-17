@@ -99,7 +99,9 @@ export class LoginPageComponent implements OnInit, OnDestroy {
           });
         }
         // Find the feature flag   
-        await this.loadFeatureFlags(user.id, user.role); 
+        if (['patient', 'therapist'].includes(user.role)) {
+          await this.loadFeatureFlags(user.id, user.role);
+        }
         this.appActions.setTherapist(user?.isTherapist);
         this.authenticationService.updateUser(user);          
         if (['admin'].includes(user.role)) {
