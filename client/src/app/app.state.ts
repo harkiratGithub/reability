@@ -26,6 +26,7 @@ export interface IGlobalState {
   stopTimer: boolean;
   score: IScore;
   showTimer: boolean;
+  gameSessionToken?: string;
   sessions: ISessionState[];
   playerFlag: string;
   isTherapist: boolean;
@@ -65,6 +66,7 @@ export const INITIAL_STATE_GLOBAL = {
     value: 0,
   },
   showTimer: false,
+  gameSessionToken: undefined,
   sessions: [],
   playerFlag: 'single',
   isTherapist: false,

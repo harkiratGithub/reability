@@ -82,7 +82,7 @@
           'patient-video-enlarge-video': enlargeVideo,
           'hide-video': !showLocalVideo || !this.currentUser.disabledSkeleton,
           'disabled-skeleton': this.currentUser.disabledSkeleton
-        }" class="patient-video" width="257" height="200" muted autoplay playsinline></video>
+        }" class="patient-video" width="257" height="200" muted autoplay playsinline #cameraElement></video>
 
       <div *ngIf="receivedRemoteVideo && connectionLost" class="no-camera-message">{{ connection_error_message }}</div>
       <div *ngIf="isCameraCheckComplete && !userHasCamera" class="patient-no-camera-message">
@@ -100,11 +100,7 @@
           'patient-video-enlarge-video': enlargeVideo,
           'hide-video': (!showLocalVideo || !showPatientVideo || !displaySkeleton)
         }" width="257" height="192" class="patient-canvas"></canvas>
-      <!-- <canvas #canvasElement2 [ngClass]="{
-          'patient-video-regular-video': !enlargeVideo,
-          'patient-video-enlarge-video': enlargeVideo
-        }" [ngStyle]="{ 'display': gameId == 3 ? 'inline-block' : 'none' }" width="257" height="192" class="patient-canvas"></canvas> -->
-      <!-- <canvas [ngStyle]="{ 'display': gameId == 3 ? 'inline-block' : 'none' }" #canvasElement2 style="width: 100%;transform: scaleX(-1);min-height: 30vh;height: auto;border-radius: 10px;object-fit: fill;"></canvas> -->
+      <canvas #canvasElement2 width="257" height="192" class="patient-canvas" style="display: none;"></canvas>
 
       <div *ngIf="trackBody && showAngles" class="angles">
         <div *ngFor="let organAngle of organAngles; let i = index" [ngClass]="{ 'angle-left': i % 2 === 0, 'angle-right': i % 2 !== 0 }">

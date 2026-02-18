@@ -21,6 +21,7 @@ export class AppActions {
   static SET_THERAPIST = 'set_therapist';
   static SET_LOGGED_IN_USER = 'set_logged_in_user';
   static SET_CURRENT_GAME = 'set_current_game';
+  static SET_GAME_TOKEN = 'set_game_token';
   static OPEN_CALL_MODAL = 'open_call_modal';
   static CLOSE_CALL_MODAL = 'close_call_modal';
   static SET_CURRENT_GAME_FROM_THERAPIST = 'set_current_game_from_therapist';
@@ -135,6 +136,13 @@ export class AppActions {
     this.ngRedux.dispatch({
       type: AppActions.SET_CURRENT_GAME,
       payload: game,
+    });
+  };
+
+  setGameToken = (data) => {
+    this.ngRedux.dispatch({
+      type: AppActions.SET_GAME_TOKEN,
+      payload: data,
     });
   };
 

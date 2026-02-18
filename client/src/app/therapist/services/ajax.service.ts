@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { tap, shareReplay, finalize } from 'rxjs/operators';
 import { Moment } from 'moment';
 import _ from 'lodash';
 import { HttpParams } from '@angular/common/http';
@@ -14,6 +15,17 @@ export class AjaxService {
   baseUrl: string;
   signalingServerUrl: string;
   latestUserGameData: [];
+
+  // Simple in-memory cache + in-flight deduplication for validGames
+  private validGamesCache = new Map<string, { ts: number; data: any }>();
+  private validGamesInflight = new Map<string, Observable<any>>();
+  private lastValidGamesCallAt = new Map<string, number>();
+  private readonly VALID_GAMES_TTL_MS = 300_000; // 5m cache
+  private readonly VALID_GAMES_MIN_INTERVAL_MS = 2000; // 2s min interval per patient
+  private floodWindowStart = 0;
+  private floodIdsInWindow = new Set<string>();
+  private readonly FLOOD_WINDOW_MS = 1000; // 1s window
+  private readonly FLOOD_MAX_DISTINCT_IDS = 15; // if >15 distinct ids in 1s → short-circuit
 
   constructor(private http: HttpClient) {
     this.baseUrl = environment.production ? '' : environment.serverUrl;
@@ -72,6 +84,10 @@ export class AjaxService {
   logout = () => {
     return this.http.post<any>(`${this.baseUrl}/logout`, {});
   };
+
+  getVideoFiles = () => {
+    return this.http.get<string[]>(`${this.baseUrl}/api/videos`);
+  }
 
   checkIsAuthenticate = () => {
     return this.http.get<any>(`${this.baseUrl}/users/isAuthenticated`, {});
@@ -144,20 +160,75 @@ export class AjaxService {
   // this route is exception, it's for patient, but therapist use it also
   getValidGames = (id) => {
     try {
-      return this.http.post<any>(`${this.baseUrl}/patient/validGames`, {
-        patientId: id,
-      });
+      if (id === null || id === undefined) {
+        return of([]);
+      }
+      const key = String(id);
+      const now = Date.now();
+
+      // Serve fresh-enough cache
+      const cached = this.validGamesCache.get(key);
+      if (cached && now - cached.ts < this.VALID_GAMES_TTL_MS) {
+        return of(cached.data);
+      }
+
+      // Coalesce concurrent requests
+      const inflight = this.validGamesInflight.get(key);
+      if (inflight) {
+        return inflight;
+      }
+
+      // Throttle bursts within a small window using cache if present (even if stale)
+      const lastAt = this.lastValidGamesCallAt.get(key) || 0;
+      if (now - lastAt < this.VALID_GAMES_MIN_INTERVAL_MS && cached) {
+        return of(cached.data);
+      }
+      this.lastValidGamesCallAt.set(key, now);
+
+      // Global flood protection across distinct patient IDs
+      if (now - this.floodWindowStart > this.FLOOD_WINDOW_MS) {
+        this.floodWindowStart = now;
+        this.floodIdsInWindow.clear();
+      }
+      this.floodIdsInWindow.add(key);
+      if (this.floodIdsInWindow.size > this.FLOOD_MAX_DISTINCT_IDS) {
+        // Too many distinct ids requested at once → return cache or empty to prevent API storm
+        if (cached) {
+          return of(cached.data);
+        }
+        return of([]);
+      }
+
+      const req$ = this.http
+        .post<any>(`${this.baseUrl}/patient/validGames`, { patientId: id })
+        .pipe(
+          tap((data) => {
+            this.validGamesCache.set(key, { ts: Date.now(), data });
+          }),
+          finalize(() => {
+            this.validGamesInflight.delete(key);
+          }),
+          shareReplay(1)
+        );
+      this.validGamesInflight.set(key, req$);
+      return req$;
     } catch (err) {
       console.error(err);
     }
   };
 
   getAllGames() {
-    return this.http.get<any[]>(`${this.baseUrl}/therapist/games`);
+    return this.http.get<any[]>(`${this.baseUrl}/common/games`);
   }
 
   getAllEndGames() {
     return this.http.get<any[]>(`${this.baseUrl}/patient/games`);
+  }
+
+  getFeatureFlag(userId: string | number, role: string) {
+    const normalizedRole = (role || '').toLowerCase();
+    const routePrefix = normalizedRole === 'therapist' ? 'therapist' : 'patient';
+    return this.http.get<any>(`${this.baseUrl}/${routePrefix}/getFeatureFlag/${String(userId)}/${role}`);
   }
 
   addGameToPatient = (patientId, gameId) => {
@@ -233,7 +304,7 @@ export class AjaxService {
 
   getPatientEndActivities = (startTime, endTime) => {
     try {
-      return this.http.post<any>(`${this.baseUrl}/patient/getPatientDataList`, {
+      return this.http.post<any>(`${this.baseUrl}/common/getPatientDataList`, {
         startTime,
         endTime,
       });
@@ -364,10 +435,10 @@ export class AjaxService {
     }
   };
 
-  updateGameSummary = (gameSummary) => {
+  updateGameSummary = ({gameSummary,token}) => {
     try {
       return this.http.post<any>(`${this.baseUrl}/patient/gameSession/updateSession`, {
-        gameSummary,
+        gameSummary,token,
       });
     } catch (err) {
       console.error(err);
@@ -397,7 +468,7 @@ export class AjaxService {
     }
   };
 
-  saveGameSettingsFromTherapist = (patientId, gameId, settings) => {
+  /*saveGameSettingsFromTherapist = (patientId, gameId, settings) => {
     try {
       this.http
         .post<any>(`${this.baseUrl}/therapist/gameSettings/saveNewGameSettings`, {
@@ -409,7 +480,7 @@ export class AjaxService {
     } catch (err) {
       console.error(err);
     }
-  };
+  };*/
 
   getConnectedPeers = () => {
     try {
@@ -735,17 +806,110 @@ export class AjaxService {
     }
   };
 
+  uploadCallAudioSession(file: File, patientId: number, therapistId: number): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file, file.name);
+    formData.append('patient_id', String(patientId));
+    formData.append('therapist_id', String(therapistId));  
+    return this.http.post<any>(`${this.baseUrl}/patient/gameactivities/uploadcallaudiofile`, formData);
+  }
+
+  getLastCallSummary = (patientId: number, therapistId: number) =>{
+    try {
+      return this.http.get<any>(`${this.baseUrl}/therapist/get-last-call-summary/${patientId}/${therapistId}`);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  getDailyCallSummary = (patientId: number, therapistId: number , date: string) =>{
+    try {
+      return this.http.get<any>(`${this.baseUrl}/therapist/get-daily-call-summary/${patientId}/${therapistId}/${date}`);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  saveGameSettingsFromTherapist = (
+    patientId,
+    gameId,
+    settings?: any,    
+    compSetting?: any   
+  ) => {
+    try {
+      const payload: any = { patientId, gameId };  
+      if (settings !== undefined) {
+        payload.settings = settings;
+      }  
+      if (compSetting !== undefined) {
+        payload.compSetting = compSetting;
+      }  
+     return  this.http.post<any>(`${this.baseUrl}/therapist/gameSettings/saveNewGameSettings`, payload)
+        .subscribe(() => { });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+
+
+  addCompensationSettings = (patientId,therapistId,allGames,compSettings) => {
+    try {
+      return this.http.post<any>(`${this.baseUrl}/therapist/compensation/add`, {
+        patientId,therapistId,allGames,compSettings
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  getCompSettings = (gameId, patientId) => {
+    try {
+      return this.http.post<any>(`${this.baseUrl}/therapist/getCompSettings`, {
+        gameId,
+        patientId,
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  getCompSettingsFromPatient = (gameId, patientId) => {
+    try {
+      return this.http.post<any>(`${this.baseUrl}/patient/getCompSettings`, {
+        gameId,
+        patientId,
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  
+  getCompThresholdValue(): Observable<{ compThresholds: any }> {
+    try {
+      return this.http.get<{ compThresholds: any }>(`${this.baseUrl}/patient/getCompThreshold`);
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  }
+ 
+  getScoreData = (patientId: number, gameId: number, fromDate: string, toDate: string): Observable<any> => {
+    try {
+      return this.http.post<any>(`${this.baseUrl}/therapist/getScoreData`, {
+        patientId,
+        gameId,
+        fromDate,
+        toDate,
+      });
+    } catch (err) {
+      console.error('Error fetching score data:', err);
+      throw err;
+    }
+  };
   clearRingingStatus(patientId: number) {
     try {
        return this.http.post<any>(`${this.baseUrl}/patient/clearRinging`, { patientId });
-    } catch (err) {
-      console.error(err);
-    } 
-  }
-  getFeatureFlag(id: string, role: string) {
-    const apiRole = role === 'therapist' ? 'therapist' : 'patient';
-    try {
-      return this.http.get<any>(`${this.baseUrl}/${apiRole}/getFeatureFlag/${id}/${role}`);
     } catch (err) {
       console.error(err);
     } 

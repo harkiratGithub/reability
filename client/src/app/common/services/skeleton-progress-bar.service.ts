@@ -2,18 +2,20 @@ import { Injectable, ElementRef } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SkeletonProgressBarService {
   private thumbUp = new BehaviorSubject<string | null>(null);
   private finalScore = new BehaviorSubject<string | null>(null);
   private progressBar = new BehaviorSubject<string | null>(null);
   private showProgressBar = new BehaviorSubject<string | null>(null);
+  private showProgressBarSummaryData = new BehaviorSubject<Array<any> | object | null>(null);
 
   thumbUpElement$ = this.thumbUp.asObservable();
   scoreElement$ = this.finalScore.asObservable();
   progressBarElement$ = this.progressBar.asObservable();
   showProgressBarElement$ = this.showProgressBar.asObservable();
+  showProgressBarSummaryDataElement$ = this.showProgressBarSummaryData.asObservable();
 
   setThumbUpElement(data: string | null): void {
     this.thumbUp.next(data);
@@ -29,5 +31,9 @@ export class SkeletonProgressBarService {
 
   setShowProgressBar(data: string | null): void {
     this.showProgressBar.next(data);
+  }
+
+  setshowProgressBarSummaryData(data: Array<any> | object): void {
+    this.showProgressBarSummaryData.next(data);
   }
 }
