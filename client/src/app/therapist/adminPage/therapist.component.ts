@@ -1036,10 +1036,20 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
     }, 1500);
   };
 
+  clearRingingStatusOfPatient(patientId) {
+    console.log("====patient_id====",patientId);
+    this.ajax.therapistClearRingingStatus(patientId).subscribe(
+      () => console.log("Ringing type cleared"),
+      (err) => console.error("Failed to clear ringing type", err)
+    );
+  }
+
   handleCall = (therapistCall, user, patientPeerId) => {
     const timer = setTimeout(() => {
       user.waitingForSession = false;
       user.missedLastCall = true;
+      console.log("=========userid=====",user);
+      this.clearRingingStatusOfPatient(user.patientId);
       this.audioTracks = this.audioTracks.filter((track) => track.peer_id !== patientPeerId);
       this.hangUpSession(user);
     }, TIME_TO_ANSWER_CALL_MS + 5000);

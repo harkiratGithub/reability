@@ -225,12 +225,6 @@ export class AjaxService {
     return this.http.get<any[]>(`${this.baseUrl}/patient/games`);
   }
 
-  getFeatureFlag(userId: string | number, role: string) {
-    const normalizedRole = (role || '').toLowerCase();
-    const routePrefix = normalizedRole === 'therapist' ? 'therapist' : 'patient';
-    return this.http.get<any>(`${this.baseUrl}/${routePrefix}/getFeatureFlag/${String(userId)}/${role}`);
-  }
-
   addGameToPatient = (patientId, gameId) => {
     try {
       this.http
@@ -910,6 +904,21 @@ export class AjaxService {
   clearRingingStatus(patientId: number) {
     try {
        return this.http.post<any>(`${this.baseUrl}/patient/clearRinging`, { patientId });
+    } catch (err) {
+      console.error(err);
+    } 
+  }
+  therapistClearRingingStatus(patientId: number) {
+    try {
+       return this.http.post<any>(`${this.baseUrl}/therapist/clearRinging`, { patientId });
+    } catch (err) {
+      console.error(err);
+    } 
+  }
+  getFeatureFlag(id: string, role: string) {
+    const apiRole = role === 'therapist' ? 'therapist' : 'patient';
+    try {
+      return this.http.get<any>(`${this.baseUrl}/${apiRole}/getFeatureFlag/${id}/${role}`);
     } catch (err) {
       console.error(err);
     } 
