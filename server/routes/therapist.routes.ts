@@ -80,4 +80,5 @@ router.get('/rtm-details', PatientController.getAllRTMDetails);
 router.post('/save-rustdesk-id', PatientController.updatePatientRustdeskId);
 router.get('/get-rustdesk-id/:patientId', PatientController.getPatientRustdeskId);
 router.get('/getFeatureFlag/:id/:role', UserController.getFeatureFlag);
+router.post('/clearRinging', UserController.clearRingingStatus);
 export default router;

@@ -742,6 +742,13 @@ export class AjaxService {
       console.error(err);
     } 
   }
+  therapistClearRingingStatus(patientId: number) {
+    try {
+       return this.http.post<any>(`${this.baseUrl}/therapist/clearRinging`, { patientId });
+    } catch (err) {
+      console.error(err);
+    } 
+  }
   getFeatureFlag(id: string, role: string) {
     const apiRole = role === 'therapist' ? 'therapist' : 'patient';
     try {
