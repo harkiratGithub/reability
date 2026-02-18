@@ -324,7 +324,6 @@ export class PatientListComponent implements OnInit, OnDestroy {
         const sumActivity = reduce(
           checkActivity,
           (acc, a) => {
-  
             // ✅ PARSE game_summary JSON if needed
             let summary = a.game_summary;
             if (typeof summary === 'string') {
@@ -342,7 +341,30 @@ export class PatientListComponent implements OnInit, OnDestroy {
               console.log("====skipping =======",a.therapist_id,acc);
               return acc; 
             }
-  
+
+            // ✅ GET LAST CLEAR TIME
+            const clearKey = `LAST_CLEAR_${this.therapistId}_${patient.userId}`;
+            const clearDataRaw = localStorage.getItem(clearKey);
+
+            if (clearDataRaw) {
+              try {               
+                const clearData = JSON.parse(clearDataRaw);
+                console.log("====lastdeletedtime====",clearData.deletedAt);
+                const deletedAt = new Date(clearData.deletedAt).getTime();
+                const dbTime = a.start_time;
+                const utcFormatted = dbTime.replace(' ', 'T') + 'Z';
+                const activityTime = new Date(utcFormatted).getTime();
+                console.log("===deletedAt===",deletedAt);
+                console.log("===activityTime===",activityTime);
+                if (activityTime <= deletedAt) {
+                  return acc;
+                }
+
+              } catch (e) {
+                console.log('Error parsing clear data');
+              }
+            }
+
             if (!a.duration) {
               return acc;
             }
@@ -391,6 +413,20 @@ export class PatientListComponent implements OnInit, OnDestroy {
     return patients;
   };
   
+  convertDbUtcToLocal(dbTime: string): string {
+    const utcString = dbTime.replace(' ', 'T') + 'Z';
+    const date = new Date(utcString);
+  
+    return date.toLocaleString('en-IN', {
+      year: 'numeric',
+      month: 'short',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    });
+  }
 
   getPeerStatusColor = (status: any) => {
     switch (status) {
@@ -673,7 +709,13 @@ export class PatientListComponent implements OnInit, OnDestroy {
     );  
     const gameMap = new Map<string, any[]>();  
     console.log("Selected Patient:", selectedPatient);
-    console.log("Current Therapist ID:", this.therapistId);  
+    console.log("Current Therapist ID:", this.therapistId); 
+    const clearKey = `LAST_CLEAR_${this.therapistId}_${patientId}`;   
+    const clearDataRaw = localStorage.getItem(clearKey);
+    if (clearDataRaw) {
+      const clearData = JSON.parse(clearDataRaw);
+      console.log("Logs last cleared at:", clearData.deletedAt);
+    } 
     if (selectedPatient && selectedPatient.lastWeekActivity) {
       selectedPatient.lastWeekActivity.forEach((activity: { gamesDuration: any[] }) => {  
         activity.gamesDuration.forEach((game: any) => {  
@@ -1078,7 +1120,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
   //   }
   // }
 
-  async copyToClipboard() {
+  /*async copyToClipboard() {
     try {
       if (!this.patientLog || !this.patientLog.length) {
         return;
@@ -1104,8 +1146,8 @@ export class PatientListComponent implements OnInit, OnDestroy {
           });
   
         if (game.latestSession) {
-          formattedGame += `Latest Session:\n`;
-  
+          //formattedGame += `Latest Session:\n`;
+          formattedGame += `\n`;
           Object.keys(game.latestSession)
             .filter((key) => key !== 'showMore')
             .forEach((key) => {
@@ -1173,7 +1215,8 @@ export class PatientListComponent implements OnInit, OnDestroy {
         return formattedGame;
       });
   
-      const formattedLog = formattedLogs.join('\n|** Game Logs **|\n\n');
+     // const formattedLog = formattedLogs.join('\n|** Game Logs **|\n\n');
+      const formattedLog = formattedLogs.join('\n\n');
       console.log('==Formatted Log==', formattedLog);
   
       await navigator.clipboard.writeText(formattedLog);
@@ -1184,19 +1227,169 @@ export class PatientListComponent implements OnInit, OnDestroy {
     } catch (e) {
       console.error('Failed to copy log to clipboard:', e.message || e);
     }
-  }
+  }*/
+
+    async copyToClipboard() {
+      try {
+        if (!this.patientLog || !this.patientLog.length) {
+          return;
+        }
+    
+        const toTitleCase = (str: string): string => {
+          return str
+            .replace(/([A-Z])/g, ' $1')
+            .toLowerCase()
+            .replace(/\b\w/g, (char) => char.toUpperCase())
+            .replace(/^game\s/i, ''); // ✅ Remove "Game " prefix
+        };
+    
+        const formatValue = (key: string, value: any) => {
+
+          // Only format real date fields
+          if (
+            typeof value === 'string' &&
+            ['date', 'createdAt', 'updatedAt', 'sessionDate'].includes(key)
+          ) {
+            return new Date(value).toLocaleString();
+          }
+        
+          return value;
+        };
+        
+    
+        const formattedLogs = this.patientLog.map((game) => {
+          let formattedGame = '';
+    
+          // Game Level Data
+          Object.keys(game)
+            .filter((key) => key !== 'showMore' && key !== 'latestSession')
+            .forEach((key) => {
+              const value = game[key];
+              if (value !== null && value !== undefined && typeof value !== 'object') {
+                formattedGame += `${toTitleCase(key)}: ${formatValue(key, value)}\n`;
+              }
+            });
+    
+          // ✅ Latest Session (WITHOUT printing "Latest Session:" row)
+          if (game.latestSession) {
+            Object.keys(game.latestSession)
+              .filter((key) => key !== 'showMore' && key !== 'gameSummary')
+              .forEach((key) => {
+                const value = game.latestSession[key];
+                if (value !== null && value !== undefined && typeof value !== 'object') {
+                  formattedGame += `${toTitleCase(key)}: ${formatValue(key, value)}\n`;
+                }
+              });
+    
+            if (
+              game.latestSession.gameSummary &&
+              Object.keys(game.latestSession.gameSummary).some(
+                (key) =>
+                  game.latestSession.gameSummary[key] !== null &&
+                  game.latestSession.gameSummary[key] !== undefined
+              )
+            ) {
+              Object.keys(game.latestSession.gameSummary)
+                .filter((key) => key !== 'showMore')
+                .forEach((key) => {
+                  const value = game.latestSession.gameSummary[key];
+                  if (value !== null && value !== undefined) {
+                    formattedGame += `${toTitleCase(key)}: ${formatValue(key, value)}\n`;
+                  }
+                });
+            }
+          }
+    
+          // Remaining Sessions
+          if (game.remainingSessions?.length) {
+            game.remainingSessions.forEach((session) => {
+              Object.keys(session)
+                .filter((key) => key !== 'showMore' && key !== 'gameSummary')
+                .forEach((key) => {
+                  const value = session[key];
+                  if (value !== null && value !== undefined && typeof value !== 'object') {
+                    formattedGame += `${toTitleCase(key)}: ${formatValue(key, value)}\n`;
+                  }
+                });
+    
+              if (
+                session.gameSummary &&
+                Object.keys(session.gameSummary).some(
+                  (key) =>
+                    session.gameSummary[key] !== null &&
+                    session.gameSummary[key] !== undefined
+                )
+              ) {
+                Object.keys(session.gameSummary)
+                  .filter((key) => key !== 'showMore')
+                  .forEach((key) => {
+                    const value = session.gameSummary[key];
+                    if (value !== null && value !== undefined) {
+                      formattedGame += `${toTitleCase(key)}: ${formatValue(key, value)}\n`;
+                    }
+                  });
+              }
+            });
+          }
+    
+          return formattedGame;
+        });
+    
+        // ✅ Removed |** Game Logs **|
+        const formattedLog = formattedLogs.join('\n\n');
+    
+        console.log('==Formatted Log==', formattedLog);
+    
+        await navigator.clipboard.writeText(formattedLog);
+        this.isLogModalOpen = false;
+        this.isCopiedToClipboard = true;
+    
+        console.log('Logs successfully copied to clipboard.');
+      } catch (e) {
+        console.error('Failed to copy log to clipboard:', e.message || e);
+      }
+    }
+    
   closeEraseLogModal = () => {
     this.isCopiedToClipboard = false;
   };
 
-  deletePatientLog = () => {
+ /* deletePatientLog = () => {
     const patient = this.patientListFiltered.find((patient: any) => patient.userId == this.selectedPatientId);
     patient.log = '';
     for (let game of this.gamesNames) {
+      console.log("====before remove===",this.selectedPatientId + '_' + game + PATIENT_LOG_STORAGE_KEY);
       localStorage.removeItem(this.selectedPatientId + '_' + game + PATIENT_LOG_STORAGE_KEY);
     }
     this.closeEraseLogModal();
+  };*/
+
+  deletePatientLog = () => {
+    //const now = new Date().toISOString();  
+    const utcString = new Date().toISOString();
+    const clearKey = `LAST_CLEAR_${this.therapistId}_${this.selectedPatientId}`;  
+    // ✅ Save erase info properly as JSON
+    localStorage.setItem(clearKey, JSON.stringify({
+      therapistId: this.therapistId,
+      patientId: this.selectedPatientId,
+      deletedAt: utcString
+    }));  
+    const patient = this.patientListFiltered.find(
+      (patient: any) => patient.userId == this.selectedPatientId
+    );  
+    if (patient) {
+      patient.log = '';
+    }  
+    for (let game of this.gamesNames) {
+      localStorage.removeItem(
+        this.selectedPatientId + '_' + game + PATIENT_LOG_STORAGE_KEY
+      );
+    }  
+     // ✅ Re-fetch & rebuild patient list
+    this.getPatientActivities();
+    this.closeEraseLogModal();
   };
+  
 
   prevGame() {
     if (this.selectedGameIndex > 0) {
