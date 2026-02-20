@@ -46,7 +46,6 @@ import { PatientScoreService } from 'src/app/common/services/patient-score.servi
 declare var LivekitClient: any;
 import { HttpClient } from '@angular/common/http';
 import e from 'cors';
-import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { AudioRecordingService } from '../../services/audio_recording.service';
 import { AlertService } from '../../../common/services/comp_alert.service';
 import { debounce } from 'lodash';

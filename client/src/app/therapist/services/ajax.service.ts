@@ -218,7 +218,7 @@ export class AjaxService {
   };
 
   getAllGames() {
-    return this.http.get<any[]>(`${this.baseUrl}/common/games`);
+    return this.http.get<any[]>(`${this.baseUrl}/therapist/games`);
   }
 
   getAllEndGames() {

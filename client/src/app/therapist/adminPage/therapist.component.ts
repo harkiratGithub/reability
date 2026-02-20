@@ -431,6 +431,27 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
           console.log("here here here");
           this.joinSession(this.selectedUser.peerId, this.selectedUser);
         }
+        if (onRingingCallSession.type === 'ringing') {
+          console.log('[Therapist Session] Clearing old ringing session');
+          this.clearRingingStatusOfPatient(this.selectedUser.patientId);
+          // 1️⃣ Clear ringing in backend
+          await this.ajax.updateStartSessionWithPatient(
+            this.selectedUser.peerId,
+            'hang_up'
+          );
+        
+          // 2️⃣ Small delay to let DB update
+          await new Promise(resolve => setTimeout(resolve, 300));        
+          // 3️⃣ Start fresh ringing session
+          this.ajax.updateStartSessionWithPatient(
+            this.selectedUser.peerId,
+            'ringing'
+          );  
+          this.isPatientOnRinging = 'calling';        
+          // 4️⃣ Join session again
+          this.joinSession(this.selectedUser.peerId, this.selectedUser);
+        }
+        
       }
       this.getSpanSize();
     }
@@ -439,7 +460,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
   async fetchLastSessionStatus(patientId: number) {
     try {
       const result = await this.ajax.getLastTherapistSessionStatus(patientId).toPromise();
-      this.isPatientOnRinging = result.type;
+      this.isPatientOnRinging = result.type;        
       return result;
     } catch (error) {
       return null;
@@ -1049,6 +1070,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       user.waitingForSession = false;
       user.missedLastCall = true;
       console.log("=========userid=====",user);
+      console.log("====4444444444====");
       this.clearRingingStatusOfPatient(user.patientId);
       this.audioTracks = this.audioTracks.filter((track) => track.peer_id !== patientPeerId);
       this.hangUpSession(user);
@@ -1060,6 +1082,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
           (activeCall) => activeCall['call'].peer === therapistCall.peer
         )
       ) {
+        console.log("====55555555====");
         this.ajax.updateStartSessionWithPatient(patientPeerId, 'connected');
         if (user.notification_email) {
           this.sendEmailAfterConnection(user);
@@ -1080,6 +1103,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     });
     therapistCall.on('close', () => {
+      console.log("====666666====");
       this.therapistActiveCalls = this.therapistActiveCalls.filter(
         // tslint:disable-next-line: no-string-literal
         (call) => call['call'].peer !== therapistCall.peer
@@ -1096,11 +1120,14 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       console.warn('Error: ', err);
       if (!err.message) {
         // this.handleCloseCall(therapistCall, user);
+        console.log("====777777====");
         this.hangUpSession(user);
       } else if (!err.message.includes('disconnected')) {
         // this.handleCloseCall(therapistCall, user);
+        console.log("====88888888====");
         this.hangUpSession(user);
       } else {
+        console.log("====999999====");
         const disconnectionInterval = setInterval(() => {
           if (!therapistCall.peerConnection || therapistCall.peerConnection.connectionState === 'failed') {
             this.hangUpSession(user);
