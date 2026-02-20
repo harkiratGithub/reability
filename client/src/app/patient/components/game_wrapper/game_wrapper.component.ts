@@ -1564,7 +1564,7 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
       return;
     }
     
-    const loaderUrl = 'Build/Grill_OB.loader.js';
+    const loaderUrl = 'https://grillgamedemo.z13.web.core.windows.net/Build/Grill_OB.loader.js';
     const script = document.createElement('script');
     script.src = loaderUrl;
     // removed debug log
@@ -1583,9 +1583,9 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
         
         // @ts-ignore
         createUnityInstance(canvas, {
-          dataUrl: 'https://grillgamedemo.z13.web.core.windows.net/Build/Grill_OB.data',
-          frameworkUrl: 'https://grillgamedemo.z13.web.core.windows.net/Build/Grill_OB.framework.js',
-          codeUrl: 'https://grillgamedemo.z13.web.core.windows.net/Build/Grill_OB.wasm',
+          dataUrl: 'https://grillgamedemo.z13.web.core.windows.net/Build/Grill_OB.data.gz',
+          frameworkUrl: 'https://grillgamedemo.z13.web.core.windows.net/Build/Grill_OB.framework.js.gz',
+          codeUrl: 'https://grillgamedemo.z13.web.core.windows.net/Build/Grill_OB.wasm.gz',
           streamingAssetsUrl: 'StreamingAssets',
           companyName: 'Reability',
           productName: 'Physiotherapy Game',
