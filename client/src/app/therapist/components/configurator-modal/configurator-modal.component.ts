@@ -35,8 +35,13 @@ export class ConfiguratorModalComponent implements OnInit, AfterViewInit {
   }*/
     constructor(
       public dialogRef: MatDialogRef<ConfiguratorModalComponent>,
-      private ajax: AjaxService){}
-
+      private ajax: AjaxService,
+      @Inject(MAT_DIALOG_DATA) public dialogData: DialogData
+    ) {
+      this.game = this.dialogData.game;
+      this.patient = this.dialogData.patient;
+      this.isGameConfiguratorInTherapistColorset = this.GAMES_WITH_THERAPIST_COLORSET.includes(this.game.name);
+    }
   getConfiguratorUrl(): string {
     try {
       const url: string = this.game?.url || '';
@@ -92,6 +97,7 @@ export class ConfiguratorModalComponent implements OnInit, AfterViewInit {
 
       const therapistMessage = {
         isTherapist: true,
+        peerId: this.patient.peerId,
         // pass-through original for reference, but game will read from game_settings
         patientSettings: normalizedSettings,
         // effective settings for Unity

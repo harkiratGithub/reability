@@ -357,7 +357,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
                 console.log("===deletedAt===",deletedAt);
                 console.log("===activityTime===",activityTime);
                 if (activityTime <= deletedAt) {
-                  return acc;
+                  //return acc;
                 }
 
               } catch (e) {
@@ -395,6 +395,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
                 duration: a.duration,
                 gameSummary,
                 sessionFeedback,
+                start_time: a.start_time
               });
             }
   
@@ -710,15 +711,28 @@ export class PatientListComponent implements OnInit, OnDestroy {
     const gameMap = new Map<string, any[]>();  
     console.log("Selected Patient:", selectedPatient);
     console.log("Current Therapist ID:", this.therapistId); 
-    const clearKey = `LAST_CLEAR_${this.therapistId}_${patientId}`;   
+    const clearKey = `LAST_CLEAR_${this.therapistId}_${patientId}`;
+    let deletedAt = null;    
     const clearDataRaw = localStorage.getItem(clearKey);
     if (clearDataRaw) {
       const clearData = JSON.parse(clearDataRaw);
-      console.log("Logs last cleared at:", clearData.deletedAt);
-    } 
+      deletedAt = new Date(clearData.deletedAt).getTime();
+    }
     if (selectedPatient && selectedPatient.lastWeekActivity) {
       selectedPatient.lastWeekActivity.forEach((activity: { gamesDuration: any[] }) => {  
         activity.gamesDuration.forEach((game: any) => {  
+          let activityTime = null;
+          if (game.start_time) {
+            const utcFormatted = game.start_time.replace(' ', 'T') + 'Z';
+            activityTime = new Date(utcFormatted).getTime();
+          }
+          
+          // ✅ Skip only old summaries
+          if (deletedAt && activityTime && activityTime <= deletedAt) {
+            return;
+          }
+          
+
           // therapist filter
           const therapistIdFromGame = Number(game?.gameSummary?.therapist_id);
           if (therapistIdFromGame !== Number(this.therapistId)) {

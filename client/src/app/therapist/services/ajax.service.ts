@@ -298,7 +298,7 @@ export class AjaxService {
 
   getPatientEndActivities = (startTime, endTime) => {
     try {
-      return this.http.post<any>(`${this.baseUrl}/common/getPatientDataList`, {
+      return this.http.post<any>(`${this.baseUrl}/patient/getPatientDataList`, {
         startTime,
         endTime,
       });
