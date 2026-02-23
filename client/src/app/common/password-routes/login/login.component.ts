@@ -124,9 +124,9 @@ export class LoginPageComponent implements OnInit, OnDestroy {
           }
          else if(this.isMobile ===true && user?.isRTM===true && user?.role === 'patient'  && user?.isMobileModelOpen) { 
             this.router.navigate([`${roleMainRoute('MOBILE_POPUP')}`]);
-          }/* else if (user?.role === 'patient'  && user?.isPainModelOpen) {
+          } else if (user?.role === 'patient'  && user?.isPainModelOpen) {
             this.router.navigate([`${roleMainRoute('RTM')}`]);
-          } */ else {
+          } else {
             if (user?.role === 'patient' && user?.isPainModelOpen===false && user?.isRTM===true) {
               this.patient_data =  this.ajax.getActivePatient(user?.patientId).subscribe((response)=>{
                 this.patient_data = response;
