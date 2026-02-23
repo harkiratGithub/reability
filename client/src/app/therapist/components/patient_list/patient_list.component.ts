@@ -782,6 +782,34 @@ export class PatientListComponent implements OnInit, OnDestroy {
     return Array.isArray(value);
   }
 
+  hasGameSummary(patient: any): boolean {
+    if (!patient?.lastWeekActivity) return false;
+  
+    return patient.lastWeekActivity.some(activity =>
+      activity?.gamesDuration?.some(game => {
+        const clearKey = `LAST_CLEAR_${this.therapistId}_${patient.userId}`;
+        const clearDataRaw = localStorage.getItem(clearKey);
+  
+        let deletedAt = null;
+        if (clearDataRaw) {
+          const clearData = JSON.parse(clearDataRaw);
+          deletedAt = new Date(clearData.deletedAt).getTime();
+        }
+  
+        if (!game.start_time) return false;
+  
+        const utcFormatted = game.start_time.replace(' ', 'T') + 'Z';
+        const activityTime = new Date(utcFormatted).getTime();
+  
+        if (deletedAt && activityTime <= deletedAt) {
+          return false;
+        }
+  
+        return true;
+      })
+    );
+  }
+
   getTotalDuration(games: any[]): string {
     let totalSeconds = 0;
 
