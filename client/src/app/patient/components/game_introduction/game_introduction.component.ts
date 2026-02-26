@@ -161,6 +161,15 @@ export class GameIntroductionComponent implements OnInit, OnChanges {
           // Video element doesn't exist yet, gradually increase progress
           this.loadingBarPercentage = Math.min(95, this.loadingBarPercentage + 5);
         }
+
+        // Final safety net: if we've reached 95% (with or without stream) and stay there,
+        // force completion after a short delay so the therapist UI never hangs.
+        if (this.loadingBarPercentage >= 95 && !this.stuckAt95Timeout) {
+          this.stuckAt95Timeout = setTimeout(() => {
+            this.loadingBarPercentage = 100;
+            this.stuckAt95Timeout = null;
+          }, 4000);
+        }
       } else if (this.introTypes.length > 0) {
         // Normal iframe game behavior
         if (!this.gotGameSettings) {

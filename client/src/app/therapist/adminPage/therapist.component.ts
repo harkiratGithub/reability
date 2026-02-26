@@ -97,6 +97,8 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
   videoSessionDisplay = false;
   currentUserInFullScreenVideoSession;
   otherSideLeftSession = false;
+  // Store separate overlay streams coming from dedicated Grill canvas MediaConnections
+  private grillOverlayStreams: { [peerId: string]: MediaStream } = {};
   mediaStreamConstraints = {
     video: true,
     audio: { echoCancellation: true },
@@ -754,6 +756,48 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       iframeEl = document.getElementById('games-iframe-wrapper-' + conn.connectionId);
     }
     switch (data.type) {
+      case 'grill_canvas_active':
+        try {
+          const connectedPaitent = this.connectedPaitents.find((p) => p.connection.peer === conn.peer);
+          if (connectedPaitent) {
+            connectedPaitent.unityCanvasActive = !!data.active;
+            // If canvas became active and Grill is shown, attempt attach immediately
+            if (connectedPaitent.unityCanvasActive && (connectedPaitent.gameId === 20 || connectedPaitent.gameName?.toLowerCase() === 'grill')) {
+              // The loading screen will be hidden in attachStreamToGrillArea when video has dimensions
+              setTimeout(() => this.attachStreamToGrillArea(conn.peer, connectedPaitent.connection.connectionId), 200);
+            } else {
+              // Canvas became inactive (game is quitting)
+              if ((connectedPaitent.gameId === 20 || connectedPaitent.gameName?.toLowerCase() === 'grill') && !data.active) {
+                (connectedPaitent as any).grillGameQuitting = true;
+                connectedPaitent.isGameShown = false;
+              }
+              // Ensure overlay is hidden if canvas not active
+              const grillVideoEl = document.getElementById('grill-video-' + connectedPaitent.connection.connectionId) as HTMLVideoElement | null;
+              if (grillVideoEl) {
+                try { (grillVideoEl as any).srcObject = null; } catch (_) {}
+                grillVideoEl.style.display = 'none';
+                grillVideoEl.style.visibility = 'hidden';
+                grillVideoEl.style.opacity = '0';
+              }
+              // Clear any stale expected canvas id and cached overlay stream on deactivate
+              try { (connectedPaitent as any).expectedCanvasTrackId = null; } catch (_) {}
+              try { delete this.grillOverlayStreams[conn.peer]; } catch (_) {}
+            }
+          }
+        } catch (_) {}
+        break;
+      case 'grill_canvas_id':
+        try {
+          const connectedPaitent = this.connectedPaitents.find((p) => p.connection.peer === conn.peer);
+          if (connectedPaitent && data.id) {
+            (connectedPaitent as any).expectedCanvasTrackId = data.id;
+            // Try immediate attach if Grill active
+            if (connectedPaitent.unityCanvasActive && (connectedPaitent.gameId === 20 || connectedPaitent.gameName?.toLowerCase() === 'grill')) {
+              setTimeout(() => this.attachStreamToGrillArea(conn.peer, connectedPaitent.connection.connectionId), 150);
+            }
+          }
+        } catch (_) {}
+        break;
       case 'game_state':
         if (data.payload.type && data.payload.type === 'menu-options') {
           this.connectedPaitents = handleGameLobbyStateMessage(this.connectedPaitents, data, conn);
@@ -1715,6 +1759,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
         }
       }, 1000);
     });
+    // Handle generic PeerJS errors
     this.therapistPeer.on('error', (err) => {
       console.warn(err);
       if (err.message && err.message.includes('Lost connection to server')) {
@@ -1729,6 +1774,159 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
           this.handleTherapistPeer();
         }, 2000);
       }
+    });
+
+    // Accept inbound MediaConnections (e.g., dedicated Grill canvas stream)
+    this.therapistPeer.on('call', (incomingCall: any) => {
+      const metadata = (incomingCall as any)?.metadata || incomingCall?.metadata;
+      try { console.log('[GRILL] inbound call metadata:', metadata); } catch (_) {}
+
+      // Canvas call received - use existing game_introduction component for loading screen
+      if (metadata === 'grill_canvas') {
+        const connectedPaitent = this.connectedPaitents.find((p) => p.connection.peer === incomingCall.peer);
+        if (!connectedPaitent) {
+          try { console.warn('[GRILL] Canvas call received but connectedPaitent not found for peer:', incomingCall.peer); } catch (_) {}
+        }
+      }
+
+      // Answer without sending local stream
+      try {
+        incomingCall.answer();
+      } catch (_) {
+        try {
+          incomingCall.answer(undefined);
+        } catch {
+          return;
+        }
+      }
+
+      incomingCall.on('stream', (stream: MediaStream) => {
+        try { console.log('[GRILL] inbound canvas stream received from', incomingCall.peer); } catch (_) {}
+
+        // Always store the stream in grillOverlayStreams, even if connectedPaitent is not found yet
+        const oldStream = this.grillOverlayStreams[incomingCall.peer];
+        if (oldStream && oldStream !== stream) {
+          try {
+            oldStream.getTracks().forEach(track => {
+              try { track.stop(); } catch (_) {}
+            });
+          } catch (_) {}
+        }
+        this.grillOverlayStreams[incomingCall.peer] = stream;
+        try { console.log('[GRILL] Stream stored in grillOverlayStreams for peer:', incomingCall.peer, 'streamId:', stream.id); } catch (_) {}
+
+        // Now try to find the patient and attach the stream
+        let connectedPaitent = this.connectedPaitents.find((p) => p.connection.peer === incomingCall.peer);
+        if (!connectedPaitent) {
+          const activeCall = this.therapistActiveCalls.find((call) => call['call'].peer === incomingCall.peer);
+          if (activeCall && activeCall.user) {
+            connectedPaitent = this.connectedPaitents.find((p) => p.user && p.user.peerId === incomingCall.peer);
+          }
+        }
+
+        if (connectedPaitent) {
+          const videoTrack = stream.getVideoTracks()[0];
+          if (videoTrack) {
+            try {
+              console.log(
+                '[GRILL] Dedicated canvas call stream received, trackId:',
+                videoTrack.id,
+                'expectedId:',
+                (connectedPaitent as any)?.expectedCanvasTrackId
+              );
+              if ((connectedPaitent as any)?.expectedCanvasTrackId && videoTrack.id !== (connectedPaitent as any)?.expectedCanvasTrackId) {
+                console.warn(
+                  '[GRILL] Track ID mismatch - received:',
+                  videoTrack.id,
+                  'expected:',
+                  (connectedPaitent as any)?.expectedCanvasTrackId,
+                  '- using received track anyway'
+                );
+              }
+            } catch (_) {}
+          }
+
+          try { connectedPaitent.unityCanvasActive = true; } catch (_) {}
+
+          const elId = 'grill-video-' + connectedPaitent.connection.connectionId;
+          const grillVideoEl = document.getElementById(elId) as HTMLVideoElement | null;
+          if (grillVideoEl) {
+            try {
+              const oldSrcObject = grillVideoEl.srcObject as MediaStream | null;
+              if (oldSrcObject && oldSrcObject !== stream) {
+                oldSrcObject.getTracks().forEach(track => {
+                  try { track.stop(); } catch (_) {}
+                });
+              }
+              grillVideoEl.srcObject = stream;
+              grillVideoEl.muted = true;
+              grillVideoEl.autoplay = true;
+              grillVideoEl.playsInline = true;
+              grillVideoEl.style.cssText = `
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                width: 100% !important;
+                height: 100% !important;
+                position: absolute !important;
+                top: 0 !important;
+                left: 0 !important;
+                z-index: 2147483647 !important;
+                background: #000 !important;
+                object-fit: contain !important;
+                pointer-events: none !important;
+              `;
+              if (grillVideoEl.parentElement) {
+                grillVideoEl.parentElement.appendChild(grillVideoEl);
+              }
+              const p = grillVideoEl.play();
+              if (p && typeof (p as any).then === 'function') {
+                (p as any).then(() => {
+                  try { console.log('[GRILL] new stream playing; videoSize:', grillVideoEl.videoWidth, 'x', grillVideoEl.videoHeight); } catch (_) {}
+                }).catch(() => {});
+              }
+            } catch (e) {
+              try { console.warn('[GRILL] direct attach failed, fallback to attachStreamToGrillArea', e); } catch (_) {}
+            }
+          }
+
+          // Also call attachStreamToGrillArea to ensure it's attached properly
+          setTimeout(() => {
+            this.attachStreamToGrillArea(incomingCall.peer, connectedPaitent.connection.connectionId);
+          }, 200);
+          setTimeout(() => {
+            this.attachStreamToGrillArea(incomingCall.peer, connectedPaitent.connection.connectionId);
+          }, 1000);
+        } else {
+          // Patient not found yet, but stream is stored; retry until patient appears
+          try {
+            console.warn(
+              '[GRILL] Canvas stream received but connectedPaitent not found yet for peer:',
+              incomingCall.peer,
+              '- stream stored, will retry attachment'
+            );
+          } catch (_) {}
+          const retryFindPatient = setInterval(() => {
+            const foundPatient = this.connectedPaitents.find((p) => p.connection.peer === incomingCall.peer);
+            if (foundPatient) {
+              clearInterval(retryFindPatient);
+              try { console.log('[GRILL] Patient found, attaching canvas stream'); } catch (_) {}
+              foundPatient.unityCanvasActive = true;
+              setTimeout(() => {
+                this.attachStreamToGrillArea(incomingCall.peer, foundPatient.connection.connectionId);
+              }, 200);
+            }
+          }, 500);
+          setTimeout(() => clearInterval(retryFindPatient), 10000);
+        }
+      });
+
+      incomingCall.on('close', () => {
+        delete this.grillOverlayStreams[incomingCall.peer];
+      });
+      incomingCall.on('error', () => {
+        delete this.grillOverlayStreams[incomingCall.peer];
+      });
     });
   };
 
@@ -2125,6 +2323,247 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
     }
     return '';
   }
+
+  // Helper function to detect Unity canvas stream (more flexible than exact match)
+  private isUnityCanvasStream(track: MediaStreamTrack): boolean {
+    if (!track) return false;
+
+    const settings = track.getSettings ? track.getSettings() : {};
+    const height = (settings as any).height || 0;
+    const aspectRatio = (settings as any).aspectRatio || 0;
+    const deviceId = (settings as any).deviceId || '';
+
+    const is16x9 = Math.abs(aspectRatio - 16 / 9) < 0.05;
+    const isHighRes = height >= 600;
+    const hasNoDeviceId = !deviceId || deviceId.length === 0;
+
+    const label = (track as any).label || '';
+    const hasCanvasLikeLabel = label.length > 50;
+
+    const isCanvas =
+      (is16x9 && isHighRes) ||
+      (hasNoDeviceId && is16x9) ||
+      (hasCanvasLikeLabel && is16x9 && height >= 500);
+
+    return isCanvas;
+  }
+
+  attachStreamToGrillArea = (peerId: string, connectionId: string, retries = 20) => {
+    let grillVideoEl = document.getElementById('grill-video-' + connectionId) as HTMLVideoElement | null;
+    if (!grillVideoEl) {
+      const videosByClass = document.querySelectorAll('.unity-game-canvas');
+      for (let i = 0; i < videosByClass.length; i++) {
+        const v = videosByClass[i] as HTMLElement;
+        if (v.id && v.id.includes('grill-video')) {
+          grillVideoEl = v as HTMLVideoElement;
+          break;
+        }
+      }
+    }
+    try {
+      console.log(
+        '[GRILL] attachStreamToGrillArea init | elementFound:',
+        !!grillVideoEl,
+        'peer:',
+        peerId,
+        'connId:',
+        connectionId,
+        'retries:',
+        retries
+      );
+    } catch (_) {}
+
+    const activeCall = this.therapistActiveCalls.find(
+      (call) => call['call'].peer === peerId
+    );
+
+    let remoteStream: MediaStream | null = null;
+
+    const connectedPaitent = this.connectedPaitents.find((p) => p.connection.peer === peerId);
+    const explicitCanvasActivePref = !!(connectedPaitent && connectedPaitent.unityCanvasActive === true);
+    const expectedId = (connectedPaitent as any)?.expectedCanvasTrackId;
+
+    if (this.grillOverlayStreams && this.grillOverlayStreams[peerId]) {
+      const candidate = this.grillOverlayStreams[peerId];
+      const vt = candidate && candidate.getVideoTracks ? candidate.getVideoTracks()[0] : null;
+      if (vt && (vt as any).readyState !== 'ended') {
+        if (expectedId) {
+          if (vt.id === expectedId) {
+            remoteStream = candidate;
+            try { console.log('[GRILL] Found matching canvas stream in grillOverlayStreams, trackId:', vt.id); } catch (_) {}
+          } else {
+            const isCanvas = this.isUnityCanvasStream(vt);
+            if (isCanvas) {
+              remoteStream = candidate;
+              try {
+                console.log(
+                  '[GRILL] Using canvas stream from grillOverlayStreams (ID mismatch but is canvas), trackId:',
+                  vt.id,
+                  'expectedId:',
+                  expectedId
+                );
+              } catch (_) {}
+            } else {
+              try {
+                console.log(
+                  '[GRILL] Stream in grillOverlayStreams is not canvas and ID mismatch, trackId:',
+                  vt.id,
+                  'expectedId:',
+                  expectedId
+                );
+              } catch (_) {}
+            }
+          }
+        } else {
+          const isCanvas = this.isUnityCanvasStream(vt);
+          if (isCanvas) {
+            remoteStream = candidate;
+            try { console.log('[GRILL] Using canvas stream from grillOverlayStreams (no expected ID), trackId:', vt.id); } catch (_) {}
+          }
+        }
+      } else {
+        try { console.log('[GRILL] Stream in grillOverlayStreams has ended track'); } catch (_) {}
+      }
+    } else {
+      try { console.log('[GRILL] No stream in grillOverlayStreams for peer:', peerId); } catch (_) {}
+    }
+
+    if (!remoteStream && activeCall && activeCall['call'].peerConnection) {
+      const pc = activeCall['call'].peerConnection as RTCPeerConnection;
+      const receivers = pc.getReceivers();
+      try {
+        console.log(
+          '[GRILL] receivers:',
+          receivers?.length,
+          receivers?.map((r) => ({
+            kind: r.track?.kind,
+            id: r.track?.id,
+            label: r.track?.label,
+            settings: r.track?.getSettings ? r.track.getSettings() : {},
+          }))
+        );
+      } catch (_) {}
+      let videoReceiver = receivers.find((r) => r.track && r.track.kind === 'video');
+
+      if (receivers && receivers.length) {
+        const explicitCanvasActive = explicitCanvasActivePref;
+
+        if (explicitCanvasActive && !remoteStream) {
+          let candidate: RTCRtpReceiver | null = null;
+          if (expectedId) {
+            candidate = receivers.find(
+              (r) => r.track && r.track.kind === 'video' && r.track.id === expectedId
+            ) as RTCRtpReceiver | null;
+          }
+          if (!candidate) {
+            candidate = receivers.find(
+              (r) => r.track && r.track.kind === 'video' && this.isUnityCanvasStream(r.track)
+            ) as RTCRtpReceiver | null;
+          }
+          try {
+            console.log(
+              '[GRILL] Checking main call receivers - explicitCanvasActive:',
+              explicitCanvasActive,
+              'expectedId:',
+              expectedId,
+              'candidateId:',
+              candidate?.track?.id,
+              'allReceiverIds:',
+              receivers.map((r) => ({ id: r.track?.id, kind: r.track?.kind }))
+            );
+          } catch (_) {}
+          if (candidate && candidate.track) {
+            videoReceiver = candidate;
+          } else {
+            if (grillVideoEl) {
+              try { (grillVideoEl as any).srcObject = null; } catch (_) {}
+              grillVideoEl.style.display = 'none';
+              grillVideoEl.style.visibility = 'hidden';
+              grillVideoEl.style.opacity = '0';
+            }
+            try {
+              console.log(
+                '[GRILL] Canvas track not in main call receivers - waiting for dedicated canvas call stream (grillOverlayStreams)'
+              );
+            } catch (_) {}
+            if (retries > 0) {
+              setTimeout(() => this.attachStreamToGrillArea(peerId, connectionId, retries - 1), 300);
+            }
+            return false;
+          }
+        }
+
+        if (!videoReceiver || !videoReceiver.track) {
+          if (retries > 0) {
+            setTimeout(() => this.attachStreamToGrillArea(peerId, connectionId, retries - 1), 300);
+          }
+          try { console.log('[GRILL] videoReceiver missing; retry'); } catch (_) {}
+          return false;
+        }
+
+        const currentVideoTrack = videoReceiver.track;
+        const isCanvas = explicitCanvasActive || this.isUnityCanvasStream(currentVideoTrack);
+
+        if (!isCanvas) {
+          if (retries > 0) {
+            setTimeout(() => this.attachStreamToGrillArea(peerId, connectionId, retries - 1), 300);
+          }
+          try { console.log('[GRILL] currentVideoTrack is not canvas; retry'); } catch (_) {}
+          return false;
+        }
+
+        remoteStream = new MediaStream([
+          currentVideoTrack,
+          ...receivers
+            .filter((r) => r.track && r.track.kind === 'audio')
+            .map((r) => r.track as MediaStreamTrack),
+        ]);
+      }
+    } else if (!remoteStream) {
+      remoteStream = this.getCurrentStream(peerId);
+    }
+
+    if (!grillVideoEl) {
+      if (retries > 0) {
+        setTimeout(() => this.attachStreamToGrillArea(peerId, connectionId, retries - 1), 500);
+      }
+      try { console.log('[GRILL] grillVideoEl not found; retry'); } catch (_) {}
+      return false;
+    }
+
+    if (!remoteStream) {
+      if (retries > 0) {
+        setTimeout(() => this.attachStreamToGrillArea(peerId, connectionId, retries - 1), 500);
+      }
+      try { console.log('[GRILL] remoteStream missing; retry'); } catch (_) {}
+      return false;
+    }
+
+    try {
+      const oldSrcObject = grillVideoEl.srcObject as MediaStream | null;
+      if (oldSrcObject && oldSrcObject !== remoteStream) {
+        oldSrcObject.getTracks().forEach((track) => {
+          try { track.stop(); } catch (_) {}
+        });
+      }
+      grillVideoEl.srcObject = remoteStream;
+      grillVideoEl.muted = true;
+      grillVideoEl.autoplay = true;
+      grillVideoEl.playsInline = true;
+      grillVideoEl.style.display = 'block';
+      grillVideoEl.style.visibility = 'visible';
+      grillVideoEl.style.opacity = '1';
+
+      const p = grillVideoEl.play();
+      if (p && typeof (p as any).then === 'function') {
+        (p as any).then(() => {
+          try { console.log('[GRILL] overlay playing; size:', grillVideoEl.videoWidth, 'x', grillVideoEl.videoHeight); } catch (_) {}
+        }).catch(() => {});
+      }
+    } catch (_) {}
+
+    return true;
+  };
 
   /******************************************************************************************/
 }

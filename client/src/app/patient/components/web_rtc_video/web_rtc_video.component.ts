@@ -3635,6 +3635,17 @@ private messageTimeout: any;
         return;
       }
 
+      // DEBUG: log entry and basic state
+      try {
+        console.log('[GRILL][replaceVideoStream] enter', {
+          gameId: this.gameId,
+          showSkeleton,
+          unityCanvasStreamActive: this.unityCanvasStreamActive,
+          hasCurrentCall: !!this.currentCall,
+          hasPeerConnection: !!this.currentCall?.peerConnection,
+        });
+      } catch (_) {}
+
       // For Grill, prefer Unity canvas stream if available
       if (this.gameId === 20) {
         try {
@@ -3655,13 +3666,30 @@ private messageTimeout: any;
               }
               unityCanvas.style.width = '100%';
               unityCanvas.style.height = 'auto';
+              try {
+                console.log('[GRILL][replaceVideoStream] unity-canvas dimensions', {
+                  width: unityCanvas.width,
+                  height: unityCanvas.height,
+                  clientWidth: unityCanvas.clientWidth,
+                  clientHeight: unityCanvas.clientHeight,
+                });
+              } catch (_) {}
             } catch (_) {}
+
             // Prefer 60fps for smoother visuals when possible
             let canvasStream: MediaStream = this.unityCanvasStream || unityCanvas.captureStream(60);
             if (!this.unityCanvasStream) {
               this.unityCanvasStream = canvasStream;
             }
             const canvasVideoTrack = canvasStream.getVideoTracks()[0];
+            try {
+              console.log('[GRILL][replaceVideoStream] canvasStream track', {
+                hasTrack: !!canvasVideoTrack,
+                trackId: canvasVideoTrack && canvasVideoTrack.id,
+                readyState: canvasVideoTrack && (canvasVideoTrack as any).readyState,
+              });
+            } catch (_) {}
+
             if (canvasVideoTrack) {
               try { (canvasVideoTrack as any).contentHint = 'detail'; } catch (_) {}
               // Ask the browser for full HD @30fps on the canvas track
@@ -3671,33 +3699,59 @@ private messageTimeout: any;
                   await (canvasVideoTrack as any).applyConstraints(desired);
                 }
               } catch (_) {}
+
+              try {
+                console.log('[GRILL][replaceVideoStream] calling startCanvasConnection', {
+                  trackId: canvasVideoTrack.id,
+                });
+              } catch (_) {}
+
               // Start or update dedicated MediaConnection with the Unity canvas track
               await this.startCanvasConnection(new MediaStream([canvasVideoTrack]), canvasVideoTrack);
               this.unityCanvasStreamActive = true;
+              try {
+                console.log('[GRILL][replaceVideoStream] startCanvasConnection completed, unityCanvasStreamActive=true');
+              } catch (_) {}
               return;
             }
+
             // Canvas exists but no video track yet - ensure placeholder call is active
+            try {
+              console.warn('[GRILL][replaceVideoStream] unity-canvas has no video track yet, using placeholder stream');
+            } catch (_) {}
             await this.ensurePlaceholderCanvasCall();
             // Retry shortly to swap placeholder with real canvas
             setTimeout(async () => {
               if (this.gameId === 20 && this.currentCall && this.currentCall.peerConnection && !this.unityCanvasStreamActive) {
+                try {
+                  console.log('[GRILL][replaceVideoStream] retry after placeholder (canvas found, no track)');
+                } catch (_) {}
                 await this.replaceVideoStream(false);
               }
             }, 700);
             return;
           } else {
             // Unity canvas not yet available - ensure placeholder call is active
+            try {
+              console.warn('[GRILL][replaceVideoStream] unity-canvas element not ready, using placeholder stream');
+            } catch (_) {}
             await this.ensurePlaceholderCanvasCall();
             // Retry shortly
             setTimeout(async () => {
               if (this.gameId === 20 && this.currentCall && this.currentCall.peerConnection && !this.unityCanvasStreamActive) {
+                try {
+                  console.log('[GRILL][replaceVideoStream] retry after placeholder (no canvas yet)');
+                } catch (_) {}
                 await this.replaceVideoStream(false);
               }
             }, 700);
             return;
           }
-        } catch (_) {
+        } catch (err) {
           // Fall back to camera/skeleton below
+          try {
+            console.error('[GRILL][replaceVideoStream] error in Unity canvas path', err);
+          } catch (_) {}
         }
       }
 
@@ -3759,6 +3813,9 @@ private messageTimeout: any;
         if (this.placeholderDrawInterval) {
           clearInterval(this.placeholderDrawInterval);
         }
+        try {
+          console.log('[GRILL][ensurePlaceholderCanvasCall] starting placeholder draw loop');
+        } catch (_) {}
         this.placeholderDrawInterval = setInterval(() => {
           ctx.fillStyle = '#000000';
           ctx.fillRect(0, 0, this.placeholderCanvas!.width, this.placeholderCanvas!.height);
@@ -3773,6 +3830,12 @@ private messageTimeout: any;
       if (stream) {
         const track = stream.getVideoTracks()[0];
         if (track) {
+          try {
+            console.log('[GRILL][ensurePlaceholderCanvasCall] created placeholder canvas stream', {
+              trackId: track.id,
+              readyState: (track as any).readyState,
+            });
+          } catch (_) {}
           await this.startCanvasConnection(stream, track);
         }
       }
@@ -3795,26 +3858,34 @@ private messageTimeout: any;
         return;
       }
       if (!this.therapistId) {
-        console.warn('[GRILL] Cannot create canvas call - therapistId not set yet. Will retry when therapist connects.');
-        // CRITICAL FIX: If therapistId is not set yet, wait for it and retry
-        // This happens when patient is already playing when therapist calls
-        if (this.gameId === 20 && this.isInGame) {
-          // Set up a retry mechanism - check every 500ms for up to 10 seconds
-          let retries = 0;
-          const maxRetries = 20;
-          const checkTherapistId = setInterval(() => {
-            retries++;
-            if (this.therapistId) {
-              clearInterval(checkTherapistId);
-              console.log('[GRILL] therapistId now available, creating canvas call');
-              this.startCanvasConnection(canvasStream, canvasVideoTrack);
-            } else if (retries >= maxRetries) {
-              clearInterval(checkTherapistId);
-              console.error('[GRILL] Failed to get therapistId after', maxRetries * 500, 'ms');
-            }
-          }, 500);
+        // Try to infer therapistId from the active call if it wasn't set via data channel yet
+        try {
+          if (this.currentCall && this.currentCall.peer) {
+            this.therapistId = this.currentCall.peer;
+            console.log('[GRILL] therapistId inferred from currentCall.peer:', this.therapistId);
+          }
+        } catch (_) {}
+
+        if (!this.therapistId) {
+          console.warn('[GRILL] Cannot create canvas call - therapistId not set yet. Will retry when therapist connects.');
+          // If therapistId is still not set, wait for it and retry
+          if (this.gameId === 20 && this.isInGame) {
+            let retries = 0;
+            const maxRetries = 20;
+            const checkTherapistId = setInterval(() => {
+              retries++;
+              if (this.therapistId) {
+                clearInterval(checkTherapistId);
+                console.log('[GRILL] therapistId now available, creating canvas call');
+                this.startCanvasConnection(canvasStream, canvasVideoTrack);
+              } else if (retries >= maxRetries) {
+                clearInterval(checkTherapistId);
+                console.error('[GRILL] Failed to get therapistId after', maxRetries * 500, 'ms');
+              }
+            }, 500);
+          }
+          return;
         }
-        return;
       }
 
       // Track lifecycle of Unity canvas video; if it ends (e.g., game quit), clean up and notify therapist
