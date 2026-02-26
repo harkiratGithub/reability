@@ -140,6 +140,7 @@ export class ConfiguratorModalComponent implements OnInit, AfterViewInit {
   }
 
   private loadUnityDirect() {
+    
     const canvas = document.getElementById('unity-canvas') as HTMLCanvasElement;
     const BUILD_BASE = 'https://grillgamedemo.z13.web.core.windows.net/Build/';
     const script = document.createElement('script');
@@ -148,9 +149,9 @@ export class ConfiguratorModalComponent implements OnInit, AfterViewInit {
     script.onload = () => {
       // @ts-ignore
       createUnityInstance(canvas, {
-        dataUrl: BUILD_BASE + 'Grill_OB.data',
-        frameworkUrl: BUILD_BASE + 'Grill_OB.framework.js',
-        codeUrl: BUILD_BASE + 'Grill_OB.wasm',
+        dataUrl: BUILD_BASE + 'Grill_OB.data.gz',
+        frameworkUrl: BUILD_BASE + 'Grill_OB.framework.js.gz',
+        codeUrl: BUILD_BASE + 'Grill_OB.wasm.gz',
         streamingAssetsUrl: 'StreamingAssets',
         companyName: 'Reability',
         productName: 'Physiotherapy Game',

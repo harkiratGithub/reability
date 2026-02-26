@@ -2519,11 +2519,11 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
       this.dialogRef = null;
        this.isEndGameModalOpen = false;
     }
-    const modalGameId = this.isTherapist ? this.gameIdTherapist : this.gameId;
-    const patientId =
-      this.connectedUser && this.connectedUser.patientId ? this.connectedUser.patientId : this.currentUser.id;
-    //console.log('Sending quit 200', modalGameId, patientId);
-    //if (!this.isTherapist || (this.isTherapist && this.inTherapistSession)) {
+    if (!this.isTherapist) {
+      const modalGameId = this.gameId;
+      const patientId =
+        this.connectedUser && this.connectedUser.patientId ? this.connectedUser.patientId : this.currentUser.id;
+      //console.log('Sending quit 200', modalGameId, patientId);
       this.dialogRef = this.dialog.open(GameHistorySessionComponent, {
         hasBackdrop: true,
         data: {
@@ -2542,7 +2542,7 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
           this.isEndGameModalOpen = false;
         }
       }, 10000);
-   // }
+    }
   }
 
   handleMediaStreamToIFrameSettingsChange = (settings) => {

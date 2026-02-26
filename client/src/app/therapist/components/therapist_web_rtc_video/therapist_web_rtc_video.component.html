@@ -10,7 +10,6 @@
 <div
   *ngIf="!isInWebcamContainer"
   [ngClass]="{
-    'hide-video': !showWebRtcVideos,
     'video-content-container-full-screen-swapped': isSwappedScreens && !isSplitScreenView,
     'video-content-container': !isSwappedScreens,
     'video-content-container-depth-cam': !isSwappedScreens && isDepthCameraConnected,
@@ -125,7 +124,7 @@
         </div>
       </div>
       <video
-        [ngStyle]="{ display: hideVideo ? 'none' : 'block' }"
+        [ngStyle]="{ display: 'block' }"
         #patientVideo
         id="{{ 'patient-video-' + therapistPatientConnection.peer }}"
         autoplay
@@ -133,7 +132,6 @@
         [style.transform]="'rotate(' + videoRotation + 'deg)'"
         [ngClass]="{
           'zoom-video': enlargeVideo,
-          'hide-video': !receivedRemoteVideo,
           'patient-video-full-screen-swapped': isSwappedScreens && !isSplitScreenView,
           'patient-video': !isSwappedScreens && !isSplitScreenView && !isDisabledSkeletonVideo,
           'patient-video-depth-cam': !isSwappedScreens && !isSplitScreenView && isDepthCameraConnected,

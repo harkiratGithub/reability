@@ -170,15 +170,15 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
     }
   
 
-    if (call && call.currentValue && call.previousValue !== call.currentValue) {
+    if (call && call.previousValue !== call.currentValue) {
       this.activeCallStream = call.currentValue;
       if (this.activeCallStream) {
         this.receivedRemoteVideo = true;
-        // Always ensure regular patient video element is visible
         if (this.remoteVideo) {
           this.remoteVideo.style.display = '';
           this.remoteVideo.style.visibility = '';
           this.remoteVideo.style.opacity = '';
+          this.handleCall();
         }
       } else {
         this.receivedRemoteVideo = false;
@@ -203,8 +203,10 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
   }
 
   ngAfterViewInit() {
-    this.remoteVideo = document.getElementById(`patient-video-${this.therapistPatientConnection.peer}`);
-    this.remoteVideo.volume = this.volume / 100;
+    this.remoteVideo = this.patientVideo ? this.patientVideo.nativeElement : null;
+    if (this.remoteVideo) {
+      this.remoteVideo.volume = this.volume / 100;
+    }
     this.localVideo = document.getElementById(`local-video-${this.therapistPatientConnection.peer}`);
 
     if (this.localVideo && !isVideoPlaying(this.localVideo) && this.localStream) {
@@ -245,6 +247,7 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
     
     this.remoteVideo.srcObject = this.activeCallStream;
     this.remoteStream = this.activeCallStream;
+    this.remoteVideo.muted = true;
     this.remoteVideo.onloadeddata = (e) => {
       let isVertical = false;
       if (this.remoteVideo.videoHeight > this.remoteVideo.videoWidth) {
