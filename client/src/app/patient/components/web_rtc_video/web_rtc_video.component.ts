@@ -3635,17 +3635,6 @@ private messageTimeout: any;
         return;
       }
 
-      // DEBUG: log entry and basic state
-      try {
-        console.log('[GRILL][replaceVideoStream] enter', {
-          gameId: this.gameId,
-          showSkeleton,
-          unityCanvasStreamActive: this.unityCanvasStreamActive,
-          hasCurrentCall: !!this.currentCall,
-          hasPeerConnection: !!this.currentCall?.peerConnection,
-        });
-      } catch (_) {}
-
       // For Grill, prefer Unity canvas stream if available
       if (this.gameId === 20) {
         try {
@@ -3666,14 +3655,6 @@ private messageTimeout: any;
               }
               unityCanvas.style.width = '100%';
               unityCanvas.style.height = 'auto';
-              try {
-                console.log('[GRILL][replaceVideoStream] unity-canvas dimensions', {
-                  width: unityCanvas.width,
-                  height: unityCanvas.height,
-                  clientWidth: unityCanvas.clientWidth,
-                  clientHeight: unityCanvas.clientHeight,
-                });
-              } catch (_) {}
             } catch (_) {}
 
             // Prefer 60fps for smoother visuals when possible
@@ -3682,13 +3663,6 @@ private messageTimeout: any;
               this.unityCanvasStream = canvasStream;
             }
             const canvasVideoTrack = canvasStream.getVideoTracks()[0];
-            try {
-              console.log('[GRILL][replaceVideoStream] canvasStream track', {
-                hasTrack: !!canvasVideoTrack,
-                trackId: canvasVideoTrack && canvasVideoTrack.id,
-                readyState: canvasVideoTrack && (canvasVideoTrack as any).readyState,
-              });
-            } catch (_) {}
 
             if (canvasVideoTrack) {
               try { (canvasVideoTrack as any).contentHint = 'detail'; } catch (_) {}
@@ -3700,58 +3674,34 @@ private messageTimeout: any;
                 }
               } catch (_) {}
 
-              try {
-                console.log('[GRILL][replaceVideoStream] calling startCanvasConnection', {
-                  trackId: canvasVideoTrack.id,
-                });
-              } catch (_) {}
-
               // Start or update dedicated MediaConnection with the Unity canvas track
               await this.startCanvasConnection(new MediaStream([canvasVideoTrack]), canvasVideoTrack);
               this.unityCanvasStreamActive = true;
-              try {
-                console.log('[GRILL][replaceVideoStream] startCanvasConnection completed, unityCanvasStreamActive=true');
-              } catch (_) {}
               return;
             }
 
             // Canvas exists but no video track yet - ensure placeholder call is active
-            try {
-              console.warn('[GRILL][replaceVideoStream] unity-canvas has no video track yet, using placeholder stream');
-            } catch (_) {}
             await this.ensurePlaceholderCanvasCall();
             // Retry shortly to swap placeholder with real canvas
             setTimeout(async () => {
               if (this.gameId === 20 && this.currentCall && this.currentCall.peerConnection && !this.unityCanvasStreamActive) {
-                try {
-                  console.log('[GRILL][replaceVideoStream] retry after placeholder (canvas found, no track)');
-                } catch (_) {}
                 await this.replaceVideoStream(false);
               }
             }, 700);
             return;
           } else {
             // Unity canvas not yet available - ensure placeholder call is active
-            try {
-              console.warn('[GRILL][replaceVideoStream] unity-canvas element not ready, using placeholder stream');
-            } catch (_) {}
             await this.ensurePlaceholderCanvasCall();
             // Retry shortly
             setTimeout(async () => {
               if (this.gameId === 20 && this.currentCall && this.currentCall.peerConnection && !this.unityCanvasStreamActive) {
-                try {
-                  console.log('[GRILL][replaceVideoStream] retry after placeholder (no canvas yet)');
-                } catch (_) {}
                 await this.replaceVideoStream(false);
               }
             }, 700);
             return;
           }
-        } catch (err) {
+        } catch (_) {
           // Fall back to camera/skeleton below
-          try {
-            console.error('[GRILL][replaceVideoStream] error in Unity canvas path', err);
-          } catch (_) {}
         }
       }
 
@@ -3813,9 +3763,6 @@ private messageTimeout: any;
         if (this.placeholderDrawInterval) {
           clearInterval(this.placeholderDrawInterval);
         }
-        try {
-          console.log('[GRILL][ensurePlaceholderCanvasCall] starting placeholder draw loop');
-        } catch (_) {}
         this.placeholderDrawInterval = setInterval(() => {
           ctx.fillStyle = '#000000';
           ctx.fillRect(0, 0, this.placeholderCanvas!.width, this.placeholderCanvas!.height);
@@ -3830,12 +3777,6 @@ private messageTimeout: any;
       if (stream) {
         const track = stream.getVideoTracks()[0];
         if (track) {
-          try {
-            console.log('[GRILL][ensurePlaceholderCanvasCall] created placeholder canvas stream', {
-              trackId: track.id,
-              readyState: (track as any).readyState,
-            });
-          } catch (_) {}
           await this.startCanvasConnection(stream, track);
         }
       }
