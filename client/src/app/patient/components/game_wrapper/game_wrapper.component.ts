@@ -2129,6 +2129,7 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
   };
 
   quitGame() {
+    
     // Immediately notify other components to hide/reset Unity canvas overlay
     this.notifyUnityCanvasQuit('quit');
     if (this.iframeEl && this.iframeEl.contentWindow) {
@@ -2637,6 +2638,14 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
   };
 
   addUserGameLog = (data: object) => {
+    /*console.log("@dev====send log data=====",data);
+    console.log("@dev=Saved before value ",data);
+      const token = this.ngRedux.getState().global.gameSessionToken;
+      const payload1 = {gameSummary:data,token:token}  
+      this.ajax.updateGameSummarytherapist(payload1).subscribe((res) => {
+        console.log('Game summary submitted:', res);
+      });
+      */
     this.menuOptionsAppActions.addUserGameLog(data);
   };
 

@@ -12,6 +12,7 @@ import * as GameDataController from '../controllers/game-data.controller';
 import * as ServerLogController from '../controllers/server-log.controller';
 import * as InstituteController from '../controllers/institute.controller';
 import * as DepartmentController from '../controllers/department.controller';
+import * as GameSessionController from '../controllers/game-session.controller';
 import express from 'express';
 import multer from 'multer';
 
@@ -81,4 +82,5 @@ router.post('/save-rustdesk-id', PatientController.updatePatientRustdeskId);
 router.get('/get-rustdesk-id/:patientId', PatientController.getPatientRustdeskId);
 router.get('/getFeatureFlag/:id/:role', UserController.getFeatureFlag);
 router.post('/clearRinging', UserController.clearRingingStatus);
+router.post('/gameSession/updateSession', GameSessionController.endGameSession);
 export default router;
