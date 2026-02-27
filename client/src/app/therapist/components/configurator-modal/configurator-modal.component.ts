@@ -17,7 +17,7 @@ export interface DialogData {
 export class ConfiguratorModalComponent implements OnInit, AfterViewInit {
   @Input() game: any;
   @Input() patient: any;
-  GAMES_WITH_THERAPIST_COLORSET = ['studio', 'wipe', 'squat', 'elephant', 'rush', 'whiteboard'];
+  GAMES_WITH_THERAPIST_COLORSET = ['studio', 'wipe', 'squat', 'elephant', 'rush', 'whiteboard', 'grill'];
   isGameConfiguratorInTherapistColorset = false;
   private iframeInitializedOnce = false;
   private unityInstance: any = null;
@@ -79,35 +79,36 @@ export class ConfiguratorModalComponent implements OnInit, AfterViewInit {
     if (this.isGrillGame()) {
       return;
     }
-    const iframeEl = document.getElementById('game-iframe');
+
     this.ajax.getGameSettingsForPatient(this.game.id, this.patient.id).subscribe((settings) => {
-      // Normalize patient settings (supports {current_set} or flat JSON), but log only raw for clarity
-      const normalizedSettings: any = (settings && settings.current_set) ? settings.current_set : (settings || {});
+      const normalizedSettings: any =
+        (settings && (settings as any).current_set) ? (settings as any).current_set : (settings || {});
 
+      const sendToIframe = () => {
+        const iframeEl = document.getElementById('game-iframe') as HTMLIFrameElement | null;
+        if (!iframeEl || !iframeEl.contentWindow) {
+          return;
+        }
 
-      // Merge mode='settings' + existing settings; provide defaults for optional fields
-      const gameSettings = {
-        ...normalizedSettings,
-        // Force configurator to settings mode regardless of DB content
-        mode: 'settings',
-        // Optional fields per spec; Unity may choose to use them if supported
-        skewerSide: normalizedSettings?.skewerSide ?? 'left',
-        marketSoundVolume: normalizedSettings?.marketSoundVolume ?? 0.5,
+        // Send IS_THERAPIST first so games see isTherapist === true before any READY/init.
+        // SDK does settings = game_settings on IS_THERAPIST, so pass game_settings to avoid clearing settings.
+        const therapistMessage = {
+          isTherapist: true,
+          peerId: this.patient.peerId,
+          userId: this.patient.peerId,
+          patientSettings: normalizedSettings,
+          game_settings: normalizedSettings,
+          isExternalConfigurator: true,
+        };
+        communicationUtil.sendMessageToIframe(iframeEl, therapistMessage, MESSAGES.IS_THERAPIST);
+
+        // Then SETTINGS so READY(settings) can fire and settings are definitely set
+        communicationUtil.sendMessageToIframe(iframeEl, normalizedSettings, MESSAGES.SETTINGS);
       };
 
-      const therapistMessage = {
-        isTherapist: true,
-        peerId: this.patient.peerId,
-        // pass-through original for reference, but game will read from game_settings
-        patientSettings: normalizedSettings,
-        // effective settings for Unity
-        game_settings: gameSettings,
-        isExternalConfigurator: true,
-      };
-
-      communicationUtil.sendMessageToIframe(iframeEl, therapistMessage, MESSAGES.IS_THERAPIST);
-      const { mode: _ignoredMode1, ...logNoMode1 } = gameSettings || {};
-      console.log(logNoMode1);
+      sendToIframe();
+      setTimeout(sendToIframe, 400);
+      setTimeout(sendToIframe, 1000);
     });
     if (this.game.name == 'whiteboard') {
       this.handleWhiteboardExternalConfigurator();
@@ -166,12 +167,16 @@ export class ConfiguratorModalComponent implements OnInit, AfterViewInit {
           window.OpeningSceneManager.onConfigSent = (configJson: string) => {
             try {
               const parsed = JSON.parse(configJson);
-              // Do not persist Unity's transient 'mode' flag to DB
               const { mode, ...settingsWithoutMode } = parsed || {};
               console.log('[CONFIGURATOR] Saving updated settings from Unity configurator:', settingsWithoutMode);
               this.ajax.saveGameSettingsFromTherapist(this.patient.id, this.game.id, settingsWithoutMode);
             } catch (err) {
               console.warn('[CONFIGURATOR] Failed to parse/save config from Unity:', err);
+            } finally {
+              // Close the Grill settings dialog after a successful save (or even if parsing fails)
+              if (this.dialogRef) {
+                this.dialogRef.close();
+              }
             }
           };
         }

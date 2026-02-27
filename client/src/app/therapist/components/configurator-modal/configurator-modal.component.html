@@ -12,8 +12,8 @@
   </ng-template>
   <mat-dialog-content>
     <ng-container *ngIf="isGrillGame(); else iframeConfigurator">
-      <div id="unity-container" style="width:100%; height: calc(80vh - 120px);">
-        <canvas id="unity-canvas" style="width:100%; height:100%; display:block;"></canvas>
+      <div id="unity-container" class="unity-container">
+        <canvas id="unity-canvas"></canvas>
       </div>
     </ng-container>
     <ng-template #iframeConfigurator>

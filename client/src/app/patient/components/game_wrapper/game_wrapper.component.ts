@@ -2265,29 +2265,26 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
     // Removed therapist-side watchdog reload to avoid reload loops in Elephant/Memory
 
     if (this.isTherapist) {
-      
       this.ajax.getGameSettingsForPatient(this.gameIdTherapist, this.connectedUser.patientId).subscribe((settings) => {
-        // removed debug log: therapist settings API response
-        
+        const normalized = (settings && (settings as any).current_set) ? (settings as any).current_set : (settings || {});
         const iframeMessage = {
           isTherapist: true,
           peerId: this.peerId,
           userId: this.peerId,
-          patientSettings: settings,
+          patientSettings: normalized,
+          game_settings: normalized,
           playerId: this.authenticationService.currentUserValue.id,
           playerFirstName: this.authenticationService.currentUserValue.firstName,
           playerLastName: this.authenticationService.currentUserValue.lastName,
         };
-        
-        // removed debug log: sending therapist settings to iframe
-        
-        communicationUtil.sendMessageToIframe(
-          this.iframeEl,
-          iframeMessage,
-          MESSAGES.IS_THERAPIST
-        );
-        
-        // removed debug log
+        if (this.iframeEl && this.iframeEl.contentWindow) {
+          communicationUtil.sendMessageToIframe(this.iframeEl, iframeMessage, MESSAGES.IS_THERAPIST);
+        }
+        setTimeout(() => {
+          if (this.iframeEl && this.iframeEl.contentWindow) {
+            communicationUtil.sendMessageToIframe(this.iframeEl, iframeMessage, MESSAGES.IS_THERAPIST);
+          }
+        }, 500);
       });
     } else {
       if (this.gameId === 20 || this.gameId === 21) {
