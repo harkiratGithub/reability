@@ -81,8 +81,11 @@ export class ConfiguratorModalComponent implements OnInit, AfterViewInit {
     }
 
     this.ajax.getGameSettingsForPatient(this.game.id, this.patient.id).subscribe((settings) => {
+      const hasCurrentSet = settings && (settings as any).current_set;
       const normalizedSettings: any =
-        (settings && (settings as any).current_set) ? (settings as any).current_set : (settings || {});
+        this.game?.name === 'studio' && hasCurrentSet
+          ? settings
+          : (hasCurrentSet ? (settings as any).current_set : (settings || {}));
 
       const sendToIframe = () => {
         const iframeEl = document.getElementById('game-iframe') as HTMLIFrameElement | null;
