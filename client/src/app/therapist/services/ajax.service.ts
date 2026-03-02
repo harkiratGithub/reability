@@ -439,6 +439,18 @@ export class AjaxService {
     }
   };
 
+  updateGameSummarytherapist = ({ gameSummary, token, patientPeerId }) => {
+    try {
+      return this.http.post<any>(`${this.baseUrl}/therapist/gameSession/updateSession`, {
+        gameSummary,
+        token,
+        patientPeerId,  // ✅ add here
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   updateGameFeedback = (gameFeedback) => {
     try {
       return this.http.post<any>(`${this.baseUrl}/patient/gameSession/updateSession`, {

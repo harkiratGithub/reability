@@ -9,14 +9,14 @@ export const startGameSession = (req, res, next) => {
 };
 
 export const endGameSession = (req, res, next) => {
-	const { gameSummary, gameFeedback } = req.body;
+	const { gameSummary, gameFeedback ,patientPeerId } = req.body;
 	const userId = req.user.id;
 	if (gameSummary)
-		GameSessionHelper.endGameSession(userId, gameSummary)
+		GameSessionHelper.endGameSession(patientPeerId ?? userId, gameSummary)
 			.then(() => res.sendStatus(200))
 			.catch((err) => next(err));
 	if (gameFeedback)
-		GameSessionHelper.feedbackGameSession(userId, gameFeedback)
+		GameSessionHelper.feedbackGameSession(patientPeerId ?? userId, gameFeedback)
 			.then(() => res.sendStatus(200))
 			.catch((err) => next(err));
 };
