@@ -1,6 +1,7 @@
 
 <div *ngIf="isInWebcamContainer" class="web-cam-sidebar-container">
   <video
+    #patientVideo
     id="{{ 'patient-video-' + therapistPatientConnection.peer }}"
     [ngClass]="setPatientSidebarVideoClasses()"
     autoplay

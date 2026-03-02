@@ -238,16 +238,14 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
   }
 
   handleCall() {
-    // Always attach the patient's stream to the regular video element
-    this.initializePoseModels();
     if (!this.remoteVideo) {
       console.warn(`[GRILL] ⚠️ remoteVideo element not found`);
       return;
     }
-    
+
     this.remoteVideo.srcObject = this.activeCallStream;
     this.remoteStream = this.activeCallStream;
-    this.remoteVideo.muted = true;
+    this.remoteVideo.muted = false;
     this.remoteVideo.onloadeddata = (e) => {
       let isVertical = false;
       if (this.remoteVideo.videoHeight > this.remoteVideo.videoWidth) {
@@ -259,7 +257,10 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
       this.remoteVideo.play();
       this.receivedRemoteVideo = true;
       this.handleStreamSending.emit();
-      this.processVideoFrames();
+      if (!this.isInWebcamContainer) {
+        this.initializePoseModels();
+        this.processVideoFrames();
+      }
     };
   }
 
@@ -346,6 +347,9 @@ export class TherapitWebRTCVideoComponent implements OnChanges, AfterViewInit, O
   };
 
   private initializePoseModels() {
+    if (this.cameraPose || !this.canvasRef) {
+      return;
+    }
     this.cameraPose = new Pose({
       locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`,
     });
