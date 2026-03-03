@@ -267,11 +267,31 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
       this.showTherapistPlaceholder = false;
       return;
     }
+    let attempts = 0;
+    const maxAttempts = 40; // ~20 seconds at 500ms interval
+
     const update = () => {
       const video = document.getElementById('grill-video-' + this.connectionId) as HTMLVideoElement | null;
       const hasFrame = !!(video && video.readyState >= 2 && video.videoWidth > 0 && video.videoHeight > 0);
       // Show while black screen (no frames yet)
       this.showTherapistPlaceholder = !hasFrame;
+
+      // If frames arrived, stop watching and hide placeholder
+      if (hasFrame && this.therapistVideoWatchTimer) {
+        clearInterval(this.therapistVideoWatchTimer);
+        this.therapistVideoWatchTimer = null;
+        return;
+      }
+
+      // Hard stop after maxAttempts to avoid infinite loading overlay
+      attempts++;
+      if (attempts >= maxAttempts) {
+        this.showTherapistPlaceholder = false;
+        if (this.therapistVideoWatchTimer) {
+          clearInterval(this.therapistVideoWatchTimer);
+          this.therapistVideoWatchTimer = null;
+        }
+      }
     };
     update();
     if (this.therapistVideoWatchTimer) {
@@ -327,6 +347,17 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
           try {
             const evt = new CustomEvent('unity-canvas-ready', { detail: { gameId: this.gameId, id: 'unity-canvas' } });
             window.dispatchEvent(evt);
+          } catch (_) {}
+
+          // Hint Unity's own resize logic to recompute the canvas size,
+          // which is what currently happens only after a manual window resize.
+          try {
+            setTimeout(() => {
+              try { window.dispatchEvent(new Event('resize')); } catch (_) {}
+            }, 50);
+            setTimeout(() => {
+              try { window.dispatchEvent(new Event('resize')); } catch (_) {}
+            }, 300);
           } catch (_) {}
         } else if (event.data.type === 'UNITY_ERROR') {
           console.error('[UNITY] Unity game error:', event.data.error);

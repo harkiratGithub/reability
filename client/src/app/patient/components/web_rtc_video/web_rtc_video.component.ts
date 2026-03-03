@@ -2939,6 +2939,38 @@ private messageTimeout: any;
           therapistToPatientConnection.send({ type: 'patients_game', payload: this.validGames });
         }
         break;
+      case 'RESTART_GRILL_CANVAS':
+        // Therapist requests a fresh Grill canvas stream (e.g. overlay stuck)
+        try {
+          if (this.gameId === 20 && this.isInGame && this.currentCall && this.currentCall.peerConnection) {
+            console.log(`[PATIENT-${this.currentUser?.peerId}] Received RESTART_GRILL_CANVAS request from therapist`);
+            // Reset canvas state and force a fresh canvas call
+            this.unityCanvasStreamActive = false;
+            try {
+              if (this.canvasCall) {
+                try { this.canvasCall.close?.(); } catch (_) {}
+                this.canvasCall = null;
+              }
+            } catch (_) {}
+            try {
+              if (this.unityCanvasStream) {
+                this.unityCanvasStream.getTracks().forEach(t => { try { t.stop(); } catch (_) {} });
+              }
+            } catch (_) {}
+            this.unityCanvasStream = null as any;
+            this.unityCanvasVideoTrack = null;
+            setTimeout(async () => {
+              if (this.gameId === 20 && this.isInGame && this.currentCall && this.currentCall.peerConnection) {
+                await this.replaceVideoStream(false).catch(err => {
+                  console.error(`[PATIENT-${this.currentUser?.peerId}] Failed to restart Grill canvas stream:`, err);
+                });
+              }
+            }, 200);
+          }
+        } catch (e) {
+          console.error('[PATIENT] Error handling RESTART_GRILL_CANVAS:', e);
+        }
+        break;
       case 'send_game_url':
         if (therapistToPatientConnection) {
           therapistToPatientConnection.send(this.getGameUrlMessage(this.isInGame));

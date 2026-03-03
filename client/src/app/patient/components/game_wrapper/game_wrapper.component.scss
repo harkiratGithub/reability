@@ -47,26 +47,22 @@
   background-size: contain;
 }
 
-// Grill video element for therapist view - fill entire area
+// Grill video element for therapist view - fill entire area with letterboxing (no zoom/crop)
 video[id^="grill-video-"].unity-game-canvas {
   position: absolute !important;
   top: 0 !important;
   left: 0 !important;
   width: 100% !important;
   height: 100% !important;
-  object-fit: contain !important;
+  object-fit: contain !important; // keep full game in view, preserve aspect
   background: #000 !important;
   z-index: 1000 !important; // Higher z-index to ensure it's on top
   border-radius: 7px;
   display: block !important;
   visibility: visible !important;
   opacity: 1 !important;
-  min-width: 100% !important;
-  min-height: 100% !important;
-  max-width: 100% !important;
-  max-height: 100% !important;
   transform: none !important; // Override the translate from .unity-game-canvas
-  aspect-ratio: unset !important; // Override aspect-ratio from .unity-game-canvas
+  aspect-ratio: 16 / 9 !important; // lock to game aspect ratio
   pointer-events: none !important; // Prevent interaction issues
 }
 .game-wrapper {
