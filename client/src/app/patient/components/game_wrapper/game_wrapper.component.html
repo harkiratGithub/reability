@@ -10,11 +10,11 @@
     }">
     <div class="outer-border">
       <div class="content-background" [ngClass]="{ 'white-bg': currentGameName == 'whiteboard' }">
-        <!-- <div class="breaking-news-wrapper" *ngIf="isPopupVisible">
+        <div class="breaking-news-wrapper" *ngIf="isPopupVisible && isCarouselEnabled">
           <div class="carousel-text-container">
             <marquee class="carousel-text" scrollamount="20">{{ carouselText[currentTextIndex] }}</marquee>
           </div>
-        </div> -->
+        </div> 
         <!-- CRITICAL: Always show iframes-container for therapist when Grill is active, even without gameUrl -->
         <div class="iframes-container" *ngIf="(isTherapist && gameUrl) || currentGameUrl || (isTherapist && (gameIdTherapist === 20 || currentGameName?.toLowerCase() === 'grill' || gameId === 20 || gameName?.toLowerCase() === 'grill'))">
           <app-end-game *ngIf="isEndGameModalOpen"></app-end-game>

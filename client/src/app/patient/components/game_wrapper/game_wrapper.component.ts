@@ -34,6 +34,8 @@ import { GameSettingsService } from '../../services/game-settings.service';
 import { SkeletonProgressBarService } from '../../../common/services/skeleton-progress-bar.service';
 import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
+import { FeatureFlagService } from '../../../common/services/feature-flag.service';
+
 // Unity WebGL Integration TypeScript Declarations
 declare global {
   interface Window {
@@ -151,6 +153,8 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
   currentVideoID = '';
   currentUser: User;
   currentGameSettings = null;
+  public isCarouselEnabled = this.flagService.isEnabled('STUDIO_CAROUSEL_FLAG');
+  
   // Queue initial session message if iframe not ready yet
   private pendingIsTherapistMessage: any = null;
   leftWrist: any = { x: 1, y: 2, z: 3 };
@@ -206,6 +210,7 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
     private gameSettingsService: GameSettingsService,
     private skeltonProgressBarService: SkeletonProgressBarService,
     private router: Router,
+    private flagService: FeatureFlagService,
   ) {
     // Enable Elephant debugging from localStorage (set ELEPHANT_DEBUG to '1' for logs, '2' for logs+breakpoints)
     try {
@@ -291,7 +296,7 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
 
 
   ngOnInit() {
-    // removed debug log: ngOnInit start
+    console.log("====isCarouselEnabled===",this.isCarouselEnabled);
     this.connectionId = this.connectionId;
 
     // Setup Unity OpeningSceneManager integration
@@ -460,10 +465,27 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
         
         if (index != undefined && this.currentGameSettings && this.currentGameSettings[index]?.fileName === videoId) {
           const additionalInfo = this.currentGameSettings[index]?.additionalInfo?.trim();
-         
+         console.log("@dev=====additionalInfo====",additionalInfo);
           this.carouselText = additionalInfo ? [additionalInfo] : [];
         } else {
           this.carouselText = [];
+        }
+
+        if (type === 'sync_video_data') {
+          if (this.isEmpty(this.carouselText)) {
+            this.isPopupVisible = false;
+          }
+
+          if (!this.timer) {
+            this.startTimer();
+          }
+
+          if (this.elapsedTime >= 2 && integerVidTime >= 2 && !this.isPopupVisible && !this.isEmpty(this.carouselText)) {
+            this.isPopupVisible = true;
+            this.startCarousel();
+          } else if (integerVidTime < 2 || this.isEmpty(this.carouselText)) {
+            this.isPopupVisible = false;
+          }
         }
         
         // Forward sync_video_data messages to skeltonVideoService for video index change handling
@@ -2277,6 +2299,8 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
           playerId: this.authenticationService.currentUserValue.id,
           playerFirstName: this.authenticationService.currentUserValue.firstName,
           playerLastName: this.authenticationService.currentUserValue.lastName,
+          enableCarouselText: this.flagService.isEnabled('STUDIO_CAROUSEL_FLAG'),
+          
         };
         if (this.iframeEl && this.iframeEl.contentWindow) {
           communicationUtil.sendMessageToIframe(this.iframeEl, iframeMessage, MESSAGES.IS_THERAPIST);
@@ -2344,7 +2368,8 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
                 playerId: this.authenticationService.currentUserValue.id,
                 playerFirstName: this.authenticationService.currentUserValue.firstName,
                 playerLastName: this.authenticationService.currentUserValue.lastName,
-                enableCarouselText: false,
+                enableCarouselText: this.flagService.isEnabled('STUDIO_CAROUSEL_FLAG'),
+          
               },
               MESSAGES.IS_THERAPIST
             );
@@ -2512,34 +2537,38 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
   }
 
   closeModal() {
+    const scorePopupFlag = this.flagService.isEnabled('SCORE_POPUP_FLAG');
+    console.log("======scorePopupFlag=====",scorePopupFlag);
     if (this.dialogRef) {
       this.dialogRef.close();
       this.dialogRef = null;
-       this.isEndGameModalOpen = false;
+      if(scorePopupFlag){
+        this.isEndGameModalOpen = false;
+      } 
     }
-    if (!this.isTherapist) {
-      const modalGameId = this.gameId;
-      const patientId =
+    if(scorePopupFlag){
+      if (!this.isTherapist && !this.inTherapistSession) {
+        const modalGameId = this.gameId;
+        const patientId =
         this.connectedUser && this.connectedUser.patientId ? this.connectedUser.patientId : this.currentUser.id;
-      //console.log('Sending quit 200', modalGameId, patientId);
-      this.dialogRef = this.dialog.open(GameHistorySessionComponent, {
-        hasBackdrop: true,
-        data: {
-          has_backdrop: false,
-          gameId: modalGameId,
-          iframeEl: this.iframeEl,
-          patientId: patientId,
-        },
-      });
-      // console.log('Sending quit 9', modalGameId);
-      this.isEndGameModalOpen = true;
-      setTimeout(() => {
-        if (this.dialogRef) {
-          this.dialogRef.close();
-          this.dialogRef = null;
-          this.isEndGameModalOpen = false;
-        }
-      }, 10000);
+        this.dialogRef = this.dialog.open(GameHistorySessionComponent, {
+          hasBackdrop: true,
+          data: {
+            has_backdrop: false,
+            gameId: modalGameId,
+            iframeEl: this.iframeEl,
+            patientId: patientId,
+          },
+        });
+        this.isEndGameModalOpen = true;
+        setTimeout(() => {
+          if (this.dialogRef) {
+            this.dialogRef.close();
+            this.dialogRef = null;
+            this.isEndGameModalOpen = false;
+          }
+        }, 10000);
+      }
     }
   }
 
