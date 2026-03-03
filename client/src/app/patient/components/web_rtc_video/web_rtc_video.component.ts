@@ -2117,7 +2117,7 @@ private messageTimeout: any;
     
     // Only proceed if session scorebar should be shown
     if (!this.shouldShowSessionScorebar) {
-      console.log('[SESSION DEBUG] Session scorebar should not be shown, skipping positioning');
+      //console.log('[SESSION DEBUG] Session scorebar should not be shown, skipping positioning');
       return;
     }
     
@@ -2126,21 +2126,21 @@ private messageTimeout: any;
    
     
     if (sessionScorebar && videosWrapper) {
-      console.log('[SESSION DEBUG] Elements found, ensuring correct positioning');
+      //console.log('[SESSION DEBUG] Elements found, ensuring correct positioning');
       
       // Check if session scorebar is already positioned correctly
       const isCorrectlyPositioned = sessionScorebar.parentNode === videosWrapper.parentNode && 
                                    sessionScorebar.previousElementSibling === videosWrapper;
       
       if (!isCorrectlyPositioned) {
-        console.log('[SESSION DEBUG] Repositioning session scorebar below video');
+        //console.log('[SESSION DEBUG] Repositioning session scorebar below video');
         videosWrapper.parentNode?.insertBefore(sessionScorebar, videosWrapper.nextSibling);
-        console.log('[SESSION DEBUG] Session scorebar repositioned');
+       // console.log('[SESSION DEBUG] Session scorebar repositioned');
       } else {
-        console.log('[SESSION DEBUG] Session scorebar already positioned correctly');
+       // console.log('[SESSION DEBUG] Session scorebar already positioned correctly');
       }
     } else {
-      console.log('[SESSION DEBUG] Elements not found');
+      //console.log('[SESSION DEBUG] Elements not found');
     }
   }
 
@@ -4122,7 +4122,7 @@ private messageTimeout: any;
     
     allSelectors.forEach(selector => {
       const elements = document.querySelectorAll(selector);
-      console.log(`[SESSION DEBUG] Found ${elements.length} elements for selector: ${selector}`);
+     // console.log(`[SESSION DEBUG] Found ${elements.length} elements for selector: ${selector}`);
       elements.forEach((element, index) => {
         const computedStyle = window.getComputedStyle(element);
         console.log(`[SESSION DEBUG] Element ${index + 1} for ${selector}:`, {
@@ -4168,16 +4168,16 @@ private messageTimeout: any;
                         element.classList.contains('force-hidden');
         
         if (isHidden) {
-          console.log(`[SESSION DEBUG] Properly destroying hidden element ${index + 1} for ${selector}`);
+          //console.log(`[SESSION DEBUG] Properly destroying hidden element ${index + 1} for ${selector}`);
           
           // Try to get Angular component reference
           const componentRef = (element as any).__ngContext__;
           if (componentRef) {
-            console.log(`[SESSION DEBUG] Found Angular component reference, destroying it`);
+            //console.log(`[SESSION DEBUG] Found Angular component reference, destroying it`);
             try {
               componentRef.destroy();
             } catch (error) {
-              console.log(`[SESSION DEBUG] Error destroying component:`, error);
+              //console.log(`[SESSION DEBUG] Error destroying component:`, error);
             }
           }
           
@@ -4190,10 +4190,10 @@ private messageTimeout: any;
     // Method 4: Additional cleanup - remove any orphaned elements
     setTimeout(() => {
       const orphanedElements = document.querySelectorAll('app-session-scorebar');
-      console.log(`[SESSION DEBUG] Found ${orphanedElements.length} orphaned session scorebar elements`);
+     // console.log(`[SESSION DEBUG] Found ${orphanedElements.length} orphaned session scorebar elements`);
       
       orphanedElements.forEach((element, index) => {
-        console.log(`[SESSION DEBUG] Removing orphaned element ${index + 1}`);
+        //console.log(`[SESSION DEBUG] Removing orphaned element ${index + 1}`);
         element.remove();
       });
     }, 100);
@@ -4214,19 +4214,19 @@ private messageTimeout: any;
     
     // Method 2: Find and destroy ALL session progress bar elements
     const allElements = document.querySelectorAll('app-session-scorebar, .scores-bar-container');
-    console.log(`[SESSION DEBUG] Found ${allElements.length} total session progress bar elements to destroy`);
+    //console.log(`[SESSION DEBUG] Found ${allElements.length} total session progress bar elements to destroy`);
     
     allElements.forEach((element, index) => {
-      console.log(`[SESSION DEBUG] Destroying element ${index + 1}`);
+     // console.log(`[SESSION DEBUG] Destroying element ${index + 1}`);
       
       // Try to destroy Angular component
       const componentRef = (element as any).__ngContext__;
       if (componentRef) {
         try {
           componentRef.destroy();
-          console.log(`[SESSION DEBUG] Angular component destroyed for element ${index + 1}`);
+          //console.log(`[SESSION DEBUG] Angular component destroyed for element ${index + 1}`);
         } catch (error) {
-          console.log(`[SESSION DEBUG] Error destroying Angular component:`, error);
+          //console.log(`[SESSION DEBUG] Error destroying Angular component:`, error);
         }
       }
       
@@ -4261,10 +4261,10 @@ private messageTimeout: any;
     allSelectors.forEach(selector => {
       try {
         const elements = document.querySelectorAll(selector);
-        console.log(`[SESSION DEBUG] Found ${elements.length} elements for selector: ${selector}`);
+        //console.log(`[SESSION DEBUG] Found ${elements.length} elements for selector: ${selector}`);
         
         elements.forEach((element, index) => {
-          console.log(`[SESSION DEBUG] Manually hiding element ${index + 1} for ${selector}`);
+          //console.log(`[SESSION DEBUG] Manually hiding element ${index + 1} for ${selector}`);
           
           // Add force-hidden class
           element.classList.add('force-hidden');
@@ -4279,7 +4279,7 @@ private messageTimeout: any;
           (element as HTMLElement).style.setProperty('min-height', '0', 'important');
         });
       } catch (error) {
-        console.log(`[SESSION DEBUG] Error with selector ${selector}:`, error);
+        //console.log(`[SESSION DEBUG] Error with selector ${selector}:`, error);
       }
     });
     
@@ -5737,9 +5737,7 @@ private async processVideoFrames() {
     window.speechSynthesis.speak(utterance);
   }
   private onPoseCameraResults(results: Results, canvasCtx: CanvasRenderingContext2D, canvasElement: HTMLCanvasElement) {
-    console.log("======results====",results,this.showMarker);
-    console.log("======canvasCtx====",canvasCtx,this.showDefaultMarker);
-    if (canvasCtx) {
+     if (canvasCtx) {
       canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
       canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
       if (results.poseLandmarks) {
