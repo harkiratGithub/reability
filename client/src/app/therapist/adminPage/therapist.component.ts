@@ -474,8 +474,15 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       return;
     }
     const iframeEl = document.getElementById('games-iframe-' + connectionId);
+    const wasOpen = this.isSettingModalOpened;
     this.isSettingModalOpened = !this.isSettingModalOpened;
     communicationUtil.sendMessageToIframe(iframeEl, this.isSettingModalOpened, MESSAGES.SETTINGS_MODAL_OPENED);
+    if (wasOpen && !this.isSettingModalOpened) {
+      const connectedPaitent = this.connectedPaitents.find((p) => p.connection.connectionId === connectionId);
+      if (connectedPaitent && (connectedPaitent.gameId === 20 || connectedPaitent.gameName?.toLowerCase() === 'grill')) {
+        setTimeout(() => this.attachStreamToGrillArea(connectedPaitent.connection.peer, connectionId), 200);
+      }
+    }
   };
 
   navigateHome = (conn) => {
@@ -525,6 +532,9 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       return;
     }
     this.currentTab = tab;
+    if (tab === tabs.session && this.connectedPaitents.length > 0) {
+      setTimeout(() => this.reattachAllGrillStreams(), 150);
+    }
   }
 
   isCurrentTab(tab: tabs): boolean {
@@ -2347,6 +2357,20 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
 
     return isCanvas;
   }
+
+  /** Re-attach Grill canvas streams for all connected patients in Grill game. Call when therapist returns to session view (e.g. after tab switch or closing settings). */
+  reattachAllGrillStreams = (): void => {
+    if (!this.connectedPaitents.length) return;
+    this.connectedPaitents.forEach((p) => {
+      const isGrill = p.gameId === 20 || p.gameName?.toLowerCase() === 'grill';
+      if (!isGrill) return;
+      const hasStream = this.grillOverlayStreams && this.grillOverlayStreams[p.connection.peer];
+      const canvasActive = p.unityCanvasActive === true;
+      if (hasStream || canvasActive) {
+        setTimeout(() => this.attachStreamToGrillArea(p.connection.peer, p.connection.connectionId), 0);
+      }
+    });
+  };
 
   attachStreamToGrillArea = (peerId: string, connectionId: string, retries = 20) => {
     let grillVideoEl = document.getElementById('grill-video-' + connectionId) as HTMLVideoElement | null;
