@@ -8,17 +8,6 @@ body.video-mode-1-to-1 [id*='video'] {
   max-height: 100% !important;
 }
 
-/* EXCEPTION: Keep Grill game stream 16:9 and fully visible on all modes */
-body.video-mode-1-to-1 video[id^='grill-video-'],
-body.video-mode-1-to-many video[id^='grill-video-'] {
-  width: 100% !important;
-  height: 100% !important;
-  max-width: 100% !important;
-  max-height: 100% !important;
-  object-fit: contain !important;
-  background: #000 !important;
-}
-
 /* Grid mode - thumbnail-sized remote videos (scope narrowly to the thumbnails component) */
 body.video-mode-1-to-many app-therapist-web-rtc-video video {
   max-width: 300px !important;

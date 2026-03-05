@@ -24,14 +24,7 @@
             "tsConfig": "src/tsconfig.app.json",
             "assets": [
               "src/favicon.ico",
-              "src/assets",
-              "src/Build",
-              "src/StreamingAssets",
-              {
-                "glob": "**/*",
-                "input": "node_modules/@mediapipe/pose",
-                "output": "src/assets/pose"
-              }
+              "src/assets"
             ],
             "styles": [
               "src/styles.scss"
@@ -60,8 +53,8 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "6mb",
-                  "maximumError": "7mb"
+                  "maximumWarning": "5mb",
+                  "maximumError": "5mb"
                 }
               ]
             }
@@ -97,12 +90,7 @@
             "scripts": [],
             "assets": [
               "src/favicon.ico",
-              "src/assets",
-              {
-                "glob": "**/*",
-                "input": "node_modules/@mediapipe/pose",
-                "output": "src/assets/pose"
-              }
+              "src/assets"
             ]
           }
         },

@@ -357,7 +357,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
                 console.log("===deletedAt===",deletedAt);
                 console.log("===activityTime===",activityTime);
                 if (activityTime <= deletedAt) {
-                  //return acc;
+                  return acc;
                 }
 
               } catch (e) {
@@ -395,7 +395,6 @@ export class PatientListComponent implements OnInit, OnDestroy {
                 duration: a.duration,
                 gameSummary,
                 sessionFeedback,
-                start_time: a.start_time
               });
             }
   
@@ -711,28 +710,15 @@ export class PatientListComponent implements OnInit, OnDestroy {
     const gameMap = new Map<string, any[]>();  
     console.log("Selected Patient:", selectedPatient);
     console.log("Current Therapist ID:", this.therapistId); 
-    const clearKey = `LAST_CLEAR_${this.therapistId}_${patientId}`;
-    let deletedAt = null;    
+    const clearKey = `LAST_CLEAR_${this.therapistId}_${patientId}`;   
     const clearDataRaw = localStorage.getItem(clearKey);
     if (clearDataRaw) {
       const clearData = JSON.parse(clearDataRaw);
-      deletedAt = new Date(clearData.deletedAt).getTime();
-    }
+      console.log("Logs last cleared at:", clearData.deletedAt);
+    } 
     if (selectedPatient && selectedPatient.lastWeekActivity) {
       selectedPatient.lastWeekActivity.forEach((activity: { gamesDuration: any[] }) => {  
         activity.gamesDuration.forEach((game: any) => {  
-          let activityTime = null;
-          if (game.start_time) {
-            const utcFormatted = game.start_time.replace(' ', 'T') + 'Z';
-            activityTime = new Date(utcFormatted).getTime();
-          }
-          
-          // ✅ Skip only old summaries
-          if (deletedAt && activityTime && activityTime <= deletedAt) {
-            return;
-          }
-          
-
           // therapist filter
           const therapistIdFromGame = Number(game?.gameSummary?.therapist_id);
           if (therapistIdFromGame !== Number(this.therapistId)) {
@@ -780,34 +766,6 @@ export class PatientListComponent implements OnInit, OnDestroy {
 
   isArray(value: any): boolean {
     return Array.isArray(value);
-  }
-
-  hasGameSummary(patient: any): boolean {
-    if (!patient?.lastWeekActivity) return false;
-  
-    return patient.lastWeekActivity.some(activity =>
-      activity?.gamesDuration?.some(game => {
-        const clearKey = `LAST_CLEAR_${this.therapistId}_${patient.userId}`;
-        const clearDataRaw = localStorage.getItem(clearKey);
-  
-        let deletedAt = null;
-        if (clearDataRaw) {
-          const clearData = JSON.parse(clearDataRaw);
-          deletedAt = new Date(clearData.deletedAt).getTime();
-        }
-  
-        if (!game.start_time) return false;
-  
-        const utcFormatted = game.start_time.replace(' ', 'T') + 'Z';
-        const activityTime = new Date(utcFormatted).getTime();
-  
-        if (deletedAt && activityTime <= deletedAt) {
-          return false;
-        }
-  
-        return true;
-      })
-    );
   }
 
   getTotalDuration(games: any[]): string {

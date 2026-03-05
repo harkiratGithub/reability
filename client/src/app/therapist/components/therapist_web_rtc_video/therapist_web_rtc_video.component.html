@@ -1,16 +1,8 @@
-
 <div *ngIf="isInWebcamContainer" class="web-cam-sidebar-container">
-  <video
-    #patientVideo
-    id="{{ 'patient-video-' + therapistPatientConnection.peer }}"
-    [ngClass]="setPatientSidebarVideoClasses()"
-    autoplay
-    playsinline
-  ></video>
+  <video id="{{ 'patient-video-' + therapistPatientConnection.peer }}" [ngClass]="setPatientSidebarVideoClasses()" autoplay playsinline></video>
 </div>
-<div
-  *ngIf="!isInWebcamContainer"
-  [ngClass]="{
+<div *ngIf="!isInWebcamContainer" [ngClass]="{
+    'hide-video': !showWebRtcVideos,
     'video-content-container-full-screen-swapped': isSwappedScreens && !isSplitScreenView,
     'video-content-container': !isSwappedScreens,
     'video-content-container-depth-cam': !isSwappedScreens && isDepthCameraConnected,
@@ -20,36 +12,21 @@
     'video-content-container-regular-video': !isSwappedScreens && !enlargeVideo,
     'video-content-container-enlarge-video': !isSwappedScreens && enlargeVideo
   }">
-  
   <div class="video-content-container-inner">
-    <div
-      cdkDrag
-      (cdkDragStarted)="handleDragStart()"
-      [ngClass]="{
+    <div cdkDrag (cdkDragStarted)="handleDragStart()" [ngClass]="{
         'video-wrapper-swapped-local': isSwappedScreens,
         'video-wrapper-rotate-regular-video': !isSwappedScreens && !isSplitScreenView && !enlargeVideo,
         'video-wrapper-rotate-enlarge-video': !isSwappedScreens && !isSplitScreenView && enlargeVideo
-      }"
-    >
-      <video
-        id="{{ 'local-video-' + therapistPatientConnection.peer }}"
-        autoplay
-        playsinline
-        [ngClass]="{
+      }">
+      <video #localVideoRef id="{{ 'local-video-' + therapistPatientConnection.peer }}" autoplay playsinline [ngClass]="{
           'hide-video': isInWebcamContainer || !shouldSwapViews,
           'local-video-full-screen-swapped': isSwappedScreens,
           'local-video': !isSwappedScreens,
           'local-video-depth-cam': !isSwappedScreens && isDepthCameraConnected
-        }"
-      ></video>
+        }"></video>
     </div>
 
-    <div
-      class="patient-video-wrapper mirror-video"
-      cdkDrag
-      (cdkDragStarted)="handleDragStart()"
-      [ngStyle]="{ display: receivedRemoteVideo ? 'block' : 'none' }"
-      [ngClass]="{
+    <div class="patient-video-wrapper mirror-video" cdkDrag (cdkDragStarted)="handleDragStart()" [ngClass]="{
         'video-border': enlargeVideo,
         'video-wrapper-no-skeleton': !isSwappedScreens && isDisabledSkeletonVideo && !enlargeVideo,
         'video-wrapper-no-skeleton-enlarge-video': !isSwappedScreens && isDisabledSkeletonVideo && enlargeVideo,
@@ -59,106 +36,39 @@
         'video-wrapper-swapped': isSwappedScreens,
         'video-wrapper-regular-video': !isSwappedScreens && !isSplitScreenView && !enlargeVideo,
         'video-wrapper-enlarge-video': !isSwappedScreens && !isSplitScreenView && enlargeVideo
-      }"
-    >
+      }">
       <div class="patient-video-buttons" *ngIf="!isSwappedScreens">
         <div>
-          <div
-            class="button-background"
-            (click)="togglePatientVideo(); $event.stopPropagation(); $event.preventDefault()"
-            title="Toggle video"
-          >
+          <div class="button-background" (click)="togglePatientVideo(); $event.stopPropagation(); $event.preventDefault()" title="Toggle video">
             <img class="debug-image" src="../../../../assets/therapist/icon_bug_video.png" alt="Fullscreen" />
           </div>
         </div>
         <div class="left-video-buttons">
-          <div
-            class="button-background"
-            (click)="handleFullScreenVideoSession(); $event.stopPropagation(); $event.preventDefault()"
-            title="Click to one-on-one consultation"
-          >
+          <div class="button-background" (click)="handleFullScreenVideoSession(); $event.stopPropagation(); $event.preventDefault()" title="Click to one-on-one consultation">
             <img class="button-image" src="../../../../assets/therapist/icon_fullscreen_video.svg" alt="Fullscreen" />
           </div>
-          <div
-            class="button-background"
-            (click)="toggleEnlargeVideo(); $event.stopPropagation(); $event.preventDefault()"
-            title="{{ enlargeVideo ? 'Click to shrink' : 'Click to enlarge' }}"
-          >
-            <img
-              class="button-image"
-              [src]="
+          <div class="button-background" (click)="toggleEnlargeVideo(); $event.stopPropagation(); $event.preventDefault()" title="{{ enlargeVideo ? 'Click to shrink' : 'Click to enlarge' }}">
+            <img class="button-image" [src]="
                 enlargeVideo
                   ? '../../../../../../assets/therapist/icon_enlarge_video_close.svg'
                   : '../../../../assets/therapist/icon_enlarge_patient_video.svg'
-              "
-              alt="Enlarge video"
-            />
+              " alt="Enlarge video" />
           </div>
         </div>
       </div>
       <div class="patient-rotation-buttons" *ngIf="!isSwappedScreens">
-        <div
-          class="button-background"
-          (click)="rotateVideo(-90); $event.stopPropagation(); $event.preventDefault()"
-          title="Rotate video right"
-        >
-          <img
-            class="button-image"
-            src="
+        <div class="button-background" (click)="rotateVideo(-90); $event.stopPropagation(); $event.preventDefault()" title="Rotate video right">
+          <img class="button-image" src="
         ../../../assets/therapist/header-icons/swap.svg
-        "
-            alt="Rotate video right"
-          />
+        " alt="Rotate video right" />
         </div>
-        <div
-          class="button-background"
-          (click)="rotateVideo(90); $event.stopPropagation(); $event.preventDefault()"
-          title="Rotate video left"
-        >
-          <img
-            class="button-image"
-            src="
+        <div class="button-background" (click)="rotateVideo(90); $event.stopPropagation(); $event.preventDefault()" title="Rotate video left">
+          <img class="button-image" src="
       ../../../assets/therapist/header-icons/swap.svg
-      "
-            alt="Rotate video left"
-          />
+      " alt="Rotate video left" />
         </div>
       </div>
-      <video
-        [ngStyle]="{ display: 'block' }"
-        #patientVideo
-        id="{{ 'patient-video-' + therapistPatientConnection.peer }}"
-        autoplay
-        playsinline
-        [style.transform]="'rotate(' + videoRotation + 'deg)'"
-        [ngClass]="{
-          'zoom-video': enlargeVideo,
-          'patient-video-full-screen-swapped': isSwappedScreens && !isSplitScreenView,
-          'patient-video': !isSwappedScreens && !isSplitScreenView && !isDisabledSkeletonVideo,
-          'patient-video-depth-cam': !isSwappedScreens && !isSplitScreenView && isDepthCameraConnected,
-          'patient-video-split-screen': !isSwappedScreens && isSplitScreenView && !isDisabledSkeletonVideo,
-          'patient-video-split-screen-no-skeleton':
-            !isSwappedScreens && isSplitScreenView && isDisabledSkeletonVideo && !isActiveSkeleton,
-          'patient-video-split-screen-active-skeleton':
-            !isSwappedScreens && isSplitScreenView && isDisabledSkeletonVideo && isActiveSkeleton,
-          'patient-video-full-screen-swapped-split-screen':
-            isSwappedScreens && isSplitScreenView && !isDisabledSkeletonVideo,
-          'patient-video-no-skeleton':
-            !isSwappedScreens && !isSplitScreenView && isDisabledSkeletonVideo && !isActiveSkeleton,
-          'patient-video-active-skeleton':
-            !isSwappedScreens && !isSplitScreenView && isDisabledSkeletonVideo && isActiveSkeleton,
-          'patient-video-full-screen-swapped-split-screen-no-skeleton':
-            isSwappedScreens && isSplitScreenView && isDisabledSkeletonVideo
-        }"
-      ></video>
-      <canvas
-        [ngStyle]="{ display: 'none' }"
-        style="transform: scaleX(1)"
-        id="{{ 'patient-video-' + therapistPatientConnection.peer }}"
-        #canvasRef
-        width="257"
-        height="192"
-        [ngClass]="{
+      <video [ngStyle]="{ display: hideVideo ? 'none' : 'block' }" #patientVideo id="{{ 'patient-video-' + therapistPatientConnection.peer }}" autoplay playsinline [style.transform]="'rotate(' + videoRotation + 'deg)'" [ngClass]="{
           'zoom-video': enlargeVideo,
           'hide-video': !receivedRemoteVideo,
           'patient-video-full-screen-swapped': isSwappedScreens && !isSplitScreenView,
@@ -177,30 +87,27 @@
             !isSwappedScreens && !isSplitScreenView && isDisabledSkeletonVideo && isActiveSkeleton,
           'patient-video-full-screen-swapped-split-screen-no-skeleton':
             isSwappedScreens && isSplitScreenView && isDisabledSkeletonVideo
-        }"
-      ></canvas>
+        }"></video>
+      <canvas [ngStyle]="{ display: hideVideo ? 'block' : 'none' }" style="transform: scaleX(1)" id="{{ 'patient-canvas-' + therapistPatientConnection.peer }}" #canvasRef width="257" height="192" [ngClass]="{
+          'zoom-video': enlargeVideo,
+          'hide-video': !receivedRemoteVideo,
+          'patient-video-full-screen-swapped': isSwappedScreens && !isSplitScreenView,
+          'patient-video': !isSwappedScreens && !isSplitScreenView && !isDisabledSkeletonVideo,
+          'patient-video-depth-cam': !isSwappedScreens && !isSplitScreenView && isDepthCameraConnected,
+          'patient-video-split-screen': !isSwappedScreens && isSplitScreenView && !isDisabledSkeletonVideo,
+          'patient-video-split-screen-no-skeleton':
+            !isSwappedScreens && isSplitScreenView && isDisabledSkeletonVideo && !isActiveSkeleton,
+          'patient-video-split-screen-active-skeleton':
+            !isSwappedScreens && isSplitScreenView && isDisabledSkeletonVideo && isActiveSkeleton,
+          'patient-video-full-screen-swapped-split-screen':
+            isSwappedScreens && isSplitScreenView && !isDisabledSkeletonVideo,
+          'patient-video-no-skeleton':
+            !isSwappedScreens && !isSplitScreenView && isDisabledSkeletonVideo && !isActiveSkeleton,
+          'patient-video-active-skeleton':
+            !isSwappedScreens && !isSplitScreenView && isDisabledSkeletonVideo && isActiveSkeleton,
+          'patient-video-full-screen-swapped-split-screen-no-skeleton':
+            isSwappedScreens && isSplitScreenView && isDisabledSkeletonVideo
+        }"></canvas>
     </div>
   </div>
-  <!-- Individual scorebar for this specific patient - regular view -->
-  <app-session-scorebar
-    *ngIf="currentGameName === 'studio' && !isSwappedScreens"
-    [gameScoreSummaryData]="individualPatientScoreData"
-    (gameSelected)="onGameSelected($event)"
-    [ngClass]="getPatientScorebarClasses()"
-    [ngStyle]="getPatientScorebarStyle()"
-  ></app-session-scorebar>
-  
-  <!-- Individual scorebar for this specific patient - full screen view -->
-  <app-session-scorebar
-    *ngIf="currentGameName === 'studio' && isSwappedScreens"
-    [gameScoreSummaryData]="individualPatientScoreData"
-    (gameSelected)="onGameSelected($event)"
-    [ngClass]="getFullscreenScorebarClasses()"
-    [ngStyle]="getFullscreenScorebarStyle()"
-  ></app-session-scorebar>
-  
-  <div *ngIf="currentCompensationMessage" class="compensation-alert">
-    {{ currentCompensationMessage }}
-  </div>
-
 </div>

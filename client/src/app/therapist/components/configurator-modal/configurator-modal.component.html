@@ -7,20 +7,16 @@
   </mat-dialog-actions>
   <ng-template #oldStyle>
     <mat-dialog-actions class="dialog-actions" align="end">
-      <!--<button class="leave-button" mat-button mat-dialog-close></button>-->
+      <button class="leave-button" mat-button mat-dialog-close></button>
     </mat-dialog-actions>
   </ng-template>
   <mat-dialog-content>
-    <ng-container *ngIf="isGrillGame(); else iframeConfigurator">
-      <div id="unity-container" class="unity-container">
-        <canvas id="unity-canvas"></canvas>
-      </div>
-    </ng-container>
-    <ng-template #iframeConfigurator>
-      <!-- Standard iframe configurator for non-Grill games -->
-      <iframe class="iframe-contianer" frameBorder="0" [src]="getConfiguratorUrl() | urlSanitaizer" (load)="onIframeLoad()" allow="autoplay *"
-        id="game-iframe" allowfullscreen>
-      </iframe>
-    </ng-template>
+    <iframe class="iframe-contianer" frameBorder="0" [src]="game.url | urlSanitaizer" (load)="onIframeLoad()" allow="autoplay *"
+      id="game-iframe" allowfullscreen [ngStyle]="{transform: 'scale(0.7)',
+      transformOrigin: 'left top',
+      width: 'calc(100% * (1 / 0.7))',
+      height: 'calc(100% * (1 / 0.7))'
+      }">
+    </iframe>
   </mat-dialog-content>
 </div>

@@ -1,7 +1,7 @@
 <div class="logs-container">
   <textarea type="text" [(ngModel)]="logsText"></textarea>
   <div class="save-btn">
-    <button (click)="saveManual()" [disabled]="!logsText" title="save">
+    <button (click)="saveToLocalStorage()" [disabled]="!logsText" title="save">
       <img src="../../../../assets/buttons/btn_send.png" />
     </button>
   </div>

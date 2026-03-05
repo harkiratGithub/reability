@@ -43,11 +43,6 @@ const appReducer = (lastState: IGlobalState, action: IAppAction) => {
         ...lastState,
         showTimer: action.payload,
       };
-    case AppActions.SET_GAME_TOKEN:
-      return {
-        ...lastState,
-        gameSessionToken: action.payload,
-      };
     case AppActions.NEWSESSION:
       const newSession = {
         playerId: action.payload.playerId,
