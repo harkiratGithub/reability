@@ -27,11 +27,12 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: auto;
-  height: auto;
+  /* Force intrinsic 16:9 size; override Unity's inline width/height on first attach */
+  width: auto !important;
+  height: auto !important;
   aspect-ratio: 16/9; /* 1280/720 = 16:9 aspect ratio */
-  max-width: 100%;
-  max-height: 100%;
+  max-width: 100% !important;
+  max-height: 100% !important;
   border-radius: 7px;
   z-index: 10;
   background: transparent;
@@ -41,7 +42,7 @@
 /* Show branded image as canvas background while loading */
 .unity-game-canvas.with-placeholder {
   background-color: transparent;
-  background-image: url('../../../../assets/game-icons/Grill-loader.png');
+  background-image: url('../../../../assets/game-icons/Grill2.gif');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -402,22 +403,22 @@ video[id^="grill-video-"].unity-game-canvas {
   }
 }
 
-/* CSS for Portrait Mode - Works fine, so no changes */
+/* Responsive sizing for game iframe on mobile only */
 @media (orientation: portrait) {
-  iframe {
+  .game-wrapper-mobile .game-iframe {
     width: 100%;
     height: auto;
-    aspect-ratio: 16/9; /* Maintain video aspect ratio */
+    aspect-ratio: 16 / 9; /* Maintain video aspect ratio */
   }
 }
 
-/* CSS for Landscape Mode - Fixes for mobile and tablet devices */
 @media (orientation: landscape) {
-  iframe {
-    width: 100vw; /* Use the full viewport width */
-    height: 56.25vw; /* Maintain 16:9 aspect ratio (width * 9 / 16) */
-    max-height: 100vh; /* Ensure it doesn’t overflow vertically */
-    max-width: 100%; /* Limit to container width if necessary */
-    object-fit: cover; /* Ensure it covers the space nicely */
+  .game-wrapper-mobile .game-iframe {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    aspect-ratio: 16 / 9; /* Maintain video aspect ratio */
+    object-fit: contain; /* Show full game without cropping */
   }
 }
