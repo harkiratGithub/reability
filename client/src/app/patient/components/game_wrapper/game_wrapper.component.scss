@@ -23,12 +23,13 @@
 }
 
 .unity-game-canvas {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  /* Force intrinsic 16:9 size; override Unity's inline width/height on first attach */
-  width: auto !important;
+  /* Let canvas be centered by flex in .content-background */
+  position: relative;
+  top: auto;
+  left: auto;
+  transform: none;
+  /* Fill available width while keeping aspect ratio */
+  width: 100% !important;
   height: auto !important;
   aspect-ratio: 16/9; /* 1280/720 = 16:9 aspect ratio */
   max-width: 100% !important;
@@ -186,6 +187,9 @@ video[id^="grill-video-"].unity-game-canvas {
         box-shadow: 0 12px 12px 0 rgba(4, 17, 24, 0.6);
         background: linear-gradient(225.53deg, #fcf9ea 0%, #faf7e6 100%);
         overflow: hidden; /* needed for Unity 'cover' sizing + rounded corners */
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
         /* Overlay shown while Unity/iframe is loading */
         .unity-loading-placeholder {
