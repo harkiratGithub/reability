@@ -5,6 +5,7 @@ import { Subscription, Observable } from 'rxjs';
 import { AppActions } from '../../../../app/app.actions';
 import { communicationUtil, MESSAGES } from '../../../common/services/communication_util.service';
 import { IScore } from '../../../../types';
+import { log } from 'console';
 
 @Component({
   selector: 'app-game-intro',
@@ -40,6 +41,15 @@ export class GameIntroductionComponent implements OnInit, OnChanges {
 
   constructor(private appActions: AppActions) {}
 
+  private isGrillGame(): boolean {
+    return !!(
+      this.currentGameName?.toLowerCase() === 'grill' ||
+      (this.initGameSettingsForTherapist &&
+        (this.initGameSettingsForTherapist.gameId === 20 ||
+          this.initGameSettingsForTherapist.gameName?.toLowerCase() === 'grill'))
+    );
+  }
+
   ngOnInit() {
     // Clear any existing timeout
     if (this.stuckAt95Timeout) {
@@ -58,13 +68,7 @@ export class GameIntroductionComponent implements OnInit, OnChanges {
       this.subscription.add(
         this.score$.subscribe((score) => {
           // Only drive from score for Grill on patient side
-          const isGrill =
-            this.currentGameName?.toLowerCase() === 'grill' ||
-            (this.initGameSettingsForTherapist &&
-              (this.initGameSettingsForTherapist.gameId === 20 ||
-                this.initGameSettingsForTherapist.gameName?.toLowerCase() === 'grill'));
-
-          if (!isGrill) {
+          if (!this.isGrillGame()) {
             return;
           }
 
@@ -88,11 +92,7 @@ export class GameIntroductionComponent implements OnInit, OnChanges {
     }
 
     const loadingBarInterval = setInterval(() => {
-      // Check if this is Grill game (check dynamically each time)
-      const isGrillGame = this.currentGameName?.toLowerCase() === 'grill' || 
-                         (this.initGameSettingsForTherapist && 
-                          (this.initGameSettingsForTherapist.gameId === 20 || 
-                           this.initGameSettingsForTherapist.gameName?.toLowerCase() === 'grill'));
+      const isGrillGame = this.isGrillGame();
 
       // For Grill game on therapist side, progress based on video stream readiness
       if (isGrillGame && this.isTherapistMode) {
@@ -170,12 +170,6 @@ export class GameIntroductionComponent implements OnInit, OnChanges {
             this.stuckAt95Timeout = null;
           }, 4000);
         }
-      } else if (this.introTypes.length > 0) {
-        // Normal iframe game behavior
-        if (!this.gotGameSettings) {
-          this.gotGameSettings = true;
-        }
-        this.loadingBarPercentage += 20;
       } else if (isGrillGame && !this.isTherapistMode) {
         // Grill game on patient side - progress based on Unity loading
         // This will be handled by the game_wrapper component sending progress updates
@@ -185,17 +179,34 @@ export class GameIntroductionComponent implements OnInit, OnChanges {
           this.loadingBarPercentage = 0;
           this.gotGameSettings = true;
         }
-      } else if (this.isTherapistMode && !isGrillGame && this.introTypes.length === 0) {
-        // Other games on therapist side without initGameSettings - start progress anyway
+      } else if (this.introTypes.length > 0) {
+        // Non-Grill games should follow ga-candidate behavior.
         if (!this.gotGameSettings) {
           this.gotGameSettings = true;
         }
-        if (this.loadingBarPercentage < 95) {
-          this.loadingBarPercentage = Math.min(95, this.loadingBarPercentage + 10);
-        }
+        this.loadingBarPercentage += 20;
       }
       
       if (this.loadingBarPercentage >= 100) {
+        if (!isGrillGame) {
+          this.loadingBarPercentage = 100;
+          this.iframeEl = document.getElementById('games-iframe-' + this.connectionId);
+          if (this.iframeEl) {
+            communicationUtil.sendMessageToIframe(this.iframeEl, {}, MESSAGES.GAME_INTRODUCTION_DONE);
+          }
+          clearInterval(loadingBarInterval);
+          if (this.isGameReadyToStart) {
+            if (!this.isTherapistMode) {
+              this.appActions.showTimer(true);
+            } else {
+              this.sendShowTimerForTherapist.emit(true);
+            }
+          } else {
+            this.introductionProgressEnded.emit(true);
+          }
+          return;
+        }
+
         this.loadingBarPercentage = 100; // Ensure it's exactly 100
         // Clear stuck timeout if we reached 100%
         if (this.stuckAt95Timeout) {
@@ -247,6 +258,7 @@ export class GameIntroductionComponent implements OnInit, OnChanges {
     ) {
       this.initGameSettingsForTherapist = changes.initGameSettingsForTherapist.currentValue;
       this.handleIntroTypes(this.initGameSettingsForTherapist);
+      console.log('this.initGameSettingsForTherapist 222222>>>>>>>>>>>>>>>>>>>', this.initGameSettingsForTherapist);
     }
   }
 

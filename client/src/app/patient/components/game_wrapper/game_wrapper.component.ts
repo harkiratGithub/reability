@@ -35,6 +35,7 @@ import { SkeletonProgressBarService } from '../../../common/services/skeleton-pr
 import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
 import { FeatureFlagService } from '../../../common/services/feature-flag.service';
+import { log } from 'console';
 
 // Unity WebGL Integration TypeScript Declarations
 declare global {
@@ -256,10 +257,10 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
   }
 
   private isGrillForTherapist(): boolean {
-    return !!(this.isTherapist && (this.gameIdTherapist === 20 ||
-      (this.currentGameName || '').toLowerCase() === 'grill' ||
-      this.gameId === 20 ||
-      (this.gameName || '').toLowerCase() === 'grill'));
+    return !!(
+      this.isTherapist &&
+      (this.gameIdTherapist === 20 || this.gameId === 20 || (this.gameName || '').toLowerCase() === 'grill')
+    );
   }
 
   private startTherapistOverlayWatch(): void {
@@ -570,8 +571,6 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
     this.gameReadyToStart.emit(false);
     if (!this.isTherapist) {
       this.appActions.updateInitGameSettings({});
-    } else {
-      this.sendInitGameSettingsForTherapist.emit({});
     }
     this.gotGameSettings = false;
     this.appActions.resetGameScore();
@@ -2040,6 +2039,7 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
     }
     if (!this.gotGameSettings && data.settings) {
       if (!this.isTherapist) {
+        console.log('data.settings>>>>>>>>>>>>>>>>>>>', data.settings);
         this.appActions.updateInitGameSettings(data.settings);
       } else {
         this.sendInitGameSettingsForTherapist.emit(data.settings);
@@ -2320,6 +2320,26 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
 
     if (this.isTherapist) {
       this.ajax.getGameSettingsForPatient(this.gameIdTherapist, this.connectedUser.patientId).subscribe((settings) => {
+        if (this.gameIdTherapist === 4) {
+          if (this.iframeEl && this.iframeEl.contentWindow) {
+            communicationUtil.sendMessageToIframe(
+              this.iframeEl,
+              {
+                isTherapist: true,
+                peerId: this.peerId,
+                userId: this.peerId,
+                patientSettings: settings,
+                playerId: this.authenticationService.currentUserValue.id,
+                playerFirstName: this.authenticationService.currentUserValue.firstName,
+                playerLastName: this.authenticationService.currentUserValue.lastName,
+                enableCarouselText: this.flagService.isEnabled('STUDIO_CAROUSEL_FLAG'),
+              },
+              MESSAGES.IS_THERAPIST
+            );
+          }
+          return;
+        }
+
         const normalized = (settings && (settings as any).current_set) ? (settings as any).current_set : (settings || {});
         const iframeMessage = {
           isTherapist: true,
@@ -2386,7 +2406,8 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
       } else {
         // Other games: ga-candidate path – run every time iframe loads, no dedupe
         this.ajax.startGameSession(this.gameId).subscribe((response) => {
-          const settings = response && (response as any).settings !== undefined ? (response as any).settings : response;
+          const settings = this.gameId === 4 ? response : (response && (response as any).settings !== undefined ? (response as any).settings : response);
+        console.log('settings>>>>>>>>>>>>>>>>>>>', settings);
           const token = (response as any)?.token;
           if (token) this.appActions.setGameToken(token);
           if (this.iframeEl && this.iframeEl.contentWindow) {

@@ -16,12 +16,12 @@
           </div>
         </div> 
         <!-- CRITICAL: Always show iframes-container for therapist when Grill is active, even without gameUrl -->
-        <div class="iframes-container" *ngIf="(isTherapist && gameUrl) || currentGameUrl || (isTherapist && (gameIdTherapist === 20 || currentGameName?.toLowerCase() === 'grill' || gameId === 20 || gameName?.toLowerCase() === 'grill'))">
+        <div class="iframes-container" *ngIf="(isTherapist && gameUrl) || currentGameUrl || (isTherapist && (gameIdTherapist === 20 || gameId === 20 || gameName?.toLowerCase() === 'grill'))">
           <app-end-game *ngIf="isEndGameModalOpen"></app-end-game>
           
           <!-- Therapist view: Grill game video (ALWAYS show for therapist when Grill is active) -->
           <video 
-            *ngIf="isTherapist && (gameIdTherapist === 20 || currentGameName?.toLowerCase() === 'grill' || gameId === 20 || gameName?.toLowerCase() === 'grill')"
+            *ngIf="isTherapist && (gameIdTherapist === 20 || gameId === 20 || gameName?.toLowerCase() === 'grill')"
             id="{{ 'grill-video-' + connectionId }}"
             class="unity-game-canvas"
             autoplay
@@ -53,7 +53,7 @@
      
           <!-- Regular iframe for other games (hide for Grill on therapist) -->
           <iframe 
-            *ngIf="!(isTherapist && (gameIdTherapist === 20 || currentGameName?.toLowerCase() === 'grill' || gameId === 20)) && (gameId !== 20 || isTherapist)"
+            *ngIf="!(isTherapist && (gameIdTherapist === 20 || gameId === 20 || gameName?.toLowerCase() === 'grill')) && (gameId !== 20 || isTherapist)"
             #iframeRef 
             id="{{ 'games-iframe-' + connectionId }}" 
             allow="autoplay *; camera *; microphone *; fullscreen *; webgl *; cross-origin-isolated *; accelerometer *; gyroscope *" 
