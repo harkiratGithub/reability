@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html ng-app="yourApp">
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="Build/Grill_OB.loader.js"></script>
+    <script src="StreamingAssets/OpeningSceneWebHelper.js"></script>
+    <script src="StreamingAssets/GrillSettingsWebHelper.js"></script>
+    <script src="StreamingAssets/GameManagerWebHelper.js"></script>
+    <script src="js/AngularJS_Unity_Service.js"></script>
+    <title>Unity WebGL with AngularJS Integration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .controls {
+            margin: 20px 0;
+        }
+        .controls button {
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .controls button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .score {
+            margin: 20px 0;
+            font-size: 18px;
+        }
+        #unity-container {
+            border: 1px solid #ccc;
+            margin: 20px 0;
+        }
+        #unity-loading-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+        #unity-progress-bar-full {
+            height: 100%;
+            background-color: #4CAF50;
+            width: 0%;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div ng-controller="GameController as gameCtrl">
+        <h1>Unity WebGL with AngularJS Integration</h1>
+        
+        <!-- Unity Game Container -->
+        <div id="unity-container">
+            <canvas id="unity-canvas"></canvas>
+            <div id="unity-loading-bar" ng-show="!gameCtrl.unityReady">
+                <div id="unity-progress-bar-full"></div>
+            </div>
+        </div>
+        
+        <!-- Game Controls -->
+        <div class="controls">
+            <button ng-click="gameCtrl.startPatientMode()" 
+                    ng-disabled="!gameCtrl.unityReady">
+                Start Patient Mode
+            </button>
+            <button ng-click="gameCtrl.startPhysiotherapyMode()" 
+                    ng-disabled="!gameCtrl.unityReady">
+                Start Physiotherapy Mode
+            </button>
+        </div>
+        
+        <!-- Score Display -->
+        <div class="score">
+            <h3>Score: {{gameCtrl.currentScore}}</h3>
+        </div>
+        
+        <!-- Status -->
+        <div class="status">
+            <p>Unity Status: <span ng-show="gameCtrl.unityReady" style="color: green;">Ready</span><span ng-show="!gameCtrl.unityReady" style="color: red;">Loading...</span></p>
+            <p>Game Mode: {{gameCtrl.gameMode}}</p>
+        </div>
+    </div>
+</body>
+</html>

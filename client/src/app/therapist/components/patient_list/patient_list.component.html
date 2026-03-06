@@ -112,7 +112,7 @@
             <button
               class="open-modal-btn"
               (click)="openLogModal(patient.userId)"
-              *ngIf="patient.gameSummary"
+              *ngIf="hasGameSummary(patient)"
               [ngClass]="{ 'animate-button': !shownLogs[patient.userId] }"
             >
               1
