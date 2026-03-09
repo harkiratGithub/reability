@@ -5189,18 +5189,22 @@ private messageTimeout: any;
       if (!canvas || !canvasCtx) return;
       if (this.gameId === 3) {
         this.onPoseCameraResults(results, canvasCtx, canvas);
-      } else if (environment.gameIdWithComp.includes(String(this.gameId))) {
+      } else if (this.isCompensationGame(this.gameId)) {
         this.calculateOtherGameAngles(results, canvasCtx, canvas);
       }
     });
   }
+
+private isCompensationGame(gameId: number): boolean {
+  return gameId !== 4 && environment.gameIdWithComp.includes(String(gameId));
+}
 
  // ================== LOAD COMP SETTINGS ==================
 private loadCompSettings(patientId: number, gameId: number) {
   if (this.compSettingsLoaded) {
     return;
   }
-  if (!environment.gameIdWithComp.includes(String(gameId))) {
+  if (!this.isCompensationGame(gameId)) {
     return;
   }
   this.ajaxService.getCompThresholdValue().pipe(
@@ -5283,7 +5287,7 @@ private async processVideoFrames() {
       }
       if (this.gameId === 3) {
         this.onPoseCameraResults(results, canvasCtx, canvas);
-      } else {
+      } else if (this.isCompensationGame(this.gameId)) {
         this.calculateOtherGameAngles(results, canvasCtx, canvas);
       }
     });

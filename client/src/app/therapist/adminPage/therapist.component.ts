@@ -40,6 +40,7 @@ import { SkeletonService } from 'src/app/common/services/skeleton.service';
 import { SkeletonProgressBarService } from 'src/app/common/services/skeleton-progress-bar.service';
 
 import { HttpClient } from '@angular/common/http';
+import { log } from 'console';
 declare var MediaRecorder: any;
 enum tabs {
   session,
@@ -2122,6 +2123,26 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
+  private resolveGameNameFromPayload(payload: any): string | undefined {
+    const rawName = payload?.name;
+    if (typeof rawName === 'string' && rawName.trim()) {
+      return rawName;
+    }
+
+    const gameId = payload?.id;
+    const gameUrl = (payload?.url || '').toLowerCase();
+
+    if (gameId === 4 || gameUrl.includes('memorygame')) {
+      return 'memory';
+    }
+
+    if (gameId === 20 || gameUrl.includes('grill')) {
+      return 'Grill';
+    }
+
+    return undefined;
+  }
+
   setGameName(conn, data) {
     const connectedPaitent = this.connectedPaitents.find((paitent) => paitent.connection.peer === conn.peer);
     if (connectedPaitent) {
@@ -2141,6 +2162,8 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
     const connectedPaitent = this.connectedPaitents.find((paitent) => paitent.connection.peer === conn.peer);
     if (connectedPaitent) {
       connectedPaitent.initGameSettingsForTherapist = data;
+
+      console.log('data.settings 111111>>>>>>>>>>>>>>>>>>>', data);
     }
   }
 
@@ -2176,6 +2199,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
     const shouldSwappedScreens = data.payload.name === 'studio' ? true : false;
     const shouldActivateSound = this.shouldActivateSound(conn);
     const currConn = this.connectedPaitents.find((connection) => connection.connection === conn);
+    const resolvedGameName = this.resolveGameNameFromPayload(data.payload);
     if (!currConn) {
       const newConnection = {
         connection: conn,
@@ -2184,7 +2208,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
         isGameShown: false,
         gameUrl: this.sanitizer.bypassSecurityTrustResourceUrl(data.payload.url),
         options_menu_state: { isTherapist: true, skeletonInGame: false, skeletonBuffer: undefined, id: conn.peer },
-        gameName: data.payload.name,
+        gameName: resolvedGameName,
         gameId: data.payload.id,
         isSwappedScreens: shouldSwappedScreens,
         isDepthCamConnected: false,
@@ -2215,9 +2239,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       currConn.initGameSettingsForTherapist = {};
       currConn.showTimerForTherapist = false;
       currConn.showWebRtcVideos = true;
-      if (data.payload.name) {
-        currConn.gameName = data.payload.name;
-      }
+      currConn.gameName = resolvedGameName;
       if (data.payload.id) {
         currConn.gameId = data.payload.id;
       }
@@ -2263,6 +2285,8 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       currConn.showTimerForTherapist = false;
       currConn.isGameShown = false;
       currConn.gameUrl = null;
+      currConn.gameName = undefined;
+      currConn.gameId = undefined;
       currConn.showWebRtcVideos = true;
       currConn.initGameSettingsForTherapist = {};
     }
