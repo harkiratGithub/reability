@@ -2,6 +2,8 @@ import {
   Component,
   OnInit,
   OnDestroy,
+  OnChanges,
+  SimpleChanges,
   Output,
   EventEmitter,
   Input,
@@ -57,7 +59,7 @@ declare global {
   templateUrl: './game_wrapper.component.html',
   styleUrls: ['./game_wrapper.component.scss'],
 })
-export class GameWrapperComponent implements OnInit, OnDestroy {
+export class GameWrapperComponent implements OnInit, OnDestroy, OnChanges {
   @ViewChild('unityCanvas') unityCanvasRef!: ElementRef<HTMLCanvasElement>;
   currentGameUrl;
   iframeEl;
@@ -300,6 +302,16 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
     this.therapistVideoWatchTimer = setInterval(update, 500);
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    // When therapist connects (inTherapistSession becomes true),
+    // immediately clear the carousel — it must never show in supervised mode.
+    if (changes['inTherapistSession'] && changes['inTherapistSession'].currentValue === true) {
+      this.isPopupVisible = false;
+      this.carouselText = [];
+      this.resetTimer();
+    }
+  }
+
   ngAfterViewInit() {
     // Load Unity only for Grill game (id: 20) on patient side
     if (!this.isTherapist && !this.unityInitialized && this.gameId === 20) {
@@ -503,7 +515,7 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
         }
 
         if (type === 'sync_video_data') {
-          if (this.isEmpty(this.carouselText)) {
+          if (this.isEmpty(this.carouselText) || this.inTherapistSession) {
             this.isPopupVisible = false;
           }
 
@@ -511,10 +523,10 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
             this.startTimer();
           }
 
-          if (this.elapsedTime >= 2 && integerVidTime >= 2 && !this.isPopupVisible && !this.isEmpty(this.carouselText)) {
+          if (!this.inTherapistSession && this.elapsedTime >= 2 && integerVidTime >= 2 && !this.isPopupVisible && !this.isEmpty(this.carouselText)) {
             this.isPopupVisible = true;
             this.startCarousel();
-          } else if (integerVidTime < 2 || this.isEmpty(this.carouselText)) {
+          } else if (integerVidTime < 2 || this.isEmpty(this.carouselText) || this.inTherapistSession) {
             this.isPopupVisible = false;
           }
         }
@@ -558,7 +570,7 @@ export class GameWrapperComponent implements OnInit, OnDestroy {
   startTimer() {
     this.timer = setInterval(() => {
       this.elapsedTime += 1;
-      if (this.elapsedTime >= 2 && !this.isPopupVisible && !this.isEmpty(this.carouselText)) {
+      if (!this.inTherapistSession && this.elapsedTime >= 2 && !this.isPopupVisible && !this.isEmpty(this.carouselText)) {
         this.isPopupVisible = true;
         this.startCarousel();
       }

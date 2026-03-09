@@ -91,11 +91,9 @@ export class LoginPageComponent implements OnInit, OnDestroy {
         const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
         const token = await this.recaptchaV3Service.execute('login').toPromise();
         // Trim username & password
-        console.log("====user--pass====",this.f.username.value,this.f.password.value);
-          const username = (this.f.username.value || '').trim();
+         const username = (this.f.username.value || '').trim();
           const password = (this.f.password.value || '').trim();
           // Optional: update form controls with trimmed values
-          console.log("====user--pass after trim ====",username,password);
           this.f.username.setValue(username);
           this.f.password.setValue(password);
           const user = await this.ajax.login(

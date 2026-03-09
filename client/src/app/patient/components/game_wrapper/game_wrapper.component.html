@@ -10,7 +10,7 @@
     }">
     <div class="outer-border">
       <div class="content-background" [ngClass]="{ 'white-bg': currentGameName == 'whiteboard' }">
-        <div class="breaking-news-wrapper" *ngIf="isPopupVisible && isCarouselEnabled">
+        <div class="breaking-news-wrapper" *ngIf="isPopupVisible && isCarouselEnabled && !inTherapistSession">
           <div class="carousel-text-container">
             <marquee class="carousel-text" scrollamount="20">{{ carouselText[currentTextIndex] }}</marquee>
           </div>
