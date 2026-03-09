@@ -17,6 +17,9 @@ RUN npm install --legacy-peer-deps
 # Copy the entire application to the working directory
 COPY . .
 
+# Remove Angular cache and previous build artifacts
+RUN rm -rf client/.angular/cache dist
+
 COPY .env .env
 
 # Run the heroku-postbuild script, including Angular build

@@ -8,8 +8,11 @@ import { throttle, isNil } from 'lodash';
 @Injectable({ providedIn: 'root' })
 export class WebCamSkeletonService {
   private currentSkeletonFromWebCamSubject: BehaviorSubject<any>;
-  public currentSkeletonFromWebCamBuffer: Observable<any>;
-  smoothFactor = 0.8; // Amount of basic smoothing, between 0 - 1
+  public currentSkeletonFromWebCamBuffer: Observable<any>; // landmarks only
+  private currentFullResultsSubject: BehaviorSubject<any>; // new: full results
+  public currentFullResults$: Observable<any>; // expose full results
+
+  smoothFactor = 0.8;
   smoothPrevPose;
   smoothPrevPoses = [];
   loopActive;
@@ -25,14 +28,22 @@ export class WebCamSkeletonService {
   constructor() {
     this.currentSkeletonFromWebCamSubject = new BehaviorSubject<any>([]);
     this.currentSkeletonFromWebCamBuffer = this.currentSkeletonFromWebCamSubject.asObservable();
+
+    // ✅ Initialize full results subject
+    this.currentFullResultsSubject = new BehaviorSubject<any>(null);
+    this.currentFullResults$ = this.currentFullResultsSubject.asObservable();
   }
 
-  async bindPage(video, firstRun = false) {
+  async bindPage(video, firstRun = false, canvasId = 'patient-canvas') {
+    
+    
     if (!this.net) {
-      this.initializeModel();
+      await this.initializeModel();
     }
 
-    while (!this.modelInitialized) {}
+    while (!this.modelInitialized) { 
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
 
     this.firstRun = firstRun;
     this.loopActive = true;
@@ -40,18 +51,27 @@ export class WebCamSkeletonService {
     try {
       video = await this.loadVideo(video);
     } catch (e) {
-      let info = document.getElementById('info');
+      const info = document.getElementById('info');
       info.textContent = 'this browser does not support video capture,' + 'or this device does not have a camera';
       info.style.display = 'block';
       throw e;
     }
-    this.detectPoseInRealTime(video, this.net);
+    this.detectPoseInRealTime(video, this.net, canvasId);
   }
 
-  detectPoseInRealTime = async (videoElement, net) => {
-    this.canvasElement = document.getElementById('patient-canvas');
-    this.canvasCtx = (this.canvasElement as HTMLCanvasElement).getContext('2d');
+  detectPoseInRealTime = async (videoElement, net, canvasId = 'patient-canvas') => {
+    this.canvasElement = document.getElementById(canvasId) as HTMLCanvasElement | null;
+    if (!this.canvasElement) {
+      console.warn(`[POSE] Canvas not found: ${canvasId}, skipping pose detection`);
+      return;
+    }
+    this.canvasCtx = this.canvasElement.getContext('2d');
+    if (!this.canvasCtx) {
+      console.warn(`[POSE] Could not get 2d context for canvas: ${canvasId}`);
+      return;
+    }
     net.onResults(this.onResults);
+    // console.log(`[POSE] Binding page with canvas ID33: ${canvasId}`);
     const callback = throttle(this.throttleSkeleton, this.FRAME_PROCESS_INTERVAL, { trailing: false });
     if (!this.camera) {
       this.camera = new Camera(videoElement, {
@@ -62,6 +82,8 @@ export class WebCamSkeletonService {
         height: videoElement.videoHeight,
       });
     }
+
+    // console.log(`[POSE] Binding page with canvas ID44: ${canvasId}`);
     this.camera.start();
   };
 
@@ -72,34 +94,40 @@ export class WebCamSkeletonService {
   async loadVideo(video) {
     this.videoElement = video;
     (this.videoElement as HTMLVideoElement).play();
-
     return this.videoElement;
   }
 
   onResults = (results) => {
-    if (this.loopActive && results.poseLandmarks) {
-      this.currentSkeletonFromWebCamSubject.next(results.poseLandmarks);
-      this.removeLandmarks(results);
+    if (this.loopActive && this.canvasElement && this.canvasCtx) {
+      // ✅ Emit full results
+      this.currentFullResultsSubject.next(results);
 
-      this.canvasCtx.save();
-      this.canvasCtx.scale(-1, 1);
-      this.canvasCtx.translate(-this.canvasElement.width, 0);
-      this.canvasCtx.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
-      this.canvasCtx.drawImage(results.image, 0, 0, this.canvasElement.width, this.canvasElement.height);
-      drawLandmarks(this.canvasCtx, results.poseLandmarks, { color: 'white', lineWidth: 1, radius: 2 });
-      this.canvasCtx.restore();
-    }
-    if (this.firstRun && results.poseLandmarks) {
-      this.firstRun = false;
-      this.stopPage();
+      // ✅ Emit pose landmarks if available
+      if (results.poseLandmarks) {
+        this.currentSkeletonFromWebCamSubject.next(results.poseLandmarks);
+        this.removeLandmarks(results);
+        this.canvasCtx.save();
+        this.canvasCtx.scale(-1, 1);
+        this.canvasCtx.translate(-this.canvasElement.width, 0);
+        this.canvasCtx.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
+        this.canvasCtx.drawImage(results.image, 0, 0, this.canvasElement.width, this.canvasElement.height);
+        drawLandmarks(this.canvasCtx, results.poseLandmarks, { color: 'white', lineWidth: 1, radius: 2 });
+        this.canvasCtx.restore();
+      }
+
+      if (this.firstRun && results.poseLandmarks) {
+        this.firstRun = false;
+        this.stopPage();
+      }
     }
   };
 
   stopPage() {
     this.loopActive = false;
-    this.camera.video.pause();
+    if (this.camera?.video) this.camera.video.pause();
     setTimeout(() => {
       this.currentSkeletonFromWebCamSubject.next(undefined);
+      this.currentFullResultsSubject.next(undefined);
     }, 100);
   }
 
@@ -119,9 +147,7 @@ export class WebCamSkeletonService {
   initializeModel = async () => {
     if (!this.net) {
       this.net = new Pose({
-        locateFile: (file) => {
-          return `assets/pose/${file}`;
-        },
+        locateFile: (file) => `assets/pose/${file}`,
       });
       this.net.setOptions({
         modelComplexity: 1,

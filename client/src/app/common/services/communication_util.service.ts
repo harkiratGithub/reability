@@ -58,6 +58,7 @@ export const MESSAGES = {
   REDIRECT_TO_HOME: 'redirect_to_home',
   SESSION_FEEDBACK: 'session_feedback',
   RDP_REQUEST:'rdp_request',
+  UPDATE_VIDEO_LAYOUT: 'update_video_layout',
 };
 
 export interface IEnlargeVideoMessage {

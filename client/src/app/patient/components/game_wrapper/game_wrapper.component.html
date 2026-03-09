@@ -10,14 +10,59 @@
     }">
     <div class="outer-border">
       <div class="content-background" [ngClass]="{ 'white-bg': currentGameName == 'whiteboard' }">
-         <div class="breaking-news-wrapper" *ngIf="isPopupVisible && isCarouselEnabled">
+        <div class="breaking-news-wrapper" *ngIf="isPopupVisible && isCarouselEnabled && !inTherapistSession">
           <div class="carousel-text-container">
             <marquee class="carousel-text" scrollamount="20">{{ carouselText[currentTextIndex] }}</marquee>
           </div>
         </div> 
-        <div class="iframes-container" *ngIf="(isTherapist && gameUrl) || currentGameUrl">
+        <!-- CRITICAL: Always show iframes-container for therapist when Grill is active, even without gameUrl -->
+        <div class="iframes-container" *ngIf="(isTherapist && gameUrl) || currentGameUrl || (isTherapist && (gameIdTherapist === 20 || gameId === 20 || gameName?.toLowerCase() === 'grill'))">
           <app-end-game *ngIf="isEndGameModalOpen"></app-end-game>
-          <iframe #iframeRef id="{{ 'games-iframe-' + connectionId }}" allow="autoplay *" crossorigin="anonymous" sandbox="allow-scripts allow-same-origin allow-modals allow-downloads allow-popups" [ngClass]="['game-iframe']" allowfullscreen [src]="getIframeSrc() | urlSanitaizer" (load)="handleIframeLoad()">
+          
+          <!-- Therapist view: Grill game video (ALWAYS show for therapist when Grill is active) -->
+          <video 
+            *ngIf="isTherapist && (gameIdTherapist === 20 || gameId === 20 || gameName?.toLowerCase() === 'grill')"
+            id="{{ 'grill-video-' + connectionId }}"
+            class="unity-game-canvas"
+            autoplay
+            playsinline
+            muted
+            style="width: 100% !important; height: 100% !important; object-fit: contain !important; background: #000 !important; position: absolute !important; top: 0 !important; left: 0 !important; z-index: 999 !important; display: block !important; visibility: visible !important; opacity: 1 !important; pointer-events: none !important;">
+          </video>
+
+          <!-- Therapist-side placeholder above black screen video while remote frames are not yet available -->
+          <div 
+            class="unity-loading-placeholder therapist" 
+            *ngIf="isTherapist && showTherapistPlaceholder">
+            <img 
+              src="../../../../assets/game-icons/Grill2.gif" 
+              alt="Grill Game" 
+              class="unity-loading-image" />
+          </div>
+
+          <!-- Unity Canvas for Grill Game (patient render) -->
+          <canvas 
+            *ngIf="gameId === 20 && !useIframeFallback && !isTherapist" 
+            #unityCanvas
+            id="unity-canvas"
+            [ngClass]="['unity-game-canvas', showPlaceholder ? 'with-placeholder' : '']"
+            width="1280" 
+            height="720">
+          </canvas>
+
+     
+          <!-- Regular iframe for other games (hide for Grill on therapist) -->
+          <iframe 
+            *ngIf="!(isTherapist && (gameIdTherapist === 20 || gameId === 20 || gameName?.toLowerCase() === 'grill')) && (gameId !== 20 || isTherapist)"
+            #iframeRef 
+            id="{{ 'games-iframe-' + connectionId }}" 
+            allow="autoplay *; camera *; microphone *; fullscreen *; webgl *; cross-origin-isolated *; accelerometer *; gyroscope *" 
+            crossorigin="anonymous" 
+            sandbox="allow-scripts allow-same-origin allow-modals allow-downloads allow-popups allow-forms allow-pointer-lock allow-orientation-lock allow-presentation allow-top-navigation-by-user-activation" 
+            [ngClass]="['game-iframe']" 
+            allowfullscreen 
+            [src]="getIframeSrc() | urlSanitaizer" 
+            (load)="handleIframeLoad()">
           </iframe>
         </div>
       </div>
@@ -26,7 +71,14 @@
 </div>
 <div *ngIf="isMobile" id="{{ 'gameWrapper-' + connectionId }}" class="game-wrapper-mobile">
   <div class="iframes-container" *ngIf="(isTherapist && gameUrl) || currentGameUrl">
-    <iframe #iframeRef id="{{ 'games-iframe-' + connectionId }}" allow="autoplay *" [ngClass]="['game-iframe']" allowfullscreen [src]="getIframeSrc() | urlSanitaizer" (load)="handleIframeLoad()">
+    <iframe #iframeRef id="{{ 'games-iframe-' + connectionId }}" 
+      allow="autoplay *; camera *; microphone *; fullscreen *; webgl *; cross-origin-isolated *; accelerometer *; gyroscope *" 
+      crossorigin="anonymous" 
+      sandbox="allow-scripts allow-same-origin allow-modals allow-downloads allow-popups allow-forms allow-pointer-lock allow-orientation-lock allow-presentation allow-top-navigation-by-user-activation" 
+      [ngClass]="['game-iframe']" 
+      allowfullscreen 
+      [src]="getIframeSrc() | urlSanitaizer" 
+      (load)="handleIframeLoad()">
     </iframe>
   </div>
 </div>
