@@ -295,7 +295,7 @@ export const resetPassword = async (req, res, next) => {
 	const patient = await PatientHelper.getPatientById(patientId);
 	const user = await UserHelper.getUserById(patient.user_id);
 
-	UserHelper.resetPassword(user, setDefaultPassword)
+	UserHelper.resetPassword(user, setDefaultPassword, patient.institute_name)
 		.then(() => res.json({ status: 'OK' }))
 		.catch((err) => res.status(403).json({ message: err }));
 };

@@ -1,5 +1,6 @@
 import { map, findLast } from 'lodash';
 
+import * as BaseModel from '../services/BaseModel.service';
 import * as UserModel from '../models/users.model';
 import * as PatientModel from '../models/patient.model';
 import * as GameModel from '../models/game.model';
@@ -194,7 +195,18 @@ const peersStatus = openPeers.map(
 	}
 };
 
-export const create = async (user: { email: any; role: any }, client = null) => {
+export const getInstituteNameFromDepartments = async (departmentIds: number[]): Promise<string | undefined> => {
+	if (!departmentIds?.length) return undefined;
+	const result = await BaseModel.runQuery({
+		text: `SELECT i.name FROM institute i
+               JOIN department d ON d.institute_id = i.id
+               WHERE d.id = $1 AND i.active = true LIMIT 1`,
+		values: [departmentIds[0]],
+	});
+	return result.rows[0]?.name;
+};
+
+export const create = async (user: { email: any; role: any }, client = null, instituteName?: string) => {
 	const defaultPassword = 'Aa123456';
 	try {
 		const user_name = await generateUniqUsername();
@@ -222,7 +234,7 @@ export const create = async (user: { email: any; role: any }, client = null) => 
 			client
 		);
 		if (user.role === ROLE.PATIENT || user.role === ROLE.THERAPIST || user.role === ROLE.VIDEO_PATIENT) {
-			await EmailHelper.sendPatientCredentialsEmail(user.email, user_name, plainTextPassword);
+			await EmailHelper.sendPatientCredentialsEmail(user.email, user_name, plainTextPassword, instituteName);
 		} else {
 			await EmailHelper.sendNewUserEmail(user.email, token);
 		}
@@ -337,10 +349,7 @@ export const sendSMSOrEmail = async (user: { id: any }, emailOrPhone: string | s
 	const fast_login_link = link_type;
 	await UserModel.updateById(user.id, { fast_login_token, fast_login_token_timestamp, fast_login_link });
 	if (emailOrPhone.includes('@')) {
-		await EmailHelper.sendFastLoginEmail(
-			emailOrPhone, //user.email
-			fast_login_token
-		);
+		// sendFastLoginEmail deleted — TODO: migrate to Resend if needed
 	} else {
 		await SMSHelper.sendFastLoginSMS(emailOrPhone, fast_login_token);
 	}
@@ -378,7 +387,8 @@ export const getUserContactData = async (patientId: any, therapistId?: any) => {
 
 export const resetPassword = async (
 	user: { id: any; user_name: any; email: any; role: any },
-	setDefaultPassword: any
+	setDefaultPassword: any,
+	instituteName?: string
 ) => {
 	const defaultPassword = 'Aa123456';
 	const { id: userId, user_name: username, email, role } = user;
@@ -397,7 +407,8 @@ export const resetPassword = async (
 		await EmailHelper.sendPatientCredentialsEmail(
 			EncryptHelper.decryptPersonalData(email),
 			username,
-			plainTextPassword
+			plainTextPassword,
+			instituteName
 		);
 	} catch (err) {
 		throw new Error(err);

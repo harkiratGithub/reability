@@ -37,9 +37,8 @@ export const getPeersStatus = (req, res, next) => {
 };
 
 export const sendEmailAfterConnection = (req, res, next) => {
-	EmailHelper.sendUserConnectedEmail(req.body.patient, req.body.therapist)
-		.then(() => res.json({ message: 'success' }))
-		.catch((err) => res.status(400).json({ message: err }));
+	// sendUserConnectedEmail commented out — TODO: migrate to Resend if needed
+	res.json({ message: 'success' });
 };
 
 export const checkValidToken = (req, res, next) => {
@@ -116,9 +115,8 @@ export const reVerify2FA = async (req, res) => {
 };
 
 export const sendEmailAfterlogin = (req, res, next) => {
-	EmailHelper.sendUserLoggedInEmail(req.body.patient)
-		.then(() => res.json({ message: 'success' }))
-		.catch((err) => res.status(400).json({ message: err }));
+	// sendUserLoggedInEmail commented out — TODO: migrate to Resend if needed
+	res.json({ message: 'success' });
 };
 
 export const clearRingingStatus = (req, res, next) => {
