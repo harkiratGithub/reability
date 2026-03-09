@@ -1448,7 +1448,16 @@ private messageTimeout: any;
           }
         }
         if (therapistToPatientConnection) {
-          therapistToPatientConnection.send(this.getGameUrlMessage(isInGame));
+          if (isInGame) {
+            // Defer so currentGameUrl$/gameId$ and @Inputs settle before sending
+            setTimeout(() => {
+              if (!this.isInGame || !this.currentGameUrl) return;
+              const payload = this.getGameUrlPayloadFromUrl(this.currentGameUrl);
+              therapistToPatientConnection.send({ type: 'game_url', payload });
+            }, 80);
+          } else {
+            therapistToPatientConnection.send(this.getGameUrlMessage(false));
+          }
         }
       })
     );
@@ -2105,6 +2114,20 @@ private messageTimeout: any;
         name: this.currentGameName,
         id: this.gameId,
       },
+    };
+  }
+
+  private getGameUrlPayloadFromUrl(url: string) {
+    const normalizedUrl = (url || '').toLowerCase();
+    const matchedGame = (this.validGames || []).find((game) => {
+      const gameUrl = (game?.url || '').toLowerCase();
+      return !!gameUrl && (normalizedUrl === `${gameUrl}index.html` || normalizedUrl.includes(gameUrl));
+    });
+
+    return {
+      url,
+      name: matchedGame?.name || this.currentGameName,
+      id: matchedGame?.id || this.gameId,
     };
   }
 
@@ -3001,6 +3024,12 @@ private messageTimeout: any;
         break;
       case 'set_game_url':
         this.handleNewGameFromTherapist.emit(data.url);
+        if (therapistToPatientConnection) {
+          const payload = this.getGameUrlPayloadFromUrl(data.url);
+          setTimeout(() => {
+            therapistToPatientConnection.send({ type: 'game_url', payload });
+          }, 50);
+        }
         break;
       case 'enter_full_screen_video_session':
         this.patientWebRtcService.setShouldPauseGameState(true);

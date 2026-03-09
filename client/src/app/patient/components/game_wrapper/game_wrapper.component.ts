@@ -976,8 +976,11 @@ export class GameWrapperComponent implements OnInit, OnDestroy, OnChanges {
         if (isEmpty(settings) || !this.gameId) {
           return;
         }
-        if (!this.isTherapist) {
+
+        if (this.iframeEl) {
           communicationUtil.sendMessageToIframe(this.iframeEl, settings, MESSAGES.NEW_SETTINGS);
+        }
+        if (!this.isTherapist) {
           this.ajax.saveGameSettings(this.gameId, settings);
         }
       })
@@ -2352,7 +2355,16 @@ export class GameWrapperComponent implements OnInit, OnDestroy, OnChanges {
           return;
         }
 
-        const normalized = (settings && (settings as any).current_set) ? (settings as any).current_set : (settings || {});
+        const hasCurrentSet = settings && (settings as any).current_set;
+        const isStudioGame =
+          this.gameIdTherapist === 3 ||
+          (this.currentGameName && this.currentGameName.toLowerCase() === 'studio');
+
+        const normalized: any =
+          isStudioGame && hasCurrentSet
+            ? settings
+            : (hasCurrentSet ? (settings as any).current_set : (settings || {}));
+
         const iframeMessage = {
           isTherapist: true,
           peerId: this.peerId,
@@ -2363,16 +2375,27 @@ export class GameWrapperComponent implements OnInit, OnDestroy, OnChanges {
           playerFirstName: this.authenticationService.currentUserValue.firstName,
           playerLastName: this.authenticationService.currentUserValue.lastName,
           enableCarouselText: this.flagService.isEnabled('STUDIO_CAROUSEL_FLAG'),
-          
         };
+
         if (this.iframeEl && this.iframeEl.contentWindow) {
           communicationUtil.sendMessageToIframe(this.iframeEl, iframeMessage, MESSAGES.IS_THERAPIST);
         }
-        setTimeout(() => {
-          if (this.iframeEl && this.iframeEl.contentWindow) {
-            communicationUtil.sendMessageToIframe(this.iframeEl, iframeMessage, MESSAGES.IS_THERAPIST);
-          }
-        }, 500);
+        if (isStudioGame) {
+          const sendSettings = () => {
+            if (this.iframeEl && this.iframeEl.contentWindow) {
+              communicationUtil.sendMessageToIframe(this.iframeEl, normalized, MESSAGES.SETTINGS);
+            }
+          };
+          sendSettings();
+          setTimeout(sendSettings, 400);
+          setTimeout(sendSettings, 1000);
+        } else {
+          setTimeout(() => {
+            if (this.iframeEl && this.iframeEl.contentWindow) {
+              communicationUtil.sendMessageToIframe(this.iframeEl, iframeMessage, MESSAGES.IS_THERAPIST);
+            }
+          }, 500);
+        }
       });
     } else {
       if (this.gameId === 20 || this.gameId === 21) {
