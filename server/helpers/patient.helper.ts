@@ -24,7 +24,8 @@ export const createPatient = async (patientData, patientContacts) => {
 				email: patientData.email,
 				role: patientData.isPatientVideo ? ROLE.VIDEO_PATIENT : ROLE.PATIENT,
 			};
-			const createdUser = await UserHelper.create(userToSave, client);
+			const instituteName = await UserHelper.getInstituteNameFromDepartments(departmentsIds);
+		const createdUser = await UserHelper.create(userToSave, client, instituteName);
 			const patientToSave = getCommonData(patientData, createdUser.id);
 			const { disabledSkeleton } = patientData;
 			const createdPatient = await PatientModel.create(
