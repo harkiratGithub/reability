@@ -238,7 +238,7 @@ export const updatePatientAvailabilityStatus = (req, res, next) => {
 	}
 
 	// Validate status is one of the allowed values
-	if (!['unavailable', 'available', 'do_not_disturb', 'offline'].includes(availabilityStatus)) {
+	if (!['unavailable', 'available'].includes(availabilityStatus)) {
 		//console.log('[Patient Availability] Invalid status:', availabilityStatus);
 		return res.status(400).json({ error: 'Invalid availability status' });
 	}

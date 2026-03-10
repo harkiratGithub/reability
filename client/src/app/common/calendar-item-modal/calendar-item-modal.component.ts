@@ -57,7 +57,7 @@ export class CalendarItemModalComponent {
     const updatePatient = { 
       id: patient.patientId, 
       techReason: this.techReason,
-      availabilityStatus: 'available' as 'available' | 'offline' | 'unavailable' | 'do_not_disturb'
+      availabilityStatus: 'available' as 'available' | 'unavailable'
     };
     patient.techReason = this.techReason;
     this.onReasonSave.emit(updatePatient);

@@ -23,5 +23,6 @@ export class User {
   instituteLogo?: string; 
   isMobile: boolean;
   patientId?: number;
-  availabilityStatus: 'offline' | 'unavailable' | 'available' | 'do_not_disturb';
+  availabilityStatus: 'unavailable' | 'available';
+  peerStatus?: string;
 }
