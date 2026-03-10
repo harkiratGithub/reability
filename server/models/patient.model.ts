@@ -7,7 +7,7 @@ import * as UtilModel from './util.model';
 import * as EncryptHelper from '../services/encrypt.helper';
 import * as Helper from '../services/util.helper';
 import { weekNumberFromDate } from '../services/week-number.helper';
-import { sgMail } from '../services/email.service';
+// import { sgMail } from '../services/email.service'; // TODO: migrate to Resend
 import * as ExcelJS from 'exceljs';
 
 export const getFormattedDateInTimeZone = (date: string) => {
@@ -863,107 +863,9 @@ export const getAllPatientRTMDetails = async (month: any, year: any, sendMail: b
 			}
 			return { data: finalResult };
 		} else {
-			const sendEmailData = async (finalValuesData) => {
-				const workbook = new ExcelJS.Workbook();
-				const worksheet = workbook.addWorksheet('Patients RTM Data');
-				worksheet.columns = [
-					{ header: 'Institute Name', key: 'institute_name' },
-					// { header: 'Patient ID', key: 'patient_id' },
-					{ header: "Patient's Unique ID", key: 'username' },
-					{ header: 'First Name', key: 'first_name' },
-					{ header: 'Last Name', key: 'last_name' },
-					// { header: 'Phone', key: 'phone' },
-					// { header: 'Email', key: 'email' },
-					{ header: 'Date', key: 'since' },
-					// { header: 'Pain Level', key: 'pain_level' },
-					// { header: 'Review Activity', key: 'review_activity' },
-					// { header: 'Reminder to Exercise', key: 'reminder_to_exercise' },
-					// { header: 'No. of Minutes of Remote Monitoring', key: 'therapist_session_minutes' },
-					// { header: 'No. of Days of Data Transmitted', key: 'days_of_data_transmitted' },
-					// { header: '98975 (1,0)', key: '98975' },
-					// { header: '98977 (1,0)', key: '98977' },
-					// { header: '98980 (1,0)', key: '98980' },
-					// { header: '98981 (1,0)', key: '98981' },
-					// { header: 'Therapist ID', key: 'therapist_id' },
-					// { header: 'Therapist Username', key: 'therapist_username' },
-					// { header: 'Therapist First Name', key: 'therapist_first_name' },
-					// { header: 'Therapist Last Name', key: 'therapist_last_name' },
-					// { header: 'Therapist Note', key: 'event_note' },
-					// { header: 'Therapist Manual Minutes', key: 'minutes_spent' },
-					// { header: 'Therapist Session Minutes', key: 'therapist_session_minutes' }, // below
-					{ header: 'Patient Pain Level', key: 'patient_pain_level' },
-					{ header: 'Patient Note', key: 'patient_note' },
-					{ header: 'Therapist Id', key: 'therapist_id' },
-					{ header: 'Therapist User Name', key: 'therapist_user_name' },
-					{ header: 'Therapist Note', key: 'therapist_note' },
-					{ header: 'Therapist Session Start Time', key: 'therapist_session_start_time' },
-					{ header: 'Therapist Session End Time', key: 'therapist_session_end_time' },
-					{ header: 'Duration', key: 'therapist_session_duration' },
-					{ header: 'Therapist Session Review Activity', key: 'therapist_session_review_activity' },
-					{ header: 'Therapist Session Mode', key: 'therapist_session_mode' },
-				];
-
-				finalValuesData.forEach((entry) => {
-					worksheet.addRow({
-						institute_name: entry.institute_name || '--',
-						username: entry.patient_username || '--',
-						first_name: entry.first_name || '--',
-						last_name: entry.last_name || '--',
-						// phone: entry.phone,
-						// email: entry.email,
-						since: entry.since || '--',
-						// pain_level: entry.data.pain_level,
-						// review_activity: entry.data.review_activity,
-						// reminder_to_exercise: entry.data.reminder_to_exercise,
-						// days_of_data_transmitted: entry.data.daysDataTransmittedInMonth,
-						// '98975': entry['98975'],
-						// '98977': entry['98977'],
-						// '98980': entry['98980'],
-						// '98981': entry['98981'],
-						// therapist_username: entry.therapist_username,
-						// therapist_first_name: entry.therapist_first_name,
-						// therapist_last_name: entry.therapist_last_name,
-						// event_note: entry.data.note,
-						// minutes_spent: entry.data.minutes_spent,
-						// therapist_session_minutes: entry.data.therapist_session_minutes,
-						patient_pain_level: entry.data.patient?.pain_level,
-						patient_note: entry.data.patient?.note || '--',
-						therapist_id: entry.data.therapist?.therapist_id || '--',
-						therapist_user_name: entry.data.therapist?.user_name || '--',
-						therapist_note: entry.data.therapist?.note || '--',
-						therapist_session_start_time: entry.data.therapist?.start_time || '--',
-						therapist_session_end_time: entry.data.therapist?.end_time || '--',
-						therapist_session_duration: entry.data.therapist?.minutes_spent || '--',
-						therapist_session_review_activity: entry.data.therapist?.review_activity_type || '--',
-						therapist_session_mode: entry.data.therapist?.mode || '--',
-					});
-				});
-
-				const buffer = await workbook.xlsx.writeBuffer();
-				const msg = {
-					to: `${userDetails?.email}`,
-					from: process.env.SENGRID_FROM_EMAIL ? process.env.SENGRID_FROM_EMAIL : 'yoramfeld@gmail.com',
-					subject: `Patient RTM Data Export - ${finalValuesData.length} Records Found`,
-					text: 'Please find the attached Excel file with the patients RTM data.',
-					attachments: [
-						{
-							content: Buffer.from(buffer).toString('base64'),
-							filename: `PatientData_${new Date().toISOString().split('T')[0]}.xlsx`,
-							type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-							disposition: 'attachment',
-						},
-					],
-				};
-
-				try {
-					await sgMail.send(msg);
-					return { message: 'Patient data successfully sent via email.' };
-				} catch (error) {
-					console.error('Error sending email:', error);
-					throw new Error('Could not send email. Please try again later.');
-				}
-			};
-			sendEmailData(values);
+			// TODO: migrate to Resend — patient data export email (sendEmailData) commented out
+			// const sendEmailData = async (finalValuesData) => { ... };
+			// sendEmailData(values);
 		}
 	});
 };
