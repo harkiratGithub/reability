@@ -2,7 +2,18 @@
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
 <script> window.parent.postMessage('Hello from iframe', '*');  </script>
-<div *ngIf="!isMobile" id="{{ 'gameWrapper-' + connectionId }}" class="game-wrapper" [ngClass]="{ 'therapist-wrapper': isTherapist }">
+<div
+  *ngIf="!isMobile"
+  id="{{ 'gameWrapper-' + connectionId }}"
+  class="game-wrapper"
+  [ngClass]="{
+    'therapist-wrapper': isTherapist,
+    'grill-wrapper':
+      gameId === 20 ||
+      (currentGameName || '').toLowerCase() === 'grill' ||
+      (gameName || '').toLowerCase() === 'grill'
+  }"
+>
   <div class="game-container" [ngClass]="{
       'game-container-regular-video': !enlargeVideo,
       'game-container-enlarge-video': enlargeVideo,
@@ -40,15 +51,19 @@
               class="unity-loading-image" />
           </div>
 
-          <!-- Unity Canvas for Grill Game (patient render) -->
+        <!-- Unity Canvas for Grill Game (patient render) -->
+        <div
+          *ngIf="gameId === 20 && !useIframeFallback && !isTherapist"
+          class="unity-canvas-wrapper"
+        >
           <canvas 
-            *ngIf="gameId === 20 && !useIframeFallback && !isTherapist" 
             #unityCanvas
             id="unity-canvas"
             [ngClass]="['unity-game-canvas', showPlaceholder ? 'with-placeholder' : '']"
             width="1280" 
             height="720">
           </canvas>
+        </div>
 
      
           <!-- Regular iframe for other games (hide for Grill on therapist) -->

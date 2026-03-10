@@ -89,6 +89,8 @@ export class GameWrapperComponent implements OnInit, OnDestroy, OnChanges {
   // Exposed to template to control loading placeholder visibility
   public unityGameLoaded = false;
   private unityInstance: any = null;
+  private unityAutoResizeInterval: any = null;
+  private unityResizeHandler: (() => void) | null = null;
   private lastAssessmentLogTs: number = 0;
   useIframeFallback = false;
   // Elephant-specific lightweight watchdog (patient side)
@@ -1670,6 +1672,76 @@ export class GameWrapperComponent implements OnInit, OnDestroy, OnChanges {
       document.body.appendChild(script);
     } catch (error) {
       console.error('Error in loadUnityDirectly:', error);
+    }
+  }
+
+  /**
+   * Ensure the Unity canvas always matches its container while
+   * preserving the authored 16:9 aspect ratio, including on
+   * the very first frame before any manual browser resize.
+   */
+  private setupUnityCanvasResize(canvasEl?: HTMLCanvasElement) {
+    const getCanvas = (): HTMLCanvasElement | null => {
+      if (canvasEl) {
+        return canvasEl;
+      }
+      if (this.unityCanvas && this.unityCanvas.nativeElement) {
+        return this.unityCanvas.nativeElement as HTMLCanvasElement;
+      }
+      const queried = document.querySelector('#unity-canvas') as HTMLCanvasElement | null;
+      return queried || null;
+    };
+
+    const resize = () => {
+      const canvas = getCanvas();
+      if (!canvas) {
+        return;
+      }
+
+      const parent = canvas.parentElement as HTMLElement | null;
+      if (!parent) {
+        return;
+      }
+
+      const parentRect = parent.getBoundingClientRect();
+      if (!parentRect.width || !parentRect.height) {
+        return;
+      }
+
+      const designRatio = 16 / 9;
+      let targetWidth = parentRect.width;
+      let targetHeight = targetWidth / designRatio;
+
+      if (targetHeight > parentRect.height) {
+        targetHeight = parentRect.height;
+        targetWidth = targetHeight * designRatio;
+      }
+
+      // Apply CSS size
+      canvas.style.width = `${targetWidth}px`;
+      canvas.style.height = `${targetHeight}px`;
+
+      // Also update the actual canvas resolution so Unity's
+      // internal viewport matches the visible size.
+      canvas.width = targetWidth;
+      canvas.height = targetHeight;
+
+      // Try to notify Unity's Module, if exposed
+      try {
+        const mod = (this.unityInstance as any)?.Module;
+        if (mod && typeof mod.setCanvasSize === 'function') {
+          mod.setCanvasSize(targetWidth, targetHeight, false);
+        }
+      } catch (_) {}
+    };
+
+    // Run once immediately
+    resize();
+
+    // Register global resize listener once
+    if (!this.unityResizeHandler) {
+      this.unityResizeHandler = resize;
+      window.addEventListener('resize', this.unityResizeHandler);
     }
   }
 

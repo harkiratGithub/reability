@@ -72,7 +72,9 @@ video[id^="grill-video-"].unity-game-canvas {
   width: 100%;
   background-repeat: no-repeat;
   background-size: cover;
-  overflow: hidden;
+  /* Allow scroll instead of clipping when viewport is short */
+  overflow-x: hidden;
+  overflow-y: auto;
 
   .header-container {
     display: flex;
@@ -293,6 +295,15 @@ video[id^="grill-video-"].unity-game-canvas {
   }
 }
 
+/* On shorter viewports, hide the cream card background below the game
+   ONLY for the Grill game so other games keep their normal card. */
+@media (max-height: 800px) {
+  .game-wrapper.grill-wrapper .game-container .outer-border .content-background {
+    background: transparent;
+    box-shadow: none;
+  }
+}
+
 .game-wrapper-mobile {
   height: 100%;
   width: 100%;
@@ -426,3 +437,4 @@ video[id^="grill-video-"].unity-game-canvas {
     object-fit: contain; /* Show full game without cropping */
   }
 }
+
