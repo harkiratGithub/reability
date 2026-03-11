@@ -589,7 +589,23 @@ export class GameWrapperComponent implements OnInit, OnDestroy, OnChanges {
     this.gotGameSettings = false;
     this.appActions.resetGameScore();
     this.appActions.stopTimer(false);
-    
+
+    // Ensure Unity audio is stopped when component is destroyed
+    try {
+      if (this.unityInstance && typeof this.unityInstance.Quit === 'function') {
+        this.unityInstance.Quit();
+      }
+      if (this.unityInstance && typeof this.unityInstance.SendMessage === 'function') {
+        this.unityInstance.SendMessage('WebGLAudioController', 'StopAllAudio');
+      }
+    } catch (_) {}
+    try {
+      const iframeUnityInstance = (this.iframeEl as any)?.contentWindow?.unityInstance;
+      if (iframeUnityInstance && typeof iframeUnityInstance.SendMessage === 'function') {
+        iframeUnityInstance.SendMessage('WebGLAudioController', 'StopAllAudio');
+      }
+    } catch (_) {}
+
     // Clean up Unity progress
     if (this.unityProgressInterval) {
       clearInterval(this.unityProgressInterval);

@@ -332,14 +332,13 @@ export class PatientListComponent implements OnInit, OnDestroy {
               } catch {}
             }
             
-            if (Number(a.therapist_id) === Number(this.therapistId)) {
-              console.log("====matching =======",a.therapist_id,acc);
-              //return acc; 
-            }
             // ✅ THERAPIST FILTER (IMPORTANT)
-            if (Number(a.therapist_id) !== Number(this.therapistId)) {
-              console.log("====skipping =======",a.therapist_id,acc);
-              return acc; 
+            // Skip only when there IS a therapist_id and it's not the current therapist.
+            if (a.therapist_id && Number(a.therapist_id) !== Number(this.therapistId)) {
+              console.log('====skipping=======', a.therapist_id, acc);
+              return acc;
+            } else {
+              console.log('====matching=======', a.therapist_id, acc);
             }
 
             // ✅ GET LAST CLEAR TIME
