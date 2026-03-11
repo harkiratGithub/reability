@@ -5,6 +5,7 @@ import { roleMainRoute } from 'src/app/routes';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AlertService } from '../../services/alert.service';
 import { AjaxService } from 'src/app/therapist/services/ajax.service';
+import { AuthenticationService } from '../../services/authentication.service';
 
 @Component({
   selector: 'app-two-factor-auth-verify',
@@ -27,7 +28,8 @@ export class TwoFactorAuthVerifyComponent implements OnInit {
     private ajax: AjaxService,
     private snackBar: MatSnackBar,
     private cdRef: ChangeDetectorRef,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private authService: AuthenticationService
   ) {}
 
   async ngOnInit() {
@@ -165,5 +167,9 @@ export class TwoFactorAuthVerifyComponent implements OnInit {
     if (event.key === 'Enter') {
       this.verifyCode();
     }
+  }
+
+  backToLogin(): void {
+    this.authService.logout();
   }
 }

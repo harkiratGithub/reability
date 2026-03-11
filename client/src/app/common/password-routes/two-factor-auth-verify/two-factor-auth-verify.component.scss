@@ -61,7 +61,9 @@
 }
 
 .two-factor-auth-container {
+  position: relative;
   padding: 20px;
+  padding-bottom: 50px;
   text-align: center;
   border-radius: 12px;
   background-color: #0e191f;
@@ -148,6 +150,14 @@ button:hover {
 
 .submit-btn {
   background-color: #363f47;
+}
+
+.submit-btn.ready {
+  background-color: #28a745;
+}
+
+.submit-btn.ready:hover {
+  background-color: #28a745;
 }
 
 .resend-btn {
@@ -283,6 +293,25 @@ h3 {
 
 .reverify-link:hover {
   text-decoration: underline;
+}
+
+.bottom-links-row {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+
+  .reverify-link {
+    display: inline;
+    text-align: left;
+    margin: 0;
+  }
+
+  .back-to-login-link {
+    margin-left: auto;
+  }
 }
 
 .reverify-message {
