@@ -147,6 +147,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
   hasValidProperties(object: any): boolean {
     // console.log("Property: ", object, Object.values(object));
     return Object.values(object).some((value) => value !== null && value !== undefined && typeof value !== 'object');
+    return Object.values(object).some((value) => value !== null && value !== undefined && typeof value !== 'object');
   }
 
   setFilteredData = (filteredData: any[]) => (this.patientListFiltered = filteredData);
@@ -332,13 +333,14 @@ export class PatientListComponent implements OnInit, OnDestroy {
               } catch {}
             }
             
+            if (Number(a.therapist_id) === Number(this.therapistId)) {
+              console.log("====matching =======",a.therapist_id,acc);
+              //return acc; 
+            }
             // ✅ THERAPIST FILTER (IMPORTANT)
-            // Skip only when there IS a therapist_id and it's not the current therapist.
-            if (a.therapist_id && Number(a.therapist_id) !== Number(this.therapistId)) {
-              console.log('====skipping=======', a.therapist_id, acc);
-              return acc;
-            } else {
-              console.log('====matching=======', a.therapist_id, acc);
+            if (Number(a.therapist_id) !== Number(this.therapistId)) {
+              console.log("====skipping =======",a.therapist_id,acc);
+              return acc; 
             }
 
             // ✅ GET LAST CLEAR TIME
