@@ -71,7 +71,11 @@ export class AuthenticationService implements OnDestroy {
       // Store user info before clearing
       const currentUser = this.currentUserValue;
 
-      // Proceed with logout
+      // Stop heartbeat before destroying the server session to avoid
+      // a race condition where the heartbeat fires during logout and
+      // triggers a 401 → "Session terminated" modal
+      this.closeHeartBeatInterval();
+
       await this.ajax.logout().toPromise();
 
       // Log success to New Relic if available
@@ -94,7 +98,6 @@ export class AuthenticationService implements OnDestroy {
     } finally {
       // Clear user data and navigate to login
       this.currentUserSubject.next(null);
-      this.closeHeartBeatInterval();
       this.router.navigate([ROUTES.LOGIN]);
     }
   };
