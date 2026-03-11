@@ -72,7 +72,10 @@ video[id^="grill-video-"].unity-game-canvas {
   width: 100%;
   background-repeat: no-repeat;
   background-size: cover;
-  overflow: hidden;
+  /* Let the page scroll vertically instead of clipping the game
+     on shorter viewports, but never scroll horizontally. */
+  overflow-x: hidden;
+  overflow-y: auto;
 
   .header-container {
     display: flex;
