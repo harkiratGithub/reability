@@ -332,17 +332,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
               } catch {}
             }
             
-            if (Number(a.therapist_id) === Number(this.therapistId)) {
-              console.log("====matching =======",a.therapist_id,acc);
-              //return acc; 
-            }
-            // ✅ THERAPIST FILTER (IMPORTANT)
-            if (Number(a.therapist_id) !== Number(this.therapistId)) {
-              console.log("====skipping =======",a.therapist_id,acc);
-              return acc; 
-            }
-
-            // ✅ GET LAST CLEAR TIME
+            // GET LAST CLEAR TIME - skip rows older than the last log-clear timestamp
             const clearKey = `LAST_CLEAR_${this.therapistId}_${patient.userId}`;
             const clearDataRaw = localStorage.getItem(clearKey);
 
@@ -357,7 +347,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
                 console.log("===deletedAt===",deletedAt);
                 console.log("===activityTime===",activityTime);
                 if (activityTime <= deletedAt) {
-                  //return acc;
+                  return acc;
                 }
 
               } catch (e) {
@@ -368,35 +358,49 @@ export class PatientListComponent implements OnInit, OnDestroy {
             if (!a.duration) {
               return acc;
             }
-  
+
+            // Always accumulate duration for ALL rows so the day shows as active.
             acc.duration = addTwoDurationTimeTogether(acc.duration, a.duration);
-            acc.withTherapistSession = (a && a.therapist_session_id) || acc.withTherapistSession;
-  
-            const seconds = getSecondsFromTimeString(a.duration);
-            if (seconds < this.minDurationToShowOnTooltip) {
-              return acc;
-            }  
-            if (!this?.allGames || this?.allGames.length === 0) {
-              return acc;
-            }  
-            const game = this?.allGames.find((game) => game.id === a.game_id);
-            if (!game) {
-              return acc;
-            }  
-            const gameName = game ? game.name : a.game_id.toString();
-            const sessionFeedback = a.session_feedback;
-            const gameSummary = summary;  
-            const gameDuration = acc.gamesDuration.find((g) => g.gameName === gameName);
-            if (gameDuration) {
-              gameDuration.duration = addTwoDurationTimeTogether(gameDuration.duration, a.duration);
+
+            const isMatchingTherapist = Number(a.therapist_id) === Number(this.therapistId);
+
+            if (isMatchingTherapist) {
+              // MATCHING: therapist_id matches → supervised session (TR).
+              // Accumulate into gamesDuration and mark withTherapistSession.
+              console.log("====matching =======", a.therapist_id, acc);
+              acc.withTherapistSession = true;
+
+              const seconds = getSecondsFromTimeString(a.duration);
+              if (seconds < this.minDurationToShowOnTooltip) {
+                return acc;
+              }
+              if (!this?.allGames || this?.allGames.length === 0) {
+                return acc;
+              }
+              const game = this?.allGames.find((game) => game.id === a.game_id);
+              if (!game) {
+                return acc;
+              }
+              const gameName = game ? game.name : a.game_id.toString();
+              const sessionFeedback = a.session_feedback;
+              const gameSummary = summary;
+              const gameDuration = acc.gamesDuration.find((g) => g.gameName === gameName);
+              if (gameDuration) {
+                gameDuration.duration = addTwoDurationTimeTogether(gameDuration.duration, a.duration);
+              } else {
+                acc.gamesDuration.push({
+                  gameName,
+                  duration: a.duration,
+                  gameSummary,
+                  sessionFeedback,
+                  start_time: a.start_time
+                });
+              }
             } else {
-              acc.gamesDuration.push({
-                gameName,
-                duration: a.duration,
-                gameSummary,
-                sessionFeedback,
-                start_time: a.start_time
-              });
+              // NOT MATCHING: therapist_id does not match → unsupervised session.
+              // Duration is already accumulated above so the day shows as active (V).
+              // Do NOT set withTherapistSession or push to gamesDuration.
+              console.log("====not matching (unsupervised) =======", a.therapist_id, acc);
             }
   
             return acc;
