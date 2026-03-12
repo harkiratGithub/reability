@@ -47,8 +47,6 @@ enum TechIssueValues {
 enum PatientAvailabilityStatus {
 	UNAVAILABLE = 'unavailable',
 	AVAILABLE = 'available',
-	DO_NOT_DISTURB = 'do_not_disturb',
-	OFFLINE = 'offline'
 }
 
 const squelPostgres = squel.useFlavour('postgres');

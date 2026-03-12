@@ -2301,9 +2301,7 @@ private messageTimeout: any;
     // For mobile devices, wait 22 seconds before making available
     if (this.isMobile) {
       setTimeout(() => {
-        if (!this.currentUser.isDoNotDisturb) {
-          this.updatePatientAvailabilityStatus('available');
-        }
+        this.updatePatientAvailabilityStatus('available');
       }, 22000);
     }
 
@@ -2313,8 +2311,7 @@ private messageTimeout: any;
       const checkModelInterval = setInterval(() => {
         if (
           this.webCamSkeletonService.modelInitialized &&
-          this.posenetLoadingTimePassed &&
-          !this.currentUser.isDoNotDisturb
+          this.posenetLoadingTimePassed
         ) {
           this.updatePatientAvailabilityStatus('available');
           clearInterval(checkModelInterval);
@@ -4089,7 +4086,7 @@ private messageTimeout: any;
     }
   };
 
-  updatePatientAvailabilityStatus(status: 'offline' | 'unavailable' | 'available' | 'do_not_disturb') {
+  updatePatientAvailabilityStatus(status: 'unavailable' | 'available') {
     // console.log('updateP7');
     // console.log('currentUser', this.currentUser, this.currentUser?.patientId, 'status', status);
     if (this.currentUser?.patientId) {

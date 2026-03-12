@@ -232,8 +232,7 @@ export interface IPatient {
   techReason?: string;
   hasCamera?: boolean;
   disabledSkeleton?: boolean;
-  availabilityStatus: 'offline' | 'unavailable' | 'available' | 'do_not_disturb';
-  isDoNotDisturb?: boolean;
+  availabilityStatus: 'unavailable' | 'available';
 }
 
 export interface ILogValueChange {

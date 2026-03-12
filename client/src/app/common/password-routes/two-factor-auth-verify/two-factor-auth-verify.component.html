@@ -52,16 +52,8 @@
         <button class="btn enable-btn" (click)="viewTab = 'verifyOtp'">Verify Now</button>
       </div>
 
-      <a
-        href="javascript:void(0)"
-        class="reverify-link"
-        *ngIf="viewTab != 'generatedQR' && !isReverifyClicked"
-        (click)="reverifyAccount()"
-        >Re-Verify your account</a
-      >
-
       <!-- <p *ngIf="viewTab != 'generatedQR' && !isReverifyClicked" class="reverify-message">
-        If you have any issues related to verifying your OTP, please contact 
+        If you have any issues related to verifying your OTP, please contact
         <a href="mailto:yoramfeld@gmail.com" class="contact-link"><br><br>yoramfeld&#64;gmail.com</a>
       </p> -->
 
@@ -81,7 +73,17 @@
           (keypress)="isNumberKey($event)"
           (keydown)="onEnter($event)"
         />
-        <button type="submit" class="btn submit-btn" (click)="verifyCode()">Submit</button>
+        <button type="submit" class="btn submit-btn" [class.ready]="verificationCode.length === 6" (click)="verifyCode()">Submit</button>
+      </div>
+
+      <div class="bottom-links-row">
+        <a
+          href="javascript:void(0)"
+          class="reverify-link"
+          *ngIf="viewTab != 'generatedQR' && !isReverifyClicked"
+          (click)="reverifyAccount()"
+        >Re-Verify your account</a>
+        <a class="reverify-link back-to-login-link" (click)="backToLogin()">Back to Login</a>
       </div>
     </div>
   </div>

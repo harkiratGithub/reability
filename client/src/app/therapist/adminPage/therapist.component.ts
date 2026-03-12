@@ -404,22 +404,10 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     // Check if patient is available before allowing ring
-    if (!user.availabilityStatus || user.availabilityStatus !== 'available') {
-      let message = 'Patient is not available for video call';
-      if (user.availabilityStatus === 'do_not_disturb') {
-        message = 'Patient has enabled Do Not Disturb mode';
-      } else if (user.availabilityStatus === 'offline') {
-        message = 'Patient is offline';
-      } else if (user.availabilityStatus === 'unavailable') {
-        message = 'Patient is unavailable';
-      } else {
-        message = 'Patient status is unknown';
-      }
-      // console.log('[Therapist Session] Cannot start session:', {
-      //   reason: message,
-      //   patientStatus: user.availabilityStatus,
-      //   patientId: user.id,
-      // });
+    if (user.availabilityStatus !== 'available') {
+      const message = user.availabilityStatus === 'unavailable'
+        ? 'Patient is unavailable'
+        : 'Patient status is unknown';
       this.appActions.setMessageRTMModal(message);
       return;
     }
@@ -1722,6 +1710,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
               if (availablePatient) {
                 patient.hasCamera = availablePatient.has_camera;
                 patient.availabilityStatus = availablePatient.availability_status ?? 'unavailable';
+                patient.peerStatus = availablePatient.peerStatus;
                 patient.isMobile = availablePatient.is_mobile;
                 console.log('[Therapist] Updated patient status:', {
                   patientId: patient.peerId,
@@ -2349,21 +2338,13 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
 
   getPatientStatusIcon(user: User): string {
     if (user.availabilityStatus === 'unavailable') {
-      return 'hourglass_empty'; // Shows a person with a slash through it
+      return 'hourglass_empty';
     }
-    if (user.availabilityStatus === 'do_not_disturb') {
-      return 'do_not_disturb'; // Red DND icon
-    }
-    if (user.availabilityStatus === 'offline') {
-      return 'offline_pin'; // Shows an offline status icon
-    }
-    return ''; // Empty hourglass for available/waiting status
+    return '';
   }
 
   getPatientStatusClass(user: User): string {
-    if (user.availabilityStatus === 'unavailable' ||
-      user.availabilityStatus === 'do_not_disturb' ||
-      user.availabilityStatus === 'offline') {
+    if (user.availabilityStatus === 'unavailable') {
       return '';
     }
     return '';

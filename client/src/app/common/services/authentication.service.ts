@@ -71,20 +71,11 @@ export class AuthenticationService implements OnDestroy {
       // Store user info before clearing
       const currentUser = this.currentUserValue;
 
-      if (currentUser?.patientId) {
-        console.log('Updating patient status to offline before logout', currentUser.patientId);
-        try {
-          // Update status to offline first
-          await this.ajax.updatePatientAvailabilityStatus(currentUser.patientId, 'offline').toPromise();
-          // Add a small delay to ensure the status update completes
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-        } catch (statusError) {
-          console.error('Failed to update patient status:', statusError);
-          // Continue with logout even if status update fails
-        }
-      }
+      // Stop heartbeat before destroying the server session to avoid
+      // a race condition where the heartbeat fires during logout and
+      // triggers a 401 → "Session terminated" modal
+      this.closeHeartBeatInterval();
 
-      // Then proceed with logout
       await this.ajax.logout().toPromise();
 
       // Log success to New Relic if available
@@ -107,7 +98,6 @@ export class AuthenticationService implements OnDestroy {
     } finally {
       // Clear user data and navigate to login
       this.currentUserSubject.next(null);
-      this.closeHeartBeatInterval();
       this.router.navigate([ROUTES.LOGIN]);
     }
   };
