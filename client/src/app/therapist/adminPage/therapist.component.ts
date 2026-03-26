@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, ViewChild, AfterViewInit, HostListener } from '@angular/core';
 import { first, debounceTime, distinctUntilChanged, map, mergeMap, delay } from 'rxjs/operators';
 import { FormControl } from '@angular/forms';
 import { Subject, Subscription, of, Observable } from 'rxjs';
@@ -118,6 +118,8 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
   sendEmailTimeoutConnection;
   InstituteLogo: string;
   isPatientOnMobile: boolean = false;
+  showLogoutDropdown = false;
+  showEmergencyDropdown = false;
   isRdpModalOpen = false;
   patientId: string = '';
   rustdeskId: string | null = null;
@@ -142,7 +144,8 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
     private http: HttpClient,
   ) {
     this.connectedTherapist = this.authenticationService.currentUserValue;
-    this.InstituteLogo = this.connectedTherapist?.instituteLogo || '';
+    // Force use of the new static SVG logo in the header
+    this.InstituteLogo = 'assets/therapist/icon_search.svg';
     this.subscription.add(
       this.keyUp
         .pipe(
@@ -322,6 +325,33 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
         console.warn('Failed to save RustDesk ID:', error);
       }
     );
+  }
+
+  toggleLogoutDropdown(event: MouseEvent) {
+    event.stopPropagation();
+    this.showLogoutDropdown = !this.showLogoutDropdown;
+    if (this.showLogoutDropdown) {
+      this.showEmergencyDropdown = false;
+    }
+  }
+
+  toggleEmergencyDropdown(event: MouseEvent) {
+    event.stopPropagation();
+    this.showEmergencyDropdown = !this.showEmergencyDropdown;
+    if (this.showEmergencyDropdown) {
+      this.showLogoutDropdown = false;
+    }
+  }
+
+  onLogoutClick() {
+    this.showLogoutDropdown = false;
+    this.logout();
+  }
+
+  @HostListener('document:click')
+  closeLogoutDropdownOnOutsideClick() {
+    this.showLogoutDropdown = false;
+    this.showEmergencyDropdown = false;
   }
 
   redirectToHome(conn) {

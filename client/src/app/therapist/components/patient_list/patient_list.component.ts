@@ -55,7 +55,7 @@ export class PatientListComponent implements OnInit, OnDestroy {
   selectedPatientId: string = '';
   filterFunc: (data: [], text: string) => void;
   peersStatusConst = PeersStatus;
-  headerMessage = 'For game settings, click on one of the icons:';
+  headerMessage = 'Game settings:';
   allGames: IGame[];
   minDurationToShowOnTooltip = 30;
   shownLogs = {};

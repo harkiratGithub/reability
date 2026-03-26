@@ -1,7 +1,7 @@
 export const displayConstanst = {
   no_session_place_holder_text: {
-    title: 'No patient selected',
-    subtitle: 'Please choose one to create a session',
+    title: 'No Patient Selected',
+    subtitle: 'Start a therapy session by selecting a patient from the list.',
   },
   no_response_from: 'NO RESPONSE FROM',
 };

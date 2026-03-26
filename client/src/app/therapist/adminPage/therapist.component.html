@@ -1,36 +1,76 @@
 <div class="main-menu-container">
-  <div class="header">
-    <div class="left" *ngIf="!InstituteLogo">
-      <img class="logo" src="assets/main-menu/beyond.png" />
-      <img class="logo" src="assets/main-menu/svg-cards/gertner_logo1.png"/>
+  <div class="header">    <div class="left" >
+      <img class="company-logo" src="../../../assets/therapist/TG-logo-white.png" />
     </div>
-    <div class="left" *ngIf="InstituteLogo">
+    <!-- <div class="left" *ngIf="InstituteLogo">
       <img class="web-logo" [src]="InstituteLogo" />
-    </div>
+    </div> -->
 
     <div class="middle">
-      <p>Emergency numbers:</p>
-      <p>03-5303595 (day time)</p>
-      <p>052-6666599 (evening time)</p>
-    </div>
-    <div class="right">
-      <div class="user-name">
-        {{ connectedTherapist.username || '' }}
-      </div>
-      <div class="tabs">
+      <div class="middle-inner">
+        <div class="tabs">
         <div class="tab" [ngClass]="{ 'not-active': !isCurrentTab(tabOptions.session) }" (click)="setCurrentTab(tabOptions.session)">
-          sessions
+          Sessions
         </div>
         <div class="tab" [ngClass]="{ 'not-active': !isCurrentTab(tabOptions.patient_list) }" (click)="setCurrentTab(tabOptions.patient_list)">
-          patient list
+          Patient List
         </div>
         <div class="tab" [ngClass]="{ 'not-active': !isCurrentTab(tabOptions.schedule) }" (click)="setCurrentTab(tabOptions.schedule)">
-          schedule
+          Schedule
         </div>
       </div>
-      <div class="logout-container" (click)="logout()">
-        <img class="log-out-image" src="assets/main-menu/svg-cards/log_out.svg" />
-        Log out
+      </div>
+    </div>
+    <div class="right">
+      <div class="info-button-wrapper">
+        <button
+          type="button"
+          class="info-button"
+          (click)="toggleEmergencyDropdown($event)"
+        >
+          i
+        </button>
+        <div class="info-dropdown" *ngIf="showEmergencyDropdown">
+          <p class="info-title">Emergency numbers:</p>
+          <p class="info-line">03-5303595 (day time)</p>
+          <p class="info-line">052-6666599 (evening time)</p>
+        </div>
+      </div>
+      <div class="profile-pill-wrapper">
+        <button
+          type="button"
+          class="profile-pill"
+          (click)="toggleLogoutDropdown($event)"
+        >
+          <span class="profile-pill-avatar">
+            <span class="pill-avatar-icon">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M7.99996 7.99996C9.47329 7.99996 10.6666 6.80663 10.6666 5.33329C10.6666 3.85996 9.47329 2.66663 7.99996 2.66663C7.99996 2.66663 5.33329 3.85996 5.33329 5.33329C5.33329 5.33329 6.52663 7.99996 7.99996 7.99996ZM7.99996 9.33329C6.21996 9.33329 2.66663 10.2266 2.66663 12V13.3333H13.3333V12C13.3333 10.2266 9.77996 9.33329 7.99996 9.33329Z"
+                  fill="white"
+                />
+              </svg>
+            </span>
+          </span>
+          <span class="profile-pill-id">
+            {{ connectedTherapist?.username || '' }}
+          </span>
+          <span class="profile-pill-arrow"></span>
+        </button>
+        <div class="profile-dropdown" *ngIf="showLogoutDropdown">
+          <button
+            type="button"
+            class="profile-dropdown-item"
+            (click)="onLogoutClick()"
+          >
+            Log out
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -40,14 +80,27 @@
         <div style="height: 100%" *ngIf="!isFullScreenMode">
           <div class="search">
             <div class="search-bar">
-              <input type="text" (keyup)="keyUp.next($event)" class="form-control" placeholder="Search By Name" />
-              <img src="../../../assets/therapist/icon_search.svg" />
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M14 14L10 10M11.3333 6.66667C11.3333 9.24227 9.24227 11.3333 6.66667 11.3333C4.09106 11.3333 2 9.24227 2 6.66667C2 4.09106 4.09106 2 6.66667 2C9.24227 2 11.3333 4.09106 11.3333 6.66667L14 14" stroke="white" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              <input
+                type="text"
+                (keyup)="keyUp.next($event)"
+                class="form-control"
+                placeholder="Search By Name"
+              />
+              <button class="search-arrow-btn" type="button">
+                <span class="arrow-icon"></span>
+              </button>
             </div>
           </div>
           <div class="patients-logged">
             <div class="summary">
-              <div class="description">LOGGED IN PATIENTS</div>
+              <div class="description">LOGGED-IN PATIENTS</div>
               <div class="count">{{ loggedInUserCount || 0 }}</div>
+            </div>
+            <div class="no-patients-copy" *ngIf="loggedInUserCount === 0">
+              No patients currently active
             </div>
             <div class="user" *ngFor="let user of filteredPatients" (click)="onSelect(user)" [ngClass]="{
                 selected: user === selectedUser,
@@ -65,6 +118,7 @@
               </div>
             </div>
           </div>
+          <div class="camera-section-divider"></div>
           <video *ngIf="therapistHasCamera" id="therapist-video" class="therapist-video" [ngClass]="{ 'hide-video': connectedPaitents.length > 0 || isCurrentTab(tabOptions.patient_list) }" playsinline autoplay muted></video>
           <div *ngIf="connectedPaitents.length === 0" class="camera-details">
             <div class="row-camera-details">
@@ -83,10 +137,14 @@
       <div class="data">
         <div class="session-container">
           <div class="no-sessions" *ngIf="connectedPaitents.length === 0">
-            <img class="no-session-image" src="../../../assets/therapist/empty_state_no_sessions.png" />
-            <div class="no-session-text">
+            <div class="no-session-card">
+              <div class="no-session-avatar">
+                <div class="avatar-icon"></div>
+              </div>
               <p class="no-session-title">{{ emptySessionText.title }}</p>
-              <p class="no-session-subtitle">{{ emptySessionText.subtitle }}</p>
+              <p class="no-session-subtitle">
+                {{ emptySessionText.subtitle }}
+              </p>
             </div>
           </div>
           <div *ngIf="connectedPaitents.length > 0" class="therapist-split-screen" [ngClass]="{ 'hide-session': videoSessionDisplay }">

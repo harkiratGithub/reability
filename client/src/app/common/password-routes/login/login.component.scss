@@ -3,7 +3,7 @@
 .main-menu-container {
   height: calc(100vh);
   width: calc(100vw);
-  background-color: #0e191f;
+  background-color: #D4F1FF;
 }
 .header {
   width: 100%;
@@ -59,8 +59,8 @@
   height: 60%;
 }
 .login-div-border-wrap {
-  background: linear-gradient(135deg, #848485 0%, #2b343b 49%);
-  padding: 2px;
+  background: transparent;
+  padding: 0;
   height: auto;
   min-width: 25vw;
   position: absolute;
@@ -98,15 +98,15 @@
 }
 .login-div {
   height: 100%;
-  width: 100%;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #3f4850 0%, #2b343b 100%);
-  box-sizing: border-box;
-  margin: 0;
-  padding: 20px 30px;
+    width: 100%;
+    border-radius: 8px;
+    background: #00486A;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 20px 30px;
 }
 .login-header {
-  color: #ececed;
+  color: #fff;
   font-family: 'Open Sans';
   font-size: 30px;
   font-weight: 300;
@@ -115,7 +115,7 @@
 }
 .login-tagline {
   margin: 0 0 3vh 0;
-  color: #ececed;
+  color: #fff;
   font-family: 'Open Sans';
   font-size: 20px;
   letter-spacing: 0;
@@ -130,12 +130,12 @@
 .form-group {
   font-size: 1.2rem;
   font-family: 'Roboto';
-  margin-bottom: 5vh;
+  margin-bottom: 1vh;
 }
 .field-header {
   margin: 0 0 8px 24px;
-  color: #ececed;
-  font-family: 'Open Sans';
+  color: #ffff;
+  font-family: Open Sans;
   font-size: 18px;
   font-weight: 600;
   letter-spacing: 0;
@@ -169,38 +169,39 @@
   width: 400px;
   border: none;
   border-radius: 36px;
-  background-color: #ff52a0;
+  background-color: #ffffff;
   color: #0e191f;
-  font-family: 'Open Sans';
+  font-family: Open Sans;
   font-size: 22px;
-  font-weight: bold;
+  font-weight: 700;
   letter-spacing: 0;
   line-height: 30px;
   text-align: center;
-  opacity: 0.2;
-  transition: background-color 0.3s, color 0.3s ease;
+  /* opacity: .2; */
+  transition: background-color .3s, color .3s ease;
   &.on {
     opacity: 1;
     cursor: pointer;
   }
   &.on:hover {
-    background-color: #f5006e;
-    color: #ffffff;
+    // background-color: #f5006e;
+    color: black;
   }
 }
 .form-control {
   box-sizing: border-box;
-  height: 8vh;
-  width: 100%;
-  padding-left: 24px;
-  border: none;
-  border-radius: 36px;
-  background-color: #0e191f;
-  color: #ffffff;
-  font-family: 'Open Sans';
-  font-size: 22px;
-  letter-spacing: 0;
-  line-height: 30px;
+    height: 8vh;
+    width: 100%;
+    padding-left: 24px;
+    border: none;
+    border-radius: 36px;
+    background-color: #ffffff24;
+    color: #fff ;
+    font-family: Open Sans;
+    font-size: 22px;
+    letter-spacing: 0;
+    line-height: 30px;
+    border: 1px solid #ffffff9c;
 }
 .input-error {
   border: 2px solid #f5003a;
@@ -308,7 +309,7 @@ input:focus {
 
 .main-menu-container-mobile {
   width: calc(100vw);
-  background-color: #0e191f;
+  background-color: #00486A;
 }
 .header-mobile {
   width: 100%;
@@ -364,7 +365,7 @@ input:focus {
   height: 60%;
 }
 .login-div-border-wrap-mobile {
-  padding: 2px;
+  padding: 0;
   margin: 20px;
   border-radius: 9px;
   box-shadow: 0 12px 12px 0 rgba(4, 17, 24, 0.6);
@@ -399,13 +400,13 @@ input:focus {
   height: 100%;
   width: 100%;
   border-radius: 8px;
-  background: linear-gradient(135deg, #3f4850 0%, #2b343b 100%);
+  background: #ffffff;
   box-sizing: border-box;
   margin: 0;
   padding: 20px 30px;
 }
 .login-header-mobile {
-  color: #ececed;
+  color: #000000;
   font-family: 'Open Sans';
   font-size: 30px;
   font-weight: 300;
@@ -415,7 +416,7 @@ input:focus {
 }
 .login-tagline-mobile {
   margin: 0 0 3vh 0;
-  color: #ececed;
+  color: #000000;
   font-family: 'Open Sans';
   letter-spacing: 0;
   line-height: 20px;
@@ -434,7 +435,7 @@ input:focus {
 }
 .field-header-mobile {
   margin: 0 0 8px 24px;
-  color: #ececed;
+  color: #000000;
   font-family: 'Open Sans';
   font-size: 18px;
   font-weight: 600;
@@ -468,7 +469,7 @@ input:focus {
   width: 400px;
   border: none;
   border-radius: 36px;
-  background-color: #ff52a0;
+  // background-color: #ff52a0;
   color: #0e191f;
   font-family: 'Open Sans';
   font-size: 22px;
@@ -483,8 +484,8 @@ input:focus {
     cursor: pointer;
   }
   &.on:hover {
-    background-color: #f5006e;
-    color: #ffffff;
+    // background-color: #f5006e;
+    color: black;
   }
 }
 .form-control-mobile {
@@ -494,8 +495,8 @@ input:focus {
   padding-left: 24px;
   border: none;
   border-radius: 36px;
-  background-color: #0e191f;
-  color: #ffffff;
+  background-color: #ffffff;
+  color: #000000;
   font-family: 'Open Sans';
   font-size: 22px;
   letter-spacing: 0;

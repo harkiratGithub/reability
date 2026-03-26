@@ -8,7 +8,7 @@
       placeholder="Search"
       [value]="filterBy"
     />
-    <img src="assets/backoffice/icon_back_office_search.svg" />
+    <!-- <img src="assets/backoffice/icon_back_office_search.svg" /> -->
   </div>
   <ng-container *ngFor="let filter of additionalFilters; index as i">
     <div class="filter" (click)="filter.filter(this.data)" [class.active]="filter.isActive">
