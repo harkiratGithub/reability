@@ -7,7 +7,7 @@
 	"scripts": {
 		"heroku-postbuild": "npm run config-angular && cd client && npm install --legacy-peer-deps && npm run postinstall-peerjs && npm run build",
 		"config-angular": "ts-node ./server/tasks/config-env.ts",
-		"start": "ts-node server/server.ts",
+		"start": "node --max-old-space-size=384 ./node_modules/ts-node/dist/bin.js --transpile-only server/server.ts",
 		"start:development": "npm run build:develop --prefix client && NODE_ENV=development NEW_RELIC_APP_NAME=Reability NEW_RELIC_LICENSE_KEY=fad76ee1ffddc459093b888a5d620588FFFFNRAL nodemon --experimental-loader=newrelic/esm-loader.mjs ./server/server.ts",
 		"start:client": "npm run start:dev --prefix client",
 		"start:production": "npm run build:develop --prefix client &&  NEW_RELIC_APP_NAME=Reability NEW_RELIC_LICENSE_KEY=fad76ee1ffddc459093b888a5d620588FFFFNRAL nodemon --experimental-loader=newrelic/esm-loader.mjs ./server/server.ts",
