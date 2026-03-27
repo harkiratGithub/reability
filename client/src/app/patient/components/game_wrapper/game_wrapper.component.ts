@@ -37,7 +37,6 @@ import { SkeletonProgressBarService } from '../../../common/services/skeleton-pr
 import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
 import { FeatureFlagService } from '../../../common/services/feature-flag.service';
-import { log } from 'console';
 
 // Unity WebGL Integration TypeScript Declarations
 declare global {

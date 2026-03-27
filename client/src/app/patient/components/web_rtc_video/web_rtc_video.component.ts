@@ -4293,9 +4293,9 @@ private messageTimeout: any;
     });
     
     // Method 3: Force garbage collection if available
-    if (window.gc) {
+    if ((window as any).gc) {
       // console.log('[SESSION DEBUG] Running garbage collection');
-      window.gc();
+      (window as any).gc();
     }
     
     // console.log('[SESSION DEBUG] Aggressive destroy completed');

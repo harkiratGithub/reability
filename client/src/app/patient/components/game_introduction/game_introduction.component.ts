@@ -5,7 +5,6 @@ import { Subscription, Observable } from 'rxjs';
 import { AppActions } from '../../../../app/app.actions';
 import { communicationUtil, MESSAGES } from '../../../common/services/communication_util.service';
 import { IScore } from '../../../../types';
-import { log } from 'console';
 
 @Component({
   selector: 'app-game-intro',

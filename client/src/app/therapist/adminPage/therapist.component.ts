@@ -40,7 +40,6 @@ import { SkeletonService } from 'src/app/common/services/skeleton.service';
 import { SkeletonProgressBarService } from 'src/app/common/services/skeleton-progress-bar.service';
 
 import { HttpClient } from '@angular/common/http';
-import { log } from 'console';
 declare var MediaRecorder: any;
 enum tabs {
   session,
