@@ -3,10 +3,10 @@ export const environment = {
     production: true,
     secretKey: 'gertner-little-secret',
     signalingServerPort: 443,
-    signalingServer: '192.168.1.3:3001',
-    signalingServerUrl: 'undefined',
+    signalingServer: 'signaling-demo.reabilityonline.com',
+    signalingServerUrl: 'https://signaling-demo.reabilityonline.com',
     recaptchaKey: '6Lc8yKspAAAAAAQ6ItzKFYZ-uJ5GG2PdWGtHZwhM',
     serverUrl: '',
-    gameIdWithComp: ['4', '9', '10', '15', '16'],
+    gameIdWithComp: undefined,
     
   };
